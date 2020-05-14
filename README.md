@@ -1,0 +1,2 @@
+# stern
+A strategy game
