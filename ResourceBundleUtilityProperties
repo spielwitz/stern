@@ -1,0 +1,7 @@
+#Resource Bunde Utlity
+#Tue May 12 20:50:38 CEST 2020
+propertiesFile=/Users/teabag123/Documents/eclipse-workspace/Stern/resources/SternResources_de_DE.properties
+outputPackageName=common
+outputClassPath=/Users/teabag123/Documents/eclipse-workspace/Stern/src/common
+outputClassName=SternResources
+outputClassFile=2
