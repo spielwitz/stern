@@ -2,6 +2,7 @@ bin
 *.jar
 jars
 README.txt
+ResourceBundleUtilityProperties
 SternClientProperties
 SternHighscores
 SternProperties
