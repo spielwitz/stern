@@ -1,0 +1,9 @@
+bin
+*.jar
+jars
+README.txt
+*Properties
+Stern*
+ServerData
+Users
+Web
