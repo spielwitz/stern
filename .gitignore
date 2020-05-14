@@ -2,8 +2,9 @@ bin
 *.jar
 jars
 README.txt
-*Properties
-Stern*
+SternClientProperties
+SternHighscores
+SternProperties
 ServerData
 Users
 Web
