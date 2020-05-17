@@ -14,33 +14,14 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package sternServer;
-
-import java.security.PrivateKey;
+package commonServer;
 
 import com.google.gson.Gson;
 
-import commonServer.LogEventType;
-import commonServer.RsaCrypt;
-import commonServer.ServerConstants;
-
-public class ServerConfiguration
+public class ResponseMessageGetLog
 {
-	public String url;
-	public int port;
-	public String adminEmail;
-	public LogEventType logLevel;
-	
-	public String serverPrivateKey; 
-	public String serverPublicKey;	
-	
-	public transient PrivateKey serverPrivateKeyObject;
-	
-	public ServerConfiguration()
-	{
-		this.port = ServerConstants.SERVER_PORT;
-		this.logLevel = LogEventType.valueOf(ServerConstants.SERVER_LOGLEVEL);
-	}
+	public String fileName;
+	public String logCsv;
 	
 	public String toJson()
 	{
@@ -48,14 +29,11 @@ public class ServerConfiguration
 		return gson.toJson(this);
 	}
 	
-	public static ServerConfiguration fromJson(String json) throws Exception
+	public static ResponseMessageGetLog fromJson(String json)
 	{
 		Gson gson = new Gson();
-		ServerConfiguration sc = gson.fromJson(json, ServerConfiguration.class);
+		ResponseMessageGetLog obj = gson.fromJson(json, ResponseMessageGetLog.class);
 		
-		sc.serverPrivateKeyObject = RsaCrypt.decodePrivateKeyFromBase64(sc.serverPrivateKey);
-		
-		return sc;
-	}
-	
+		return obj;
+	}	
 }

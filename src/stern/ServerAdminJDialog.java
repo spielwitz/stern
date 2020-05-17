@@ -28,7 +28,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -49,16 +51,23 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import common.ReleaseGetter;
 import common.SternResources;
+import common.Utils;
 import commonServer.ClientUserCredentials;
+import commonServer.LogEventType;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageChangeUser;
+import commonServer.RequestMessageSetLogLevel;
 import commonServer.RequestMessageType;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGetUsers;
 import commonServer.ResponseMessageChangeUser;
+import commonServer.ResponseMessageGetLog;
+import commonServer.ResponseMessageGetServerStatus;
 import commonServer.ServerUtils;
 import commonUi.ButtonDark;
+import commonUi.ComboBoxDark;
 import commonUi.DialogFontHelper;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
@@ -78,6 +87,14 @@ public class ServerAdminJDialog extends JDialog
 	private ButtonDark butAddUser;
 	private ButtonDark butDeleteUser;
 	private ButtonDark butRefreshUserList;
+	private ButtonDark butServerLogDownload;
+	private ButtonDark butServerLogLevelChange;
+	private ButtonDark butServerStatusRefresh;
+	
+	private TextFieldDark tfServerStartDate;
+	private TextFieldDark tfServerLogSize;
+	private TextFieldDark tfServerBuild;
+	private ComboBoxDark<String> comboServerLogLevel;
 	private LabelDark labPing;
 	private LabelDark labAuthUrl;
 	private LabelDark labAuthPort;
@@ -186,12 +203,60 @@ public class ServerAdminJDialog extends JDialog
 		
 		PanelDark panShutdown = new PanelDark(new BorderLayout(10, 10));
 		
-		PanelDark panButtonsShutdown = new PanelDark(new FlowLayout());
+		GroupBoxDark panServerStatusGroup = new GroupBoxDark(SternResources.ServerStatus(false), font);
 		
+		PanelDark panServerStatus = new PanelDark(new SpringLayout());
+		
+		panServerStatus.add(new LabelDark(SternResources.ServerBuild(false), font));
+		this.tfServerBuild = new TextFieldDark(font, 30);
+		this.tfServerBuild.setEditable(false);
+		panServerStatus.add(this.tfServerBuild);
+		panServerStatus.add(new LabelDark("", font));
+		
+		panServerStatus.add(new LabelDark(SternResources.ServerLaeuftSeit(false), font));
+		this.tfServerStartDate = new TextFieldDark(font, 30);
+		this.tfServerStartDate.setEditable(false);
+		panServerStatus.add(this.tfServerStartDate);
 		this.butShutdown = new ButtonDark(this, SternResources.ServerAdminShutdown(false), font);
-		panButtonsShutdown.add(this.butShutdown);
+		panServerStatus.add(this.butShutdown);
 		
-		panShutdown.add(panButtonsShutdown, BorderLayout.CENTER);
+		panServerStatus.add(new LabelDark(SternResources.ServerLogGroesse(false), font));
+		this.tfServerLogSize = new TextFieldDark(font, 30);
+		this.tfServerLogSize.setEditable(false);
+		panServerStatus.add(this.tfServerLogSize);
+		this.butServerLogDownload = new ButtonDark(this, SternResources.ServerLogDownload(false), font);
+		panServerStatus.add(this.butServerLogDownload);
+		
+		panServerStatus.add(new LabelDark(SternResources.ServerLogLevel(false), font));
+		
+		String[] logLevels = new String[LogEventType.values().length];
+		int counter = 0;
+		for (LogEventType logEventType: LogEventType.values())
+		{
+			logLevels[counter] = logEventType.toString();
+			counter++;
+		}
+		
+		this.comboServerLogLevel = new ComboBoxDark<String>(logLevels, font);
+		panServerStatus.add(this.comboServerLogLevel);
+		this.butServerLogLevelChange = new ButtonDark(this, SternResources.ServerLogLevelAendern(false), font);
+		panServerStatus.add(this.butServerLogLevelChange);
+		
+		SpringUtilities.makeCompactGrid(panServerStatus,
+			      4, 3, //rows, cols
+			      10, 10, //initialX, initialY
+			      10, 10);//xPad, yPad
+		
+		panServerStatusGroup.add(panServerStatus);
+		
+		panShutdown.add(panServerStatusGroup, BorderLayout.NORTH);
+		
+		PanelDark panServerStatusButtons = new PanelDark(new FlowLayout());
+		
+		this.butServerStatusRefresh = new ButtonDark(this, SternResources.ServerStatusAktualisieren(false), font);
+		panServerStatusButtons.add(this.butServerStatusRefresh);
+		
+		panShutdown.add(panServerStatusButtons, BorderLayout.CENTER);
 		
 		panShutdownOuter.add(panShutdown);
 		
@@ -200,7 +265,7 @@ public class ServerAdminJDialog extends JDialog
 			      10, 10, //initialX, initialY
 			      0, 0);//xPad, yPad
 		
-		tabpane.addTab(SternResources.ServerAdminShutdown(false), panShutdownOuter);
+		tabpane.addTab(SternResources.ServerStatus(false), panShutdownOuter);
 		
 		// ---------------
 		PanelDark panAuthOuter = new PanelDark(new SpringLayout());
@@ -411,6 +476,18 @@ public class ServerAdminJDialog extends JDialog
 		else if (source == this.butDeleteUser)
 		{
 			this.userDelete();
+		}
+		else if (source == this.butServerStatusRefresh)
+		{
+			this.serverStatusRefresh();
+		}
+		else if (source == this.butServerLogDownload)
+		{
+			this.serverLogDownload();
+		}
+		else if (source == this.butServerLogLevelChange)
+		{
+			this.serverLogLevelChange();
 		}
 	}
 	
@@ -652,6 +729,99 @@ public class ServerAdminJDialog extends JDialog
 					this, 
 					SternResources.ServerAdminUserDeleted(false, userId), 
 					SternResources.ServerAdminSpieler(false),
+					JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+	
+	private void serverStatusRefresh()
+	{
+		RequestMessage requestMessage = new RequestMessage(RequestMessageType.ADMIN_GET_SERVER_STATUS);
+		
+		ResponseMessage respMsg = this.sendAndReceive(requestMessage, true);
+		
+		if (!respMsg.error)
+		{
+			ResponseMessageGetServerStatus respMsgPayload = ResponseMessageGetServerStatus.fromJson(respMsg.payloadSerialized);
+			
+			this.tfServerBuild.setText(ReleaseGetter.format(respMsgPayload.build));
+			this.tfServerStartDate.setText(ReleaseGetter.format(Utils.millisecondsToString(respMsgPayload.serverStartDate)));
+			this.tfServerLogSize.setText(respMsgPayload.logSizeBytes + " Bytes");
+			this.comboServerLogLevel.setSelectedItem(respMsgPayload.logLevel.toString());
+		}
+	}
+	
+	private void serverLogDownload()
+	{
+		RequestMessage requestMessage = new RequestMessage(RequestMessageType.ADMIN_GET_LOG);
+		
+		ResponseMessage respMsg = this.sendAndReceive(requestMessage, true);
+		
+		if (!respMsg.error)
+		{
+			ResponseMessageGetLog respMsgPayload = ResponseMessageGetLog.fromJson(respMsg.payloadSerialized);
+			
+			if (respMsgPayload.fileName != null && respMsgPayload.logCsv != null && respMsgPayload.logCsv.length() > 0)
+			{			
+				FileDialog fd = new FileDialog(this, "Log-Datei speichern", FileDialog.SAVE);
+				fd.setFile(respMsgPayload.fileName);
+				
+				fd.setVisible(true);
+				
+				String dirname = fd.getDirectory();
+				String filename = fd.getFile();
+				
+				if (filename != null)
+				{
+					File file = new File(dirname, filename);
+					
+					try
+					{
+						BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
+					    writer.write(respMsgPayload.logCsv);
+					     
+					    writer.close();
+					}
+					catch (Exception x) {}
+				}
+			}
+			else
+				JOptionPane.showMessageDialog(
+						this, 
+						SternResources.ServerLogLeer(false), 
+						SternResources.ServerLogDownload(false),
+						JOptionPane.INFORMATION_MESSAGE);
+			
+			//respMsgPayload.fileName
+		}
+	}
+	
+	private void serverLogLevelChange()
+	{
+		String newLogLevel = (String) this.comboServerLogLevel.getSelectedItem();
+		
+		int dialogResult = JOptionPane.showConfirmDialog(this,
+				SternResources.ServerLogLevelAendernAYS(false, newLogLevel),
+			    SternResources.ServerLogLevelAendern(false),
+			    JOptionPane.YES_NO_OPTION);
+		
+		if (dialogResult != JOptionPane.YES_OPTION)
+			return;
+		
+		RequestMessage requestMessage = new RequestMessage(RequestMessageType.ADMIN_SET_LOG_LEVEL);
+		
+		RequestMessageSetLogLevel requestMessagePayload = new RequestMessageSetLogLevel();
+		requestMessagePayload.logLevel = LogEventType.valueOf(newLogLevel);
+		
+		requestMessage.payloadSerialized = requestMessagePayload.toJson();
+		
+		ResponseMessage respMsg = this.sendAndReceive(requestMessage, true);
+		
+		if (!respMsg.error)
+		{
+			JOptionPane.showMessageDialog(
+					this, 
+					SternResources.ServerLogLevelAendernErfolg(false), 
+					SternResources.ServerLogLevelAendern(false),
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}

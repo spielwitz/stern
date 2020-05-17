@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: FU
+		// Hoechstes vergebenes Symbol: GF
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -543,6 +543,17 @@ public class SternResources
 		symbolDict.put("FS","MenuEmail_FS");
 		symbolDict.put("FT","EmailErzeugen_FT");
 		symbolDict.put("FU","EmailUnbekannt_FU");
+		symbolDict.put("FV","ServerStatus_FV");
+		symbolDict.put("FW","ServerBuild_FW");
+		symbolDict.put("FX","ServerLaeuftSeit_FX");
+		symbolDict.put("FY","ServerLogGroesse_FY");
+		symbolDict.put("FZ","ServerLogDownload_FZ");
+		symbolDict.put("GA","ServerLogLevel_GA");
+		symbolDict.put("GB","ServerLogLevelAendern_GB");
+		symbolDict.put("GC","ServerStatusAktualisieren_GC");
+		symbolDict.put("GD","ServerLogLevelAendernAYS_GD");
+		symbolDict.put("GE","ServerLogLevelAendernErfolg_GE");
+		symbolDict.put("GF","ServerLogLeer_GF");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -3582,10 +3593,10 @@ public class SternResources
 	}
 
 	/**
-	   * Request-Nachricht vom Typ {0} [CY]
+	   * Request-Nachricht vom Typ {0} von User {1} [CY]
 	   */
-	public static String ServerInfoMessageType(boolean symbol, String arg0) {
-		return symbol ? "$CY§"+arg0+"$":MessageFormat.format(messages.getString("ServerInfoMessageType_CY"), arg0);
+	public static String ServerInfoMessageType(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$CY§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerInfoMessageType_CY"), arg0, arg1);
 	}
 
 	/**
@@ -4111,5 +4122,82 @@ public class SternResources
 	   */
 	public static String EmailUnbekannt(boolean symbol) {
 		return symbol ? "$FU$":messages.getString("EmailUnbekannt_FU");
+	}
+
+	/**
+	   * Server-Status [FV]
+	   */
+	public static String ServerStatus(boolean symbol) {
+		return symbol ? "$FV$":messages.getString("ServerStatus_FV");
+	}
+
+	/**
+	   * Server-Build [FW]
+	   */
+	public static String ServerBuild(boolean symbol) {
+		return symbol ? "$FW$":messages.getString("ServerBuild_FW");
+	}
+
+	/**
+	   * L\u00E4uft seit [FX]
+	   */
+	public static String ServerLaeuftSeit(boolean symbol) {
+		return symbol ? "$FX$":messages.getString("ServerLaeuftSeit_FX");
+	}
+
+	/**
+	   * Gr\u00F6\u00DFe des Logs [FY]
+	   */
+	public static String ServerLogGroesse(boolean symbol) {
+		return symbol ? "$FY$":messages.getString("ServerLogGroesse_FY");
+	}
+
+	/**
+	   * Log herunterladen [FZ]
+	   */
+	public static String ServerLogDownload(boolean symbol) {
+		return symbol ? "$FZ$":messages.getString("ServerLogDownload_FZ");
+	}
+
+	/**
+	   * Log-Level [GA]
+	   */
+	public static String ServerLogLevel(boolean symbol) {
+		return symbol ? "$GA$":messages.getString("ServerLogLevel_GA");
+	}
+
+	/**
+	   * Log-Level \u00E4ndern [GB]
+	   */
+	public static String ServerLogLevelAendern(boolean symbol) {
+		return symbol ? "$GB$":messages.getString("ServerLogLevelAendern_GB");
+	}
+
+	/**
+	   * Status aktualisieren [GC]
+	   */
+	public static String ServerStatusAktualisieren(boolean symbol) {
+		return symbol ? "$GC$":messages.getString("ServerStatusAktualisieren_GC");
+	}
+
+	/**
+	   * M\u00F6chten Sie das Log-Level des Servers wirklich auf "{0}" \u00E4ndern? [GD]
+	   */
+	public static String ServerLogLevelAendernAYS(boolean symbol, String arg0) {
+		return symbol ? "$GD§"+arg0+"$":MessageFormat.format(messages.getString("ServerLogLevelAendernAYS_GD"), arg0);
+	}
+
+	/**
+	   * Das Log-Level des Servers wurde erfolgreich ge\u00E4ndert. [GE]
+	   */
+	public static String ServerLogLevelAendernErfolg(boolean symbol) {
+		return symbol ? "$GE$":messages.getString("ServerLogLevelAendernErfolg_GE");
+	}
+
+	/**
+	   * Das Server-Log enth\u00E4lt keine Daten. [GF]
+	   */
+	public static String ServerLogLeer(boolean symbol) {
+		return symbol ? "$GF$":messages.getString("ServerLogLeer_GF");
 	}
 }

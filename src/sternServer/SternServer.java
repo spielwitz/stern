@@ -49,14 +49,18 @@ import common.Spieler;
 import common.SternResources;
 import common.Utils;
 import commonServer.ClientUserCredentials;
+import commonServer.LogEventType;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageActivateUser;
 import commonServer.RequestMessageGetEvaluations;
 import commonServer.RequestMessageChangeUser;
 import commonServer.RequestMessagePostMoves;
+import commonServer.RequestMessageSetLogLevel;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
 import commonServer.ResponseMessageGetEvaluations;
+import commonServer.ResponseMessageGetLog;
+import commonServer.ResponseMessageGetServerStatus;
 import commonServer.ResponseMessageGetUsers;
 import commonServer.ResponseMessageChangeUser;
 import commonServer.RsaCrypt;
@@ -79,6 +83,7 @@ public class SternServer
 	private Hashtable<String,SpielInfo> games;
 	private boolean shutdown = false;
 	private boolean adminCreated;
+	private long serverStartDate;
 	
 	private Hashtable<String, Object> lockObjects;
 	
@@ -186,6 +191,8 @@ public class SternServer
 					SternResources.ServerNotStarted(false, Integer.toString(serverConfig.port)));
 			return;
 		}
+		
+		this.serverStartDate = System.currentTimeMillis();
 			
 		while (true)
 		{
@@ -340,19 +347,8 @@ public class SternServer
 			serverConfig.url = url;
 			serverConfig.port = port;
 			serverConfig.adminEmail = adminEmail;
-
-			try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileServerCredentials.getAbsoluteFile())))
-			{
-				String text = serverConfig.toJson();
-				bw.write(text);
-				
-				System.out.println(
-						SternResources.ServerIDateiAngelegt(
-								false, 
-								fileServerCredentials.getAbsolutePath().toString()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			
+			this.updateServerConfig(fileServerCredentials, true);
 		}
 	}
 	
@@ -509,7 +505,7 @@ public class SternServer
 			    logMessage(
 						LogEventId.M6,
 						this.getId(),
-						LogEventType.Information,
+						LogEventType.Verbose,
 						SternResources.ServerBenutzer(false, userId));
 			    
 			    // Pruefen, ob es den user gibt. Wenn nicht, dann sofort aussteigen.
@@ -657,8 +653,8 @@ public class SternServer
 			logMessage(
 					LogEventId.M17,
 					this.getId(),
-					LogEventType.Verbose,
-					SternResources.ServerInfoMessageType(false, msg.type.toString()));
+					LogEventType.Information,
+					SternResources.ServerInfoMessageType(false, msg.type.toString(), userId));
 			
 		    ResponseMessage resp = null;
 		    
@@ -699,6 +695,17 @@ public class SternServer
 						case ADMIN_GET_USERS:
 							resp = processRequestAdminGetUsers();
 							break;
+						case ADMIN_GET_SERVER_STATUS:
+							resp = processRequestAdminGetServerStatus();
+							break;
+						case ADMIN_GET_LOG:
+							resp = processRequestAdminGetLog();
+							break;
+						case ADMIN_SET_LOG_LEVEL:
+							resp = processRequestAdminSetLogLevel(
+									RequestMessageSetLogLevel.fromJson(msg.payloadSerialized));
+							break;
+							
 						default:
 							resp = this.notAuthorized(userId);
 							break;
@@ -827,7 +834,7 @@ public class SternServer
 			logMessage(
 					LogEventId.M7,
 					this.getId(),
-					LogEventType.Information,
+					LogEventType.Verbose,
 					SternResources.ServerInfoClientClosing(false, socket.getInetAddress().toString()));
 
 		    try {
@@ -1102,6 +1109,63 @@ public class SternServer
 		msgResponse.payloadSerialized = msgResponseGetUsers.toJson();
 
 		return msgResponse;
+	}
+	
+	private ResponseMessage processRequestAdminGetServerStatus()
+	{
+		ResponseMessage msgResponse = new ResponseMessage();
+					
+		ResponseMessageGetServerStatus msgResponsePayload = new ResponseMessageGetServerStatus();
+		
+		msgResponsePayload.logLevel = serverConfig.logLevel;
+		msgResponsePayload.build = ReleaseGetter.getRelease();
+		msgResponsePayload.serverStartDate = this.serverStartDate;
+		
+		if (this.logFilePath != null)
+		{
+			msgResponsePayload.logSizeBytes = new File(this.logFilePath.toString()).length();
+		}
+				
+		msgResponse.payloadSerialized = msgResponsePayload.toJson();
+
+		return msgResponse;
+	}
+	
+	private ResponseMessage processRequestAdminGetLog()
+	{
+		ResponseMessage msgResponse = new ResponseMessage();
+		
+		ResponseMessageGetLog msgResponsePayload = new ResponseMessageGetLog();
+		
+		if (this.logFilePath != null)
+		{
+			try
+	        {
+				File file = new File(this.logFilePath.toString());
+				msgResponsePayload.fileName = file.getName();
+				msgResponsePayload.logCsv = new String ( Files.readAllBytes( this.logFilePath ) );
+	        } 
+	        catch (Exception e) 
+	        {
+	        	msgResponse.error = true;
+	        	msgResponse.errorMsg = e.getMessage();
+	        }
+		}
+		
+		msgResponse.payloadSerialized = msgResponsePayload.toJson();
+
+		return msgResponse;
+	}
+	
+	private ResponseMessage processRequestAdminSetLogLevel(RequestMessageSetLogLevel requestMsg)
+	{
+		serverConfig.logLevel = requestMsg.logLevel;
+		
+		// Server-Konfiguration anpassen
+		File fileServerCredentials = Paths.get(homeDir, FOLDER_NAME_DATA, ServerConstants.SERVER_CONFIG_FILE).toFile();
+		this.updateServerConfig(fileServerCredentials, false);
+		
+		return new ResponseMessage();
 	}
 	
 	private ResponseMessage processRequestActivateUser(
@@ -1468,4 +1532,23 @@ public class SternServer
 		}
 	}
 
+	private void updateServerConfig(File fileServerCredentials, boolean writeConsoleMessage)
+	{
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileServerCredentials.getAbsoluteFile())))
+		{
+			String text = serverConfig.toJson();
+			bw.write(text);
+			
+			if (writeConsoleMessage)
+			{
+				System.out.println(
+						SternResources.ServerIDateiAngelegt(
+								false, 
+								fileServerCredentials.getAbsolutePath().toString()));
+			}
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
 }

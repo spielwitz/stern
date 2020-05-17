@@ -14,13 +14,25 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package sternServer;
+package commonServer;
 
-public enum LogEventType
+import com.google.gson.Gson;
+
+public class RequestMessageSetLogLevel
 {
-	Verbose,
-	Information,
-	Warning,
-	Error,
-	Critical
+	public LogEventType logLevel;
+	
+	public String toJson()
+	{
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
+	
+	public static RequestMessageSetLogLevel fromJson(String json)
+	{
+		Gson gson = new Gson();
+		RequestMessageSetLogLevel user = gson.fromJson(json, RequestMessageSetLogLevel.class);
+		
+		return user;
+	}
 }

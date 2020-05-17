@@ -16,23 +16,11 @@
 
 package commonServer;
 
-public enum RequestMessageType
+public enum LogEventType
 {
-	//GET_GAME_INFO,
-	GET_GAMES_AND_USERS,
-	POST_MOVES,
-	POST_NEW_GAME,
-	ADMIN_CHANGE_USER,
-	ADMIN_SERVER_SHUTDOWN,
-	ADMIN_PING,
-	ADMIN_GET_USERS,
-	ADMIN_DELETE_USER,
-	ADMIN_GET_SERVER_STATUS,
-	ADMIN_GET_LOG,
-	ADMIN_SET_LOG_LEVEL,
-	PING,
-	GET_GAME,
-	GET_GAMES_ZUGEINGABE,
-	GET_EVALUATIONS,
-	ACTIVATE_USER
+	Verbose,
+	Information,
+	Warning,
+	Error,
+	Critical
 }

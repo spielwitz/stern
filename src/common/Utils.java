@@ -29,6 +29,10 @@ import java.net.NetworkInterface;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.text.DateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.BitSet;
@@ -305,6 +309,16 @@ public class Utils
 		Date date = new Date(dateLong);
 		DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM); 
 		return df.format(date);
+	}
+	
+	public static String millisecondsToString(long dateLong)
+	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+		
+		Instant instant = Instant.ofEpochMilli(dateLong);
+	    LocalDateTime date = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    
+	    return date.format(formatter);
 	}
 	
 	public static String getMyIPAddress()
