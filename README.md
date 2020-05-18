@@ -20,7 +20,7 @@ STERN offers two game modes: the STERN CLASSIC mode with all the features mentio
 
 Instead of sitting in front of a single computer, players can also enter their moves on several computers that are connected to one another in a network. If a game afternoon or evening is not enough, a game can be continued via email. And finally there is still the possibility for everyone to host STERN on a server and to invite players from all over the world.
 
-But the best is still the classic game variant, which has been around since 1989: take an afternoon and an evening, sit down on a large couch in front of a large screen or projector, stand up for chips and unhealthy drinks, switch on All devices that did not exist in the 80s and have a good time together.
+But the best is still the classic game variant, which has been around since 1989: take an afternoon and an evening, sit down on a large couch in front of a large screen or projector, stand up for chips and unhealthy drinks, switch off all devices that did not exist in the 80s and have a good time together.
 
 ## Built With
 
