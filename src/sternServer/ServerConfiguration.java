@@ -34,6 +34,8 @@ public class ServerConfiguration
 	public String serverPrivateKey; 
 	public String serverPublicKey;	
 	
+	public String locale;
+	
 	public transient PrivateKey serverPrivateKeyObject;
 	
 	public ServerConfiguration()

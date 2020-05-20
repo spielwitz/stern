@@ -44,6 +44,20 @@ public class ReleaseGetter
 				false, tag, monat, jahr, stunde, minute);
 	}
 	
+	public static String format2(String unformattedString)
+	{
+		String jahr = unformattedString.substring(0, 4);
+		String monat = unformattedString.substring(4, 6);
+		String tag = unformattedString.substring(6, 8);
+		
+		String stunde = unformattedString.substring(8, 10);
+		String minute = unformattedString.substring(10, 12);
+		String sekunde = unformattedString.substring(12, 14);
+		
+		return SternResources.ReleaseFormatted2(
+				false, tag, monat, jahr, stunde, minute, sekunde);
+	}
+	
 	private ReleaseGetter()
 	{
 		InputStream inputStream = getClass().getResourceAsStream("/release.txt");

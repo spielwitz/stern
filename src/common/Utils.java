@@ -321,6 +321,16 @@ public class Utils
 	    return date.format(formatter);
 	}
 	
+	public static String currentTimeToLocalizedString()
+	{
+		Instant instant = Instant.ofEpochMilli(System.currentTimeMillis());
+	    LocalDateTime date = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+	    
+	    String dateBuildStyle = date.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+	    
+	    return ReleaseGetter.format2(dateBuildStyle);
+	}
+	
 	public static String getMyIPAddress()
 	{
 		String meineIP = null;

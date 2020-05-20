@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: GF
+		// Hoechstes vergebenes Symbol: GG
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -554,6 +554,7 @@ public class SternResources
 		symbolDict.put("GD","ServerLogLevelAendernAYS_GD");
 		symbolDict.put("GE","ServerLogLevelAendernErfolg_GE");
 		symbolDict.put("GF","ServerLogLeer_GF");
+		symbolDict.put("GG","ReleaseFormatted2_GG");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -3446,7 +3447,7 @@ public class SternResources
 	}
 
 	/**
-	   * Sind alle Angaben richtig? [J]/andere Eingabe [CD]
+	   * Sind alle Angaben richtig? Ja = [1]/ Nein = [andere Taste] [CD]
 	   */
 	public static String ServerInitConfirm(boolean symbol) {
 		return symbol ? "$CD$":messages.getString("ServerInitConfirm_CD");
@@ -4199,5 +4200,12 @@ public class SternResources
 	   */
 	public static String ServerLogLeer(boolean symbol) {
 		return symbol ? "$GF$":messages.getString("ServerLogLeer_GF");
+	}
+
+	/**
+	   * {0}.{1}.{2} {3}:{4}:{5} [GG]
+	   */
+	public static String ReleaseFormatted2(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4, String arg5) {
+		return symbol ? "$GG§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"§"+arg5+"$":MessageFormat.format(messages.getString("ReleaseFormatted2_GG"), arg0, arg1, arg2, arg3, arg4, arg5);
 	}
 }

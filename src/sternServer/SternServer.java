@@ -118,10 +118,31 @@ public class SternServer
 		String serverUrl = null;
 		int port = 0;
 		String adminEmail = null;
+		String locale = null;
 		
 		if (setupServer)
 		{
 			// Ein paar Fragen beantworten
+			while (true)
+			{
+				System.out.println("Deutsch [de] / English [en]: ");
+				
+				String language = this.getInput();
+				
+				if (language.toLowerCase().equals("de"))
+				{
+					locale = "de-DE";
+					break;
+				}
+				else if (language.toLowerCase().equals("en"))
+				{
+					locale = "en-US";
+					break;
+				}
+			}
+			
+			SternResources.setLocale(locale);
+			
 			System.out.println("\n"+SternResources.ServerWillkommen(false)+"\n");
 
 			System.out.print(SternResources.ServerAdminUrl(false)+ " ("+SternResources.ServerVoreingestellt(false)+": "+ServerConstants.SERVER_HOSTNAME+"): ");
@@ -148,7 +169,7 @@ public class SternServer
 		    System.out.print("\n"+SternResources.ServerInitConfirm(false)+": ");
 		    String ok = this.getInput();
 		    		    
-		    if (!ok.equals("J"))
+		    if (!ok.equals("1"))
 		    {
 		    	 System.out.print(SternResources.ServerInitAbort(false));
 		    	 return;
@@ -156,7 +177,7 @@ public class SternServer
 		}
 
 		this.initCreateDataFolders();
-		this.initServerConfig(serverUrl, port, adminEmail);
+		this.initServerConfig(serverUrl, port, adminEmail, locale);
 		this.initReadAllUsers();
 		this.initCreateAdmin(serverUrl, port);
 		this.initReadAllGames();
@@ -315,7 +336,7 @@ public class SternServer
 		}
 	}
 	
-	private void initServerConfig(String url, int port, String adminEmail)
+	private void initServerConfig(String url, int port, String adminEmail, String locale)
 	{
 		File fileServerCredentials = Paths.get(homeDir, FOLDER_NAME_DATA, ServerConstants.SERVER_CONFIG_FILE).toFile();
 		
@@ -331,6 +352,9 @@ public class SternServer
 			{
 				e.printStackTrace();
 			}
+			
+			if (serverConfig.locale != null)
+				SternResources.setLocale(serverConfig.locale);
 		}
 		else
 		{
@@ -338,6 +362,8 @@ public class SternServer
 			KeyPair keyPairRequest = RsaCrypt.getNewKeyPair();
 			
 			serverConfig = new ServerConfiguration();
+			
+			serverConfig.locale = locale;
 			
 			serverConfig.serverPrivateKeyObject = keyPairRequest.getPrivate();
 			
@@ -419,7 +445,7 @@ public class SternServer
 			sb.append(SternResources.ServerILogMeldung(false) + "\n\n");
 		}
 		
-		sb.append(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
+		sb.append(Utils.currentTimeToLocalizedString());
 		sb.append("\t");
 		
 		sb.append(eventId);
@@ -966,7 +992,7 @@ public class SternServer
 					LogEventId.M14,
 					threadId,
 					LogEventType.Error,
-					SternResources.ServerErrorAdminNeuerUser(true));
+					SternResources.ServerErrorAdminNeuerUser(false));
 
 			return msgResponse;
 		}
