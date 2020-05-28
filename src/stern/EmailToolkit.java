@@ -28,12 +28,12 @@ import common.EmailTransportBase;
 import common.ReleaseGetter;
 import common.Utils;
 
-public class EmailToolkit
+class EmailToolkit
 {
 	private static final String BASE64_START = "----------begin:\n";
 	private static final String BASE64_END = "\n:end----------";
 	
-	public static boolean launchEmailClient(String recipient, String subject, String bodyText, String password, EmailTransportBase obj)
+	static boolean launchEmailClient(String recipient, String subject, String bodyText, String password, EmailTransportBase obj)
 	{
 		boolean ok = true;
 		
@@ -69,7 +69,7 @@ public class EmailToolkit
 		return ok;
 	}
 	
-	public static <T> EmailTransportBase parseEmail(String body, Class<T> expectedClass, String password)
+	static <T> EmailTransportBase parseEmail(String body, Class<T> expectedClass, String password)
 	{
 		// Zuerst alle Leerzeichen aus der Mail entfernen
 		body = body.replace(" ", "");
@@ -109,7 +109,7 @@ public class EmailToolkit
 	    }
 	}
 	
-	public static String getClipboardContent()
+	static String getClipboardContent()
 	{
 		String retval = "";
 		

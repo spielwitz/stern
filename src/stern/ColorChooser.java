@@ -42,16 +42,15 @@ import commonUi.ButtonDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 
-@SuppressWarnings("serial")
-public class ColorChooser  extends JDialog implements ActionListener
+@SuppressWarnings("serial") class ColorChooser  extends JDialog implements ActionListener
 {
 	private ColorPanel[] colorPanels;
 	private ButtonDark butOk;
 	private ButtonDark butAbbruch;
-	public boolean abort = false;
-	public byte selectedColor;
+	boolean abort = false;
+	byte selectedColor;
 	
-	public ColorChooser(JDialog parent, byte currentColor, Font font)
+	ColorChooser(JDialog parent, byte currentColor, Font font)
 	{
 		super (parent, SternResources.SpielparameterJDialogFarbe(false), true);
 		
@@ -111,7 +110,7 @@ public class ColorChooser  extends JDialog implements ActionListener
 		this.colorChanged(currentColor);
 	}
 	
-	public void colorChanged(byte colorIndex)
+	private void colorChanged(byte colorIndex)
 	{
 		this.selectedColor = colorIndex;
 		

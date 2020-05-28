@@ -65,8 +65,8 @@ import commonUi.SternAbout;
 import commonUi.UpdateChecker;
 import common.SternResources;
 
-@SuppressWarnings("serial")
-public class SternClient extends Frame
+@SuppressWarnings("serial") 
+public class SternClient extends Frame // NO_UCD (use default)
 	implements 
 		WindowListener, 
 		ActionListener,
@@ -74,7 +74,7 @@ public class SternClient extends Frame
 		IHostComponentMethods,
 		IUpdateCheckerCallback
 {
-	public boolean connected = false;
+	boolean connected = false;
 	
 	// UI components
 	private PaintPanel paintPanel;
@@ -111,7 +111,7 @@ public class SternClient extends Frame
 		new SternClient(meineIp);
 	}
 	
-	public SternClient(String meineIp)
+	private SternClient(String meineIp)
 	{
 		super();
 		

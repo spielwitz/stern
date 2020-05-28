@@ -18,9 +18,8 @@ package stern;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class HighscoreEntry implements Serializable
+@SuppressWarnings("serial") class HighscoreEntry implements Serializable
 {
-	public int punkte;
-	public String name;
+	int punkte;
+	String name;
 }

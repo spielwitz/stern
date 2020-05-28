@@ -16,7 +16,7 @@
 
 package common;
 
-public enum ObjektTyp
+enum ObjektTyp
 {
 	// Alles, was fliegt und/oder was man kaufen und verkaufen kann
 	RAUMER,
@@ -32,6 +32,5 @@ public enum ObjektTyp
 	FESTUNG_REPARATUR,
 	ERAUM,
 	EPROD,
-	SCHWARZES_LOCH,
 	KAPITULATION
 }

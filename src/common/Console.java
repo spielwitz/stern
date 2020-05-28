@@ -19,7 +19,7 @@ package common;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-public class Console
+class Console
 {
 	// Das Datenmodell der Text-Console
 	private String[] text; // Text, der in der Konsole angezeigt wird. Jedes Element ist eine Zeile
@@ -35,12 +35,12 @@ public class Console
 	
 	private Spiel parent;
 		
-	public static final int MAX_LINES = 5;
-	public static final char HIDDEN_CHAR = '-';
+	static final int MAX_LINES = 5;
+	private static final char HIDDEN_CHAR = '-';
 	
-	public static final String KEY_YES = "1";
+	static final String KEY_YES = "1";
 	
-	public Console(Spiel spiel, boolean background)
+	Console(Spiel spiel, boolean background)
 	{
 		// Zeile 0 ist immer die aktuelle Zeile
 		this.text = new String[MAX_LINES];
@@ -63,7 +63,7 @@ public class Console
 		this.background = background;
 	}
 	
-	public void lineBreak()
+	void lineBreak()
 	{
 		byte currentCol = this.textCol[this.outputLine];
 		
@@ -82,13 +82,7 @@ public class Console
 		this.textCol[outputLine] = currentCol; 		
 	}
 	
-	public void deleteLine()
-	{
-		this.text[outputLine] = "";
-	}
-		
-	@SuppressWarnings("unchecked")
-	public ConsoleInput waitForKeyPressed(
+	@SuppressWarnings("unchecked") ConsoleInput waitForKeyPressed(
 			ArrayList<ConsoleKey> allowedKeys, 
 			boolean hidden)
 	{
@@ -96,7 +90,7 @@ public class Console
 		return this.keyInput(1, hidden, false, "");
 	}
 	
-	public ConsoleInput waitForKeyPressedYesNo(
+	ConsoleInput waitForKeyPressedYesNo(
 			boolean hidden)
 	{
 		this.keys = new ArrayList<ConsoleKey>();
@@ -107,7 +101,7 @@ public class Console
 		return this.keyInput(1, hidden, false, "");
 	}
 	
-	public ConsoleInput waitForTextEntered(
+	ConsoleInput waitForTextEntered(
 			int maxLength,
 			ArrayList<ConsoleKey> allowedKeys,
 			boolean hidden,
@@ -117,7 +111,7 @@ public class Console
 	}
 	
 	@SuppressWarnings("unchecked")
-	public ConsoleInput waitForTextEntered(
+	private ConsoleInput waitForTextEntered(
 			int maxLength,
 			ArrayList<ConsoleKey> allowedKeys,
 			boolean hidden,
@@ -132,7 +126,7 @@ public class Console
 		return this.keyInput(maxLength, hidden, false, presetText);
 	}
 	
-	public void waitForTaste()
+	void waitForTaste()
 	{
 		this.keys = new ArrayList<ConsoleKey>();
 		this.keys.add(new ConsoleKey("TAB", SternResources.Weiter(true)));
@@ -143,15 +137,7 @@ public class Console
 		this.keyInput(1, false, true, "");
 	}
 	
-	public void pause(int milliseconds)
-	{
-		this.keys = new ArrayList<ConsoleKey>();
-		this.updateScreen(true);
-		
-		this.parent.pause(milliseconds);
-	}
-	
-	public boolean waitForTasteReplay()
+	boolean waitForTasteReplay()
 	{
 		KeyEventExtended keyEvent = this.parent.waitForKeyInput(); 	
 		
@@ -168,7 +154,7 @@ public class Console
 		this.textCol[this.outputLine] = col;
 	}
 	
-	public void clear()
+	void clear()
 	{
 		this.outputLine = MAX_LINES - 1;
 		
@@ -313,12 +299,12 @@ public class Console
 		return new ConsoleInput(inputText.toString(), keyCode, clientId, languageCode);
 	}
 	
-	public void appendText(String text)
+	void appendText(String text)
 	{
 		this.text[this.outputLine] = this.text[this.outputLine] + text;
 	}
 	
-	public void setHeaderText(String text, byte col)
+	void setHeaderText(String text, byte col)
 	{
 		this.headerText = text;
 		this.headerCol = col;
@@ -338,13 +324,13 @@ public class Console
 				this.isBackground());
 	}
 	
-	public void outAbbruch()
+	void outAbbruch()
 	{
 		this.appendText(SternResources.AktionAbgebrochen(true));
 		this.lineBreak();
 	}
 	
-	public void outUngueltigeEingabe()
+	void outUngueltigeEingabe()
 	{
 		this.appendText(SternResources.UngueltigeEingabe(true));
 		this.lineBreak();
@@ -352,7 +338,7 @@ public class Console
 		
 
 	
-	public enum ConsoleModus
+	enum ConsoleModus
 	{
 		TEXT_INPUT,
 		PLANETEN_EDITOR,

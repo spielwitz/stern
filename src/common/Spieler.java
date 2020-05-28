@@ -89,7 +89,7 @@ public class Spieler implements Serializable
 		this.tot = tot;
 	}
 	
-	public boolean istTot()
+	boolean istTot()
 	{
 		return this.tot;
 	}

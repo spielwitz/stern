@@ -16,7 +16,7 @@
 
 package stern;
 
-public interface IColorChooserCallback 
+interface IColorChooserCallback 
 {
 	public void colorChanged(int sp, byte newColorIndex, byte oldColorIndex);
 }

@@ -23,10 +23,9 @@ import javax.swing.border.TitledBorder;
 
 import commonUi.PanelDark;
 
-@SuppressWarnings("serial")
-public class GroupBoxDark extends PanelDark 
+@SuppressWarnings("serial") class GroupBoxDark extends PanelDark 
 {
-	public GroupBoxDark(String title, Font font)
+	GroupBoxDark(String title, Font font)
 	{
 		super();
 			

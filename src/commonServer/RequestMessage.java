@@ -18,8 +18,6 @@ package commonServer;
 
 import com.google.gson.Gson;
 
-import common.ReleaseGetter;
-
 public class RequestMessage
 {
 	public RequestMessageType type;
@@ -31,7 +29,6 @@ public class RequestMessage
 	public RequestMessage (RequestMessageType type)
 	{
 		this.type = type;
-		this.build = ReleaseGetter.getRelease();
 	}
 	
 	public String toJson()

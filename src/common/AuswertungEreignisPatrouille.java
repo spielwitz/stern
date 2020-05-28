@@ -16,36 +16,37 @@
 
 package common;
 
-import java.io.Serializable;
+import java.awt.geom.Point2D;
+import java.util.Comparator;
 
-@SuppressWarnings("serial")
-public class Loch implements Serializable
+class AuswertungEreignisPatrouille implements Comparator<AuswertungEreignisPatrouille>
 {
-	private boolean active; // Loch ist aktiv
-	private Point pos; // Momentane Position
-	private int nextActionJahr; // Jahr, in dem das Loch wieder verschwindet bzw. auftaucht
+	int winkel; // Ein Wert zwischen 0 und 364. Stellt den Erfasungswinkel dar
 	
-	public Loch(boolean active, Point pos, int nextActionJahr) {
-		super();
-		this.active = active;
-		this.pos = pos;
-		this.nextActionJahr = nextActionJahr;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public Point getPos() {
-		return pos;
-	}
-
-	public int getNextActionJahr() {
-		return nextActionJahr;
-	}
+	Point2D.Double markierungPos;
+	Point posObjAnderes;
+	Flugobjekt objPatrouille; 
+	Flugobjekt objAnderes;
 	
-	public void setPosition(Point pos)
+	public AuswertungEreignisPatrouille()
 	{
-		this.pos = pos.klon();
+		
+	}
+	
+	AuswertungEreignisPatrouille(Flugobjekt objPatrouille, Flugobjekt objAnderes)
+	{
+		this.objPatrouille = objPatrouille;
+		this.objAnderes = objAnderes;
+	}
+		
+	@Override
+	public int compare(AuswertungEreignisPatrouille o1, AuswertungEreignisPatrouille o2) 
+	{
+		if (o1.winkel > o2.winkel)
+			return 1;
+		else if (o1.winkel < o2.winkel)
+			return -1;
+		else
+			return 0;
 	}
 }

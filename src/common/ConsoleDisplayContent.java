@@ -19,8 +19,8 @@ package common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("serial")
-public class ConsoleDisplayContent implements Serializable
+@SuppressWarnings("serial") 
+class ConsoleDisplayContent implements Serializable
 {
 	// Ein Client meldet sich am Server an. Jeder Client ist gleichwertig!
 	// Jeder Tastendruck wird an den Server per Event weitergeleitet und dort ueberprueft.
@@ -59,7 +59,7 @@ public class ConsoleDisplayContent implements Serializable
 		return a;
 	}
 
-	public ConsoleDisplayContent(String[] text, byte[] textCol,
+	ConsoleDisplayContent(String[] text, byte[] textCol,
 			ArrayList<ConsoleKey> keys, String headerText, byte headerCol, int outputLine, boolean waitingForInput) {
 		super();
 		this.t = text;

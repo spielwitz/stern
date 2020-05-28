@@ -51,7 +51,7 @@ public class MessageWithLink extends JEditorPane {
         setBorder(null);
     }
 
-    static StringBuffer getStyle() {
+    private static StringBuffer getStyle() {
         // for copying style
         JLabel label = new JLabel();
         Font font = label.getFont();

@@ -16,16 +16,8 @@
 
 package common;
 
-class InventurPdfChapter
+enum AuswertungEreignisTyp 
 {
-	String chapterName;
-	String nichtVorhandenMsg;
-	ScreenDisplayContent sdc;
-	InventurPdfTable table;
-	
-	InventurPdfChapter(String chapterName, String nichtVorhandenMsg)
-	{
-		this.chapterName = chapterName;
-		this.nichtVorhandenMsg = nichtVorhandenMsg;
-	}
+	ANKUNFT,
+	SEKTOR_BETRETEN
 }

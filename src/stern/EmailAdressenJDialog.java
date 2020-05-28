@@ -50,8 +50,7 @@ import commonUi.DialogFontHelper;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 
-@SuppressWarnings("serial")
-public class EmailAdressenJDialog extends JDialog
+@SuppressWarnings("serial") class EmailAdressenJDialog extends JDialog
 			implements 	ActionListener,
 			ListSelectionListener,
 			MouseListener,
@@ -67,9 +66,9 @@ public class EmailAdressenJDialog extends JDialog
 	private JList<String> list;
 	private int[] seq;
 	
-	public int selectedIndex = -1;
+	int selectedIndex = -1;
 	
-	public EmailAdressenJDialog(
+	EmailAdressenJDialog(
 			JDialog parent,
 			ArrayList<String> emailAdressen)
 	{

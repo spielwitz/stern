@@ -25,9 +25,9 @@ import common.ReleaseGetter;
 import common.SternResources;
 import commonUi.MessageWithLink;
 
-public class MinBuildChecker
+class MinBuildChecker
 {
-	public static boolean doCheck(Frame parent, String minBuild)
+	static boolean doCheck(Frame parent, String minBuild)
 	{
 		boolean success = true;
 		

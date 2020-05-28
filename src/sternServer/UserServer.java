@@ -23,23 +23,23 @@ import com.google.gson.Gson;
 
 import commonServer.RsaCrypt;
 
-public class UserServer
+class UserServer
 {
-	public String userId; // z.B. "Zorro", 3-10 Zeichen, A-Z, a-z, 0-9
+	String userId; // z.B. "Zorro", 3-10 Zeichen, A-Z, a-z, 0-9
 	
-	public boolean active; // Benutzer ist aktiv
+	boolean active; // Benutzer ist aktiv
 	
-	public String userPublicKey; // Public key des Users: Verschluesselung der Response auf Server-Seite
-	public String name;
+	String userPublicKey; // Public key des Users: Verschluesselung der Response auf Server-Seite
+	String name;
 	
-	public String email;
+	String email;
 	
-	public String activationCode;
+	String activationCode;
 	
-	public transient HashSet<String> games;
-	public transient PublicKey userPublicKeyObject;
+	transient HashSet<String> games;
+	transient PublicKey userPublicKeyObject;
 	
-	public UserServer(String userId)
+	UserServer(String userId)
 	{
 		this.userId = userId;
 		this.email = "";
@@ -48,13 +48,13 @@ public class UserServer
 		this.games = new HashSet<String>();
 	}
 	
-	public String toJson()
+	String toJson()
 	{
 		Gson gson = new Gson();
 		return gson.toJson(this);
 	}
 	
-	public static UserServer fromJson(String json) throws Exception
+	static UserServer fromJson(String json) throws Exception
 	{
 		Gson gson = new Gson();
 		UserServer user = gson.fromJson(json, UserServer.class);

@@ -16,11 +16,11 @@
 
 package sternClient;
 
-public class ClientSettings
+class ClientSettings
 {
-	public String serverIp;
-	public String meineIp;
-	public String meinName;
-	public String clientCode;
-	public String clientId;
+	String serverIp;
+	String meineIp;
+	String meinName;
+	String clientCode;
+	String clientId;
 }

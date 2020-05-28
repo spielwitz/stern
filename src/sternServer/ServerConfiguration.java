@@ -24,19 +24,19 @@ import commonServer.LogEventType;
 import commonServer.RsaCrypt;
 import commonServer.ServerConstants;
 
-public class ServerConfiguration
+class ServerConfiguration
 {
-	public String url;
-	public int port;
-	public String adminEmail;
-	public LogEventType logLevel;
+	String url;
+	int port;
+	String adminEmail;
+	LogEventType logLevel;
 	
-	public String serverPrivateKey; 
-	public String serverPublicKey;	
+	String serverPrivateKey; 
+	String serverPublicKey;	
 	
-	public String locale;
+	String locale;
 	
-	public transient PrivateKey serverPrivateKeyObject;
+	transient PrivateKey serverPrivateKeyObject;
 	
 	public ServerConfiguration()
 	{
@@ -44,13 +44,13 @@ public class ServerConfiguration
 		this.logLevel = LogEventType.valueOf(ServerConstants.SERVER_LOGLEVEL);
 	}
 	
-	public String toJson()
+	String toJson()
 	{
 		Gson gson = new Gson();
 		return gson.toJson(this);
 	}
 	
-	public static ServerConfiguration fromJson(String json) throws Exception
+	static ServerConfiguration fromJson(String json) throws Exception
 	{
 		Gson gson = new Gson();
 		ServerConfiguration sc = gson.fromJson(json, ServerConfiguration.class);

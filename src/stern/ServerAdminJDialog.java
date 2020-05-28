@@ -75,8 +75,7 @@ import commonUi.PasswordFieldDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial")
-public class ServerAdminJDialog extends JDialog 
+@SuppressWarnings("serial") class ServerAdminJDialog extends JDialog 
 			implements ChangeListener, ActionListener, ListSelectionListener
 {
 	private ButtonDark butClose;
@@ -103,7 +102,7 @@ public class ServerAdminJDialog extends JDialog
 	
 	private PanelUserData panUsersDetailsInner;
 	
-	public String serverAdminCredentialsFile;
+	String serverAdminCredentialsFile;
 	private ClientUserCredentials cuc;
 	
 	private JList<String> listUsers;
@@ -112,7 +111,7 @@ public class ServerAdminJDialog extends JDialog
 	
 	private static Font font;
 	
-	public ServerAdminJDialog(
+	ServerAdminJDialog(
 			Stern parent,
 			String title,
 			String serverAdminCredentialsFile)

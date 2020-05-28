@@ -27,7 +27,7 @@ public class SpielzuegeEmailTransport extends EmailTransportBase implements Seri
 	private String minBuild;
 	private ArrayList<Spielzug> spielzuege;
 	
-	public SpielzuegeEmailTransport(UUID spielzugReferenzCode, String minBuild, ArrayList<Spielzug> spielzuege)
+	SpielzuegeEmailTransport(UUID spielzugReferenzCode, String minBuild, ArrayList<Spielzug> spielzuege)
 	{
 		this.spielzugReferenzCode = spielzugReferenzCode;
 		this.spielzuege = spielzuege;

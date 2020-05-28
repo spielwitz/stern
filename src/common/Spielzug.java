@@ -19,8 +19,7 @@ package common;
 import java.io.Serializable;
 import java.util.UUID;
 
-@SuppressWarnings("serial")
-public class Spielzug implements Serializable
+@SuppressWarnings("serial") class Spielzug implements Serializable
 {
 	transient private Planet planetVorher;
 
@@ -30,7 +29,7 @@ public class Spielzug implements Serializable
 	private boolean[] buendnis;
 	private UUID stopLabel;
 	
-	public Spielzug(int plIndex, Flugobjekt obj, Planet planetVorher)
+	Spielzug(int plIndex, Flugobjekt obj, Planet planetVorher)
 	{
 		// Flugobjekte starten
 		super();
@@ -39,7 +38,7 @@ public class Spielzug implements Serializable
 		this.planetVorher = planetVorher;
 	}
 	
-	public Spielzug(int plIndex, Planet planetVorher, Planet planetNachher)
+	Spielzug(int plIndex, Planet planetVorher, Planet planetNachher)
 	{
 		// Planeteneditor
 		super();
@@ -48,7 +47,7 @@ public class Spielzug implements Serializable
 		this.planetNachher = (Planet)Utils.klon(planetNachher);
 	}
 	
-	public Spielzug(int plIndex, Planet planetVorher, boolean[] buendnis)
+	Spielzug(int plIndex, Planet planetVorher, boolean[] buendnis)
 	{
 		// Buendnis geaendert
 		super();
@@ -57,7 +56,7 @@ public class Spielzug implements Serializable
 		this.buendnis = (boolean[])Utils.klon(buendnis);
 	}
 	
-	public Spielzug(Flugobjekt obj, UUID stopLabel, int plIndex)
+	Spielzug(Flugobjekt obj, UUID stopLabel, int plIndex)
 	{
 		// Gestopptes Objekt zu neuem Ziel geschickt
 		super();

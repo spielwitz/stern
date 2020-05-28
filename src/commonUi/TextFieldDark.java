@@ -24,12 +24,6 @@ import javax.swing.JTextField;
 @SuppressWarnings("serial")
 public class TextFieldDark extends JTextField 
 {
-	public TextFieldDark(Font f)
-	{
-		super();
-		this.init(f);
-	}
-	
 	public TextFieldDark(String text, Font f)
 	{
 		super(text);

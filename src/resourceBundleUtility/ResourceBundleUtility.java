@@ -53,7 +53,7 @@ import javax.swing.SpringLayout;
 import commonUi.SpringUtilities;
 
 @SuppressWarnings("serial")
-public class ResourceBundleUtility extends Frame implements ActionListener, WindowListener
+public class ResourceBundleUtility extends Frame implements ActionListener, WindowListener // NO_UCD (unused code)
 {
 	private Properties props;
 	

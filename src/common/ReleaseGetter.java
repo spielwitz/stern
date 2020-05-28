@@ -44,7 +44,7 @@ public class ReleaseGetter
 				false, tag, monat, jahr, stunde, minute);
 	}
 	
-	public static String format2(String unformattedString)
+	static String format2(String unformattedString)
 	{
 		String jahr = unformattedString.substring(0, 4);
 		String monat = unformattedString.substring(4, 6);

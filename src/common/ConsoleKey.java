@@ -18,13 +18,13 @@ package common;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class ConsoleKey implements Serializable
+@SuppressWarnings("serial") 
+class ConsoleKey implements Serializable
 {
 	private String key;
 	private String text;
 	
-	public ConsoleKey(String key, String text) {
+	ConsoleKey(String key, String text) {
 		super();
 		this.key = key;
 		this.text = text;
@@ -36,7 +36,7 @@ public class ConsoleKey implements Serializable
 		return SternResources.getString(text);
 	}
 	
-	public static int getMaxKeyLength(ConsoleKey key1, ConsoleKey key2)
+	static int getMaxKeyLength(ConsoleKey key1, ConsoleKey key2)
 	{
 		int len1 = 0;
 		int len2 = 0;
@@ -49,7 +49,7 @@ public class ConsoleKey implements Serializable
 		return Math.max(len1, len2);
 	}
 	
-	public static int getMaxTextLength(ConsoleKey key1, ConsoleKey key2)
+	static int getMaxTextLength(ConsoleKey key1, ConsoleKey key2)
 	{
 		int len1 = 0;
 		int len2 = 0;

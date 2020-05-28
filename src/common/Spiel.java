@@ -31,9 +31,9 @@ import java.util.Vector;
 @SuppressWarnings("serial")
 public class Spiel extends EmailTransportBase implements Serializable
 {
+	private String saveBuild; // Build, mit dem das Spiel abgespeichert wurde
 	private String name;
 	private long startDatum;
-	private int spieldauerSekunden;
 	private String minBuild; // Mindestens vorausgesetzter Build
 	private HashSet<SpielOptionen> optionen; // Entspricht "setup" im alten Vega 
 	private int maxJahre;
@@ -52,11 +52,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	private Hashtable<Integer,ArrayList<Spielzug>> spielzuege;
 	private UUID[] spielzuegeReferenzCodes;
 	private Hashtable<String,Mine> minen;
-	private ArrayList<Hashtable<ObjektTyp,Integer>> preiseKaufArray;
-	private ArrayList<Hashtable<ObjektTyp,Integer>> preiseVerkaufArray;
 	private String emailAdresseSpielleiter;
-	
-	private Loch loch;
 	
 	private boolean abgeschlossen;
 	
@@ -64,7 +60,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	// Transiente Felder
 	transient private boolean emailSpieler;
-	transient private long currentTime;
 	transient private boolean initial;
 	transient private boolean enableParameterChange;
 	
@@ -77,55 +72,38 @@ public class Spiel extends EmailTransportBase implements Serializable
 	transient private Hashtable<String,Integer> planetenByPoint;
 	transient private int[] planetenSortiert;
 	transient static private ArrayList<Point> heimatPlanetUmkreis;
-	
-	transient private static Hashtable<ObjektTyp,Integer> preiseKaufUntergrenze;
-	transient private static Hashtable<ObjektTyp,Integer> preiseKaufObergrenze;
+	transient static Hashtable<ObjektTyp, Integer> editorPreiseKauf;
+	transient static Hashtable<ObjektTyp, Integer> editorPreiseVerkauf;
 	
 	transient private boolean goToReplay;
 	
-	transient private int[][] distanzMatrix;
-	
+	transient private Flugzeit[][] distanzMatrix;
+	transient private int[][] distanzMatrixJahre;
+		
 	static {
-		preiseKaufUntergrenze = new Hashtable<ObjektTyp,Integer>();
-		preiseKaufObergrenze = new Hashtable<ObjektTyp,Integer>();
+		// Editor-Preise definieren
+		editorPreiseKauf = new Hashtable<ObjektTyp, Integer>();
 		
-		preiseKaufUntergrenze.put(ObjektTyp.AUFKLAERER, Constants.PREIS_MIN_AUFKL);
-		preiseKaufObergrenze.put(ObjektTyp.AUFKLAERER, Constants.PREIS_MIN_AUFKL + Constants.PREIS_SPANNE_AUFKL-1);
+		editorPreiseKauf.put(ObjektTyp.AUFKLAERER, Constants.PREIS_AUFKLAERER);
+		editorPreiseKauf.put(ObjektTyp.EPROD, Constants.PREIS_EPROD);
+		editorPreiseKauf.put(ObjektTyp.ERAUM, Constants.PREIS_ERAUM);
+		editorPreiseKauf.put(ObjektTyp.FESTUNG, Constants.PREIS_FESTUNG);
+		editorPreiseKauf.put(ObjektTyp.FESTUNG_REPARATUR, Constants.PREIS_FESTUNG_REPARATUR);
+		editorPreiseKauf.put(ObjektTyp.MINE50, Constants.PREIS_MINE50);
+		editorPreiseKauf.put(ObjektTyp.MINE100, Constants.PREIS_MINE100);
+		editorPreiseKauf.put(ObjektTyp.MINE250, Constants.PREIS_MINE250);
+		editorPreiseKauf.put(ObjektTyp.MINE500, Constants.PREIS_MINE500);
+		editorPreiseKauf.put(ObjektTyp.MINENRAEUMER, Constants.PREIS_MINENRAEUMER);
+		editorPreiseKauf.put(ObjektTyp.PATROUILLE, Constants.PREIS_PATROUILLE);
+		editorPreiseKauf.put(ObjektTyp.TRANSPORTER, Constants.PREIS_TRANSPORTER);
 		
-		preiseKaufUntergrenze.put(ObjektTyp.PATROUILLE, Constants.PREIS_MIN_PATR);
-		preiseKaufObergrenze.put(ObjektTyp.PATROUILLE, Constants.PREIS_MIN_PATR + Constants.PREIS_SPANNE_PATR-1);
+		editorPreiseVerkauf = new Hashtable<ObjektTyp, Integer>();
 		
-		preiseKaufUntergrenze.put(ObjektTyp.FESTUNG, Constants.PREIS_MIN_FESTUNG);
-		preiseKaufObergrenze.put(ObjektTyp.FESTUNG, Constants.PREIS_MIN_FESTUNG + Constants.PREIS_SPANNE_FESTUNG-1);
-			
-		preiseKaufUntergrenze.put(ObjektTyp.EPROD, Constants.PREIS_MIN_EPROD);
-		preiseKaufObergrenze.put(ObjektTyp.EPROD, Constants.PREIS_MIN_EPROD + Constants.PREIS_SPANNE_EPROD-1);
+		for (ObjektTyp typ: editorPreiseKauf.keySet())
+			editorPreiseVerkauf.put(typ, 
+					Utils.round((double)editorPreiseKauf.get(typ) * Constants.PREIS_KAUF_VERKAUF_RATIO));
 		
-		preiseKaufUntergrenze.put(ObjektTyp.MINE50, Constants.PREIS_MIN_MINE50);
-		preiseKaufObergrenze.put(ObjektTyp.MINE50, Constants.PREIS_MIN_MINE50 + Constants.PREIS_SPANNE_MINE50-1);
-		
-		preiseKaufUntergrenze.put(ObjektTyp.MINE100, Constants.PREIS_MIN_MINE100);
-		preiseKaufObergrenze.put(ObjektTyp.MINE100, Constants.PREIS_MIN_MINE100 + Constants.PREIS_SPANNE_MINE100-1);
-		
-		preiseKaufUntergrenze.put(ObjektTyp.MINE250, Constants.PREIS_MIN_MINE250);
-		preiseKaufObergrenze.put(ObjektTyp.MINE250, Constants.PREIS_MIN_MINE250 + Constants.PREIS_SPANNE_MINE250-1);
-		
-		preiseKaufUntergrenze.put(ObjektTyp.MINE500, Constants.PREIS_MIN_MINE500);
-		preiseKaufObergrenze.put(ObjektTyp.MINE500, Constants.PREIS_MIN_MINE500 + Constants.PREIS_SPANNE_MINE500-1);
-		
-		preiseKaufUntergrenze.put(ObjektTyp.TRANSPORTER, Constants.PREIS_MIN_TRANSP);
-		preiseKaufObergrenze.put(ObjektTyp.TRANSPORTER, Constants.PREIS_MIN_TRANSP + Constants.PREIS_SPANNE_TRANSP-1);
-		
-		preiseKaufUntergrenze.put(ObjektTyp.MINENRAEUMER, Constants.PREIS_MIN_MINENR);
-		preiseKaufObergrenze.put(ObjektTyp.MINENRAEUMER, Constants.PREIS_MIN_MINENR + Constants.PREIS_SPANNE_MINENR-1);
-		
-		preiseKaufUntergrenze.put(ObjektTyp.FESTUNG_REPARATUR, Constants.PREIS_MIN_FESTUNG_REPARATUR);
-		preiseKaufObergrenze.put(ObjektTyp.FESTUNG_REPARATUR, Constants.PREIS_MIN_FESTUNG_REPARATUR + Constants.PREIS_SPANNE_FESTUNG_REPARATUR-1);
-		
-		preiseKaufUntergrenze.put(ObjektTyp.ERAUM, Constants.PREIS_MIN_ERAUM);
-		preiseKaufObergrenze.put(ObjektTyp.ERAUM, Constants.PREIS_MIN_ERAUM + Constants.PREIS_SPANNE_ERAUM-1);
 	}
-	
 	protected Spiel() {}
 	
 	@SuppressWarnings("unchecked")
@@ -142,6 +120,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.anzPl = anzPl;
 		this.anzSp = spieler.length;
 		this.maxJahre = maxJahre;
+		
+		this.build = ReleaseGetter.getRelease();
 		
 		this.initial = true;
 		
@@ -160,7 +140,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return spiel;
 	}
 	
-	public void initAfterLoad(SpielThread spielThread)
+	void initAfterLoad(SpielThread spielThread)
 	{
 		// Transiente Felder instanziieren
 		this.spielThread = spielThread;
@@ -169,10 +149,12 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.spielThread.checkMenueEnabled();
 		this.goToReplay = this.emailSpieler;
 		
+		this.migrieren();
+		
 		this.hauptschleife();
 	}
 	
-	public void initNewGame(
+	void initNewGame(
 			SpielThread spielThread)
 			
 	{
@@ -246,7 +228,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		
 	}
 	
-	public boolean istSpielerEmail(int spIndex)
+	private boolean istSpielerEmail(int spIndex)
 	{
 		if (this.optionen.contains(SpielOptionen.EMAIL))
 			return this.spieler[spIndex].istEmail();
@@ -259,7 +241,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return this.initial;
 	}
 	
-	public void setInitial()
+	void setInitial()
 	{
 		this.initial = true;
 	}
@@ -309,23 +291,27 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return this.optionen.contains(SpielOptionen.SIMPEL);
 	}
 	
-	public int[][] getDistanzMatrix()
+	public Flugzeit[][] getDistanzMatrix()
 	{
 		if (this.distanzMatrix == null)
 		{
-			this.distanzMatrix = new int[anzPl][anzPl];
+			this.distanzMatrix = new Flugzeit[anzPl][anzPl];
+			this.distanzMatrixJahre = new int[anzPl][anzPl];
 			
 			for (int pl = 0; pl < anzPl - 1; pl++)
 			{
 				for (int pl2 = pl + 1; pl2 < anzPl; pl2++)
 				{
-					this.distanzMatrix[pl][pl2] = Flugobjekt.getFlugdauer(
+					this.distanzMatrix[pl][pl2] = Flugobjekt.getFlugzeit(
 							ObjektTyp.RAUMER,
 							false,
 							this.planeten[pl].getPos(),
 							this.planeten[pl2].getPos());
 					
 					this.distanzMatrix[pl2][pl] = this.distanzMatrix[pl][pl2];
+					
+					this.distanzMatrixJahre[pl][pl2] = this.distanzMatrix[pl][pl2].jahr;
+					this.distanzMatrixJahre[pl2][pl] = this.distanzMatrixJahre[pl][pl2];
 				}
 			}  			
 		}
@@ -346,7 +332,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return retval;
 	}
 	
-	public void addArchiv(Hashtable<Integer,Archiv> neueArchive)
+	private void addArchiv(Hashtable<Integer,Archiv> neueArchive)
 	{
 		for (Integer j: neueArchive.keySet())
 			this.archiv.put(j, neueArchive.get(j));
@@ -487,8 +473,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			for (Flugobjekt objOrig: this.objekte)
 			{
-				if (objOrig.getTyp() == ObjektTyp.SCHWARZES_LOCH ||
-					objOrig.istBeteiligt(spIndex))
+				if (objOrig.istBeteiligt(spIndex))
 				{
 					spClone.objekte.add((Flugobjekt)Utils.klon(objOrig));
 				}
@@ -503,9 +488,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				// So tun als haetten alle anderen Spieler bereits Spielzuege eingegeben
 				spClone.spielzuege.put(sp, new ArrayList<Spielzug>());
 				spClone.spielzuegeReferenzCodes[sp] = null;
-				
-				spClone.preiseKaufArray.set(sp, new Hashtable<ObjektTyp,Integer>());
-				spClone.preiseVerkaufArray.set(sp, new Hashtable<ObjektTyp,Integer>());
 			}
 		}
 		
@@ -551,11 +533,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 	{
 		HashSet<SpielOptionen> optionen = new HashSet<SpielOptionen>();
 		
-		optionen.add(SpielOptionen.KOMPAKTES_SPIELFELD);
-		optionen.add(SpielOptionen.AUSSERIRDISCHE);
+//		optionen.add(SpielOptionen.KOMPAKTES_SPIELFELD);
+//		optionen.add(SpielOptionen.AUSSERIRDISCHE);
 		optionen.add(SpielOptionen.KEIN_ENDLOSSPIEL);
 		optionen.add(SpielOptionen.KOMMANDOZENTRALEN);
-		optionen.add(SpielOptionen.SCHWARZES_LOCH);
+//		optionen.add(SpielOptionen.SCHWARZES_LOCH);
 		optionen.add(SpielOptionen.FESTUNGEN);
 		optionen.add(SpielOptionen.AUTO_SAVE);
 		
@@ -588,11 +570,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.archiv = new Hashtable<Integer,Archiv>();
 		this.jahr = 0;
 		
-		if (!this.optionen.contains(SpielOptionen.SIMPEL))
-			this.loch = new Loch(false, null, Constants.LOCH_ERSTES_JAHR);
-		else
-			this.loch = null;
-		
 		this.minen = new Hashtable<String,Mine>();
 		
 		this.objekte = new ArrayList<Flugobjekt>();
@@ -600,8 +577,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.planeten = new Planet[anzPl];
 		
 		this.screenDisplayContent = null;
-		
-		this.spieldauerSekunden = 0;
 		
 		this.startDatum = System.currentTimeMillis();
 		
@@ -611,7 +586,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.breite = Constants.FELD_MAX_X;
 		this.hoehe = Constants.FELD_MAX_Y;
 		
-		if (this.optionen.contains(SpielOptionen.KOMPAKTES_SPIELFELD) && this.anzPl < Constants.ANZAHL_PLANETEN_MAX)
+		if (this.anzPl < Constants.ANZAHL_PLANETEN_MAX)
 		{
 			double felderProPlanet = (double)(Constants.FELD_MAX_X * Constants.FELD_MAX_Y) / (double)Constants.ANZAHL_PLANETEN_MAX;
 			double ratio = (double)Constants.FELD_MAX_X / (double)Constants.FELD_MAX_Y;
@@ -758,8 +733,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			
 			Festung festung = (!this.optionen.contains(SpielOptionen.SIMPEL) && heimatPlanet) ? 
-									new Festung(1,100) :
-										null;
+									new Festung() :
+									null;
+									
 			Kommandozentrale kz = (heimatPlanet && (!this.optionen.contains(SpielOptionen.SIMPEL)))
 					                  ? new Kommandozentrale(pl)
 									  : null;
@@ -906,7 +882,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private void hauptschleife()
 	{
-		this.currentTime = System.currentTimeMillis(); // Zur Berechnung der Gesamtspieldauer
+		this.updateSaveBuild();
 		
 		if (this.spielzuege == null)
 			this.spielzuege = new Hashtable<Integer, ArrayList<Spielzug>>();
@@ -1061,9 +1037,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 	}
 	private void abschliessen(boolean background)
 	{
-		// Spiel abschliessen
-		this.refreshSpieldauerSekunden();
-		
 		this.abgeschlossen = true;
 		
 		// Gratulation
@@ -1204,31 +1177,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	public void jahrVorbereiten()
 	{
-		// Preise berechnen
-		this.preiseKaufArray = new ArrayList<Hashtable<ObjektTyp,Integer>>();
-		this.preiseVerkaufArray = new ArrayList<Hashtable<ObjektTyp,Integer>>();
-
-		// Preise fuer alle Spieler und neutrale Planeten berechnen
-		for (int sp = 0; sp <= this.anzSp; sp++)
-		{
-			Hashtable<ObjektTyp,Integer> preiseKauf2 = new Hashtable<ObjektTyp,Integer>();
-			Hashtable<ObjektTyp,Integer> preiseVerkauf2 = new Hashtable<ObjektTyp,Integer>();
-			
-			for (ObjektTyp typ: preiseKaufUntergrenze.keySet())
-			{
-				preiseKauf2.put(typ,
-						preiseKaufUntergrenze.get(typ) + 
-						Utils.random(
-								preiseKaufObergrenze.get(typ)-preiseKaufUntergrenze.get(typ)+1));
-				
-				preiseVerkauf2.put(typ, 
-						Utils.round((double)preiseKauf2.get(typ) * Constants.PREIS_KAUF_VERKAUF_RATIO));
-			}
-			
-			preiseKaufArray.add(preiseKauf2);
-			preiseVerkaufArray.add(preiseVerkauf2);
-		}
-		
 		// Spielzuege loeschen
 		this.spielzuege = new Hashtable<Integer, ArrayList<Spielzug>> ();
 		
@@ -1285,7 +1233,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				new SpielfeldDisplayContent(plData,
 				null,
 				null,
-				null,
 				null));
 		
 		this.spielThread.updateDisplay(this.screenDisplayContent);
@@ -1325,8 +1272,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 		}
 		
-		Point lochPos = (this.loch != null && this.loch.isActive()) ? this.loch.getPos() : null;
-		
 		//Flugobjekte zeichnen (nur bei Simple-Stern)
 		ArrayList<SpielfeldLineDisplayContent> lines = new ArrayList<SpielfeldLineDisplayContent>();
 
@@ -1334,7 +1279,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		{
 			for (Flugobjekt obj: this.objekte)
 			{
-				if (obj.istZuLoeschen() || obj.getNeu() || obj.getTyp() == ObjektTyp.SCHWARZES_LOCH
+				if (obj.istZuLoeschen() || obj.getNeu()
 					|| obj.getTyp() == ObjektTyp.KAPITULATION)
 					continue;
 				
@@ -1352,7 +1297,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				new SpielfeldDisplayContent(plData,
 				markedField,
 				lines, // lines, wenn Flugobjekte gezeichnet werden sollen, sonst null.
-				lochPos,
 				null));
 		
 		if (!this.console.isBackground())
@@ -1427,7 +1371,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spielThread.updateDisplay(this.screenDisplayContent);
 	}
 	
-	public void updateConsoleDisplay(ConsoleDisplayContent cont, boolean isBackground)
+	void updateConsoleDisplay(ConsoleDisplayContent cont, boolean isBackground)
 	{
 		if (this.screenDisplayContent == null)
 			this.screenDisplayContent = new ScreenDisplayContent();
@@ -1475,7 +1419,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		}
 	}
 	
-	public void buildPlanetenNameMap()
+	private void buildPlanetenNameMap()
 	{
 		this.mapPlanetIndexToName = new Hashtable<String,String>();
 		this.mapPlanetNameToIndex = new Hashtable<String,String>();
@@ -1501,7 +1445,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.planetenSortiert = Utils.listeSortieren(planetenUnsortiert, false);
 	}
 	
-	public int getPlanetIndexFromPoint(Point pt)
+	private int getPlanetIndexFromPoint(Point pt)
 	{
 		if (this.planetenByPoint == null)
 			this.buildPlanetenNameMap();
@@ -1516,7 +1460,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			return plIndex.intValue();
 	}
 	
-	public Point getPointFromFeldName(String name)
+	private Point getPointFromFeldName(String name)
 	{
 		if (name.length() != 2)
 			return null;
@@ -1543,7 +1487,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			return null;
 	}
 	
-	public String getFeldNameFromPoint(Point pt)
+	private String getFeldNameFromPoint(Point pt)
 	{
 		int plIndex = this.getPlanetIndexFromPoint(pt);
 		
@@ -1554,7 +1498,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		
 	}
 	
-	public static String getSectorNameFromPoint(Point pt)
+	static String getSectorNameFromPoint(Point pt)
 	{
 		return Character.toString((char)(65+(pt.getY()))) +
 			   Character.toString((char)(65+(pt.getX())));
@@ -1650,7 +1594,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return retval;
 	}
 	
-	public KeyEventExtended waitForKeyInput()
+	KeyEventExtended waitForKeyInput()
 	{
 		if (!this.console.isBackground())
 			return this.spielThread.waitForKeyInput();
@@ -1668,23 +1612,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 						"");
 	}
 	
-	public void pause(int milliseconds)
+	private void pause(int milliseconds)
 	{
 		if (!this.console.isBackground())
 			this.spielThread.pause(milliseconds);
-	}
-	
-	private void refreshSpieldauerSekunden()
-	{
-		if (this.abgeschlossen)
-			return;
-		
-		long timeNow = System.currentTimeMillis();
-		
-		int diffSekunden = Utils.round((double)(timeNow - this.currentTime) / 1000.0);
-		this.spieldauerSekunden += diffSekunden;
-		
-		this.currentTime = timeNow;
 	}
 	
 	// =========================================
@@ -1723,7 +1654,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			short ladecode = this.inmki();
 			
 			spiel.startDatum = Utils.getDateFromOldVega(this.getDate(this.inmki()));
-			spiel.spieldauerSekunden = this.inmkl() * 60;
+			this.inmkl(); // Spieldauer in Sekunden
 			
 			short setup = this.inmki();
 			@SuppressWarnings("unused")
@@ -1733,22 +1664,23 @@ public class Spiel extends EmailTransportBase implements Serializable
 			spiel.maxJahre = this.inmki();
 			spiel.jahr = this.inmki()-1; // Achtung: Frueher begann das Spiel mit jahr=1, heute mit jahr=0!
 			
+			boolean schwarzesLoch = false;
 			spiel.optionen = new HashSet<SpielOptionen>();
 			if ((setup & 32) > 0)
 				spiel.optionen.add(SpielOptionen.KOMMANDOZENTRALEN);
-//			if ((setup & 8) > 0)
-			spiel.optionen.add(SpielOptionen.SCHWARZES_LOCH);
+			if ((setup & 8) > 0)
+				schwarzesLoch = true;
 //			if ((setup & 1) > 0  && spiel.eingabezeitMinuten > 0)
 //				spiel.optionen.add(SpielOptionen.BEGRENZTE_EINGABEZEIT);
 			if ((setup & 4) > 0 && spiel.maxJahre > 0)
 				spiel.optionen.add(SpielOptionen.KEIN_ENDLOSSPIEL);
 //			if ((setup & 2) > 0)
-			spiel.optionen.add(SpielOptionen.AUSSERIRDISCHE);
+//			spiel.optionen.add(SpielOptionen.AUSSERIRDISCHE);
 //			if ((setup & 16) > 0)
 //				spiel.optionen.add(SpielOptionen.AUTO_SAVE);
 			
 			spiel.optionen.add(SpielOptionen.FESTUNGEN);
-			spiel.optionen.add(SpielOptionen.KOMPAKTES_SPIELFELD);
+//			spiel.optionen.add(SpielOptionen.KOMPAKTES_SPIELFELD);
 		
 			// Spieler
 			spiel.anzSp = this.inasc();
@@ -1829,7 +1761,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				if (festung > 0)
 				{
 					short intakt = this.inasc();
-					fest = new Festung(festung, intakt);
+					fest = Festung.migrieren(festung, intakt);
 				}
 				
 				short evorrat = this.inmki();
@@ -2008,23 +1940,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			
 			// Schwarzes Loch			
-			if (spiel.optionen.contains(SpielOptionen.SCHWARZES_LOCH))
+			if (schwarzesLoch)
 			{
-				
-				short loch_time = this.inmki();
+				this.inmki();
 				short loch = this.inasc(); // Boolean
-				short lochx = 0, lochy = 0;
 				
 				if (loch > 0)
 				{
-					lochx = this.inasc();
-					lochy = this.inasc();
+					this.inasc();
+					this.inasc();
 				}
-				
-				spiel.loch = new Loch((loch > 0), new Point(lochx, lochy), loch_time);
 			}
-			else
-				spiel.loch = new Loch(false, new Point(0,0), 0);
 			
 			// Punktestand-Historie
 			spiel.archiv = new Hashtable<Integer,Archiv>();
@@ -2196,7 +2122,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  		public int y;
  		public byte col;
  		
- 		public PlanetenInfo(int x, int y, byte col)
+ 		private PlanetenInfo(int x, int y, byte col)
  		{
  			this.x = x;
  			this.y = y;
@@ -2204,15 +2130,15 @@ public class Spiel extends EmailTransportBase implements Serializable
  		}
  	}
  	// =====================
- 	protected class Zugeingabe
+ 	private class Zugeingabe
  	{
  		private Spiel spiel;
  		private int spielerJetzt;
- 		public boolean eingabeAbgeschlossen;
- 		public boolean kapituliert;
+ 		private boolean eingabeAbgeschlossen;
+ 		private boolean kapituliert;
  		
  		@SuppressWarnings("unchecked")
- 		public Zugeingabe(Spiel spiel)
+ 		private Zugeingabe(Spiel spiel)
  		{
  			this.spiel = spiel;
 
@@ -3000,16 +2926,22 @@ public class Spiel extends EmailTransportBase implements Serializable
 				// Info?
 				if (inputText.equals("-"))
 				{
-					int ankunft = this.spiel.jahr + 
-							this.spiel.getDistanzMatrix()[startPl][zielPl] + 1;
-
 					this.spiel.console.appendText(
 							SternResources.ZugeingabeMaxAnzahlRaumer(true, 
-									Integer.toString((maxAnz))));
-					this.spiel.console.lineBreak();
+									Integer.toString((maxAnz))) + " ");
+					
+					Flugzeit flugzeit = Flugobjekt.getFlugzeit(
+							ObjektTyp.RAUMER, 
+							false, 
+							this.spiel.planeten[startPl].getPos(), 
+							this.spiel.planeten[zielPl].getPos());
+					
 					this.spiel.console.appendText(
-							SternResources.ZugeingabeAnkunft(true, 
-									Integer.toString(ankunft)));
+							SternResources.ZugeingabeAnkunft(true));
+					
+					flugzeit.jahr += this.spiel.jahr;
+					this.spiel.console.appendText(
+							flugzeit.toOutputString(true));
 
 					this.spiel.console.waitForTaste();
 					continue;
@@ -3314,11 +3246,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 				// Patrouille: Mission oder Transfer?
 				keys = new ArrayList<ConsoleKey>();
 
-				keys.add(new ConsoleKey("1",SternResources.ZugeingabePatrouilleMission(true)));
-				keys.add(new ConsoleKey("2", SternResources.ZugeingabePatrouilleTransfer(true)));
+				keys.add(new ConsoleKey("1",SternResources.ZugeingabePatrouilleMissionLinks(true)));
+				keys.add(new ConsoleKey("2",SternResources.ZugeingabePatrouilleMissionRechts(true)));
+				keys.add(new ConsoleKey("3", SternResources.ZugeingabePatrouilleTransfer(true)));
 				keys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 
 				boolean transfer = false;
+				int anz = 1; // 1 = linksdrehend, 2 = rechtsdrehend
 				boolean abbruch = false;
 
 				do
@@ -3333,15 +3267,19 @@ public class Spiel extends EmailTransportBase implements Serializable
 						abbruch = true;
 						break;
 					}
+					
+					String key = input.getInputText().toUpperCase();
 
-					if (!input.getInputText().toUpperCase().equals("1") && 
-					    !input.getInputText().toUpperCase().equals("2"))
+					if (!key.equals("1") &&
+						!key.equals("2") && 
+					    !key.equals("3"))
 					{
 						this.spiel.console.outUngueltigeEingabe();
 						continue;
 					}
 
-					transfer = (input.getInputText().toUpperCase().equals("2"));
+					anz = key.equals("1") ? 1 : 2;
+					transfer = (key.equals("3"));
 
 					break;
 
@@ -3356,7 +3294,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						this.spiel.planeten[startPl].getPos(),
 						this.spiel.planeten[zielPl].getPos(),
 						typ,
-						1,
+						anz,
 						this.spielerJetzt,
 						transfer,
 						true,
@@ -3512,7 +3450,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				// Patrouille: Mission oder Transfer?
 				keys = new ArrayList<ConsoleKey>();
 
-				keys.add(new ConsoleKey("1",SternResources.ZugeingabePatrouilleMission(true)));
+				keys.add(new ConsoleKey("1",SternResources.ZugeingabeMinenraeumerMission(true)));
 				keys.add(new ConsoleKey("2", SternResources.ZugeingabePatrouilleTransfer(true)));
 				keys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 
@@ -4180,16 +4118,14 @@ public class Spiel extends EmailTransportBase implements Serializable
  	}
  	
  	// =============================
- 	protected class Planeteneditor
+ 	private class Planeteneditor
  	{
- 		private Hashtable<ObjektTyp,Integer> preiseKauf;
- 		private Hashtable<ObjektTyp,Integer> preiseVerkauf;
  		private ArrayList<ObjektTyp> editorReihenfolge;
  		private Spiel spiel;
  		private boolean readOnly;
  		private boolean reduzierteAnzeige;
  		
- 		public Planeteneditor(
+ 		private Planeteneditor(
  				Spiel spiel,
  				int plIndex,
  				ArrayList<Spielzug> spielzuege,
@@ -4199,14 +4135,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  			this.readOnly = readOnly;
  			this.reduzierteAnzeige = reduzierteAnzeige;
  			
- 			this.preiseKauf = spiel.planeten[plIndex].getBes() == Constants.BESITZER_NEUTRAL ?
- 								spiel.preiseKaufArray.get(spiel.anzSp) :
- 								spiel.preiseKaufArray.get(spiel.planeten[plIndex].getBes());
- 								
-			this.preiseVerkauf = spiel.planeten[plIndex].getBes() == Constants.BESITZER_NEUTRAL ?
-									spiel.preiseVerkaufArray.get(spiel.anzSp) :
-									spiel.preiseVerkaufArray.get(spiel.planeten[plIndex].getBes());
- 								
  			this.spiel = spiel;
  			
  			this.editorReihenfolge = new ArrayList<ObjektTyp>();
@@ -4326,7 +4254,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			{
  				if (kauf)
  					// Kaufen
- 					pl.kaufeEprod(this.preiseKauf.get(ObjektTyp.EPROD));
+ 					pl.kaufeEprod(Spiel.editorPreiseKauf.get(ObjektTyp.EPROD));
  			}
  			else if (typ == ObjektTyp.ERAUM)
  			{
@@ -4341,70 +4269,34 @@ public class Spiel extends EmailTransportBase implements Serializable
  					return;
  				
  				if (kauf)
- 					pl.kaufeFestung(this.preiseKauf.get(typ));				
+ 					pl.kaufeFestung(Spiel.editorPreiseKauf.get(typ));				
  				else
- 					pl.verkaufeFestung(Utils.round((double)(this.preiseVerkauf.get(typ) * pl.getFestungIntakt()) / 100.));
+ 					pl.verkaufeFestung(Utils.round((double)(
+ 							Spiel.editorPreiseVerkauf.get(typ) * pl.getFestungZustand())));
  			}
  			else if (typ == ObjektTyp.FESTUNG_REPARATUR)
  			{
- 				if (kauf && pl.getFestungFaktor() > 0 && pl.getFestungIntakt() < 100)
- 					pl.repariereFestung(Constants.PREIS_MIN_FESTUNG_REPARATUR * pl.getFestungFaktor());
+ 				if (kauf && pl.getFestungFaktor() > 0 && !pl.istFestungVollIntakt())
+ 					pl.repariereFestung(Constants.PREIS_FESTUNG_REPARATUR * pl.getFestungFaktor());
  			}
  			else
  			{
  				// Flugobjekte
  				if (kauf)
- 					pl.kaufeObjekt(typ, 1, this.preiseKauf.get(typ));
+ 					pl.kaufeObjekt(typ, 1, Spiel.editorPreiseKauf.get(typ));
  				else
- 					pl.verkaufeObjekt(typ, this.preiseVerkauf.get(typ));
+ 					pl.verkaufeObjekt(typ, Spiel.editorPreiseVerkauf.get(typ));
  			}
  		}
  		
  		private void updateDisplay (Planet pl, int zeile, boolean readOnly)
  		{
- 			Hashtable<ObjektTyp,String> preisspanneKauf = new Hashtable<ObjektTyp,String>();
- 			Hashtable<ObjektTyp,String> preisspanneVerkauf = new Hashtable<ObjektTyp,String>();
  			Hashtable<ObjektTyp,String> anzahl = new Hashtable<ObjektTyp,String>();
  			HashSet<ObjektTyp> kaufNichtMoeglich = new HashSet<ObjektTyp>();
  			HashSet<ObjektTyp> verkaufNichtMoeglich = new HashSet<ObjektTyp>();
  			
- 			@SuppressWarnings("unchecked")
- 			Hashtable<ObjektTyp,Integer> preiseKauf = (Hashtable<ObjektTyp,Integer>)Utils.klon(this.preiseKauf);
- 			@SuppressWarnings("unchecked")
- 			Hashtable<ObjektTyp,Integer> preiseVerkauf = (Hashtable<ObjektTyp,Integer>)Utils.klon(this.preiseVerkauf);
- 			
  			for (ObjektTyp typ: this.editorReihenfolge)
  			{
- 				// Verkaufspreis fuer angeschlagene Festungen
- 				if (typ == ObjektTyp.FESTUNG && pl.getFestungFaktor() > 0 && pl.getFestungIntakt() < 100)
- 					preiseVerkauf.put(typ, Utils.round((double)preiseVerkauf.get(typ) * (double)pl.getFestungIntakt() / 100.));
- 				
- 				// Preis fuer Doppelfestungen
- 				if (typ == ObjektTyp.FESTUNG_REPARATUR && pl.getFestungFaktor() > 1)
- 					preiseKauf.put(typ, pl.getFestungFaktor() * Constants.PREIS_MIN_FESTUNG_REPARATUR);
- 				
- 				// Preisspannen
- 				StringBuilder sb = new StringBuilder();
- 				sb.append("(");
- 				sb.append(Utils.padString(Spiel.preiseKaufUntergrenze.get(typ),2));
- 				sb.append("-");
- 				sb.append(Utils.padString(Spiel.preiseKaufObergrenze.get(typ),2));
- 				sb.append(")");
- 				
- 				preisspanneKauf.put(typ, sb.toString());
- 				
- 				if (typ != ObjektTyp.EPROD && typ != ObjektTyp.FESTUNG_REPARATUR)
- 				{
- 					sb = new StringBuilder();
- 					sb.append("(");
- 					sb.append(Utils.padString(Utils.round((double)Spiel.preiseKaufUntergrenze.get(typ)*Constants.PREIS_KAUF_VERKAUF_RATIO),2));
- 					sb.append("-");
- 					sb.append(Utils.padString(Utils.round((double)Spiel.preiseKaufObergrenze.get(typ)*Constants.PREIS_KAUF_VERKAUF_RATIO),2));
- 					sb.append(")");
- 					
- 					preisspanneVerkauf.put(typ, sb.toString());
- 				}
- 				
  				// Angezeigte Menge
  				int evorrat = pl.getEvorrat();
  				
@@ -4428,7 +4320,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				}
  				else if (typ == ObjektTyp.FESTUNG_REPARATUR)
  				{
- 					anz = pl.getFestungIntakt();
+ 					anz = pl.getFestungRaumer();
  					anzString = Utils.numToString(anz);
  				}
  				else
@@ -4442,14 +4334,14 @@ public class Spiel extends EmailTransportBase implements Serializable
  				// Was kann man kaufen, was nicht?
  				if (typ == ObjektTyp.FESTUNG_REPARATUR)
  				{
- 					if (pl.getFestungFaktor() == 0 || (pl.getFestungFaktor() > 0 && pl.getFestungIntakt() >= 100))
+ 					if (pl.getFestungFaktor() == 0 || (pl.getFestungFaktor() > 0 && pl.istFestungVollIntakt()))
  						kaufNichtMoeglich.add(typ);
  				}
  				else if (typ == ObjektTyp.EPROD && pl.getEprod() >= Constants.EPROD_MAX)
  					kaufNichtMoeglich.add(typ);
  				else if (typ == ObjektTyp.FESTUNG && (!spiel.optionen.contains(SpielOptionen.FESTUNGEN) || anz >= Constants.MAX_ANZ_FESTUNGEN))
  					kaufNichtMoeglich.add(typ);
- 				else if (this.preiseKauf.get(typ) > evorrat)
+ 				else if (Spiel.editorPreiseKauf.get(typ) > evorrat)
  					kaufNichtMoeglich.add(typ);
  				
  				// Was kann man verkaufen, was nicht?
@@ -4467,10 +4359,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  			this.spiel.screenDisplayContent.setPlEdit(new
  				PlanetenEditorDisplayContent(
  						this.editorReihenfolge.get(zeile),
- 						preiseKauf,
- 						preiseVerkauf,
- 						preisspanneKauf,
- 						preisspanneVerkauf,
  						anzahl,
  						kaufNichtMoeglich,
  						verkaufNichtMoeglich,
@@ -4486,14 +4374,14 @@ public class Spiel extends EmailTransportBase implements Serializable
  	}
  	
  // =============================
- 	protected class Statistik
+ 	private class Statistik
  	{ 		
  		private Spiel spiel;
  		
  		private int markiertesJahrIndex;
  		private char modus;
 	 		
- 		public Statistik(
+ 		private Statistik(
  				Spiel spiel)
  		{
  			this.spiel = spiel;
@@ -4674,7 +4562,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setStatistik(
  				new StatistikDisplayContent(
- 						this.spiel.spieldauerSekunden,
  						this.spiel.startDatum,
  						titel,
  						(Spieler[])Utils.klon(this.spiel.spieler),
@@ -4695,12 +4582,12 @@ public class Spiel extends EmailTransportBase implements Serializable
  	}
  	
  // =============================
-  	protected class Auswertung
+  	private class Auswertung
   	{
   		private Spiel spiel;
   		private ArrayList<ScreenDisplayContent> replay = new ArrayList<ScreenDisplayContent>();
   		
-  		public Auswertung(Spiel spiel)
+  		private Auswertung(Spiel spiel)
   		{
   			this.spiel = spiel;
   			
@@ -4713,12 +4600,12 @@ public class Spiel extends EmailTransportBase implements Serializable
 					Colors.INDEX_NEUTRAL);
 			
 			this.spiel.console.clear();
+			this.writeEreignisDatumJahresbeginn();
 			this.spiel.console.appendText(
-					SternResources.AuswertungBeginnt(
-							true, Integer.toString(this.spiel.jahr+1)));
+					SternResources.AuswertungBeginnt(true));
 			this.taste();
 			
-			// Die Spielzuege werden eingearbeitet
+			// Die Spielzuege werden eingearbeitet, Objekte werden gestartet
 			this.spielzuege();
 			
 			// Planeten produzieren Energie und Raumer
@@ -4728,14 +4615,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 				pl.produziereRaumer();
 			}
 			
-			// Ausserirdische einstreuen
-			this.ausserirdischeStarten();
-			
-			// Schwarzes Loch einsetzen
-			this.lochEinsetzen();
-			
 			// Das Kennzeichen "Neu" bei allen Flugobjekten loeschen
-			for (Flugobjekt obj: objekte)
+			for (Flugobjekt obj: this.spiel.objekte)
 				obj.resetNeu();
 			
 			// Alle Bildschirminhalte aktualisieren
@@ -4744,64 +4625,88 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			// Buendnisse aufraeumen
 			this.buendnisseAufraeumen();
-		
-			// Flugobjekte in zufaelliger Reihenfolge bewegen
-			int[] seq = Utils.randomList(this.spiel.objekte.size());
 			
-			for (int i = 0; i < seq.length; i++)
+			// Patrouillen beobachten, bevor sich andere Objekte bewegt haben
+			this.patrouillenBeobachten(false);
+
+			// Ereignisse der Flugobjekte sammeln
+			ArrayList<AuswertungEreignis> alleEreignisse = new ArrayList<AuswertungEreignis>(); 
+			
+			for (Flugobjekt obj: this.spiel.objekte)
 			{
-				Flugobjekt obj = this.spiel.objekte.get(seq[i]);
-				
 				if (obj.isStop() || obj.istZuLoeschen())
 					continue;
 				
-				// Eine Kapitulation
-				if (obj.getTyp() == ObjektTyp.KAPITULATION)
-				{
-					this.kommandozentraleErobert(obj.getBes(), Constants.BESITZER_NEUTRAL, true);
-					obj.setZuLoeschen();
-					continue;
-				}
+				ArrayList<AuswertungEreignis> ereignisse = obj.bewegen();
 				
-				ArrayList<Flugobjekt> beobachteteAndereObjekte = new ArrayList<Flugobjekt>(); 
-				
-				ArrayList<Point> felder = obj.bewegen();
-				
-				// Objekt wird ueber die Sektoren bewegt
-				for (int feldIndex = 0; feldIndex < felder.size(); feldIndex++)
-				{
-					Point feld = felder.get(feldIndex);
-					
-					// 1. Schwarzes Loch bewegt sich
-					this.lochBewegen(obj, feld, (feldIndex > 0));
-					
-					// 2. Pruefen, ob sich das Objekt ueber das Schwarze Loch bewegt
-					this.objektFaelltInsLoch(obj, feld);
-					if (obj.istZuLoeschen())
-						break;
-					
-					// 3. Minenfelder
-					this.minenfeld(obj, feld);
-					if (obj.istZuLoeschen())
-						break;
-					
-					// 4. Patrouillen beobachten ihr Umfeld
-					this.patrouilleBeobachtet(obj, feld, beobachteteAndereObjekte);
-					if (obj.istZuLoeschen())
-						break;
-				}
-				
-				// Das Schwarze Loch wird nach der Bewegung immer geloescht
-				if (obj.getTyp() == ObjektTyp.SCHWARZES_LOCH)
-					obj.setZuLoeschen();
-				
-				// Ankunft testen?
-				if (obj.istZuLoeschen() || !obj.istAngekommen())
-					continue;
-				
-				// Objekt ist angekommen
-				this.ankunft(obj);
+				alleEreignisse.addAll(ereignisse);				
 			}
+			
+			// Ereignisse sortieren
+			Collections.sort(alleEreignisse, new AuswertungEreignis());
+			
+			// Gibt es gleiche Ereignisse, also z.B. zwei Ankuenfte
+			// auf demselben Planeten? Sortiere diese Ereignisse zufaellig um
+			for (int i = 0; i < alleEreignisse.size(); i++)
+			{
+				AuswertungEreignis ereignis = alleEreignisse.get(i);
+				
+				ArrayList<AuswertungEreignis> ereignisseKopie = new ArrayList<AuswertungEreignis>(); 
+				ereignisseKopie.add(ereignis);
+				
+				for (int j = i + 1; j < alleEreignisse.size(); j++)
+				{
+					AuswertungEreignis ereignis2 = alleEreignisse.get(j);
+					
+					if (ereignis.compare(ereignis, ereignis2) == 0	)
+						ereignisseKopie.add(ereignis2);
+					else
+						break;
+				}
+				
+				if (ereignisseKopie.size() == 1)
+					continue;
+				
+				int seq[] = Utils.randomList(ereignisseKopie.size());
+				
+				for (int k = 0; k < seq.length; k++)
+					alleEreignisse.set(i + k, ereignisseKopie.get(seq[k]));
+				
+				i += (ereignisseKopie.size()-1);
+			}
+			
+			// Ereignisse abarbeiten
+			for (AuswertungEreignis ereignis: alleEreignisse)
+			{
+				if (ereignis.obj.isStop() || ereignis.obj.istZuLoeschen())
+					continue;
+
+				// Eine Kapitulation
+				if (ereignis.obj.getTyp() == ObjektTyp.KAPITULATION)
+				{
+					this.kommandozentraleErobert(
+							ereignis.obj.getBes(), 
+							Constants.BESITZER_NEUTRAL, 
+							true,
+							ereignis.getTag());
+					ereignis.obj.setZuLoeschen();
+					continue;
+				}
+				
+				if (ereignis.typ == AuswertungEreignisTyp.SEKTOR_BETRETEN)
+				{
+					// Minen pruefen
+					this.minenfeld(ereignis);
+				}
+				else if (ereignis.typ == AuswertungEreignisTyp.ANKUNFT)
+				{
+					// Objekt ist angekommen
+					this.ankunft(ereignis);
+				}
+			}
+			
+			// Patrouillen beobachten noch einmal
+			this.patrouillenBeobachten(true);
 			
 			// Nicht mehr benoetigte Objekte loeschen
 			for (int i = this.spiel.objekte.size() - 1; i >= 0; i--)
@@ -4817,7 +4722,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			this.checkSpielerTot();
 
-			this.spiel.console.setLineColor(Colors.INDEX_WEISS);
+			this.writeEreignisDatumJahresende();
 			this.spiel.console.appendText(SternResources.AuswertungEnde(true));
 
 			this.taste();
@@ -4834,10 +4739,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			// Neue Preise berechnen
 			this.spiel.jahrVorbereiten();
-			
-			// Zeit aktualisieren
-			if (!this.spiel.console.isBackground())
-				this.spiel.refreshSpieldauerSekunden();
   		}
   		
   		private void spielzuege()
@@ -5124,390 +5025,281 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.replay.add(cont);
   		}
   		
-  		private void pause(int milliseconds)
+//  		private void pause(int milliseconds)
+//  		{
+//  			this.spiel.console.pause(milliseconds);
+//  			
+//  			ScreenDisplayContent cont = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
+//  			cont.setPlEdit(null);
+//  			cont.setPause(true);
+//			this.replay.add(cont);
+//  		}
+  		
+  		private void writeEreignisDatum(int tag)
   		{
-  			this.spiel.console.pause(milliseconds);
-  			
-  			ScreenDisplayContent cont = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
-  			cont.setPlEdit(null);
-  			cont.setPause(true);
-			this.replay.add(cont);
+  			if (tag < 1)
+  				writeEreignisDatumJahresbeginn();
+  			else if (tag > Constants.ANZ_TAGE_JAHR)
+  				writeEreignisDatumJahresende();
+  			else
+  			{		
+	  			// this.spiel.console.setLineColor(Colors.INDEX_WEISS);
+					
+				this.spiel.console.appendText(
+					SternResources.AuswertungEreignisTag(
+							true, 
+							Integer.toString(this.spiel.jahr + 1), 
+							Integer.toString(tag)));
+	  			
+				// this.spiel.console.lineBreak();
+  			}
   		}
   		
-  		private void ausserirdischeStarten()
+  		private void writeEreignisDatumJahresbeginn()
   		{
-  			if (!this.spiel.optionen.contains(SpielOptionen.AUSSERIRDISCHE) || this.spiel.jahr < Constants.AUSSERIRDISCHE_ERSTES_JAHR)
-  				return;
-	
-			if (Utils.random(Constants.AUSSERIRDISCHE_WAHRSCHEINLICHKEIT) != 0)
-				return;
-			
-			// Suche einen Planeten zufaellig aus
-			int[] plListe = Utils.randomList(this.spiel.anzPl);
-			
-			for (int i = 0; i < this.spiel.anzPl; i++)
-			{
-				int pl = plListe[i];
+  			// this.spiel.console.setLineColor(Colors.INDEX_WEISS);
 				
-				if (this.spiel.planeten[pl].getBes() != Constants.BESITZER_NEUTRAL)
-				{
-					Planet zielPlanet = this.spiel.planeten[pl];
-					
-					// Startfeld zufaellig bestimmen
-					Point startPos = Point.getRandom(this.spiel.xOff, this.spiel.yOff, this.spiel.breite, this.spiel.hoehe);
-					
-					// Anzahl
-					int anz = (int)(Math.log(this.spiel.jahr+1) / Math.log(1.02));
-					anz += (int)((double)anz * (double)(Utils.random(161) - 80) / 100.);
-					
-					// Raumerflotte starten
-					this.spiel.objekte.add(new Flugobjekt(
-							Constants.KEIN_PLANET,
-							pl,
-							startPos,
-							zielPlanet.getPos(),
-							ObjektTyp.RAUMER,
-							anz,
-							Constants.BESITZER_NEUTRAL,
-							false,
-							false,
-							null,
-							null));
-					
-					break;
-				}
-			}
-  		}
-  	
-  		private void lochEinsetzen()
-  		{
-			if (!this.spiel.optionen.contains(SpielOptionen.SCHWARZES_LOCH) || this.spiel.loch == null)
-				return;
-	
-			if (this.spiel.loch.isActive())
-			{
-				// Loch ist aktiv. Soll es verschwinden?
-				if (this.spiel.jahr >= this.spiel.loch.getNextActionJahr())
-				{
-					this.spiel.loch = new Loch(false,
-							null,
-							this.spiel.jahr + Constants.LOCH_MINDESTDAUER_WEG +
-									Utils.random(Constants.LOCH_DAUER_SPANNE_WEG));
-					return;
-				}	
-			}
-			else
-			{
-				// Loch ist inaktiv. Soll es erscheinen?
-				if (this.spiel.jahr < this.spiel.loch.getNextActionJahr())
-					return;
-				
-				Point zielPosition = null;
-				boolean ok = true;
-				
-				do
-				{
-					// Loch soll an einem zufaelligen Ort erscheinen, aber nicht auf einem Planeten
-					zielPosition = Point.getRandom(this.spiel.xOff, this.spiel.yOff, this.spiel.breite, this.spiel.hoehe);
-					ok = true;
-					
-					for (Planet pl: this.spiel.planeten)
-					{
-						if (pl.getPos().equals(zielPosition))
-						{
-							ok = false;
-							break;
-						}
-					}
-				} while (!ok);
-				
-				this.spiel.loch = new Loch(true,
-									zielPosition,
-									this.spiel.jahr + Constants.LOCH_MINDESTDAUER +
-											Utils.random(Constants.LOCH_DAUER_SPANNE));
-			}
-			
-			if (!this.spiel.loch.isActive())
-				return;
-		
-			// Loch bewegen
-			// Gehe alle Sektoren um den momentanen Standort herum durch
-			int[] seq = Utils.randomList((Constants.LOCH_MAX_DX * 2 + 1) * (Constants.LOCH_MAX_DY * 2 + 1));
-			boolean ok = true;
-			Point zielPosition = null;
-			
-			for (int i = 0; i < seq.length; i++)
-			{
-				ok = true;
-				
-				int dx = (seq[i] % (Constants.LOCH_MAX_DX * 2 + 1)) - Constants.LOCH_MAX_DX;
-				int dy= (seq[i] / (Constants.LOCH_MAX_DY * 2 + 1)) - Constants.LOCH_MAX_DY;
-				
-				// Neue Position darf nicht die alte Position sein und muss innerhalb des Spielfeldes liegen
-				if ((dx == 0 && dy == 0) ||
-						this.spiel.loch.getPos().getX() + dx < this.spiel.xOff || this.spiel.loch.getPos().getX() + dx >= this.spiel.xOff + this.spiel.breite ||
-					    this.spiel.loch.getPos().getY() + dy < this.spiel.yOff || this.spiel.loch.getPos().getY() + dy >= this.spiel.yOff + this.spiel.hoehe)
-					continue;
-				
-				zielPosition = new Point(this.spiel.loch.getPos().getX() + dx, this.spiel.loch.getPos().getY() + dy);
-				
-				// Neue Position darf nicht auf einem anderen Planeten liegen
-				for (Planet pl: this.spiel.planeten)
-				{
-					if (pl.getPos().equals(zielPosition))
-					{
-						ok = false;
-						break;
-					}
-				}
-				
-				if (ok == true)
-					break;
-			}
-			
-			// "Flugobjekt" fuer das schwarze Loch anlegen
-			Flugobjekt obj = new Flugobjekt(
-					Constants.KEIN_PLANET,
-					Constants.KEIN_PLANET,
-					this.spiel.loch.getPos(),
-					zielPosition,
-					ObjektTyp.SCHWARZES_LOCH,
-					0,
-					Constants.BESITZER_NEUTRAL,
-					false,
-					true,
-					null,
-					null);
-			
-			this.spiel.objekte.add(obj);
-  			
+			this.spiel.console.appendText(
+					SternResources.AuswertungEreignisJahresbeginn(
+							true, 
+							Integer.toString(this.spiel.jahr + 1)));
+
+  			// this.spiel.console.lineBreak();
   		}
   		
-  		private void lochBewegen(Flugobjekt objLoch, Point feld, boolean taste)
+  		private void writeEreignisDatumJahresende()
   		{
-  			if (objLoch.getTyp() != ObjektTyp.SCHWARZES_LOCH)
-  				return;
+  			// this.spiel.console.setLineColor(Colors.INDEX_WEISS);
+				
+			this.spiel.console.appendText(
+					SternResources.AuswertungEreignisJahresende(
+							true, 
+							Integer.toString(this.spiel.jahr + 1)));
+
+  			// this.spiel.console.lineBreak();
+  		}
+  		
+  		private void patrouillenBeobachten(boolean jahresende)
+  		{
+  			ArrayList<AuswertungEreignisPatrouille> alleEreignisse = new ArrayList<AuswertungEreignisPatrouille>();
   			
-  			if (taste)
+  			// Gehe alle Patrouillen durch. Stelle eine Ereignisliste auf, geordnet
+  			// nach Beobachtungswinkel (0 - 359 Grad, Aufloesung 1 Grad)
+  			for (Flugobjekt obj: this.spiel.objekte)
   			{
-  				this.spiel.console.setLineColor(Colors.INDEX_WEISS);
-	  			this.spiel.console.appendText(
-	  					SternResources.AuswertungSchwarzesLochBewegtSich(true));
-	  			this.pause(Constants.PAUSE_MILLISECS);
-	  			this.spiel.console.lineBreak();
+  				if (obj.istZuLoeschen())
+  					continue;
+  				
+  				if (obj.getTyp() == ObjektTyp.PATROUILLE &&
+  					!obj.isTransfer())
+  				{
+  					alleEreignisse.addAll(this.patrouilleBeobachtet(obj));
+  				}
   			}
   			
-  			this.spiel.loch.setPosition(feld);
-  			this.spiel.updateSpielfeldDisplay();
-  			
-  			ArrayList<Flugobjekt> andereObjekte = this.findeFlugobjekteAufFeld(feld, objLoch);
-  			if (andereObjekte.size() == 0)
+  			if (alleEreignisse.size() == 0)
   				return;
   			
-  			// Alle "anderen Objekte" fallen ins Loch
-  			for (Flugobjekt anderesObj: andereObjekte)
-  				this.objektFaelltInsLoch(anderesObj, feld);  			
-  		}
-  		
-  		private void objektFaelltInsLoch(Flugobjekt obj, Point feld)
-  		{
-  			if (obj.getTyp() == ObjektTyp.SCHWARZES_LOCH || obj.istZuLoeschen())
-				return;
-		
-			if (this.spiel.loch == null || !this.spiel.loch.isActive() || !this.spiel.loch.getPos().equals(feld))
-				return;
-			
-			if (obj.getBes() != Constants.BESITZER_NEUTRAL)
-			{
-				this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
-				this.spiel.console.appendText(
-						SternResources.AuswertungNachrichtAnAusSektor(true,
-								this.spiel.spieler[obj.getBes()].getName(),
-								Spiel.getSectorNameFromPoint(feld)));
-			}
-			else
-			{
-				this.spiel.console.setLineColor(Colors.INDEX_NEUTRAL);
-				this.spiel.console.appendText(
-						SternResources.AuswertungNachrichtAnAusserirdischeAusSektor(true,
-								Spiel.getSectorNameFromPoint(feld)));
-			}
-			
-			this.spiel.console.lineBreak();
-			
-			if (obj.getTyp() == ObjektTyp.RAUMER)
-				this.spiel.console.appendText(
-						SternResources.AuswertungSchwarzesLochRaumer(true, 
-								Integer.toString(obj.getAnz())));
-			else if (obj.getTyp() == ObjektTyp.AUFKLAERER)
-				this.spiel.console.appendText(
-						SternResources.AuswertungSchwarzesLochAufklaerer(true));
-			else if (obj.getTyp() == ObjektTyp.MINE50 || obj.getTyp() == ObjektTyp.MINE100 || obj.getTyp() == ObjektTyp.MINE250 || obj.getTyp() == ObjektTyp.MINE500)
-				this.spiel.console.appendText(
-						SternResources.AuswertungSchwarzesLochMinenleger(true));
-			else if (obj.getTyp() == ObjektTyp.MINENRAEUMER)
-				this.spiel.console.appendText(
-						SternResources.AuswertungSchwarzesLochMinenraeumer(true));
-			else if (obj.getTyp() == ObjektTyp.PATROUILLE)
-				this.spiel.console.appendText(
-						SternResources.AuswertungSchwarzesLochPatrouille(true));
-			else if (obj.getTyp() == ObjektTyp.TRANSPORTER)
-				this.spiel.console.appendText(
-						SternResources.AuswertungSchwarzesLochTransporter(true));
-			
-			obj.setZuLoeschen();
-			
-			this.spiel.updateSpielfeldDisplay(
-					this.spiel.getSimpleMarkedField(feld));
-			
-			// Taste. Weiter mit naechstem Objekt.
-			this.taste();
-			
-			// Kommandozentrale im Loch verschwunden?
-			if (obj.getKz() != null)
-				this.kommandozentraleErobert(obj.getBes(), Constants.BESITZER_NEUTRAL, false);
-  		}
-  		
-  		private void patrouilleBeobachtet(Flugobjekt objPatr, Point feld, ArrayList<Flugobjekt> beobachteteAndereObjekte)
-  		{
-  			if (!(objPatr.getTyp() == ObjektTyp.PATROUILLE && !objPatr.isTransfer()))
-  				return;
+  			// Sortiere Ereignisse nach Winkel
+  			Collections.sort(alleEreignisse, new AuswertungEreignisPatrouille());
   			
-  			int[] umfeldreihenfolge = Utils.randomList((Constants.PATROUILLE_BEOBACHTUNG_DX * 2 + 1) * (Constants.PATROUILLE_BEOBACHTUNG_DY * 2 + 1));
-  			
-  			for (int i = 0; i < umfeldreihenfolge.length; i++)
-  			{
-				int dx = (umfeldreihenfolge[i] % (Constants.PATROUILLE_BEOBACHTUNG_DX * 2 + 1)) - Constants.PATROUILLE_BEOBACHTUNG_DX;
-				int dy = (umfeldreihenfolge[i] / (Constants.PATROUILLE_BEOBACHTUNG_DY * 2 + 1)) - Constants.PATROUILLE_BEOBACHTUNG_DY;
-
-				Point umfeld = new Point(feld.getX()+dx,feld.getY()+dy);
+  			// Wenn mehrere Ereignisse im selben Winkel stattfinden, dann Ereignisse
+  			// zufaellig umsortieren
+			for (int i = 0; i < alleEreignisse.size(); i++)
+			{
+				AuswertungEreignisPatrouille ereignis = alleEreignisse.get(i);
 				
-				ArrayList<Flugobjekt> andereObjekte = this.findeFlugobjekteAufFeld(umfeld, objPatr);
-				if (andereObjekte.size() == 0)
+				ArrayList<AuswertungEreignisPatrouille> ereignisseKopie = new ArrayList<AuswertungEreignisPatrouille>(); 
+				ereignisseKopie.add(ereignis);
+				
+				for (int j = i + 1; j < alleEreignisse.size(); j++)
+				{
+					AuswertungEreignisPatrouille ereignis2 = alleEreignisse.get(j);
+					
+					if (ereignis.winkel == ereignis2.winkel)
+						ereignisseKopie.add(ereignis2);
+					else
+						break;
+				}
+				
+				if (ereignisseKopie.size() == 1)
 					continue;
 				
-				for (Flugobjekt anderesObj: andereObjekte)
-				{
-					if (anderesObj.istZuLoeschen() || 
-						anderesObj.getTyp() == ObjektTyp.SCHWARZES_LOCH ||
-						objPatr.getBes() == anderesObj.getBes() ||
-						beobachteteAndereObjekte.contains(anderesObj))
-						continue;
-					
-					// Anderes Objekt als "beobachtet" markieren, damit es in derselben
-					// Runde von derselben Patrouille nicht zweimal beobachtet wird.
-					beobachteteAndereObjekte.add(anderesObj);
-					
-					// Spezialfall Buendnisraumer. Wenn der Besitzer der Flotte Buendnismitglied auf dem Zielplaneten ist, 
-					// dann nicht melden
-					if (!anderesObj.isStop() && anderesObj.getTyp() == ObjektTyp.RAUMER && this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(anderesObj.getBes()))
-						continue;
-					
-					// Wenn der Besitzer der Patrouille an der Buendnisflotte beteiligt ist, dann auch nicht melden.
-					if (anderesObj.istBeteiligt(objPatr.getBes()))
-						continue;
-
-					// Zwei Patrouillen kaempfen gegeneinander
-					if (anderesObj.getTyp() == ObjektTyp.PATROUILLE && !anderesObj.isTransfer())
-					{
-						boolean entdeckerVerliert = (Utils.random(6) + 1 > 3);
-						
-						Flugobjekt objSieger = entdeckerVerliert ?
-												anderesObj : objPatr;
-						Flugobjekt objVerlierer = entdeckerVerliert ?
-												objPatr : anderesObj;
-						
-						this.spiel.console.setLineColor(this.spiel.spieler[objSieger.getBes()].getColIndex());
-						this.spiel.console.appendText(
-							SternResources.AuswertungPatrouilleMeldetAusSektor(true,
-										this.spiel.spieler[objSieger.getBes()].getName(),
-										Spiel.getSectorNameFromPoint(objVerlierer.getCurrentField())));
-						this.spiel.console.lineBreak();
-						
-						// Sektor markieren
-						this.spiel.updateSpielfeldDisplay(
-								this.spiel.getSimpleMarkedField(
-										objVerlierer.getExactPos()));
-						
-						this.spiel.console.appendText(
-								SternResources.AuswertungPatrouillePatrouilleZerstoert(true));
-						
-						
-						this.taste();
-						objVerlierer.setZuLoeschen();
-					}
-					else
-					{
-						// Meldung machen. Kleinobjekte kapern
-						// Feld markieren
-						this.spiel.updateSpielfeldDisplay(
-								this.spiel.getSimpleMarkedField(anderesObj.getExactPos()));
-						
-						this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
-						this.spiel.console.appendText(
-								SternResources.AuswertungPatrouilleMeldetAusSektor(true,
-										this.spiel.spieler[objPatr.getBes()].getName(),
-										getSectorNameFromPoint(anderesObj.getCurrentField())));
-						this.spiel.console.lineBreak();
-						
-						boolean kapern = true;
-						
-						if (anderesObj.getTyp() == ObjektTyp.AUFKLAERER)
-							this.spiel.console.appendText(
-											SternResources.AuswertungPatrouilleAufklaererGekapert(true));
-						else if (anderesObj.getTyp() == ObjektTyp.TRANSPORTER)
-							this.spiel.console.appendText(
-											SternResources.AuswertungPatrouilleTransporterGekapert(true));
-						else if (anderesObj.getTyp() == ObjektTyp.MINENRAEUMER)
-							this.spiel.console.appendText(
-											SternResources.AuswertungPatrouilleMinenraeumerGekapert(true));
-						else if (anderesObj.getTyp() == ObjektTyp.MINE50 || 
-								 anderesObj.getTyp() == ObjektTyp.MINE100 ||
-								 anderesObj.getTyp() == ObjektTyp.MINE250 ||
-								 anderesObj.getTyp() == ObjektTyp.MINE500)
-							this.spiel.console.appendText(
-											SternResources.AuswertungPatrouilleMinenlegerGekapert(true));
-						else if (anderesObj.getTyp() == ObjektTyp.PATROUILLE)
-							this.spiel.console.appendText(
-											SternResources.AuswertungPatrouillePatrouilleGekapert(true));
-						else if (anderesObj.getTyp() == ObjektTyp.RAUMER)
-						{
-							if (anderesObj.getAnz() > Constants.PATROUILLE_KAPERT_RAUMER)
-							{
-								this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleRaumerGesichtet(true, 
-												Integer.toString(anderesObj.getAnz())));
-								kapern = false;
-								this.taste();
-							}
-							else
-							{
-								this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleRaumerGekapert(true, 
-												Integer.toString(anderesObj.getAnz())));
-							}
-						}
-						
-						if (kapern)
-						{
-							this.taste();
-							
-							anderesObj.gekapert(
-									objPatr.getBes(),
-									umfeld);
-						}	
-					}
-					if (objPatr.istZuLoeschen())
-						break;
-				} // Naechstes anderes Objekt
+				int seq[] = Utils.randomList(ereignisseKopie.size());
 				
-				if (objPatr.istZuLoeschen())
-					break;
-  			} // Naechstes Umfeld
+				for (int k = 0; k < seq.length; k++)
+					alleEreignisse.set(i + k, ereignisseKopie.get(seq[k]));
+				
+				i += (ereignisseKopie.size()-1);
+			}
+			
+			// Patrouillenereignisse abarbeiten
+  			for (AuswertungEreignisPatrouille ereignis: alleEreignisse)
+  			{
+  				Flugobjekt objPatr = ereignis.objPatrouille;
+  				
+  				Flugobjekt anderesObj = ereignis.objAnderes;
+  				
+  				if (objPatr.istZuLoeschen() || anderesObj.istZuLoeschen())
+  					continue;
+  				
+  				// Eigene Objekte nicht melden
+  				if (objPatr.getBes() == anderesObj.getBes())
+  					continue;
+  				
+  				//Spezialfall Buendnisraumer. Wenn der Besitzer der Patrouille Buendnismitglied auf dem Zielplaneten ist, 
+				// dann nicht melden
+				if (anderesObj.getTyp() == ObjektTyp.RAUMER && 
+					this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(objPatr.getBes()))
+					continue;
+				
+				// Wenn der Besitzer der Patrouille an der Buendnisflotte beteiligt ist, dann auch nicht melden.
+				if (anderesObj.istBeteiligt(objPatr.getBes()))
+					continue;
+  				
+  				if (jahresende)  					
+  					this.writeEreignisDatumJahresende();
+  				else
+  					this.writeEreignisDatumJahresbeginn();
+  					
+  				if (anderesObj.getTyp() == ObjektTyp.PATROUILLE &&
+  					!anderesObj.isTransfer())
+  				{
+  					// Kampf zweier Patrouillen. Die beobachtende Patrouille
+  					// war schneller und vernichtet die andere
+					this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
+					this.spiel.console.appendText(
+						SternResources.AuswertungPatrouilleMeldetAusSektor(true,
+									this.spiel.spieler[objPatr.getBes()].getName(),
+									Spiel.getSectorNameFromPoint(ereignis.posObjAnderes)));
+					this.spiel.console.lineBreak();
+					
+					// Sektor markieren
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleMarkedField(
+									ereignis.markierungPos));
+					
+					this.spiel.console.appendText(
+							SternResources.AuswertungPatrouillePatrouilleZerstoert(true));
+					
+					this.taste();
+					anderesObj.setZuLoeschen();
+  				}
+  				else
+  				{
+  					// Andere Objekte
+					// Meldung machen. Kleinobjekte kapern
+					// Feld markieren
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleMarkedField(ereignis.markierungPos));
+					
+					this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
+					this.spiel.console.appendText(
+							SternResources.AuswertungPatrouilleMeldetAusSektor(true,
+									this.spiel.spieler[objPatr.getBes()].getName(),
+									getSectorNameFromPoint(ereignis.posObjAnderes)));
+					this.spiel.console.lineBreak();
+					
+					boolean kapern = true;
+					
+					if (anderesObj.getTyp() == ObjektTyp.AUFKLAERER)
+						this.spiel.console.appendText(
+										SternResources.AuswertungPatrouilleAufklaererGekapert(true));
+					else if (anderesObj.getTyp() == ObjektTyp.TRANSPORTER)
+						this.spiel.console.appendText(
+										SternResources.AuswertungPatrouilleTransporterGekapert(true));
+					else if (anderesObj.getTyp() == ObjektTyp.MINENRAEUMER)
+						this.spiel.console.appendText(
+										SternResources.AuswertungPatrouilleMinenraeumerGekapert(true));
+					else if (anderesObj.getTyp() == ObjektTyp.MINE50 || 
+							 anderesObj.getTyp() == ObjektTyp.MINE100 ||
+							 anderesObj.getTyp() == ObjektTyp.MINE250 ||
+							 anderesObj.getTyp() == ObjektTyp.MINE500)
+						this.spiel.console.appendText(
+										SternResources.AuswertungPatrouilleMinenlegerGekapert(true));
+					else if (anderesObj.getTyp() == ObjektTyp.PATROUILLE)
+						this.spiel.console.appendText(
+										SternResources.AuswertungPatrouillePatrouilleGekapert(true));
+					else if (anderesObj.getTyp() == ObjektTyp.RAUMER)
+					{
+						if (anderesObj.getAnz() > Constants.PATROUILLE_KAPERT_RAUMER)
+						{
+							this.spiel.console.appendText(
+									SternResources.AuswertungPatrouilleRaumerGesichtet(true, 
+											Integer.toString(anderesObj.getAnz())));
+							kapern = false;
+							this.taste();
+						}
+						else
+						{
+							this.spiel.console.appendText(
+									SternResources.AuswertungPatrouilleRaumerGekapert(true, 
+											Integer.toString(anderesObj.getAnz())));
+						}
+					}
+					
+					if (kapern)
+					{
+						this.taste();
+						
+						anderesObj.gekapert(
+								objPatr.getBes(),
+								ereignis.posObjAnderes);
+					}	
+  				}
+  			}
   		}
   		
-  		private void minenfeld(Flugobjekt obj, Point feld)
+  		private ArrayList<AuswertungEreignisPatrouille> patrouilleBeobachtet(Flugobjekt objPatr)
   		{
+  			Point2D.Double momPos = objPatr.getExactPos();
+  			
+  			ArrayList<AuswertungEreignisPatrouille> ereignisse = new ArrayList<AuswertungEreignisPatrouille>();
+  			
+  			// Gehe alle Flugobjekte durch und pruefe, ob sie in Beobachtungsreichweite sind
+  			// und berechne den Winkel, von Flugrichtung aus gesehen.
+  			for (Flugobjekt otherObj: this.spiel.objekte)
+  			{
+  				if (otherObj == objPatr ||
+  					otherObj.istZuLoeschen() ||
+  					otherObj.getTyp() == ObjektTyp.KAPITULATION)
+  					continue;
+  				
+  				Point2D.Double momPosOther = otherObj.getExactPos();
+  					
+  				double dist = Utils.dist(momPosOther, momPos);
+  				
+  				if (dist > Constants.PATROUILLE_BEOBACHTUNGSRADIUS)
+  					continue;
+  				
+  				AuswertungEreignisPatrouille ereignis = 
+  						new AuswertungEreignisPatrouille(objPatr, otherObj);
+  				
+  				Point2D.Double zielPosPatr = objPatr.getZiel().toPoint2dDouble();
+  				
+  				if (Utils.dist(momPos, momPosOther) <= Flugobjekt.PRECISION)
+  					ereignis.winkel = 0;
+  				else
+	  				ereignis.winkel = objPatr.getAnz() == 1 ?
+	  						// linksdrehend
+	  						Utils.winkelVektoren(momPos, momPosOther, zielPosPatr) :
+	  						//rechtsdrehend
+	  						Utils.winkelVektoren(momPos, zielPosPatr, momPosOther);
+  				
+  				ereignis.markierungPos = momPosOther;
+  				ereignis.posObjAnderes = otherObj.getCurrentField();
+  				
+  				ereignisse.add(ereignis);
+  			}
+  			
+  			return ereignisse;
+  		}
+  		  		
+  		private void minenfeld(AuswertungEreignis ereignis)
+  		{
+  			Flugobjekt obj = ereignis.obj;
+  			Point feld = ereignis.feld;
+  			
   			if (this.spiel.minen == null || this.spiel.minen.size() == 0 || obj.istZuLoeschen())
   				return;
 		
@@ -5517,23 +5309,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			if (obj.getTyp() == ObjektTyp.RAUMER)
 			{
-				if (obj.getBes() != Constants.BESITZER_NEUTRAL)
-				{
-					this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
-					this.spiel.console.appendText (
-							SternResources.AuswertungNachrichtAnAusSektor(true,
-									this.spiel.spieler[obj.getBes()].getName(),
-									Spiel.getSectorNameFromPoint(mine.getPos())));
-				}
-				else
-				{
-					this.spiel.console.setLineColor(Colors.INDEX_NEUTRAL);
-					this.spiel.console.appendText (
-							SternResources.AuswertungNachrichtAnAusserirdischeAusSektor(true,
-									Spiel.getSectorNameFromPoint(mine.getPos())));
-				}
-				
-				this.spiel.console.lineBreak();
+				this.writeEreignisDatum(ereignis.getTag());
+				this.spiel.console.setLineColor(Colors.INDEX_NEUTRAL);
 				
 				if (obj.getAnz() >= mine.getStaerke())
 				{
@@ -5544,6 +5321,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 					
 					// Anzahl der Raumerflotte reduzieren
 					obj.subtractRaumer(mine.getStaerke(), obj.getBes());
+					
+					if (obj.getAnz() <= 0)
+						obj.setZuLoeschen();
 					
 					this.spiel.minen.remove(feld.getString());
 				}
@@ -5561,16 +5341,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 					mine.setStaerke(mine.getStaerke() - obj.getAnz());
 				}
 			}
-			else if (obj.getTyp() == ObjektTyp.SCHWARZES_LOCH)
-			{
-				this.spiel.console.appendText(
-						SternResources.AuswertungMinenfeldImLoch(
-								true, 
-								Integer.toString(mine.getStaerke())));
-				this.spiel.minen.remove(feld.getString());
-			}
 			else if (obj.getTyp() == ObjektTyp.MINENRAEUMER)
 			{
+				this.writeEreignisDatum(ereignis.getTag());
 				this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
 				this.spiel.console.appendText (
 						SternResources.AuswertungNachrichtAnAusSektor(true,
@@ -5595,8 +5368,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 
   		}
   		
-  		private void ankunft(Flugobjekt obj)
+  		private void ankunft(AuswertungEreignis ereignis)
   		{
+  			Flugobjekt obj = ereignis.obj;
+  			
   			if (obj.istZuLoeschen() || !obj.istAngekommen())
   				return;
   			
@@ -5606,10 +5381,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 			if (plIndex != Constants.KEIN_PLANET)
 				pl = this.spiel.planeten[plIndex];
 			
-			this.spiel.console.setLineColor(this.getColByPlanet(pl));
-			
 			if (obj.getTyp() == ObjektTyp.AUFKLAERER)
 			{
+				this.writeEreignisDatum(ereignis.getTag());
+				this.spiel.console.setLineColor(this.getColByPlanet(pl));
+				
 				if (pl.getBes() == obj.getBes())
 				{
 					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
@@ -5638,6 +5414,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			else if (obj.getTyp() == ObjektTyp.TRANSPORTER)
 			{
+				this.writeEreignisDatum(ereignis.getTag());
+				this.spiel.console.setLineColor(this.getColByPlanet(pl));
+				
 				this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
 				
 				// Energie uebertragen
@@ -5669,7 +5448,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 					else
 					{
 						this.taste();
-						this.kommandozentraleErobert(obj.getKz().getSp(), pl.getBes(), false);
+						this.kommandozentraleErobert(
+								obj.getKz().getSp(), 
+								pl.getBes(), 
+								false,
+								ereignis.getTag());
 					}
 				}
 				else
@@ -5683,6 +5466,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				{
 					if (obj.isTransfer())
 					{
+						this.writeEreignisDatum(ereignis.getTag());
+						this.spiel.console.setLineColor(this.getColByPlanet(pl));
+						
 						this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
 						if (obj.getBes() == pl.getBes())
 						{
@@ -5706,6 +5492,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				else
 				{
+					this.writeEreignisDatum(ereignis.getTag());
+					this.spiel.console.setLineColor(this.getColByPlanet(pl));
+					
 					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
 					this.spiel.console.appendText(
 						SternResources.AuswertungPatrouilleZerschellt(
@@ -5720,6 +5509,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 					 obj.getTyp() == ObjektTyp.MINE250 ||
 					 obj.getTyp() == ObjektTyp.MINE500)
 			{
+				this.writeEreignisDatum(ereignis.getTag());
+				this.spiel.console.setLineColor(this.getColByPlanet(pl));
+				
 				if (obj.isTransfer())
 				{
 					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
@@ -5749,16 +5541,56 @@ public class Spiel extends EmailTransportBase implements Serializable
 							SternResources.AuswertungMineGelegt(true, this.spiel.spieler[obj.getBes()].getName()));
 					this.mineLegen(obj);
 					this.taste();
+					
+					// Pruefe, ob sich gerade Raumer auf dem Minenfeld befinden
+					ArrayList<AuswertungEreignis> minenEreignisse = new ArrayList<AuswertungEreignis>();
+					
+					for (Flugobjekt objRaumer: this.spiel.objekte)
+					{
+						if (objRaumer.istZuLoeschen() || objRaumer.getTyp() != ObjektTyp.RAUMER)
+							continue;
+						
+						// Wo befindet sich die Raumerflotte an diesem Tag?
+						Point feldRaumer = objRaumer.getFeldTag(ereignis.getTag());
+						
+						if (feldRaumer.equals(ereignis.feld))
+						{
+							AuswertungEreignis minenEreignis = new AuswertungEreignis(AuswertungEreignisTyp.SEKTOR_BETRETEN, ereignis.getTag(), objRaumer);
+							
+							minenEreignis.feld = ereignis.feld;							
+							minenEreignisse.add(minenEreignis);
+						}
+					}
+					
+					if (minenEreignisse.size() > 0)
+					{
+						int seq[] = Utils.randomList(minenEreignisse.size());
+						
+						for (int k = 0; k < seq.length; k++)
+						{
+							// Raumer laufen auf Mine
+							this.minenfeld(minenEreignisse.get(seq[k]));
+						}
+					}
 				}
 			}
 			else if (obj.getTyp() == ObjektTyp.MINENRAEUMER)
 			{
 				if (obj.getZpl() == Constants.KEIN_PLANET)
+				{
+					// Pruefe auf Minenfeld
+					this.minenfeld(ereignis);
+					
 					// Minenraeumer wenden. Transfer-Kennzeichen aendern
 					obj.wenden(true);
+				}
 				else
 				{
 					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+					
+					this.writeEreignisDatum(ereignis.getTag());
+					this.spiel.console.setLineColor(this.getColByPlanet(pl));
+					
 					if (obj.getBes() == pl.getBes())
 					{
 						pl.incObjekt(obj.getTyp(), 1);
@@ -5775,6 +5607,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			else if (obj.getTyp() == ObjektTyp.RAUMER)
 			{
+				this.writeEreignisDatum(ereignis.getTag());
+				this.spiel.console.setLineColor(this.getColByPlanet(pl));
+
 				if (this.spiel.planeten[obj.getZpl()].getBes() == obj.getBes() ||
 					this.spiel.planeten[obj.getZpl()].istBuendnisMitglied(obj.getBes()))
 				{
@@ -5792,31 +5627,21 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				else
 					// Feind. Angriff auf Planet
-					this.raumerAngriff(obj, plIndex);
+					this.raumerAngriff(ereignis, plIndex);
 				
 				obj.setZuLoeschen();
 			}
   		}
   		
-  		private void raumerAngriff(Flugobjekt obj, int plIndex)
+  		private void raumerAngriff(AuswertungEreignis ereignis, int plIndex)
   		{
+  			Flugobjekt obj = ereignis.obj;
   			Planet pl = this.spiel.planeten[plIndex];
   			
   			this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
   			
 			int angr = obj.getAnz();
 			
-			int festung = pl.getFestungFaktor() * 
-					(Constants.FESTUNG_STAERKE_MIN + Utils.random(Constants.FESTUNG_STAERKE_SPANNE));
-			festung = Utils.round(((double)pl.getFestungIntakt() / 100.) * (double)festung);
-			
-			int vert = festung > 0 ? vert = festung : pl.getAnz(ObjektTyp.RAUMER);
-			String vertBezeichnung = 
-					festung > 0 ? 
-							SternResources.AuswertungAngriffFestung(true) : 
-							SternResources.AuswertungAngriffPlanet(true);
-			
-			this.spiel.console.clear();
 			this.spiel.console.setLineColor(pl.getCol(this.spiel.spieler));
 			this.spiel.console.appendText(
 							SternResources.AuswertungAngriffAngriffAufPlanet(
@@ -5825,111 +5650,74 @@ public class Spiel extends EmailTransportBase implements Serializable
 
 			this.spiel.console.lineBreak();
 			this.spiel.console.setLineColor(Colors.INDEX_WEISS);
-			this.spiel.console.appendText(SternResources.AuswertungAngriffAngreifer(true) +": " + angr + ", "+vertBezeichnung+": " + vert + ".");
-			this.pause(Constants.PAUSE_MILLISECS);
-			this.spiel.console.lineBreak();
-						
-			while (angr > 0 && vert > 0)
+
+			// Festung?
+			int festungStaerke = pl.getFestungRaumer();
+			
+			if (festungStaerke > 0)
 			{
-				int sa = angr;
-				int sb = vert + 
-						Utils.round((double)vert * 
-								(double)(Constants.VERT_BONUS_PROZENT_MIN + Utils.random(Constants.VERT_BONUS_PROZENT_SPANNE)) / 100.);
-
-				sa = (int)(Utils.random(sa) / 6) + 1;
-				sb = (int)(Utils.random(sb) / 6) + 1;
+				this.spiel.console.appendText(
+						SternResources.AuswertungAngriffAngreiferFestung(
+								true, Integer.toString(angr), Integer.toString(festungStaerke)) + " ");
+				this.spiel.console.lineBreak();
 				
-				angr -= sb;
-				vert -= sa;
-				
-				if (angr < 0)
-					angr = 0;
-				if (vert < 0)
-					vert = 0;
-				
-				if (vert == 0 && pl.getFestungFaktor() > 0)
+				if (angr >= festungStaerke)
 				{
-					this.spiel.console.appendText(
-							SternResources.AuswertungAngriffAngreifer(true) +": " + angr + ", "+vertBezeichnung+": " + vert + ".");
-					this.pause(Constants.PAUSE_MILLISECS);
-					this.spiel.console.lineBreak();
-					
-					// Festung zerstoert!
+					// Festung zerstoert
+					angr -= festungStaerke;
 					pl.deleteFestung();
+				}
+				else
+				{
+					// Angriff gescheitert, Festung dezimiert
+					festungStaerke -= angr;
+					angr = 0;
 					
-					// Angreifer kaempfen ab jetzt gegen Raumer 
-					vert = pl.getAnz(ObjektTyp.RAUMER);
-
-					this.spiel.console.appendText(
-							SternResources.AuswertungAngriffFestungZerstoert(true));
-					this.pause(Constants.PAUSE_MILLISECS);
-					this.spiel.console.lineBreak();
-					vertBezeichnung = SternResources.AuswertungAngriffPlanet(true);
+					if (festungStaerke <= 0)
+						pl.deleteFestung();
+					else
+						pl.setFestungRaumer(festungStaerke);
+					
 				}
 				
-				this.spiel.console.appendText(
-						SternResources.AuswertungAngriffAngreifer(true) +": " + angr + ", "+vertBezeichnung+": " + vert + ".");
-				this.pause(Constants.PAUSE_MILLISECS);
-				
-				if (angr == 0 || vert == 0)
-					this.spiel.console.lineBreak();
-				else
-					this.spiel.console.deleteLine();
-				
+				if (angr <= 0)
+					this.spiel.console.appendText(
+							SternResources.AuswertungAngriffAngriffGescheitert(true));
 			}
-			
-			if (angr == 0 && vert != 0)
-			{
-				// Reststaerke der Festung berechnen
-				if (pl.getFestungFaktor() > 0)
-					pl.setFestungIntakt(Math.max(Utils.round(100. * (double)vert / (double)festung), 1));
-				else
-					// Raumer auf Planet reduzieren
-					pl.subtractRaumer(this.spiel.anzSp, pl.getAnz(ObjektTyp.RAUMER) - vert, pl.getBes(), true);
-			}
-			
-			// Ende des Kampfes
+
 			Kommandozentrale kz = null;
 			
-			if (angr == 0 && vert == 0)
-			{
-				this.spiel.console.setLineColor(Colors.INDEX_NEUTRAL);
+			if (angr > 0)
+			{			
+				// Angreifer stellt sich den regulären Truppen
+				int vert = pl.getAnz(ObjektTyp.RAUMER);
+				
 				this.spiel.console.appendText(
-						SternResources.AuswertungAngriffUntentschieden(true));
+						SternResources.AuswertungAngriffAngreiferPlanet(
+								true, Integer.toString(angr), Integer.toString(vert)));
 				this.spiel.console.lineBreak();
-				this.spiel.console.appendText(
-						SternResources.AuswertungAngriffEnergieproduktionHalbiert(true));
-				kz = pl.erobert(this.spiel.anzSp, Constants.BESITZER_NEUTRAL, null);
-			}
-			else if (angr == 0 && vert != 0)
-			{
-				this.spiel.console.appendText(
-						SternResources.AuswertungAngriffAngriffGescheitert(true));					
-			}
-			else
-			{
-				if (obj.getBes() == Constants.BESITZER_NEUTRAL)
+				
+				if (angr > vert)
 				{
-					this.spiel.console.setLineColor(Colors.INDEX_NEUTRAL);
-					this.spiel.console.appendText(
-							SternResources.AuswertungAngriffAusserirdischeErobert(true));
-					this.spiel.console.lineBreak();
-					this.spiel.console.appendText(
-							SternResources.AuswertungAngriffEnergieproduktionHalbiert(true));
-				}
-				else
-				{
+					// Verluste von der Flotte abziehen
+					obj.subtractRaumer(vert,obj.getBes());
+					
+					// Eigentum uebertragen. Evtl. Produktion halbieren, wenn Planet wieder neutral ist
+					kz = pl.erobert(this.spiel.anzSp, obj.getBes(), obj);
+					
 					this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
 					this.spiel.console.appendText(
 							SternResources.AuswertungAngriffSpielerErobert(true,
 									this.spiel.spieler[obj.getBes()].getName()));
 				}
-				
-				// Verluste von der Flotte abziehen
-				obj.subtractRaumer(obj.getAnz() - angr,obj.getBes());
-				
-				// Eigentum uebertragen. Evtl. Produktion halbieren, wenn Planet wieder neutral ist
-				kz = pl.erobert(this.spiel.anzSp, obj.getBes(), obj);
+				else
+				{
+					// Raumer auf Planet reduzieren
+					pl.subtractRaumer(this.spiel.anzSp, angr, pl.getBes(), true);
+					
+					this.spiel.console.appendText(
+							SternResources.AuswertungAngriffAngriffGescheitert(true));					
+				}
 			}
 			
 			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
@@ -5938,7 +5726,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.taste();
 			
 			if (kz != null)
-				this.kommandozentraleErobert(kz.getSp(), obj.getBes(), false);
+				this.kommandozentraleErobert(
+						kz.getSp(), 
+						obj.getBes(), 
+						false,
+						ereignis.getTag());
   		}
   		
   		private void mineLegen(Flugobjekt obj)
@@ -5972,15 +5764,16 @@ public class Spiel extends EmailTransportBase implements Serializable
   				mine.add(staerke, mh);
   		}
   		
-  		private void kommandozentraleErobert(int spVerlierer, int spGewinner, boolean kapituliert)
+  		private void kommandozentraleErobert(int spVerlierer, int spGewinner, boolean kapituliert, int ereignisTag)
   		{
+  			this.writeEreignisDatum(ereignisTag);
+  			
   			// Spieler "spGewinner" hat die Kommandozentrale von Spieler "spVerlierer" erobert
   			if (spGewinner == Constants.BESITZER_NEUTRAL)
   			{
   				if (kapituliert)
   				{
   					this.spiel.console.setLineColor(this.spiel.spieler[spVerlierer].getColIndex());
-  					
   					this.spiel.console.appendText(
 	  						SternResources.AuswertungKapitulation(
 	  								true,
@@ -5989,7 +5782,6 @@ public class Spiel extends EmailTransportBase implements Serializable
   				else
   				{
 	  				this.spiel.console.setLineColor(Colors.INDEX_NEUTRAL);
-	  				
 	  				this.spiel.console.appendText(
 	  						SternResources.AuswertungKommandozentraleErobertNeutral(
 	  								true,
@@ -6012,7 +5804,12 @@ public class Spiel extends EmailTransportBase implements Serializable
   				pl.spielerwechsel(spVerlierer, spGewinner);
   			}
   				
-  			// Besitzer aller Flugobjekte und Teilnahme an Buendnissen wechseln
+  			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
+  			this.spiel.updateSpielfeldDisplay();
+  			
+  			this.taste();
+  			
+  			// Besitzer aller Flugobjekte und Teilnahme an Buendnissenflotten wechseln
   			for (Flugobjekt obj: this.spiel.objekte)
   			{
   				int weitererEroberterSpieler = obj.spielerwechsel(spVerlierer, spGewinner);
@@ -6021,60 +5818,23 @@ public class Spiel extends EmailTransportBase implements Serializable
   				// der Ausserirdischen faellt...
   				if (weitererEroberterSpieler != Constants.BESITZER_NEUTRAL)
   				{
-  					this.spiel.console.lineBreak();
-  					this.kommandozentraleErobert(weitererEroberterSpieler, spGewinner, false);
+  					this.kommandozentraleErobert(
+  							weitererEroberterSpieler, 
+  							spGewinner,
+  							false,
+  							ereignisTag);
   				}
   			}
-  			  			
-  			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
-  			this.spiel.updateSpielfeldDisplay();
-  			
-  			this.taste();
-  				
-  		}
-
-  		
-  		private ArrayList<Flugobjekt> findeFlugobjekteAufFeld(Point pt, Flugobjekt excludeObj)
-  		{
-  			// Finde alle Flugobjekte auf einem bestimmten Feld. Sortiere die zurueckgegebenen Objekte in
-  			// zufaelliger Reihenfolge. "excludeObj" kann mitgegeben werden. Dieses Objekte taucht nicht
-  			// in der Rueckgabeliste auf
-  			ArrayList<Integer> objekteIDs = new ArrayList<Integer>();
-  			
-  			for (int i = 0; i < this.spiel.objekte.size(); i++)
-  			{
-  				Flugobjekt obj = this.spiel.objekte.get(i);
-  				
-  				if (obj.getTyp() == ObjektTyp.KAPITULATION)
-  					continue;	
-  				
-  				if (excludeObj != null && obj == excludeObj)
-  					continue;
-  				
-  				// Objekte mit Loeschvormerkung werden ausgeschlossen
-  				if (!obj.istZuLoeschen() && obj.getCurrentField().equals(pt))
-  					objekteIDs.add(i);
-  			}
-  			
-  			// Objekte zufaellig sorieren
-  			int[] seq = Utils.randomList(objekteIDs.size());
-  			ArrayList<Flugobjekt> retval = new ArrayList<Flugobjekt>();
-  			
-  			for (int i = 0; i < seq.length; i++)
-  				retval.add(this.spiel.objekte.get(objekteIDs.get(seq[i])));
-  			
-  			return retval;
-  		}
-
+  		}  		
   	}
   	
   	// ===============
   	
-  	protected class Replay
+  	private class Replay
  	{
  		private Spiel spiel;
  		
- 		public Replay(Spiel spiel)
+ 		private Replay(Spiel spiel)
  		{
  			this.spiel = spiel;
  			
@@ -6250,7 +6010,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   	
   	// ==============
   	
-  	protected class Spezialmenue
+  	private class Spezialmenue
  	{
  		private Spiel spiel;
  		
@@ -6264,7 +6024,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			// Konstruktor nur für Inventur benutzt
  		}
  		
- 		public Spezialmenue(Spiel spiel)
+ 		private Spezialmenue(Spiel spiel)
  		{
  			this.spiel = spiel;
  			boolean simpel = this.spiel.isSimple();
@@ -6285,22 +6045,20 @@ public class Spiel extends EmailTransportBase implements Serializable
  				keys.add(new ConsoleKey("0",SternResources.SpielinformationenPlanet(true)));
  				
  				keys.add(new ConsoleKey("1",SternResources.SpielinformationenEnergieproduktion(true)));
- 				if (!simpel && this.spiel.optionen.contains(SpielOptionen.AUSSERIRDISCHE))
- 					keys.add(new ConsoleKey("2",SternResources.SpielinformationenAusserirdische(true)));
  				
  				if (!simpel && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
- 					keys.add(new ConsoleKey("3", SternResources.SpielinformationenFestungen(true)));
+ 					keys.add(new ConsoleKey("2", SternResources.SpielinformationenFestungen(true)));
  				if (!simpel)
- 					keys.add(new ConsoleKey("4",SternResources.SpielinformationenMinenfelder(true)));
+ 					keys.add(new ConsoleKey("3",SternResources.SpielinformationenMinenfelder(true)));
  				if (!simpel)
- 					keys.add(new ConsoleKey("5",SternResources.SpielinformationenPatrouillen(true)));
+ 					keys.add(new ConsoleKey("4",SternResources.SpielinformationenPatrouillen(true)));
  				if (!simpel && (this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN) ||
  						this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH)))
- 					keys.add(new ConsoleKey("6", SternResources.SpielinformationenKommandozentralen(true)));
+ 					keys.add(new ConsoleKey("5", SternResources.SpielinformationenKommandozentralen(true)));
  				if (!simpel)
- 					keys.add(new ConsoleKey("7",SternResources.SpielinformationenBuendnisse(true)));
+ 					keys.add(new ConsoleKey("6",SternResources.SpielinformationenBuendnisse(true)));
  				if (!simpel)
- 					keys.add(new ConsoleKey("8",SternResources.SpielinformationenNeutralePlaneten(true)));
+ 					keys.add(new ConsoleKey("7",SternResources.SpielinformationenNeutralePlaneten(true)));
  				 				
  				ConsoleInput input = this.spiel.console.waitForKeyPressed(keys, false);
  				
@@ -6314,21 +6072,19 @@ public class Spiel extends EmailTransportBase implements Serializable
  				
  				if (inputString.equals("1"))
  					this.energieprod();
- 				else if (!simpel && inputString.equals("4"))
+ 				else if (!simpel && inputString.equals("3"))
  					this.minenfelder();
- 				else if (!simpel && inputString.equals("7"))
+ 				else if (!simpel && inputString.equals("6"))
  					this.buendnisse();
- 				else if (!simpel && inputString.equals("3") && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
+ 				else if (!simpel && inputString.equals("2") && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
  					this.festungen();
- 				else if (!simpel && inputString.equals("5"))
+ 				else if (!simpel && inputString.equals("4"))
  					this.patrouillen();
- 				else if (!simpel && inputString.equals("2") && this.spiel.optionen.contains(SpielOptionen.AUSSERIRDISCHE))
- 					this.ausserirdische();
- 				else if (!simpel && inputString.equals("6") && 
+ 				else if (!simpel && inputString.equals("5") && 
  						( this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN) ||
  								this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH)))
  					this.kommandozentralen();
- 				else if (!simpel && inputString.equals("8"))
+ 				else if (!simpel && inputString.equals("7"))
  					this.neutralePlaneten();
  				else if (inputString.equals("0"))
  					this.editor();
@@ -6369,7 +6125,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
- 					null,
  					null,
  					null,
  					null));
@@ -6424,7 +6179,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					null,
- 					null,
  					minen));
  			
  			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
@@ -6464,7 +6218,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
- 					null,
  					null,
  					null,
  					null));
@@ -6550,7 +6303,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					null,
- 					null,
  					null));
  			
  			// Intakt
@@ -6586,7 +6338,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					}
  					
  					String plName = " " + this.spiel.getPlanetenNameFromIndex(plIndex);
- 					String anzRaum = "     " + this.spiel.planeten[plIndex].getFestungIntakt()+"%";
+ 					String anzRaum = "     " + this.spiel.planeten[plIndex].getFestungRaumer();
  					text.add(plName.substring(plName.length()-2, plName.length()) + 
  							":" +
  							anzRaum.substring(anzRaum.length()-5, anzRaum.length()));
@@ -6656,7 +6408,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					lines,
- 					null,
  					null));
  			
  			
@@ -6675,7 +6426,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			for (Flugobjekt zentrale: zentralen)
  			{
- 				int flugdauerRestjahr = zentrale.getAnkunftsjahr();
+ 				Flugzeit flugzeitRest = zentrale.getRestflugzeit();
  				Kommandozentrale kz = zentrale.getKz();
  				
  				String spieler = this.spiel.spieler[kz.getSp()].getName();
@@ -6685,8 +6436,11 @@ public class Spiel extends EmailTransportBase implements Serializable
  				this.spiel.console.appendText(
  						SternResources.SpielinformationenKommandozentralenUnterwegs(true,
  								spieler,
- 								this.spiel.getPlanetenNameFromIndex(zentrale.getZpl()),
- 								Integer.toString((this.spiel.jahr + flugdauerRestjahr + 1))) + " ");
+ 								this.spiel.getPlanetenNameFromIndex(zentrale.getZpl())));
+ 				this.spiel.console.lineBreak();
+ 				this.spiel.console.appendText(
+ 						SternResources.SpielinformationenKommandozentralenUnterwegs2(true,
+ 								flugzeitRest.toOutputString(false)) + " ");
  				
  				ConsoleInput input = this.spiel.console.waitForKeyPressed(keys, false);
  				
@@ -6723,79 +6477,12 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					lines,
- 					null,
  					null));
  			
  			
  			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
 
  			this.spiel.console.waitForTaste();
- 		}
- 		
- 		private void ausserirdische()
- 		{
- 			this.spiel.console.setHeaderText(
- 					this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenAusserirdischeTitel(true), Colors.INDEX_NEUTRAL);
-
- 			ArrayList<Flugobjekt> aliens = new ArrayList<Flugobjekt>();
- 			
- 			HashSet<Integer> brighterPlanets = new HashSet<Integer>();
- 			ArrayList<SpielfeldLineDisplayContent> lines = new ArrayList<SpielfeldLineDisplayContent>();
-
- 			for (Flugobjekt obj: this.spiel.objekte)
- 			{
- 				if (obj.getTyp() != ObjektTyp.RAUMER || obj.getBes() != Constants.BESITZER_NEUTRAL)
- 					continue;
- 				
- 				aliens.add(obj);
- 				
- 				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
- 	 					obj.getStart(), obj.getZiel(), obj.getExactPos(), Colors.INDEX_WEISS);
- 				
- 				lines.add(line);
- 				
- 				brighterPlanets.add(obj.getZpl());
- 			}
- 			 			
- 			ArrayList<SpielfeldPlanetDisplayContent> plData = this.standardSpielfeld(null, brighterPlanets);
- 			
- 			this.spiel.screenDisplayContent.setSpielfeld(
- 					new SpielfeldDisplayContent(plData,
- 					null,
- 					lines,
- 					null,
- 					null));
- 			
- 			
- 			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
-
- 			if (aliens.size() == 0)
- 			{
- 				this.spiel.console.appendText(
- 						SternResources.SpielinformationenKeineAusserirdische(true));
- 				this.spiel.console.waitForTaste();
- 				return;
- 			}
- 			
- 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
- 			keys.add(new ConsoleKey(SternResources.Taste(true), SternResources.Weiter(true)));
- 			keys.add(new ConsoleKey("ESC", SternResources.Abbrechen(true)));
- 			
- 			for (Flugobjekt alien: aliens)
- 			{
- 				int flugdauerRestjahr = alien.getAnkunftsjahr();
- 				
- 				this.spiel.console.appendText(
- 						SternResources.SpielinformationenAusserirdischeUnterwegs(true,
- 								Integer.toString(alien.getAnz()), 
- 								this.spiel.getPlanetenNameFromIndex(alien.getZpl()), 
- 								Integer.toString(this.spiel.jahr + flugdauerRestjahr + 1)) + " ");
- 				
- 				ConsoleInput input = this.spiel.console.waitForKeyPressed(keys, false);
- 				
- 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
- 					break;
- 			}
  		}
  		
  		private void editor()
@@ -6851,7 +6538,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			} while (true);
  		}
 
- 		public ArrayList<SpielfeldPlanetDisplayContent> standardSpielfeld(Hashtable<Integer, ArrayList<Byte>> frames, HashSet<Integer> brighterPlanets)
+ 		private ArrayList<SpielfeldPlanetDisplayContent> standardSpielfeld(Hashtable<Integer, ArrayList<Byte>> frames, HashSet<Integer> brighterPlanets)
  		{
  			ArrayList<SpielfeldPlanetDisplayContent> plData = new ArrayList<SpielfeldPlanetDisplayContent>(this.spiel.anzPl);
  			
@@ -6900,7 +6587,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   	
   	// ================
   	
-  	protected class Inventur
+  	private class Inventur
   	{
   		private Spiel spiel;
   		private int spieler;
@@ -6909,7 +6596,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		private ScreenDisplayContent sdcBefore;
   		private boolean simple;
   		
-  		public Inventur(Spiel spiel, int spieler)
+  		private Inventur(Spiel spiel, int spieler)
   		{
   			this.spiel = spiel;
   			this.spieler = spieler;
@@ -7006,7 +6693,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			// ---
   			// Alle Objekte sammeln und dann nach Ankunftsjahr sortieren
   			// Nicht sammeln: Patrouillen im Einsatz
-  			ArrayList<Integer> restflugzeitenTemp = new ArrayList<Integer>();
+  			ArrayList<Flugzeit> restflugzeiten = new ArrayList<Flugzeit>();
   			ArrayList<Flugobjekt> objekte = new ArrayList<Flugobjekt>();
   			ArrayList<SpielfeldLineDisplayContent> lines = new ArrayList<SpielfeldLineDisplayContent>();
   			
@@ -7036,7 +6723,9 @@ public class Spiel extends EmailTransportBase implements Serializable
   				objekte.add(obj);
   				
   				// Restflugzeit
-  				restflugzeitenTemp.add(obj.getRestflugzeit());
+  				Flugzeit flugzeit = obj.getRestflugzeit();
+  				flugzeit.obj = obj;
+  				restflugzeiten.add(flugzeit);
   			}
   			
   			this.spiel.screenDisplayContent = new ScreenDisplayContent();
@@ -7080,22 +6769,18 @@ public class Spiel extends EmailTransportBase implements Serializable
   				chapter.table.colAlignRight[5] = false;
   				
   				chapter.table.cells.add(SternResources.InventurAnkunft(false));
-  				chapter.table.colAlignRight[6] = true;
+  				chapter.table.colAlignRight[6] = false;
   				
   				chapter.table.cells.add(SternResources.InventurBuendnis(false));
   				chapter.table.colAlignRight[7] = false;
  			}
 			
 			// Objekte nach Ankunftzeit sortieren
-			int[] restflugzeiten = new int[restflugzeitenTemp.size()];
-			for (int i = 0; i < restflugzeiten.length; i++)
-				restflugzeiten[i] = restflugzeitenTemp.get(i).intValue();
+ 			Collections.sort(restflugzeiten, new Flugzeit());
 			
-			int[] seq = Utils.listeSortieren(restflugzeiten, false);
-			
-			for (int i = 0; i < restflugzeiten.length; i++)
+			for (Flugzeit flugzeit: restflugzeiten)
 			{
-				Flugobjekt obj = objekte.get(seq[i]);
+				Flugobjekt obj = flugzeit.obj;
 				
 				// Zur Grafik hinzufuegen
 				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
@@ -7188,10 +6873,8 @@ public class Spiel extends EmailTransportBase implements Serializable
  				}
  				
  				// Ankunftsjahr
- 				chapter.table.cells.add(
- 						SternResources.InventurAnkunftJahr(
- 								false, 
- 								Integer.toString(this.spiel.jahr + 1 + restflugzeitenTemp.get(seq[i])).toString()));
+ 				flugzeit.jahr += this.spiel.jahr;
+ 				chapter.table.cells.add(flugzeit.toOutputString(false));
  				
  				if (!this.simple)
  				{
@@ -7223,8 +6906,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					markedFields,
  					lines,
- 					(spiel.loch != null && spiel.loch.isActive()) ?
- 							spiel.loch.getPos() : null,
  					null));
  			
  			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -7286,10 +6967,11 @@ public class Spiel extends EmailTransportBase implements Serializable
  				
  				String plNameStart = Utils.padString("  " + spiel.getPlanetenNameFromIndex(obj.getSpl()), 2);
  				String plNameZiel = Utils.padString("  " + spiel.getPlanetenNameFromIndex(obj.getZpl()), 2);
+ 				String orientierung = obj.getAnz() == 1 ? "L" : "R";
  				
  				String lineConcat = obj.getSpl() < obj.getZpl() ?
- 							plNameStart + plNameZiel :
- 							plNameZiel + plNameStart;
+ 							plNameStart + plNameZiel + orientierung:
+ 							plNameZiel + plNameStart + orientierung;
  							
  				if (patPerLine.containsKey(lineConcat))
  					patPerLine.replace(lineConcat, 
@@ -7300,7 +6982,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
   			if (patPerLine != null)
   			{
-  				chapter.table = new InventurPdfTable(3);
+  				chapter.table = new InventurPdfTable(4);
   				
   				// Spaltenueberschriften
   				chapter.table.cells.add(SternResources.InventurPlanet1(false));
@@ -7309,13 +6991,25 @@ public class Spiel extends EmailTransportBase implements Serializable
   				chapter.table.cells.add(SternResources.InventurPlanet2(false));
   				chapter.table.colAlignRight[1] = false;
   				
-  				chapter.table.cells.add(SternResources.InventurPatrouillen(false));
-  				chapter.table.colAlignRight[2] = true;
+  				chapter.table.cells.add(SternResources.InventurPatrouillenOrientierung(false));
+  				chapter.table.colAlignRight[2] = false;
   				
-  				for (String key: patPerLine.keySet())
+  				chapter.table.cells.add(SternResources.InventurPatrouillen(false));
+  				chapter.table.colAlignRight[3] = true;
+  				
+  				ArrayList<String> keys = new ArrayList<String>(patPerLine.keySet());
+  				Collections.sort(keys);
+  				
+  				for (String key: keys)
   				{
   					chapter.table.cells.add(key.substring(0, 2));
-  					chapter.table.cells.add(key.substring(2));
+  					chapter.table.cells.add(key.substring(2, 4));
+  					
+  					chapter.table.cells.add(
+  							key.charAt(4) == 'L' ?
+  									SternResources.InventurPatrouillenOrientierungLinks(false) :
+  									SternResources.InventurPatrouillenOrientierungRechts(false));
+  					
   					chapter.table.cells.add(patPerLine.get(key).toString());
   				}
 	 			
@@ -7325,8 +7019,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 	 					new SpielfeldDisplayContent(plData,
 	 					null,
 	 					lines,
-	 					(spiel.loch != null && spiel.loch.isActive()) ?
-	 							spiel.loch.getPos() : null,
 	 					null));
 	 			
 	 			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -7380,7 +7072,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				chapter.table.cells.add(SternResources.InventurFestungKurz(false));
 				chapter.table.colAlignRight[5] = true;
 				
-				chapter.table.cells.add(SternResources.InventurFestungZustandKurz(false));
+				chapter.table.cells.add(SternResources.InventurFestungRaumerKurz(false));
 				chapter.table.colAlignRight[6] = true;
 				
 				chapter.table.cells.add(SternResources.InventurRaumerKurz(false));
@@ -7446,7 +7138,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!simple)
   				{
   					chapter.table.cells.add(istBes ? Utils.numToString(pl.getFestungFaktor()) : "?");
-  					chapter.table.cells.add(istBes ? Utils.numToString(pl.getFestungIntakt()) : "?");
+  					chapter.table.cells.add(istBes ? Utils.numToString(pl.getFestungRaumer()) : "?");
   				}
   				chapter.table.cells.add(Utils.numToString(pl.getAnz(ObjektTyp.RAUMER)));
   				
@@ -7494,7 +7186,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 
   			for (Flugobjekt obj: spiel.objekte)
   			{
-  				if (obj.istZuLoeschen() || obj.getNeu() || obj.getTyp() == ObjektTyp.SCHWARZES_LOCH)
+  				if (obj.istZuLoeschen() || obj.getNeu())
   					continue;
   				
   				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
@@ -7509,8 +7201,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					null, // lines,
- 					(spiel.loch != null && spiel.loch.isActive()) ?
- 							spiel.loch.getPos() : null,
  					this.minen()));
  			
  			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -7564,14 +7254,14 @@ public class Spiel extends EmailTransportBase implements Serializable
   	  	
   	// =========================================
   	
-  	protected class Entfernungstabelle
+  	private class Entfernungstabelle
   	{
   		private Spiel spiel;
   		private InventurPdfDaten pdfDaten;
   		private Spezialmenue sm;
   		private ScreenDisplayContent sdcBefore;
   		
-  		public Entfernungstabelle(Spiel spiel)
+  		private Entfernungstabelle(Spiel spiel)
   		{
   			this.spiel = spiel;
   			
@@ -7656,6 +7346,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
   			chapter.table = new InventurPdfTable(this.spiel.anzPl + 1);
   			chapter.table.highlightFirstCol = true;
+  			chapter.table.smallFont = true;
   			
 			// Spaltenueberschriften
   			chapter.table.cells.add("");
@@ -7665,7 +7356,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			{
   				int plIndex = spiel.getPlanetenSortiert()[pl];
   				chapter.table.cells.add(Utils.padString(" "+this.spiel.getPlanetenNameFromIndex(plIndex), 2));
-  				chapter.table.colAlignRight[pl+1] = true;
+  				chapter.table.colAlignRight[pl+1] = false;
   			}
   			
   			for (int plVon = 0; plVon < this.spiel.anzPl; plVon++)
@@ -7676,8 +7367,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				{
   					chapter.table.cells.add(
   							plVon != plNach ?
-  									Integer.toString(
-  											this.spiel.getDistanzMatrix()[plVon][plNach]) :
+  										this.spiel.getDistanzMatrix()[plVon][plNach].toOutputStringDistanzmatrix(false) :
   										"");
   				}
   			}
@@ -7686,7 +7376,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
- 					null,
  					null,
  					null,
  					null));
@@ -7722,19 +7411,19 @@ public class Spiel extends EmailTransportBase implements Serializable
   	  	
   	// =========================================
   	
-  	protected static class KI
+  	private static class KI
   	{
-  		public static Vector<KiZug> calc (Spiel spielKopie, int sp)
+  		private static Vector<KiZug> calc (Spiel spielKopie, int sp)
   		{
   			Vector<KiZug> alleZuege = new Vector<KiZug>();
   			
 			// Entfernungstabelle berechnen
-  			int[][] dist = spielKopie.getDistanzMatrix();
+  			spielKopie.getDistanzMatrix();
   			
   			// Berechne Asugangslage
   			int score[] = new int [spielKopie.anzPl];
 
-  			score = calcAusgangslage(spielKopie, sp, dist);
+  			score = calcAusgangslage(spielKopie, sp, spielKopie.distanzMatrixJahre);
   			
   			// Ermittle Spielzuege
   			Vector<KiZug> kiZuege;
@@ -7757,7 +7446,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   					continue;
   						
   				// Finde naechstgelegene eigenen Startplanetn, der nicht bedroht ist
-  				int distPl[] = Utils.listeSortieren(dist[plZiel], false);
+  				int distPl[] = Utils.listeSortieren(spielKopie.distanzMatrixJahre[plZiel], false);
   				
   				momDist = -1;
   				anzRaumerGes = 0;
@@ -7766,7 +7455,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				
   				angrZuschlag = 1. + (double)Utils.random(Constants.KI_FAKTOR_ANGRIFF_MAX_RND) / 100.;
   				
-  				for (int tt = 0; tt < dist.length; tt++)
+  				for (int tt = 0; tt < spielKopie.distanzMatrixJahre.length; tt++)
   				{
   					plStart = distPl[tt];
   					Planet planetStart = spielKopie.planeten[plStart];
@@ -7774,13 +7463,13 @@ public class Spiel extends EmailTransportBase implements Serializable
   					if (plStart == plZiel || planetStart.getBes() != sp || score[plStart] > 0)
   						continue;
   					
-  					if (momDist >= 0 && dist[plZiel][plStart] != momDist)
+  					if (momDist >= 0 && spielKopie.distanzMatrixJahre[plZiel][plStart] != momDist)
   					{
   						kiZuege = new Vector<KiZug>();
   						anzRaumerGes = 0;
   					}
   					
-  					momDist = dist[plZiel][plStart];
+  					momDist = spielKopie.distanzMatrixJahre[plZiel][plStart];
   					anzRaumer = 0;
   					minRaumer = 999999999;
   					
@@ -7919,7 +7608,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				{
   					// Fremder Planet
   					if (planetZiel.getBes() != Constants.BESITZER_NEUTRAL)
-  						scoreAusgang[plZiel] -= (planetZiel.getAnz(ObjektTyp.RAUMER) + Constants.FESTUNG_STAERKE_MIN + Constants.FESTUNG_STAERKE_SPANNE / 2);
+  						scoreAusgang[plZiel] -= (planetZiel.getAnz(ObjektTyp.RAUMER) + Constants.FESTUNG_STAERKE);
   				}
   			}
   			
@@ -8013,7 +7702,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		return auswertungAusgefuehrt;
   	}
   	
-  	public static void zugeingabeKi(Spiel spiel, int spieler)
+  	private static void zugeingabeKi(Spiel spiel, int spieler)
   	{
   		Vector<KiZug> zuege = KI.calc(spiel, spieler);
 			
@@ -8055,7 +7744,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		}
   	}
   	
-  	public int getSpielerIndexByName(String userId)
+  	private int getSpielerIndexByName(String userId)
   	{
   		int spIndex = 1;
   		
@@ -8127,5 +7816,53 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
   			this.starteAuswertungServer();
   		}
+  	}
+  	
+  	public void migrieren()
+  	{
+  		boolean migrationNoetig =
+  				this.saveBuild == null || // Bei alten STERN-Builds vor dem "grossen Umbau"
+  				(!this.saveBuild.equals(Constants.NO_BUILD_INFO) && 
+  						this.saveBuild.compareTo(Constants.MIGRATION_BUILD_LIMIT) < 0);
+  		
+  		if (!migrationNoetig)
+  			return;
+  		
+  		// Loesche alte Aufzeichnungen
+  		if (this.archiv != null)
+  		{	
+	  		for (Archiv archiv: this.archiv.values())
+	  		{
+	  			archiv.loescheAuswertung();
+	  		}
+  		}
+  		
+  		if (this.objekte != null)
+  		{
+	  		for (int i = this.objekte.size() - 1; i>= 0; i--)
+			{
+				Flugobjekt obj = this.objekte.get(i);
+	
+		  		// Loesche "Ausseridische", die unterwegs sind
+				if (obj.getBes() == Constants.BESITZER_NEUTRAL)
+				{
+					this.objekte.remove(i);
+					continue;
+				}
+				
+				// Bei Patrouillen im Einsatz: Mache sie durch Zufall links- oder rechtsdrehend
+				if (obj.getTyp() == ObjektTyp.PATROUILLE &&
+					!obj.isTransfer())
+				{
+					// 1 == linksdrehend, 2 == rechtsdrehend
+					obj.setAnz(Utils.random(2) + 1);
+				}
+			}
+  		}
+  	}
+  	
+  	public void updateSaveBuild()
+  	{
+  		this.saveBuild = ReleaseGetter.getRelease();
   	}
 }

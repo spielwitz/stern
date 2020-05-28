@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.text.DateFormat;
@@ -36,7 +35,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -60,9 +58,9 @@ public class Utils
 		return (int) (Utils.secRandom.nextDouble() * max);
 	}
 	
-	public static double rnd()
+	static double dist(Point2D.Double p1, Point2D.Double p2)
 	{
-		return Utils.secRandom.nextDouble();
+		return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 	}
 	
 	public static Object klon(Object obj)
@@ -97,11 +95,11 @@ public class Utils
 	{
 		return (int)Math.round(arg);		
 	}
-	public static int[] randomList(int num)
+	static int[] randomList(int num)
 	{
 		return randomList(num, num);
 	}
-	public static int[] sequentialList(int num)
+	static int[] sequentialList(int num)
 	{
 		int retval[] = new int[num];
 		
@@ -110,7 +108,7 @@ public class Utils
 		
 		return retval;
 	}
-	public static int[] randomList(int maxNum, int anz)
+	private static int[] randomList(int maxNum, int anz)
 	{
 		int retval[] = new int[anz];
 		int t, tt;
@@ -132,7 +130,7 @@ public class Utils
 
 		return retval;
 	}
-	public static int[] listeSortieren (int liste[], boolean absteigend)
+	static int[] listeSortieren (int liste[], boolean absteigend)
 	{
 		int reihenfolge[] = new int[liste.length];
 		int swap;
@@ -165,40 +163,6 @@ public class Utils
 		
 		return reihenfolge;
 	}
-	public static int[] listeSortieren (double liste[], boolean absteigend)
-	{
-		int reihenfolge[] = new int[liste.length];
-		int swap;
-		boolean ok = false;
-		
-		// Initiale Verteilung
-		for (int t = 0; t < liste.length; t++)
-			reihenfolge[t] = t;
-		
-		// Sortieren
-		while (ok == false)
-		{
-			ok = true;
-			
-			for (int t = 0; t < liste.length - 1; t++)
-			{
-				if (absteigend == false && liste[reihenfolge[t]] > liste[reihenfolge[t+1]])
-					ok = false;
-				else if (absteigend == true && liste[reihenfolge[t]] < liste[reihenfolge[t+1]])
-					ok = false;
-				
-				if (ok == false)
-				{
-					swap = reihenfolge[t];
-					reihenfolge[t] = reihenfolge[t+1];
-					reihenfolge[t+1] = swap;
-				}
-			}
-		}
-		
-		return reihenfolge;
-	}	
-	
 	public static int[] listeSortieren (String liste[], boolean absteigend)
 	{
 		int reihenfolge[] = new int[liste.length];
@@ -233,25 +197,18 @@ public class Utils
 		return reihenfolge;
 	}
 	
-	public static String numToString(int num)
+	static String numToString(int num)
 	{
 		if (num == 0)
 			return "";
 		else
 			return Integer.toString(num);
 	}
-	public static String padString(int num, int length)
+	static String padString(int num, int length)
 	{
 		return padString(Integer.toString(num), length);
 	}
-	public static String padString0(int num, int length)
-	{
-		if (num != 0)
-			return padString(Integer.toString(num), length);
-		else
-			return padString("", length);
-	}
-	public static  String padString(String text, int length)
+	static  String padString(String text, int length)
 	{
 		StringBuilder sb = null;
 		String fillUpString = new String(new char[length]).replace('\0', ' ');
@@ -262,12 +219,12 @@ public class Utils
 		return sb.substring(sb.length()-length, sb.length());
 	}	
 	
-	public static String padStringLeft(String text, int length)
+	static String padStringLeft(String text, int length)
 	{
 		return (text + getStringWithGivenLength(' ', length)).substring(0, length);
 	}
 	
-	public static String getStringWithGivenLength(char c, int length)
+	private static String getStringWithGivenLength(char c, int length)
 	{
 		if (length <= 0)
 			return "";
@@ -279,21 +236,29 @@ public class Utils
 		}
 	}
 	
-	public static double VektorproduktBetrag(Point2D.Double pt1, Point2D.Double pt2, Point2D.Double pt3)
+	static int winkelVektoren(Point2D.Double pt1, Point2D.Double pt2, Point2D.Double pt3)
 	{
-		// pt1 ist der gemeinsame Startpunkt von zwei Vektoren
-		// Vektor a= pt1 -> pt2, Vektor b = pt1 -> pt3
+		// Gibt den Winkel zwischen den Vektoren pt1-pt2 und pt1-pt3 in ganzen Grad zurueck
+		double x1 = pt2.x - pt1.x;
+		double y1 = pt2.y - pt1.y;
 		
-		double ax = pt2.x - pt1.x;
-		double ay = pt2.y - pt1.y;
+		double x2 = pt3.x - pt1.x;
+		double y2 = pt3.y - pt1.y;
 		
-		double bx = pt3.x - pt1.x;
-		double by = pt3.y - pt1.y;
+		double w1 = Math.atan2(y1, x1);
+		double w2 = Math.atan2(y2, x2);
 		
-		return ax * by - ay * bx;
+		double w = w2 - w1;
+		
+		int wGrad = Utils.round(180 * (w / Math.PI)); 
+		
+		if (wGrad < 0)
+			return 360 + wGrad;
+		else
+			return wGrad;
 	}
 	
-	public static long getDateFromOldVega(String dateString)
+	static long getDateFromOldVega(String dateString)
 	{
 		int year = Integer.parseInt(dateString.substring(0, 4)); // - 1900, 
 		int month = Integer.parseInt(dateString.substring(4, 6)) -1; 
@@ -345,97 +310,6 @@ public class Utils
 		return meineIP;
 	}
 	
-	public static String encryptString(String text)
-	{
-		if (text.length() == 0)
-			return "";
-		
-		try
-		{
-			// Verschluesseln
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, getEncryptionKey());
-			byte[] encrypted = cipher.doFinal(text.getBytes());
-			 
-			// bytes zu Base64-String konvertieren (dient der Lesbarkeit)
-			return Base64.getEncoder().encodeToString(encrypted);
-		}
-		catch (Exception x)
-		{ 
-		}
-		
-		return null;
-	}
-	
-	public static String decryptString(String encryptedString)
-	{
-		if (encryptedString.length() == 0)
-			return "";
-		
-		try
-		{
-			// BASE64 String zu Byte-Array konvertieren
-			byte[] crypted2 = Base64.getDecoder().decode(encryptedString);
-	
-			// Entschluesseln
-			Cipher cipher2 = Cipher.getInstance("AES");
-			cipher2.init(Cipher.DECRYPT_MODE, getEncryptionKey());
-			byte[] cipherData2 = cipher2.doFinal(crypted2);
-			return new String(cipherData2);
-		}
-		catch (Exception x) {}
-		
-		return null;
-	}
-	
-	private static SecretKeySpec getEncryptionKey()
-	{
-		SecretKeySpec secretKeySpec = null;
-		
-		try
-		{
-			// Das Passwort bzw der Schluesseltext
-		      String keyStr = getMacAddress();
-		      // byte-Array erzeugen
-		      byte[] key = (keyStr).getBytes("UTF-8");
-		      // aus dem Array einen Hash-Wert erzeugen mit MD5 oder SHA
-		      MessageDigest sha = MessageDigest.getInstance("SHA-256");
-		      key = sha.digest(key);
-		      // nur die ersten 128 bit nutzen
-		      key = Arrays.copyOf(key, 16); 
-		      // der fertige Schluessel
-		      secretKeySpec = new SecretKeySpec(key, "AES");
-		}
-		catch (Exception x)
-		{}
-	      
-	    return secretKeySpec;
-	}
-	
-	private static String getMacAddress()
-	{
-	  String result = "";
-
-	  try
-	  {
-		  for ( NetworkInterface ni : Collections.list( NetworkInterface.getNetworkInterfaces() ) )
-		  {
-		    byte[] hardwareAddress = ni.getHardwareAddress();
-	
-		    if ( hardwareAddress != null )
-		    {
-		      for ( int i = 0; i < hardwareAddress.length; i++ )
-		        result += String.format( (i==0?"":"-")+"%02X", hardwareAddress[i] );
-	
-		      return result;
-		    }
-		  }
-	  }
-	  catch (Exception x) {}
-
-	  return result;
-	}
-	
 	public static Hashtable<String,String> resolveProgramArgs(String[] args)
 	{
 		Hashtable<String,String> retval = new Hashtable<String,String>();
@@ -458,7 +332,7 @@ public class Utils
 		return retval;
 	}
 	
-	public static Point2D.Double toPoint2D(Point p)
+	static Point2D.Double toPoint2D(Point p)
 	{
 		return new Point2D.Double(p.getX(), p.getY());
 	}
@@ -601,4 +475,18 @@ public class Utils
 		
 		return retval;
 	}
+	
+	static double VektorproduktBetrag(Point2D.Double pt1, Point2D.Double pt2, Point2D.Double pt3)
+	{
+		// pt1 ist der gemeinsame Startpunkt von zwei Vektoren
+		// Vektor a= pt1 -> pt2, Vektor b = pt1 -> pt3
+		
+		double ax = pt2.x - pt1.x;
+		double ay = pt2.y - pt1.y;
+		
+		double bx = pt3.x - pt1.x;
+		double by = pt3.y - pt1.y;
+		
+		return ax * by - ay * bx;
+	}	
 }

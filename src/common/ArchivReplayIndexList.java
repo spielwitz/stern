@@ -19,15 +19,15 @@ package common;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class ArchivReplayIndexList implements Serializable
+class ArchivReplayIndexList implements Serializable
 {
-	public ConsoleDisplayContent c; // Console-Inhalt
-	public int p; // Planeten Index
-	public int s; // Spielfeld Index
+	ConsoleDisplayContent c; // Console-Inhalt
+	int p; // Planeten Index
+	int s; // Spielfeld Index
 		
 	private int u; // Pause (0 oder 1)
 	
-	public ArchivReplayIndexList(
+	ArchivReplayIndexList(
 			ConsoleDisplayContent c, 
 			int p, 
 			int s,

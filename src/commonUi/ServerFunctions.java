@@ -145,14 +145,14 @@ public class ServerFunctions
 		private ScreenDisplayContent content;
 		private boolean inputEnabled;
 		
-		public ClientScreenDisplayContentUpdater(String clientId, String clientIp, String clientName)
+		private ClientScreenDisplayContentUpdater(String clientId, String clientIp, String clientName)
 		{
 			this.clientId = clientId;
 			this.clientIp = clientIp;
 			this.clientName = clientName;
 		}
 		
-		public void setContent(ScreenDisplayContent content, boolean inputEnabled)
+		private void setContent(ScreenDisplayContent content, boolean inputEnabled)
 		{
 			this.content = content;
 			this.inputEnabled = inputEnabled;
@@ -228,9 +228,8 @@ public class ServerFunctions
 		// Stop RMI
 		try {
             // access the service
-			Registry registry;
-			registry = LocateRegistry.getRegistry();
-			registry.unbind(ServerFunctions.getServerId());
+			Registry registry = LocateRegistry.getRegistry();
+			this.unbindRegistry(registry);
 
             // get rid of the service object
             UnicastRemoteObject.unexportObject(parent, true);
@@ -256,5 +255,14 @@ public class ServerFunctions
 		}
 		
 		return ok;
+	}
+	
+	private void unbindRegistry(Registry registry)
+	{
+		try
+		{
+			registry.unbind(ServerFunctions.getServerId());
+		}
+		catch (Exception x) {}
 	}
 }

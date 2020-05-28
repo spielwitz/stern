@@ -19,8 +19,7 @@ package common;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class SpielfeldLineDisplayContent implements Serializable
+@SuppressWarnings("serial") class SpielfeldLineDisplayContent implements Serializable
 {
 	// Stellt eine Linie dar, die im Spielfeld gezeichnet wird, z.B. um die
 	// Wege der Patrouillen anzuzeigen
@@ -29,7 +28,7 @@ public class SpielfeldLineDisplayContent implements Serializable
 	private PointLowRes p;
 	private byte c;
 	
-	public SpielfeldLineDisplayContent(Point start, Point end, Point2D.Double pos, byte col) {
+	SpielfeldLineDisplayContent(Point start, Point end, Point2D.Double pos, byte col) {
 		super();
 		this.s = start;
 		this.e = end;

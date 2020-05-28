@@ -44,8 +44,7 @@ import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 
-@SuppressWarnings("serial")
-public class EmailCreatorJDialog extends JDialog
+@SuppressWarnings("serial") class EmailCreatorJDialog extends JDialog
 			implements 	ActionListener
 {
 	private Hashtable<CheckBoxDark, String> checkbox2emailMap;
@@ -58,12 +57,12 @@ public class EmailCreatorJDialog extends JDialog
 	private String body;
 	private String subject;
 	
-	public String separatorPreset;
-	public boolean launched = false;
+	String separatorPreset;
+	boolean launched = false;
 	
 	private static final String[] separators = new String[] {";", ","};
 	
-	public EmailCreatorJDialog(
+	EmailCreatorJDialog(
 			JDialog parent,
 			Spieler[] spieler,
 			String emailSpielleiter,
@@ -78,7 +77,7 @@ public class EmailCreatorJDialog extends JDialog
 		this.setLocationRelativeTo(parent);	
 	}
 	
-	public EmailCreatorJDialog(
+	EmailCreatorJDialog(
 			Frame parent,
 			Spieler[] spieler,
 			String emailSpielleiter,

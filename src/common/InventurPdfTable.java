@@ -18,13 +18,14 @@ package common;
 
 import java.util.ArrayList;
 
-public class InventurPdfTable
+class InventurPdfTable
 {
-	public boolean[] colAlignRight;
-	public ArrayList<String> cells;
-	public boolean highlightFirstCol;
+	boolean[] colAlignRight;
+	ArrayList<String> cells;
+	boolean highlightFirstCol;
+	boolean smallFont;
 	
-	public InventurPdfTable(int numCols)
+	InventurPdfTable(int numCols)
 	{
 		this.colAlignRight = new boolean[numCols];
 		this.cells = new ArrayList<String>();

@@ -18,13 +18,12 @@ package common;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class MineHistorie implements Serializable
+@SuppressWarnings("serial") class MineHistorie implements Serializable
 {
 	private int sp; // Gelegt von Spieler
 	private ObjektTyp typ;
 	
-	public MineHistorie(int sp, ObjektTyp typ) {
+	MineHistorie(int sp, ObjektTyp typ) {
 		super();
 		this.sp = sp;
 		this.typ = typ;

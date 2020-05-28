@@ -19,13 +19,13 @@ package common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("serial")
-public class PlanetenlisteDisplayContent implements Serializable
+@SuppressWarnings("serial") 
+class PlanetenlisteDisplayContent implements Serializable
 {
 	private ArrayList<String> t;
 	private ArrayList<Byte> c;
 	
-	public PlanetenlisteDisplayContent(ArrayList<String> text,
+	PlanetenlisteDisplayContent(ArrayList<String> text,
 			ArrayList<Byte> textCol) {
 		super();
 		this.t = text;

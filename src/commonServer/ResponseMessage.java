@@ -24,6 +24,7 @@ public class ResponseMessage
 {
 	public boolean error;
 	public String errorMsg;
+	public String build;
 	
 	public String payloadSerialized;
 	

@@ -25,16 +25,15 @@ import javax.swing.JDialog;
 
 import common.Colors;
 
-@SuppressWarnings("serial")
-public class SpielerFarbenCanvas extends JButton implements ActionListener
+@SuppressWarnings("serial") class SpielerFarbenCanvas extends JButton implements ActionListener
 {
-	public byte colIndex;
+	byte colIndex;
 	private JDialog parent;
 	private IColorChooserCallback callback;
-	public int spieler;
+	int spieler;
 	private Font font;
 	
-	public SpielerFarbenCanvas(JDialog parent, IColorChooserCallback callback, int spieler, byte colIndex, Font font)
+	SpielerFarbenCanvas(JDialog parent, IColorChooserCallback callback, int spieler, byte colIndex, Font font)
 	{
 		super();
 		this.colIndex = colIndex;

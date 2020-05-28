@@ -42,10 +42,10 @@ public class ScreenDisplayContent implements Serializable
 	private int m;
 	private boolean u;
 	
-	transient public final static int MODUS_SPIELFELD = 0;
-	transient public final static int MODUS_PLANETENEDITOR = 1;
-	transient public final static int MODUS_STATISTIK = 2;
-	transient public final static int MODUS_ENTFERUNGSTABELLE = 3;
+	transient final static int MODUS_SPIELFELD = 0;
+	transient final static int MODUS_PLANETENEDITOR = 1;
+	transient final static int MODUS_STATISTIK = 2;
+	transient final static int MODUS_ENTFERUNGSTABELLE = 3;
 	
 	public ScreenDisplayContent()
 	{
@@ -96,16 +96,6 @@ public class ScreenDisplayContent implements Serializable
 		this.e = plEdit;
 	}
 	
-	public void switchDisplayMode (int mode)
-	{
-		this.m = mode;
-	}
-
-	public void deletePlEditData()
-	{
-		this.e = null;
-	}
-
 	public StatistikDisplayContent getStatistik() {
 		return t;
 	}

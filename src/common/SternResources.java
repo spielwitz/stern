@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: GG
+		// Hoechstes vergebenes Symbol: GV
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -44,7 +44,7 @@ public class SternResources
 		symbolDict.put("04","Aktualisieren_04");
 		symbolDict.put("05","AufklaererPlural_05");
 		symbolDict.put("06","Auswaehlen_06");
-		symbolDict.put("07","AuswertungAngriffAngreifer_07");
+		symbolDict.put("07","AuswertungAngriffAngreiferFestung_07");
 		symbolDict.put("08","AuswertungAngriffAngriffAufPlanet_08");
 		symbolDict.put("09","AuswertungAngriffAngriffGescheitert_09");
 		symbolDict.put("0A","InventurFlugobjekte_0A");
@@ -73,13 +73,8 @@ public class SternResources
 		symbolDict.put("0X","InventurPdfFehler_0X");
 		symbolDict.put("0Y","InventurPdfGeoeffnet_0Y");
 		symbolDict.put("0Z","InventurPlanet_0Z");
-		symbolDict.put("10","AuswertungAngriffAusserirdischeErobert_10");
-		symbolDict.put("11","AuswertungAngriffEnergieproduktionHalbiert_11");
-		symbolDict.put("12","AuswertungAngriffFestungZerstoert_12");
-		symbolDict.put("13","AuswertungAngriffFestung_13");
-		symbolDict.put("14","AuswertungAngriffPlanet_14");
+		symbolDict.put("13","AuswertungAngriffAngreiferPlanet_13");
 		symbolDict.put("15","AuswertungAngriffSpielerErobert_15");
-		symbolDict.put("16","AuswertungAngriffUntentschieden_16");
 		symbolDict.put("17","AuswertungAufklaererAngekommen_17");
 		symbolDict.put("19","AuswertungBeginnt_19");
 		symbolDict.put("1A","InventurPlanet1_1A");
@@ -106,7 +101,6 @@ public class SternResources
 		symbolDict.put("1V","Links_1V");
 		symbolDict.put("1W","Loeschen_1W");
 		symbolDict.put("1X","MenuBestenliste_1X");
-		symbolDict.put("1Y","MenuClient_1Y");
 		symbolDict.put("1Z","MenuDatei_1Z");
 		symbolDict.put("20","AuswertungBuendnisNichtGeaendert_20");
 		symbolDict.put("21","AuswertungEnde_21");
@@ -114,7 +108,6 @@ public class SternResources
 		symbolDict.put("23","AuswertungKommandozentraleErobertSpieler_23");
 		symbolDict.put("24","AuswertungMineGelegt_24");
 		symbolDict.put("25","AuswertungMinenfeldGeraeumt_25");
-		symbolDict.put("26","AuswertungMinenfeldImLoch_26");
 		symbolDict.put("27","AuswertungMinenlegerAngekommen_27");
 		symbolDict.put("28","AuswertungMinenlegerZerschellt_28");
 		symbolDict.put("29","AuswertungMinenraeumerAngekommen_29");
@@ -145,7 +138,6 @@ public class SternResources
 		symbolDict.put("2Z","OK_2Z");
 		symbolDict.put("30","AuswertungMinenraeumerZerschellt_30");
 		symbolDict.put("31","AuswertungNachrichtAnAusSektor_31");
-		symbolDict.put("32","AuswertungNachrichtAnAusserirdischeAusSektor_32");
 		symbolDict.put("33","AuswertungPatrouilleAngekommen_33");
 		symbolDict.put("34","AuswertungPatrouilleAufklaererGekapert_34");
 		symbolDict.put("35","AuswertungPatrouilleMeldetAusSektor_35");
@@ -158,7 +150,7 @@ public class SternResources
 		symbolDict.put("3C","PlEditEe_3C");
 		symbolDict.put("3D","PlEditEeEnergievorrat_3D");
 		symbolDict.put("3E","PlEditEprodPlus4_3E");
-		symbolDict.put("3F","PlEditFestungZustand_3F");
+		symbolDict.put("3F","PlEditFestungRaumer_3F");
 		symbolDict.put("3G","PlEditFestungen_3G");
 		symbolDict.put("3H","PlEditKaufpreis_3H");
 		symbolDict.put("3I","PlEditRaumerProd_3I");
@@ -202,9 +194,6 @@ public class SternResources
 		symbolDict.put("4K","Spieler_4K");
 		symbolDict.put("4L","SpielfeldOkFrage_4L");
 		symbolDict.put("4M","Spielinformationen_4M");
-		symbolDict.put("4N","SpielinformationenAusserirdische_4N");
-		symbolDict.put("4O","SpielinformationenAusserirdischeTitel_4O");
-		symbolDict.put("4P","SpielinformationenAusserirdischeUnterwegs_4P");
 		symbolDict.put("4Q","SpielinformationenBuendnisPlanet_4Q");
 		symbolDict.put("4R","SpielinformationenBuendnisse_4R");
 		symbolDict.put("4T","SpielinformationenBuendnisseTitel_4T");
@@ -214,17 +203,9 @@ public class SternResources
 		symbolDict.put("4X","SpielinformationenFestungen_4X");
 		symbolDict.put("4Y","SpielinformationenFestungenTitel_4Y");
 		symbolDict.put("4Z","SpielinformationenKeinBuendnis_4Z");
-		symbolDict.put("50","AuswertungSchwarzesLochAufklaerer_50");
-		symbolDict.put("51","AuswertungSchwarzesLochBewegtSich_51");
-		symbolDict.put("52","AuswertungSchwarzesLochMinenleger_52");
-		symbolDict.put("53","AuswertungSchwarzesLochMinenraeumer_53");
-		symbolDict.put("54","AuswertungSchwarzesLochPatrouille_54");
-		symbolDict.put("55","AuswertungSchwarzesLochRaumer_55");
-		symbolDict.put("56","AuswertungSchwarzesLochTransporter_56");
 		symbolDict.put("57","AuswertungSpielerTot_57");
 		symbolDict.put("58","AuswertungTransporterAngekommen_58");
 		symbolDict.put("59","AuswertungTransporterZerschellt_59");
-		symbolDict.put("5A","SpielinformationenKeineAusserirdische_5A");
 		symbolDict.put("5B","SpielinformationenKeinePlanetenMitBuendnissen_5B");
 		symbolDict.put("5C","SpielinformationenKommandozentralen_5C");
 		symbolDict.put("5D","SpielinformationenKommandozentralenTitel_5D");
@@ -259,7 +240,6 @@ public class SternResources
 		symbolDict.put("68","ClientSettingsJDialogVerbinden_68");
 		symbolDict.put("69","ClientSettingsJDialogVerbindungsstatus_69");
 		symbolDict.put("6A","Statistik_6A");
-		symbolDict.put("6B","StatistikGesamteSpieldauer_6B");
 		symbolDict.put("6C","StatistikJahrMinus_6C");
 		symbolDict.put("6D","StatistikJahrPlus_6D");
 		symbolDict.put("6E","StatistikMax_6E");
@@ -345,7 +325,7 @@ public class SternResources
 		symbolDict.put("8N","ZugeingabeNeueBuendnisstruktur_8N");
 		symbolDict.put("8O","ZugeingabeNichtGenugRaumer_8O");
 		symbolDict.put("8P","ZugeingabePatrouille_8P");
-		symbolDict.put("8Q","ZugeingabePatrouilleMission_8Q");
+		symbolDict.put("8Q","ZugeingabePatrouilleMissionLinks_8Q");
 		symbolDict.put("8R","ZugeingabePatrouilleTransfer_8R");
 		symbolDict.put("8S","ZugeingabePlanet_8S");
 		symbolDict.put("8T","ZugeingabePlanetGehoertNicht_8T");
@@ -364,7 +344,7 @@ public class SternResources
 		symbolDict.put("96","InventurEnergieproduktionKurz_96");
 		symbolDict.put("97","InventurEnergievorratKurz_97");
 		symbolDict.put("98","InventurFestungKurz_98");
-		symbolDict.put("99","InventurFestungZustandKurz_99");
+		symbolDict.put("99","InventurFestungRaumerKurz_99");
 		symbolDict.put("9A","ZugeingabeSpielzuegeNichtImportiert_9A");
 		symbolDict.put("9B","ZugeingabeStartErfolgreich_9B");
 		symbolDict.put("9C","ZugeingabeStartplanet_9C");
@@ -555,6 +535,20 @@ public class SternResources
 		symbolDict.put("GE","ServerLogLevelAendernErfolg_GE");
 		symbolDict.put("GF","ServerLogLeer_GF");
 		symbolDict.put("GG","ReleaseFormatted2_GG");
+		symbolDict.put("GH","AuswertungEreignisTag_GH");
+		symbolDict.put("GI","AuswertungEreignisJahresbeginn_GI");
+		symbolDict.put("GJ","AuswertungEreignisJahresende_GJ");
+		symbolDict.put("GK","FlugzeitOutput_GK");
+		symbolDict.put("GL","FlugzeitOutputJahresende_GL");
+		symbolDict.put("GM","FlugzeitOutputShort_GM");
+		symbolDict.put("GN","FlugzeitOutputJahresendeShort_GN");
+		symbolDict.put("GO","ZugeingabePatrouilleMissionRechts_GO");
+		symbolDict.put("GP","ZugeingabeMinenraeumerMission_GP");
+		symbolDict.put("GQ","InventurPatrouillenOrientierungLinks_GQ");
+		symbolDict.put("GR","InventurPatrouillenOrientierungRechts_GR");
+		symbolDict.put("GS","InventurPatrouillenOrientierung_GS");
+		symbolDict.put("GT","SpielinformationenKommandozentralenUnterwegs2_GT");
+		symbolDict.put("GV","ServerBuildVeraltet_GV");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -633,14 +627,14 @@ public class SternResources
 	}
 
 	/**
-	   * Angreifer [07]
+	   * Angreifer: {0}, Festung: {1} [07]
 	   */
-	public static String AuswertungAngriffAngreifer(boolean symbol) {
-		return symbol ? "$07$":messages.getString("AuswertungAngriffAngreifer_07");
+	public static String AuswertungAngriffAngreiferFestung(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$07§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferFestung_07"), arg0, arg1);
 	}
 
 	/**
-	   * --> Angriff auf Planet {0} [08]
+	   * Angriff auf Planet {0} [08]
 	   */
 	public static String AuswertungAngriffAngriffAufPlanet(boolean symbol, String arg0) {
 		return symbol ? "$08§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngriffAufPlanet_08"), arg0);
@@ -836,38 +830,10 @@ public class SternResources
 	}
 
 	/**
-	   * Die Au\u00DFerirdischen haben den Planeten erobert! Der Planet ist wieder neutral. [10]
+	   * Angreifer: {0}, Planet: {1} [13]
 	   */
-	public static String AuswertungAngriffAusserirdischeErobert(boolean symbol) {
-		return symbol ? "$10$":messages.getString("AuswertungAngriffAusserirdischeErobert_10");
-	}
-
-	/**
-	   * Die Energieproduktion hat sich halbiert. [11]
-	   */
-	public static String AuswertungAngriffEnergieproduktionHalbiert(boolean symbol) {
-		return symbol ? "$11$":messages.getString("AuswertungAngriffEnergieproduktionHalbiert_11");
-	}
-
-	/**
-	   * Festung zerst\u00F6rt! [12]
-	   */
-	public static String AuswertungAngriffFestungZerstoert(boolean symbol) {
-		return symbol ? "$12$":messages.getString("AuswertungAngriffFestungZerstoert_12");
-	}
-
-	/**
-	   * FESTUNG [13]
-	   */
-	public static String AuswertungAngriffFestung(boolean symbol) {
-		return symbol ? "$13$":messages.getString("AuswertungAngriffFestung_13");
-	}
-
-	/**
-	   * Planet [14]
-	   */
-	public static String AuswertungAngriffPlanet(boolean symbol) {
-		return symbol ? "$14$":messages.getString("AuswertungAngriffPlanet_14");
+	public static String AuswertungAngriffAngreiferPlanet(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$13§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferPlanet_13"), arg0, arg1);
 	}
 
 	/**
@@ -878,24 +844,17 @@ public class SternResources
 	}
 
 	/**
-	   * Beide Parteien haben verloren. Der Planet ist wieder neutral. [16]
-	   */
-	public static String AuswertungAngriffUntentschieden(boolean symbol) {
-		return symbol ? "$16$":messages.getString("AuswertungAngriffUntentschieden_16");
-	}
-
-	/**
-	   * --> 1 Aufkl\u00E4rer auf Planet {0} angekommen. [17]
+	   * 1 Aufkl\u00E4rer auf Planet {0} angekommen. [17]
 	   */
 	public static String AuswertungAufklaererAngekommen(boolean symbol, String arg0) {
 		return symbol ? "$17§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAufklaererAngekommen_17"), arg0);
 	}
 
 	/**
-	   * Die Auswertung des Jahres {0} beginnt. [19]
+	   * Flugobjekte starten, Planeten produzieren. [19]
 	   */
-	public static String AuswertungBeginnt(boolean symbol, String arg0) {
-		return symbol ? "$19§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungBeginnt_19"), arg0);
+	public static String AuswertungBeginnt(boolean symbol) {
+		return symbol ? "$19$":messages.getString("AuswertungBeginnt_19");
 	}
 
 	/**
@@ -1067,13 +1026,6 @@ public class SternResources
 	}
 
 	/**
-	   * Client [1Y]
-	   */
-	public static String MenuClient(boolean symbol) {
-		return symbol ? "$1Y$":messages.getString("MenuClient_1Y");
-	}
-
-	/**
 	   * Spiel [1Z]
 	   */
 	public static String MenuDatei(boolean symbol) {
@@ -1095,21 +1047,21 @@ public class SternResources
 	}
 
 	/**
-	   * --> 'Die Neutralen' erobern die Kommandozentrale von {0}! [22]
+	   * 'Die Neutralen' erobern die Kommandozentrale von {0}! [22]
 	   */
 	public static String AuswertungKommandozentraleErobertNeutral(boolean symbol, String arg0) {
 		return symbol ? "$22§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertNeutral_22"), arg0);
 	}
 
 	/**
-	   * --> {0} erobert die Kommandozentrale von {1}! [23]
+	   * {0} erobert die Kommandozentrale von {1}! [23]
 	   */
 	public static String AuswertungKommandozentraleErobertSpieler(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$23§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertSpieler_23"), arg0, arg1);
 	}
 
 	/**
-	   * --> Nachricht an {0}: Mine wurde gelegt. [24]
+	   * Nachricht an {0}: Mine wurde gelegt. [24]
 	   */
 	public static String AuswertungMineGelegt(boolean symbol, String arg0) {
 		return symbol ? "$24§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMineGelegt_24"), arg0);
@@ -1123,28 +1075,21 @@ public class SternResources
 	}
 
 	/**
-	   * Im @@@SCHWARZEN LOCH@@@ verschwindet ein Minenfeld der St\u00E4rke {0}. [26]
-	   */
-	public static String AuswertungMinenfeldImLoch(boolean symbol, String arg0) {
-		return symbol ? "$26§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenfeldImLoch_26"), arg0);
-	}
-
-	/**
-	   * --> 1 Minenleger auf Planet {0} angekommen. [27]
+	   * 1 Minenleger auf Planet {0} angekommen. [27]
 	   */
 	public static String AuswertungMinenlegerAngekommen(boolean symbol, String arg0) {
 		return symbol ? "$27§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerAngekommen_27"), arg0);
 	}
 
 	/**
-	   * --> 1 Minenleger auf Planet {0} zerschellt. [28]
+	   * 1 Minenleger auf Planet {0} zerschellt. [28]
 	   */
 	public static String AuswertungMinenlegerZerschellt(boolean symbol, String arg0) {
 		return symbol ? "$28§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerZerschellt_28"), arg0);
 	}
 
 	/**
-	   * --> 1 Minenr\u00E4umer auf Planet {0} angekommen. [29]
+	   * 1 Minenr\u00E4umer auf Planet {0} angekommen. [29]
 	   */
 	public static String AuswertungMinenraeumerAngekommen(boolean symbol, String arg0) {
 		return symbol ? "$29§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerAngekommen_29"), arg0);
@@ -1326,28 +1271,21 @@ public class SternResources
 	}
 
 	/**
-	   * --> 1 Minenr\u00E4umer auf Planet {0} zerschellt. [30]
+	   * 1 Minenr\u00E4umer auf Planet {0} zerschellt. [30]
 	   */
 	public static String AuswertungMinenraeumerZerschellt(boolean symbol, String arg0) {
 		return symbol ? "$30§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerZerschellt_30"), arg0);
 	}
 
 	/**
-	   * --> Nachricht an {0} aus Sektor {1}: [31]
+	   * Nachricht an {0} aus Sektor {1}: [31]
 	   */
 	public static String AuswertungNachrichtAnAusSektor(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$31§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungNachrichtAnAusSektor_31"), arg0, arg1);
 	}
 
 	/**
-	   * --> Nachricht an die Au\u00DFerirdischen aus Sektor {0}: [32]
-	   */
-	public static String AuswertungNachrichtAnAusserirdischeAusSektor(boolean symbol, String arg0) {
-		return symbol ? "$32§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungNachrichtAnAusserirdischeAusSektor_32"), arg0);
-	}
-
-	/**
-	   * --> 1 Patrouille auf Planet {0} angekommen. [33]
+	   * 1 Patrouille auf Planet {0} angekommen. [33]
 	   */
 	public static String AuswertungPatrouilleAngekommen(boolean symbol, String arg0) {
 		return symbol ? "$33§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleAngekommen_33"), arg0);
@@ -1361,7 +1299,7 @@ public class SternResources
 	}
 
 	/**
-	   * --> Patrouille meldet an {0} aus Sektor {1}: [35]
+	   * Patrouille meldet an {0} aus Sektor {1}: [35]
 	   */
 	public static String AuswertungPatrouilleMeldetAusSektor(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$35§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleMeldetAusSektor_35"), arg0, arg1);
@@ -1431,10 +1369,10 @@ public class SternResources
 	}
 
 	/**
-	   * % Festungszustand (Kauf +1%) [3F]
+	   * Festungsraumer (Kauf +{0}) [3F]
 	   */
-	public static String PlEditFestungZustand(boolean symbol) {
-		return symbol ? "$3F$":messages.getString("PlEditFestungZustand_3F");
+	public static String PlEditFestungRaumer(boolean symbol, String arg0) {
+		return symbol ? "$3F§"+arg0+"$":MessageFormat.format(messages.getString("PlEditFestungRaumer_3F"), arg0);
 	}
 
 	/**
@@ -1599,14 +1537,14 @@ public class SternResources
 	}
 
 	/**
-	   * --> 1 Patrouille auf Planet {0} zerschellt. [43]
+	   * 1 Patrouille auf Planet {0} zerschellt. [43]
 	   */
 	public static String AuswertungPatrouilleZerschellt(boolean symbol, String arg0) {
 		return symbol ? "$43§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleZerschellt_43"), arg0);
 	}
 
 	/**
-	   * --> {0} Raumer auf Planet {1} angekommen. [44]
+	   * {0} Raumer auf Planet {1} angekommen. [44]
 	   */
 	public static String AuswertungRaumerAngekommen(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$44§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerAngekommen_44"), arg0, arg1);
@@ -1739,27 +1677,6 @@ public class SternResources
 	}
 
 	/**
-	   * Au\u00DFerirdische [4N]
-	   */
-	public static String SpielinformationenAusserirdische(boolean symbol) {
-		return symbol ? "$4N$":messages.getString("SpielinformationenAusserirdische_4N");
-	}
-
-	/**
-	   * Au\u00DFerirdische [4O]
-	   */
-	public static String SpielinformationenAusserirdischeTitel(boolean symbol) {
-		return symbol ? "$4O$":messages.getString("SpielinformationenAusserirdischeTitel_4O");
-	}
-
-	/**
-	   * {0} au\u00DFerirdische Raumer unterwegs zu Planet {1}. Ankunft im Jahr {2}. [4P]
-	   */
-	public static String SpielinformationenAusserirdischeUnterwegs(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$4P§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("SpielinformationenAusserirdischeUnterwegs_4P"), arg0, arg1, arg2);
-	}
-
-	/**
 	   * Zeige B\u00FCndnisstruktur auf Planet [4Q]
 	   */
 	public static String SpielinformationenBuendnisPlanet(boolean symbol) {
@@ -1823,55 +1740,6 @@ public class SternResources
 	}
 
 	/**
-	   * 1 Aufkl\u00E4rer im @@@SCHWARZEN LOCH@@@ verschwunden. [50]
-	   */
-	public static String AuswertungSchwarzesLochAufklaerer(boolean symbol) {
-		return symbol ? "$50$":messages.getString("AuswertungSchwarzesLochAufklaerer_50");
-	}
-
-	/**
-	   * Das @@@SCHWARZE LOCH@@@ bewegt sich... [51]
-	   */
-	public static String AuswertungSchwarzesLochBewegtSich(boolean symbol) {
-		return symbol ? "$51$":messages.getString("AuswertungSchwarzesLochBewegtSich_51");
-	}
-
-	/**
-	   * 1 Minenleger im @@@SCHWARZEN LOCH@@@ verschwunden. [52]
-	   */
-	public static String AuswertungSchwarzesLochMinenleger(boolean symbol) {
-		return symbol ? "$52$":messages.getString("AuswertungSchwarzesLochMinenleger_52");
-	}
-
-	/**
-	   * 1 Minenr\u00E4umer im @@@SCHWARZEN LOCH@@@ verschwunden. [53]
-	   */
-	public static String AuswertungSchwarzesLochMinenraeumer(boolean symbol) {
-		return symbol ? "$53$":messages.getString("AuswertungSchwarzesLochMinenraeumer_53");
-	}
-
-	/**
-	   * 1 Patrouille im @@@SCHWARZEN LOCH@@@ verschwunden. [54]
-	   */
-	public static String AuswertungSchwarzesLochPatrouille(boolean symbol) {
-		return symbol ? "$54$":messages.getString("AuswertungSchwarzesLochPatrouille_54");
-	}
-
-	/**
-	   * {0} Raumer im @@@SCHWARZEN LOCH@@@ verschwunden. [55]
-	   */
-	public static String AuswertungSchwarzesLochRaumer(boolean symbol, String arg0) {
-		return symbol ? "$55§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungSchwarzesLochRaumer_55"), arg0);
-	}
-
-	/**
-	   * 1 Transporter im @@@SCHWARZEN LOCH@@@ verschwunden. [56]
-	   */
-	public static String AuswertungSchwarzesLochTransporter(boolean symbol) {
-		return symbol ? "$56$":messages.getString("AuswertungSchwarzesLochTransporter_56");
-	}
-
-	/**
 	   * ### Tja, {0}. Das Spiel ist aus! ### [57]
 	   */
 	public static String AuswertungSpielerTot(boolean symbol, String arg0) {
@@ -1879,28 +1747,21 @@ public class SternResources
 	}
 
 	/**
-	   * --> 1 Transporter auf Planet {0} angekommen. [58]
+	   * 1 Transporter auf Planet {0} angekommen. [58]
 	   */
 	public static String AuswertungTransporterAngekommen(boolean symbol, String arg0) {
 		return symbol ? "$58§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungTransporterAngekommen_58"), arg0);
 	}
 
 	/**
-	   * --> 1 Transporter auf Planet {0} zerschellt. [59]
+	   * 1 Transporter auf Planet {0} zerschellt. [59]
 	   */
 	public static String AuswertungTransporterZerschellt(boolean symbol, String arg0) {
 		return symbol ? "$59§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungTransporterZerschellt_59"), arg0);
 	}
 
 	/**
-	   * Es sind keine Au\u00DFerirdischen unterwegs. [5A]
-	   */
-	public static String SpielinformationenKeineAusserirdische(boolean symbol) {
-		return symbol ? "$5A$":messages.getString("SpielinformationenKeineAusserirdische_5A");
-	}
-
-	/**
-	   * Es gibt keine Planeten mit Buendnissen. [5B]
+	   * Es gibt keine Planeten mit B\u00FCndnissen. [5B]
 	   */
 	public static String SpielinformationenKeinePlanetenMitBuendnissen(boolean symbol) {
 		return symbol ? "$5B$":messages.getString("SpielinformationenKeinePlanetenMitBuendnissen_5B");
@@ -1921,10 +1782,10 @@ public class SternResources
 	}
 
 	/**
-	   * Die K.-Zentrale von {0} ist unterwegs zu Planet {1}. Ankunft im Jahr {2}. [5E]
+	   * Die K.-Zentrale von {0} ist unterwegs zu Planet {1}. [5E]
 	   */
-	public static String SpielinformationenKommandozentralenUnterwegs(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$5E§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs_5E"), arg0, arg1, arg2);
+	public static String SpielinformationenKommandozentralenUnterwegs(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$5E§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs_5E"), arg0, arg1);
 	}
 
 	/**
@@ -2135,13 +1996,6 @@ public class SternResources
 	   */
 	public static String Statistik(boolean symbol) {
 		return symbol ? "$6A$":messages.getString("Statistik_6A");
-	}
-
-	/**
-	   * Gesamte Spieldauer [6B]
-	   */
-	public static String StatistikGesamteSpieldauer(boolean symbol) {
-		return symbol ? "$6B$":messages.getString("StatistikGesamteSpieldauer_6B");
 	}
 
 	/**
@@ -2404,10 +2258,10 @@ public class SternResources
 	}
 
 	/**
-	   * Ankunft im Jahr {0}. [7E]
+	   * Ankunft: [7E]
 	   */
-	public static String ZugeingabeAnkunft(boolean symbol, String arg0) {
-		return symbol ? "$7E§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeAnkunft_7E"), arg0);
+	public static String ZugeingabeAnkunft(boolean symbol) {
+		return symbol ? "$7E$":messages.getString("ZugeingabeAnkunft_7E");
 	}
 
 	/**
@@ -2544,7 +2398,7 @@ public class SternResources
 	}
 
 	/**
-	   * Sie sind kein Buendnismitglied auf diesem Planeten. [7Y]
+	   * Sie sind kein B\u00FCndnismitglied auf diesem Planeten. [7Y]
 	   */
 	public static String ZugeingabeKeinBuendnismitglied(boolean symbol) {
 		return symbol ? "$7Y$":messages.getString("ZugeingabeKeinBuendnismitglied_7Y");
@@ -2621,10 +2475,10 @@ public class SternResources
 	}
 
 	/**
-	   * Jahr {0} [89]
+	   * J{0}T{1} [89]
 	   */
-	public static String InventurAnkunftJahr(boolean symbol, String arg0) {
-		return symbol ? "$89§"+arg0+"$":MessageFormat.format(messages.getString("InventurAnkunftJahr_89"), arg0);
+	public static String InventurAnkunftJahr(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$89§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("InventurAnkunftJahr_89"), arg0, arg1);
 	}
 
 	/**
@@ -2740,10 +2594,10 @@ public class SternResources
 	}
 
 	/**
-	   * Einsatz\n [8Q]
+	   * Einsatz (linksdrehend) [8Q]
 	   */
-	public static String ZugeingabePatrouilleMission(boolean symbol) {
-		return symbol ? "$8Q$":messages.getString("ZugeingabePatrouilleMission_8Q");
+	public static String ZugeingabePatrouilleMissionLinks(boolean symbol) {
+		return symbol ? "$8Q$":messages.getString("ZugeingabePatrouilleMissionLinks_8Q");
 	}
 
 	/**
@@ -2873,10 +2727,10 @@ public class SternResources
 	}
 
 	/**
-	   * Fe% [99]
+	   * FeRa [99]
 	   */
-	public static String InventurFestungZustandKurz(boolean symbol) {
-		return symbol ? "$99$":messages.getString("InventurFestungZustandKurz_99");
+	public static String InventurFestungRaumerKurz(boolean symbol) {
+		return symbol ? "$99$":messages.getString("InventurFestungRaumerKurz_99");
 	}
 
 	/**
@@ -3867,7 +3721,7 @@ public class SternResources
 	}
 
 	/**
-	   * --> Nachricht an {0}: Ein Aufkl\u00E4rer hat einen Spionagesender installiert. [EJ]
+	   * Nachricht an {0}: Spionagesender installiert. [EJ]
 	   */
 	public static String AuswertungAufklaererSender(boolean symbol, String arg0) {
 		return symbol ? "$EJ§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0);
@@ -3944,7 +3798,7 @@ public class SternResources
 	}
 
 	/**
-	   * +++ Spieler {0} hat kapituliert +++ [EU]
+	   * Spieler {0} hat kapituliert. [EU]
 	   */
 	public static String AuswertungKapitulation(boolean symbol, String arg0) {
 		return symbol ? "$EU§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungKapitulation_EU"), arg0);
@@ -4207,5 +4061,103 @@ public class SternResources
 	   */
 	public static String ReleaseFormatted2(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4, String arg5) {
 		return symbol ? "$GG§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"§"+arg5+"$":MessageFormat.format(messages.getString("ReleaseFormatted2_GG"), arg0, arg1, arg2, arg3, arg4, arg5);
+	}
+
+	/**
+	   * ++ Jahr {0}, Tag {1} ++ [GH]
+	   */
+	public static String AuswertungEreignisTag(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$GH§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungEreignisTag_GH"), arg0, arg1);
+	}
+
+	/**
+	   * ++ Jahr {0}, Jahresbeginn ++ [GI]
+	   */
+	public static String AuswertungEreignisJahresbeginn(boolean symbol, String arg0) {
+		return symbol ? "$GI§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungEreignisJahresbeginn_GI"), arg0);
+	}
+
+	/**
+	   * ++ Jahr {0}, Jahresende ++ [GJ]
+	   */
+	public static String AuswertungEreignisJahresende(boolean symbol, String arg0) {
+		return symbol ? "$GJ§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungEreignisJahresende_GJ"), arg0);
+	}
+
+	/**
+	   * Jahr {0}, Tag {1} [GK]
+	   */
+	public static String FlugzeitOutput(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$GK§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("FlugzeitOutput_GK"), arg0, arg1);
+	}
+
+	/**
+	   * Jahr {0}, Jahresende [GL]
+	   */
+	public static String FlugzeitOutputJahresende(boolean symbol, String arg0) {
+		return symbol ? "$GL§"+arg0+"$":MessageFormat.format(messages.getString("FlugzeitOutputJahresende_GL"), arg0);
+	}
+
+	/**
+	   * J{0}\nT{1} [GM]
+	   */
+	public static String FlugzeitOutputShort(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$GM§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("FlugzeitOutputShort_GM"), arg0, arg1);
+	}
+
+	/**
+	   * J{0}\nEnde [GN]
+	   */
+	public static String FlugzeitOutputJahresendeShort(boolean symbol, String arg0) {
+		return symbol ? "$GN§"+arg0+"$":MessageFormat.format(messages.getString("FlugzeitOutputJahresendeShort_GN"), arg0);
+	}
+
+	/**
+	   * Einsatz (rechtsdrehend) [GO]
+	   */
+	public static String ZugeingabePatrouilleMissionRechts(boolean symbol) {
+		return symbol ? "$GO$":messages.getString("ZugeingabePatrouilleMissionRechts_GO");
+	}
+
+	/**
+	   * Einsatz [GP]
+	   */
+	public static String ZugeingabeMinenraeumerMission(boolean symbol) {
+		return symbol ? "$GP$":messages.getString("ZugeingabeMinenraeumerMission_GP");
+	}
+
+	/**
+	   * Linksdrehend [GQ]
+	   */
+	public static String InventurPatrouillenOrientierungLinks(boolean symbol) {
+		return symbol ? "$GQ$":messages.getString("InventurPatrouillenOrientierungLinks_GQ");
+	}
+
+	/**
+	   * Rechtsdrehend [GR]
+	   */
+	public static String InventurPatrouillenOrientierungRechts(boolean symbol) {
+		return symbol ? "$GR$":messages.getString("InventurPatrouillenOrientierungRechts_GR");
+	}
+
+	/**
+	   * Orientierung [GS]
+	   */
+	public static String InventurPatrouillenOrientierung(boolean symbol) {
+		return symbol ? "$GS$":messages.getString("InventurPatrouillenOrientierung_GS");
+	}
+
+	/**
+	   * Ankunft: {0}. [GT]
+	   */
+	public static String SpielinformationenKommandozentralenUnterwegs2(boolean symbol, String arg0) {
+		return symbol ? "$GT§"+arg0+"$":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs2_GT"), arg0);
+	}
+
+	/**
+	   * Der Server benutzt Build {0}. Ihr STERN-Build erwartet einen Server-Build von mindestens {1}. [GV]
+	   */
+	public static String ServerBuildVeraltet(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$GV§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerBuildVeraltet_GV"), arg0, arg1);
 	}
 }

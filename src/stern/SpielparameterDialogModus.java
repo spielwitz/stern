@@ -16,7 +16,7 @@
 
 package stern;
 
-public enum SpielparameterDialogModus
+enum SpielparameterDialogModus
 {
 	NEUES_SPIEL,
 	LAUFENDES_SPIEL,

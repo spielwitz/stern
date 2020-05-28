@@ -18,10 +18,8 @@ package common;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class StatistikDisplayContent implements Serializable
+@SuppressWarnings("serial") class StatistikDisplayContent implements Serializable
 {
-	private int spieldauerSekunden;
 	private long startDatum;
 	private String titel;
 	private Spieler[] spieler;
@@ -37,22 +35,6 @@ public class StatistikDisplayContent implements Serializable
 	private int markiertesJahrIndex;
 	private boolean modusPunkte;
 	
-	public String getSpieldauer()
-	{
-		StringBuilder sb = new StringBuilder();
-		
-		int std = this.spieldauerSekunden / 3600;
-		int min = (this.spieldauerSekunden - std * 3600) / 60;
-		
-		sb.append(std);
-		sb.append(" "+SternResources.StatistikStunden(false)+" ");
-		
-		sb.append(min);
-		sb.append(" "+SternResources.StatistikMinuten(false));		
-		
-		return sb.toString();
-	}
-
 	public long getStartDatum()
 	{
 		return this.startDatum;
@@ -114,13 +96,12 @@ public class StatistikDisplayContent implements Serializable
 		return jahre;
 	}
 
-	public StatistikDisplayContent(int spieldauerSekunden, long startDatum,
+	StatistikDisplayContent(long startDatum,
 			String titel, Spieler[] spieler, int[][] werte, int[][] championsJahr,
 			int jahre, int maxWert,
 			int maxWertJahr, int maxWertSpieler, int minWert, int minWertJahr,
 			int minWertSpieler, int markiertesJahrIndex, boolean modusPunkte) {
 		super();
-		this.spieldauerSekunden = spieldauerSekunden;
 		this.startDatum = startDatum;
 		this.titel = titel;
 		this.spieler = spieler;

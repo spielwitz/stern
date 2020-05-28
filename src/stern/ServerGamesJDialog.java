@@ -73,8 +73,7 @@ import common.Spieler;
 import common.SternResources;
 import common.Utils;
 
-@SuppressWarnings("serial")
-public class ServerGamesJDialog extends JDialog implements ActionListener, IColorChooserCallback
+@SuppressWarnings("serial") class ServerGamesJDialog extends JDialog implements ActionListener, IColorChooserCallback
 {
 	private JTabbedPane tabpane;
 	private PanelDark panNewGame;
@@ -98,7 +97,7 @@ public class ServerGamesJDialog extends JDialog implements ActionListener, IColo
 	private ComboBoxDark<String> comboPlaneten;
 	private TextFieldDark tfSpielName;
 	
-	public Spiel spielGeladen;
+	Spiel spielGeladen;
 	
 	private ClientUserCredentials cuc;
 	
@@ -112,7 +111,7 @@ public class ServerGamesJDialog extends JDialog implements ActionListener, IColo
 	
 	private final static String MAX_JAHRE_UNENDLICH = SternResources.SpielparameterJDialogUnendlich(false);
 	
-	public ServerGamesJDialog(
+	ServerGamesJDialog(
 			Stern parent,
 			String title,
 			String currentGameId,
@@ -230,7 +229,6 @@ public class ServerGamesJDialog extends JDialog implements ActionListener, IColo
 			this.comboPlaneten.addActionListener(this);
 		}
 		else if (source == this.comboPlaneten || 
-				source == this.cbOptionen.get(SpielOptionen.ZUFAELLIGE_VERTEILUNG) ||
 				source == this.cbOptionen.get(SpielOptionen.SIMPEL) ||
 				source == this.butNewGameNeuesSpielfeld)
 			this.updateSpiel();
@@ -645,18 +643,14 @@ public class ServerGamesJDialog extends JDialog implements ActionListener, IColo
 		// Spieloptionen
 		if (optionen.contains(SpielOptionen.SIMPEL))
 		{
-			optionen.remove(SpielOptionen.AUSSERIRDISCHE);
 			optionen.remove(SpielOptionen.FESTUNGEN);
 			optionen.remove(SpielOptionen.KOMMANDOZENTRALEN);
 			optionen.remove(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH);
-			optionen.remove(SpielOptionen.SCHWARZES_LOCH);
 		}
 		else
 		{
-			optionen.add(SpielOptionen.AUSSERIRDISCHE);
 			optionen.add(SpielOptionen.FESTUNGEN);
 			optionen.add(SpielOptionen.KOMMANDOZENTRALEN);
-			optionen.add(SpielOptionen.SCHWARZES_LOCH);
 		}
 		
 		optionen.remove(SpielOptionen.AUTO_SAVE);

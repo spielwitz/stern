@@ -16,27 +16,10 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
 import common.SpielzuegeEmailTransport;
 
 public class RequestMessagePostMoves
 {
 	public String gameId;
 	public SpielzuegeEmailTransport zuege;
-
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessagePostMoves fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessagePostMoves user = gson.fromJson(json, RequestMessagePostMoves.class);
-		
-		return user;
-	}
 }

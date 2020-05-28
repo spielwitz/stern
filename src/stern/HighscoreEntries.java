@@ -18,9 +18,9 @@ package stern;
 
 import java.util.ArrayList;
 
-public class HighscoreEntries
+class HighscoreEntries
 {
-	public ArrayList<HighscoreEntry> list;
+	ArrayList<HighscoreEntry> list;
 	
 	public HighscoreEntries()
 	{

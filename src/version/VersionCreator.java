@@ -28,7 +28,7 @@ import java.util.Date;
 import common.Constants;
 import common.ReleaseGetter;
 
-public class VersionCreator {
+public class VersionCreator { // NO_UCD (unused code)
 
 	public static void main(String[] args)
 	{

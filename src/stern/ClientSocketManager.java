@@ -21,6 +21,9 @@ import java.io.EOFException;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import common.Constants;
+import common.ReleaseGetter;
+import common.SternResources;
 import commonServer.ClientUserCredentials;
 import commonServer.RequestMessage;
 import commonServer.ResponseMessage;
@@ -28,9 +31,9 @@ import commonServer.RsaCrypt;
 import commonServer.ServerConstants;
 import commonServer.ServerUtils;
 
-public class ClientSocketManager
+class ClientSocketManager
 {
-	public static ResponseMessage sendAndReceive (
+	static ResponseMessage sendAndReceive (
 			ClientUserCredentials user,
 			RequestMessage msg)
 	{
@@ -57,6 +60,9 @@ public class ClientSocketManager
 		byte[] payloadBytes = null;
 		Socket kkSocket = null;
 		OutputStream out = null;
+		
+		// Build in Request-Nachricht setzen
+		msg.build = ReleaseGetter.getRelease();
 		
 	    try {
 			kkSocket = new Socket(user.url, user.port);
@@ -131,6 +137,22 @@ public class ClientSocketManager
 		    // des Users entschlüsseln.
 		    String json = RsaCrypt.decrypt(payloadBytes, user.userPrivateKeyObject);
 		    ResponseMessage msgResponse = ResponseMessage.fromJson(json);
+		    
+		    if (!ReleaseGetter.getRelease().equals(Constants.NO_BUILD_INFO)) // Wenn Stern aus Eclipse heraus gestartet wird
+			{
+				 if (!(msgResponse.build != null && msgResponse.build.equals(Constants.NO_BUILD_INFO)))
+				 {
+					 if (msgResponse.build == null || msgResponse.build.compareTo(Constants.MIN_BUILD) < 0)
+					 {
+						 msgResponse.error = true;
+						 msgResponse.errorMsg = SternResources.ServerBuildVeraltet(
+									false,
+									msgResponse.build == null ? "[null]" : ReleaseGetter.format(msgResponse.build),
+									ReleaseGetter.format(Constants.MIN_BUILD)
+									);
+					 }
+				 }
+			}
 		    
 		    return msgResponse;
 	    }

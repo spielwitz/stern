@@ -16,25 +16,9 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
 public class RequestMessageGetEvaluations
 {
 	public String gameId;
 	public int vonJahr;
 	public int bisJahr;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessageGetEvaluations fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageGetEvaluations user = gson.fromJson(json, RequestMessageGetEvaluations.class);
-		
-		return user;
-	}
 }

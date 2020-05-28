@@ -56,8 +56,7 @@ import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial")
-public class ServerCredentialsJDialog extends JDialog implements ActionListener
+@SuppressWarnings("serial") class ServerCredentialsJDialog extends JDialog implements ActionListener
 {
 	private ButtonDark butOk;
 	private ButtonDark butClose;
@@ -72,14 +71,14 @@ public class ServerCredentialsJDialog extends JDialog implements ActionListener
 	
 	private CheckBoxDark cbServerCommunicationEnabled;
 	
-	public String serverUserCredentialsFile;
-	public boolean serverCommunicationEnabled;
+	String serverUserCredentialsFile;
+	boolean serverCommunicationEnabled;
 	private ClientUserCredentials cuc;
-	public boolean ok = false;
+	boolean ok = false;
 	
 	private static Font font;
 	
-	public ServerCredentialsJDialog(
+	ServerCredentialsJDialog(
 			Stern parent,
 			String title,
 			boolean serverCommunicationEnabled,
@@ -429,7 +428,7 @@ public class ServerCredentialsJDialog extends JDialog implements ActionListener
 				cuc == null || cuc.port == 0 ? "" : Integer.toString(cuc.port));
 		
 		this.labAuthUserId.setText(
-				cuc == null || cuc.userId == null ? "" : cuc.userId);
+				cuc == null || cuc.userId == null ? "" : cuc.userId);		
 	}
 	
 	private void setControlsEnabled()

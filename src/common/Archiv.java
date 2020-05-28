@@ -34,7 +34,7 @@ public class Archiv implements Serializable
 	private ArrayList<PlanetenlisteDisplayContent> p; // Planetenliste-Inhalte
 	private ArrayList<SpielfeldDisplayContent> s; // Spielfeld-Inhalte
 	
-	public Archiv(int[] punkte, int[] raumer, int[] anzPl, int[] eprod)
+	Archiv(int[] punkte, int[] raumer, int[] anzPl, int[] eprod)
 	{
 		super();
 		this.punkte = punkte;
@@ -143,14 +143,14 @@ public class Archiv implements Serializable
 		}
 	}
 	
-	public void loescheAuswertung()
+	void loescheAuswertung()
 	{
 		this.replayIndexed = null;
 		this.p = null;
 		this.s = null;
 	}
 	
-	public boolean auswertungExists()
+	boolean auswertungExists()
 	{
 		return this.replayIndexed != null;
 	}

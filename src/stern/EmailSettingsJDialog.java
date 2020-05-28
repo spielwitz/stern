@@ -47,16 +47,15 @@ import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial")
-public class EmailSettingsJDialog extends JDialog implements ActionListener, FocusListener
+@SuppressWarnings("serial") class EmailSettingsJDialog extends JDialog implements ActionListener, FocusListener
 {
 	private final static int COLUMNS_TEXT_FIELS = 40;
 	private final static String EMAIL_SELECT_BUTTON_TEXT = ".";
 	
 	private ButtonDark butOk;
 	private ButtonDark butCancel;
-	public String emailAdresseSpielleiter;
-	public ArrayList<Spieler> spieler;
+	String emailAdresseSpielleiter;
+	ArrayList<Spieler> spieler;
 	
 	private ButtonDark butEmailSpielleiter;
 	
@@ -70,10 +69,9 @@ public class EmailSettingsJDialog extends JDialog implements ActionListener, Foc
 	
 	private static Font font;
 	
-	public int dlgResult = JOptionPane.CANCEL_OPTION;
+	public int dlgResult = JOptionPane.CANCEL_OPTION; // NO_UCD (unused code)
 	
-	@SuppressWarnings("unchecked")
-	public EmailSettingsJDialog(
+	@SuppressWarnings("unchecked") EmailSettingsJDialog(
 			JDialog parent,
 			String emailAdresseSpielleiter,
 			ArrayList<Spieler> spieler,

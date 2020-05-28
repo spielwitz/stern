@@ -16,7 +16,7 @@
 
 package common;
 
-public class ConsoleInput
+class ConsoleInput
 {
 	private String inputText;
 	private int lastKeyCode;
@@ -35,7 +35,7 @@ public class ConsoleInput
 	public String getLanguageCode() {
 		return languageCode;
 	}
-	public ConsoleInput(String inputText, int lastKeyCode, String clientId, String languageCode)
+	ConsoleInput(String inputText, int lastKeyCode, String clientId, String languageCode)
 	{
 		super();
 		this.inputText = inputText;

@@ -20,26 +20,22 @@ import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("serial")
-public class SpielfeldDisplayContent implements Serializable
+@SuppressWarnings("serial") class SpielfeldDisplayContent implements Serializable
 {
 	private ArrayList<SpielfeldPlanetDisplayContent> p;
 	private ArrayList<PointLowRes> m; // Markierte Felder
 	private ArrayList<SpielfeldLineDisplayContent> l;
-	private Point o; // Position des Schwarzen Lochs. Wenn NULL, dann kein Loch :-)
 	private ArrayList<MinenfeldDisplayContent> n;
 	
-	public SpielfeldDisplayContent(
+	SpielfeldDisplayContent(
 			ArrayList<SpielfeldPlanetDisplayContent> planets,
 			ArrayList<Point2D.Double> markedFields,
 			ArrayList<SpielfeldLineDisplayContent> lines,
-			Point lochPos,
 			ArrayList<MinenfeldDisplayContent> minen) {
 
 		this.p = planets;
 		this.m = markedFields == null ? null : PointLowRes.toArrayList(markedFields);
 		this.l = lines;
-		this.o = lochPos;
 		this.n = minen;
 	}
 
@@ -53,10 +49,6 @@ public class SpielfeldDisplayContent implements Serializable
 
 	public ArrayList<SpielfeldLineDisplayContent> getLines() {
 		return l;
-	}
-
-	public Point getLochPos() {
-		return o;
 	}
 
 	public ArrayList<MinenfeldDisplayContent> getMinen() {

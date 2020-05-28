@@ -19,8 +19,7 @@ package common;
 import java.io.Serializable;
 import java.util.Hashtable;
 
-@SuppressWarnings("serial")
-public class Planet implements Serializable
+@SuppressWarnings("serial") class Planet implements Serializable
 {
 	private Point pos; // Koordinaten des Planeten
 	private Buendnis buendnis; // Nicht von aussen manipulieren, da sonst nicht mehr synchron mit "anz"
@@ -33,7 +32,7 @@ public class Planet implements Serializable
 	private Kommandozentrale kz;
 	private Hashtable<Integer,Integer> sender; // Spionagesender. Schluessel ist Spieler, Wert ist Jahr wenn Sender zum letzten Mal sendet
 	
-	public Planet(Point pos, Buendnis buendnis,
+	Planet(Point pos, Buendnis buendnis,
 			Hashtable<ObjektTyp, Integer> anz, int bes, Festung festung,
 			int evorrat, int eprod, int eraum, Kommandozentrale kz)
 	{
@@ -53,7 +52,7 @@ public class Planet implements Serializable
 	// ==== die bei Raumern auf "anz" geht, wenn kein Buendnis vorliegt und auf "buendnisRaumer",
 	// ==== wenn ein Buendnis existiert
 	
-	public int getAnz(ObjektTyp typ)
+	int getAnz(ObjektTyp typ)
 	{
 		Integer anz = this.anz.get(typ);
 		
@@ -63,7 +62,7 @@ public class Planet implements Serializable
 			return 0;
 	}
 	
-	public int getRaumerProSpieler(int spieler)
+	int getRaumerProSpieler(int spieler)
 	{
 		if (!this.istBuendnis())
 		{
@@ -76,7 +75,7 @@ public class Planet implements Serializable
 			return this.buendnis.getAnz(spieler);
 	}
 	
-	public int getAnzProTypUndSpieler(ObjektTyp typ, int spieler)
+	int getAnzProTypUndSpieler(ObjektTyp typ, int spieler)
 	{
 		if (typ == ObjektTyp.RAUMER && this.istBuendnis())
 			return this.buendnis.getAnz(spieler);
@@ -86,7 +85,7 @@ public class Planet implements Serializable
 			return 0;
 	}
 	
-	public void incRaumerProSpieler(int spieler, int anz)
+	private void incRaumerProSpieler(int spieler, int anz)
 	{
 		if (this.istBuendnis())
 		{
@@ -142,6 +141,14 @@ public class Planet implements Serializable
 		this.eraum = eraum;
 	}
 	
+	public int getFestungRaumer()
+	{
+		if (this.festung == null)
+			return 0;
+		else
+			return this.festung.getRaumer();
+	}
+	
 	public int getFestungFaktor()
 	{
 		if (this.festung == null)
@@ -150,15 +157,7 @@ public class Planet implements Serializable
 			return this.festung.getFaktor();
 	}
 	
-	public int getFestungIntakt()
-	{
-		if (this.festung == null)
-			return 0;
-		else
-			return this.festung.getIntakt();
-	}
-	
-	public boolean istBuendnis()
+	boolean istBuendnis()
 	{
 		if (this.buendnis == null)
 			return false;
@@ -166,7 +165,7 @@ public class Planet implements Serializable
 		return (this.buendnis.getAnzahlMitglieder() > 1);
 	}
 	
-	public boolean istKommandozentrale()
+	boolean istKommandozentrale()
 	{
 		return (this.kz != null);
 	}
@@ -176,7 +175,7 @@ public class Planet implements Serializable
 		return this.kz;
 	}
 	
-	public boolean istBuendnisMitglied(int spieler)
+	boolean istBuendnisMitglied(int spieler)
 	{
 		if (!this.istBuendnis())
 			return false;
@@ -184,7 +183,7 @@ public class Planet implements Serializable
 			return this.buendnis.istMitglied(spieler);
 	}
 	
-	public int[] subtractRaumer(int anzSp, int anz, int bevorzugterSpieler, boolean buendnis)
+	int[] subtractRaumer(int anzSp, int anz, int bevorzugterSpieler, boolean buendnis)
 	{
 		int[] abzuege = new int[anzSp];
 		
@@ -230,7 +229,7 @@ public class Planet implements Serializable
 		}
 	}
 	
-	public void kaufeEprod(int preis)
+	void kaufeEprod(int preis)
 	{
 		if (this.evorrat >= preis && this.eprod < Constants.EPROD_MAX)
 		{
@@ -242,54 +241,81 @@ public class Planet implements Serializable
 		}
 	}
 	
-	public void kaufeFestung(int preis)
+	void kaufeFestung(int preis)
 	{
 		if (this.evorrat >= preis && this.getFestungFaktor() < Constants.MAX_ANZ_FESTUNGEN)
 		{
 			if (this.festung == null)
-				this.festung = new Festung(1, 100);
+				this.festung = new Festung();
 			else
-				this.festung.addFestung();
+				this.festung.add();
 			
 			this.evorrat -= preis;
 		}
 	}
 	
-	public void verkaufeFestung(int preis)
+	void verkaufeFestung(int preis)
 	{
 		if (this.festung != null)
 		{
 			if (this.festung.getFaktor() == 1)
 				this.festung = null;
 			else
-				this.festung.subFestung();
+			{
+				this.festung.subtract();
+				
+				if (this.festung.getRaumer() == 0)
+					this.festung = null;
+			}
 			
 			this.evorrat += preis;
 		}
 	}
 	
-	public void repariereFestung(int preis)
+	void repariereFestung(int preis)
 	{
-		if (this.evorrat >= preis && this.festung != null && this.festung.getIntakt() < 100)
+		if (this.evorrat >= preis && this.festung != null && !this.festung.istVollIntakt())
 		{
-			this.festung.incIntakt();
+			this.festung.repair();
 			this.evorrat -= preis;
 		}
 	}
 	
-	public void incEraum()
+	boolean istFestungVollIntakt()
+	{
+		if (this.festung == null)
+			return true;
+		else
+			return this.festung.istVollIntakt();
+	}
+	
+	double getFestungZustand()
+	{
+		if (this.festung == null)
+			return 0;
+		else
+			return this.festung.getZustand();
+	}
+	
+	void setFestungRaumer(int raumer)
+	{
+		if (this.festung != null)
+			this.festung.setRaumer(raumer);
+	}
+	
+	void incEraum()
 	{
 		if (this.eraum < this.eprod)
 			this.eraum++;
 	}
 	
-	public void decEraum()
+	void decEraum()
 	{
 		if (this.eraum > 0)
 			this.eraum--;
 	}
 	
-	public void subEvorrat(int anz)
+	void subEvorrat(int anz)
 	{
 		this.evorrat -= anz;
 		
@@ -297,24 +323,24 @@ public class Planet implements Serializable
 			this.evorrat = 0;
 	}
 	
-	public void addEvorrat(int anz)
+	void addEvorrat(int anz)
 	{
 		this.evorrat += anz;
 	}
 	
-	public Kommandozentrale kommandozentraleVerlegen()
+	Kommandozentrale kommandozentraleVerlegen()
 	{
 		Kommandozentrale kz = (Kommandozentrale)Utils.klon(this.kz);
 		this.kz = null;
 		return kz;
 	}
 	
-	public void kommandozentraleAufnehmen(Kommandozentrale kz)
+	void kommandozentraleAufnehmen(Kommandozentrale kz)
 	{
 		this.kz = (Kommandozentrale)Utils.klon(kz);
 	}
 	
-	public void incObjekt(ObjektTyp typ, int anz)
+	void incObjekt(ObjektTyp typ, int anz)
 	{
 		if (this.anz.containsKey(typ))
 			this.anz.put(typ, this.anz.get(typ)+ anz);
@@ -322,7 +348,7 @@ public class Planet implements Serializable
 			this.anz.put(typ, anz);
 	}
 	
-	public void decObjekt(ObjektTyp typ, int anz)
+	void decObjekt(ObjektTyp typ, int anz)
 	{
 		if (this.anz.containsKey(typ))
 		{
@@ -333,7 +359,7 @@ public class Planet implements Serializable
 		}
 	}
 	
-	public void kaufeObjekt(ObjektTyp typ, int anz, int preis)
+	void kaufeObjekt(ObjektTyp typ, int anz, int preis)
 	{
 		if (this.evorrat >= preis)
 		{
@@ -342,7 +368,7 @@ public class Planet implements Serializable
 		}
 	}
 	
-	public void verkaufeObjekt(ObjektTyp typ, int preis)
+	void verkaufeObjekt(ObjektTyp typ, int preis)
 	{
 		int anz = this.getAnz(typ);
 		
@@ -357,12 +383,12 @@ public class Planet implements Serializable
 		}
 	}
 	
-	public void produziereEvorrat()
+	void produziereEvorrat()
 	{
 		this.evorrat += (this.eprod - this.eraum);
 	}
 	
-	public void produziereRaumer()
+	void produziereRaumer()
 	{
 		if (this.eraum <= 0)
 			return;
@@ -381,7 +407,7 @@ public class Planet implements Serializable
 		}
 	}
 	
-	public void mergeRaumer(int anzSp, Flugobjekt obj)
+	void mergeRaumer(int anzSp, Flugobjekt obj)
 	{
 		if (obj.istBuendnis())
 		{
@@ -406,12 +432,12 @@ public class Planet implements Serializable
 			
 	}
 	
-	public void deleteFestung()
+	void deleteFestung()
 	{
 		this.festung = null;
 	}
 	
-	public Kommandozentrale erobert(int anzSp, int sp, Flugobjekt obj)
+	Kommandozentrale erobert(int anzSp, int sp, Flugobjekt obj)
 	{
 		Kommandozentrale kz = null;
 		if (this.istKommandozentrale())
@@ -428,13 +454,6 @@ public class Planet implements Serializable
 		// Besitzer aendern
 		this.bes = sp;
 		
-		// Energieproduktion halbieren, wenn Planet wieder neutral wird
-		if (sp == Constants.BESITZER_NEUTRAL)
-		{
-			this.eprod = Math.max(Utils.round((double)this.eprod / 2.), 1);
-			this.eraum = this.eprod; // Ausserirdische produzieren nur Raumer
-		}
-		
 		// Raumer hinzufuegen
 		if (obj != null)
 			this.mergeRaumer(anzSp, obj);
@@ -442,7 +461,7 @@ public class Planet implements Serializable
 		return kz;
 	}
 	
-	public void spielerwechsel(int alterSpieler, int neuerSpieler)
+	void spielerwechsel(int alterSpieler, int neuerSpieler)
 	{
 		// Besitzer des Planeten wechseln
 		if (this.bes == alterSpieler)
@@ -451,12 +470,8 @@ public class Planet implements Serializable
 			this.kz = null;
 			
 			// Wird aufgerufen, wenn die Kommandozentrale in fremde Haende gefallen ist
-			// Energieproduktion halbieren, wenn Planet von Ausserirdischen erobert wurde
 			if (neuerSpieler == Constants.BESITZER_NEUTRAL)
 			{
-				this.eprod = Math.max(Utils.round((double)this.eprod / 2.), 1);
-				this.eraum = this.eprod; // Ausserirdische produzieren nur Raumer
-				
 				if (this.istBuendnis())
 				{
 					// Keine Buendnisse auf neutralen Planeten. Alle fremden Spieler
@@ -475,7 +490,7 @@ public class Planet implements Serializable
 		if (this.sender != null && this.sender.containsKey(alterSpieler))
 		{
 			if (neuerSpieler == Constants.BESITZER_NEUTRAL)
-				// Sender loeschen, wenn Planet von Ausserirdischen erobert wurde
+				// Sender loeschen, wenn Planet wieder neutral ist
 				this.sender.remove(alterSpieler);
 			else
 			{
@@ -501,13 +516,7 @@ public class Planet implements Serializable
 		}
 	}
 	
-	public void setFestungIntakt(int arg)
-	{
-		if (this.festung != null)
-			this.festung.setIntakt(arg);
-	}
-	
-	public void buendnisKuendigen(int spieler)
+	void buendnisKuendigen(int spieler)
 	{
 		// spieler: Spieler, der die Kuendigung ausgesprochen hat
 		if (!this.istBuendnis())
@@ -534,20 +543,7 @@ public class Planet implements Serializable
 		
 	}
 	
-	public void buendnisSpielerErsetzen(int spielerAlt, int spielerNeu)
-	{
-		if (!this.istBuendnisMitglied(spielerAlt))
-			return;
-		
-		this.buendnis.spielerErsetzen(spielerAlt, spielerNeu);
-		
-		this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
-		
-		if (this.buendnis.getAnzahlMitglieder() <= 1)
-			this.buendnis = null;
-	}
-	
-	public void buendnisSpielerHinzufuegen(int anzSp, int spieler)
+	void buendnisSpielerHinzufuegen(int anzSp, int spieler)
 	{
 		// Fremde Spieler zum Buendnis auf einem Planeten hinzufuegen
 		if (!this.istBuendnis())
@@ -562,7 +558,7 @@ public class Planet implements Serializable
 		this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
 	}
 	
-	public boolean[] buendnisGetMitglieder()
+	boolean[] buendnisGetMitglieder()
 	{
 		if (this.buendnis != null)
 			return this.buendnis.getMitglieder();
@@ -570,7 +566,7 @@ public class Planet implements Serializable
 			return null;
 	}
 
-	public int[] buendnisAufraeumen(int anzSp)
+	int[] buendnisAufraeumen(int anzSp)
 	{
 		if (this.buendnis == null)
 			return new int[anzSp];
@@ -583,8 +579,7 @@ public class Planet implements Serializable
 		return abzuege;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void spielzugUebernahmePlanet(Planet pl)
+	@SuppressWarnings("unchecked") void spielzugUebernahmePlanet(Planet pl)
 	{
 		// Flugobjekte kopieren, vorher Raumer sichern
 		Integer raumer = this.anz.get(ObjektTyp.RAUMER);
@@ -603,7 +598,7 @@ public class Planet implements Serializable
 		this.festung = pl.festung;
 	}
 	
-	public boolean spielzugUebernahmeBuendnis(int spieler, boolean[] mitglieder)
+	boolean spielzugUebernahmeBuendnis(int spieler, boolean[] mitglieder)
 	{
 		if (spieler == this.bes)
 		{
@@ -631,7 +626,7 @@ public class Planet implements Serializable
 		return true;
 	}
 	
-	public Buendnis uebertrageBuendnisAufFlotte(int[] abzuege)
+	Buendnis uebertrageBuendnisAufFlotte(int[] abzuege)
 	{
 		// Starte eine Buendnisflotte. Die Buendnisstruktur des Planeten wird auf die Flotte 
 		// uebertragen
@@ -646,14 +641,14 @@ public class Planet implements Serializable
 		return objBuendnis;
 	}
 	
-	public byte getCol(Spieler[] spieler)
+	byte getCol(Spieler[] spieler)
 	{
 		return this.isNeutral() ?
 				Colors.INDEX_NEUTRAL :
 				spieler[this.getBes()].getColIndex();
 	}
 	
-	public void setSender(int spieler, int jahr)
+	void setSender(int spieler, int jahr)
 	{
 		if (this.sender == null)
 			this.sender = new Hashtable<Integer, Integer>();
@@ -661,7 +656,7 @@ public class Planet implements Serializable
 		this.sender.put(spieler, jahr);
 	}
 	
-	public boolean hatSender(int spieler, int momentanesJahr)
+	boolean hatSender(int spieler, int momentanesJahr)
 	{
 		if (this.sender == null)
 			return false;
@@ -672,7 +667,7 @@ public class Planet implements Serializable
 			return false;
 	}
 	
-	public Planet getSpielerInfo(int spIndex, int momentanesJahr, boolean zeigeNeutralePlaneten)
+	Planet getSpielerInfo(int spIndex, int momentanesJahr, boolean zeigeNeutralePlaneten)
 	{
 		// Erzeuge einen Clone und reduziere alle Informationen,
 		// die den Spieler nichts angehen

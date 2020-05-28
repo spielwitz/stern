@@ -18,12 +18,12 @@ package common;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class Kommandozentrale implements Serializable
+@SuppressWarnings("serial") 
+class Kommandozentrale implements Serializable
 {
 	private int sp; // Spieler, dem die Zentrale gehoehrt
 
-	public Kommandozentrale(int sp) {
+	Kommandozentrale(int sp) {
 		super();
 		this.sp = sp;
 	}

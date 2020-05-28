@@ -16,7 +16,7 @@
 
 package common;
 
-public class KiZug {
+class KiZug {
 	int startPl, zielPl, anz;
 
 }

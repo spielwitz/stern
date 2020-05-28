@@ -24,24 +24,23 @@ import java.util.ArrayList;
 // als Integer um Faktor 10 erhöht ab. Also aus (3.1234564,-223.44663456) wird
 // (31, -2234). Damit wird beim Abspeichern der Auswertung nicht so viel Speicher
 // verwendet
-@SuppressWarnings("serial")
-public class PointLowRes implements Serializable
+@SuppressWarnings("serial") class PointLowRes implements Serializable
 {
 	private int x;
 	private int y;
 	
-	public PointLowRes(Point2D.Double pt)
+	PointLowRes(Point2D.Double pt)
 	{
 		this.x = Utils.round(pt.x * 10.);
 		this.y = Utils.round(pt.y * 10.);
 	}
 	
-	public Point2D.Double toPoint2D()
+	Point2D.Double toPoint2D()
 	{
 		return new Point2D.Double((double)this.x / 10., (double)this.y / 10.);
 	}
 	
-	public static ArrayList<PointLowRes> toArrayList(ArrayList<Point2D.Double> list)
+	static ArrayList<PointLowRes> toArrayList(ArrayList<Point2D.Double> list)
 	{
 		if (list == null)
 			return null;
@@ -54,7 +53,7 @@ public class PointLowRes implements Serializable
 		return resultList;
 	}
 	
-	public static ArrayList<Point2D.Double> fromArrayList(ArrayList<PointLowRes> list)
+	static ArrayList<Point2D.Double> fromArrayList(ArrayList<PointLowRes> list)
 	{
 		if (list == null)
 			return null;

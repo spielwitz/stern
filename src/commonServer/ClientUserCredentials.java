@@ -38,7 +38,7 @@ public class ClientUserCredentials
 		return gson.toJson(this);
 	}
 	
-	public static ClientUserCredentials fromJson(String json) throws Exception
+	static ClientUserCredentials fromJson(String json) throws Exception
 	{
 		Gson gson = new Gson();
 		ClientUserCredentials user = gson.fromJson(json, ClientUserCredentials.class);

@@ -31,9 +31,9 @@ public class ScreenPainter
 	private static final int		SCREEN_SIZE_W = 640;
 	private static final int		SCREEN_SIZE_H = 480;
 	
-	public static final int		SPIELFELD_XOFF = 10;
-	public static final int		SPIELFELD_YOFF = 10;
-	public static final int		SPIELFELD_DX = 18;
+	private static final int		SPIELFELD_XOFF = 10;
+	private static final int		SPIELFELD_YOFF = 10;
+	static final int				SPIELFELD_DX = 18;
 	
 	private static final double		MINENKNOEDEL_ABSTAND = (double)SPIELFELD_DX / (double)Constants.ANZAHL_SPIELER_MAX; 
 	
@@ -45,7 +45,7 @@ public class ScreenPainter
 	private static final int 		sp3 = 64; // Verkaufspreis
 
 	
-	public static final String 		CURSOR = "_";
+	private static final String 	CURSOR = "_";
 	
 	private static final int 		PLANETENLISTE_XOFF = 2 * SPIELFELD_XOFF + Constants.FELD_MAX_X * SPIELFELD_DX;
 	private static final int 		PLANETENLISTE_YOFF = SPIELFELD_YOFF;
@@ -61,7 +61,7 @@ public class ScreenPainter
 	private double factor;
 	
 	private Graphics2D dbGraphics;
-	public static ArrayList<String> titelBildTextLines;
+	static ArrayList<String> titelBildTextLines;
 		
 	private Font fontPlaneten, fontMinen, fontFelder;
 	private FontMetrics fmPlaneten, fmMinen, fmFelder;
@@ -358,15 +358,6 @@ public class ScreenPainter
 			}
 		}
 		
-		// Schwarzes Loch
-		if (sdc.getLochPos() != null)
-			this.drawCTextSpielfeld(
-					sdc.getLochPos(), 
-					"@", 
-					Color.white, 
-					this.fontPlaneten, 
-					this.fmPlaneten);
-		
 		// Markierte Felder
 		this.markiereFelder(sdc.getMarkedFields());		
 		
@@ -463,7 +454,8 @@ public class ScreenPainter
 		this.editorZeile(ObjektTyp.EPROD, pedc, SternResources.PlEditEprodPlus4(false), 3);
 		this.editorZeile(ObjektTyp.ERAUM, pedc, SternResources.PlEditRaumerProd(false), 4);
 		this.editorZeile(ObjektTyp.FESTUNG, pedc, SternResources.PlEditFestungen(false), 5);
-		this.editorZeile(ObjektTyp.FESTUNG_REPARATUR, pedc, SternResources.PlEditFestungZustand(false), 6);
+		this.editorZeile(ObjektTyp.FESTUNG_REPARATUR, pedc, 
+				SternResources.PlEditFestungRaumer(false, Integer.toString(Constants.FESTUNG_REPARATUR_ANZ_RAUMER)), 6);
 		
 		this.editorZeile(ObjektTyp.AUFKLAERER, pedc, SternResources.AufklaererPlural(false), 8);
 		this.editorZeile(ObjektTyp.TRANSPORTER, pedc, SternResources.TransporterPlural(false), 9);
@@ -496,10 +488,8 @@ public class ScreenPainter
 		if (pedc.getKaufNichtMoeglich().contains(typ))
 			farbe = Colors.INDEX_NEUTRAL;
 				
-		this.drawLTextEditor(Utils.padString(pedc.getPreiseKauf().get(typ),2), sp2, zeile, Colors.get(farbe));
-		this.drawLTextEditor(SternResources.PlEditEe(false), sp2+3, zeile, Colors.get(farbe));
-		
-		this.drawLTextEditor(pedc.getPreisspanneKauf().get(typ), sp2+6, zeile, Colors.get(Colors.INDEX_NEUTRAL));
+		this.drawLTextEditor(Utils.padString(Spiel.editorPreiseKauf.get(typ),2), sp2 + 4, zeile, Colors.get(farbe));
+		this.drawLTextEditor(SternResources.PlEditEe(false), sp2+7, zeile, Colors.get(farbe));
 		
 		// Verkaufspreis
 		if (typ == ObjektTyp.EPROD || typ == ObjektTyp.FESTUNG_REPARATUR)
@@ -509,10 +499,8 @@ public class ScreenPainter
 		if (pedc.getVerkaufNichtMoeglich().contains(typ))
 			farbe = Colors.INDEX_NEUTRAL;
 		
-		this.drawLTextEditor(Utils.padString(pedc.getPreiseVerkauf().get(typ),2), sp3, zeile, Colors.get(farbe));
-		this.drawLTextEditor(SternResources.PlEditEe(false), sp3+3, zeile, Colors.get(farbe));
-		
-		this.drawLTextEditor(pedc.getPreisspanneVerkauf().get(typ), sp3+6, zeile, Colors.get(Colors.INDEX_NEUTRAL));
+		this.drawLTextEditor(Utils.padString(Spiel.editorPreiseVerkauf.get(typ),2), sp3 + 4, zeile, Colors.get(farbe));
+		this.drawLTextEditor(SternResources.PlEditEe(false), sp3+7, zeile, Colors.get(farbe));
 	}
 	
 	private void drawLTextEditor(String text, int spalte, int zeile, Color col)
@@ -594,12 +582,9 @@ public class ScreenPainter
 		}
 		
 		// Spieldaten
-		this.drawLTextEditor(SternResources.StatistikSpielBegonnen(false), 0, 13, Color.white);
+		this.drawLTextEditor(SternResources.StatistikSpielBegonnen(false), 0, 16, Color.white);
 		
-		this.drawLTextEditor(Utils.dateToString(sdc.getStartDatum()), 0, 14, Color.white);
-		
-		this.drawLTextEditor(SternResources.StatistikGesamteSpieldauer(false), 0, 16, Color.white);
-		this.drawLTextEditor(sdc.getSpieldauer(), 0, 17, Color.white);
+		this.drawLTextEditor(Utils.dateToString(sdc.getStartDatum()), 0, 17, Color.white);
 		
 		// Min und Max
 		this.drawLTextEditor(

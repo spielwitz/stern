@@ -19,24 +19,13 @@ package commonServer;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.security.SecureRandom;
 
 public class ServerUtils
 {
-	private static SecureRandom secRandom;
-	
 	public static final String ARG_PORT = "port";
 	public static final String ARG_HOSTNAME = "host";
 	public static final String ARG_LOGLEVEL = "log";
 	public static final String ARG_CLIENT_CREDENTIALS = "credentials";
-	
-	public static int random(int max)
-	{
-		if (ServerUtils.secRandom == null)
-			ServerUtils.secRandom = new SecureRandom();
-		
-		return (int) (ServerUtils.secRandom.nextDouble() * max);
-	}
 	
 	public static byte[] convertIntToByteArray(int a)
 	{

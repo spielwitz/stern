@@ -20,14 +20,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Hashtable;
 
-@SuppressWarnings("serial")
-public class PlanetenEditorDisplayContent implements Serializable
+@SuppressWarnings("serial") 
+class PlanetenEditorDisplayContent implements Serializable
 {
 	private ObjektTyp typMarkiert;
-	private Hashtable<ObjektTyp,Integer> preiseKauf;
-	private Hashtable<ObjektTyp,Integer> preiseVerkauf;
-	private Hashtable<ObjektTyp,String> preisspanneKauf;
-	private Hashtable<ObjektTyp,String> preisspanneVerkauf;
 	private Hashtable<ObjektTyp,String> anzahl;
 	private HashSet<ObjektTyp> kaufNichtMoeglich;
 	private HashSet<ObjektTyp> verkaufNichtMoeglich;
@@ -39,11 +35,7 @@ public class PlanetenEditorDisplayContent implements Serializable
 	private boolean kommandozentrale;
 	
 	
-	public PlanetenEditorDisplayContent(ObjektTyp typMarkiert,
-			Hashtable<ObjektTyp, Integer> preiseKauf,
-			Hashtable<ObjektTyp, Integer> preiseVerkauf,
-			Hashtable<ObjektTyp, String> preisspanneKauf,
-			Hashtable<ObjektTyp, String> preisspanneVerkauf,
+	PlanetenEditorDisplayContent(ObjektTyp typMarkiert,
 			Hashtable<ObjektTyp, String> anzahl,
 			HashSet<ObjektTyp> kaufNichtMoeglich,
 			HashSet<ObjektTyp> verkaufNichtMoeglich,
@@ -54,10 +46,6 @@ public class PlanetenEditorDisplayContent implements Serializable
 			boolean reduzierteAnzeige) {
 		super();
 		this.typMarkiert = typMarkiert;
-		this.preiseKauf = preiseKauf;
-		this.preiseVerkauf = preiseVerkauf;
-		this.preisspanneKauf = preisspanneKauf;
-		this.preisspanneVerkauf = preisspanneVerkauf;
 		this.anzahl = anzahl;
 		this.kaufNichtMoeglich = kaufNichtMoeglich;
 		this.verkaufNichtMoeglich = verkaufNichtMoeglich;
@@ -74,15 +62,6 @@ public class PlanetenEditorDisplayContent implements Serializable
 	}
 
 
-	public Hashtable<ObjektTyp, Integer> getPreiseKauf() {
-		return preiseKauf;
-	}
-
-
-	public Hashtable<ObjektTyp, Integer> getPreiseVerkauf() {
-		return preiseVerkauf;
-	}
-
 	public boolean isReadOnly()
 	{
 		return this.readOnly;
@@ -92,16 +71,6 @@ public class PlanetenEditorDisplayContent implements Serializable
 	{
 		return this.reduzierteAnzeige;
 	}
-
-	public Hashtable<ObjektTyp, String> getPreisspanneKauf() {
-		return preisspanneKauf;
-	}
-
-
-	public Hashtable<ObjektTyp, String> getPreisspanneVerkauf() {
-		return preisspanneVerkauf;
-	}
-
 
 	public Hashtable<ObjektTyp, String> getAnzahl() {
 		return anzahl;

@@ -16,15 +16,15 @@
 
 package common;
 
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class Point implements Serializable
+@SuppressWarnings("serial") class Point implements Serializable
 {
 	private int x;
 	private int y;
 	
-	public Point(int x, int y)
+	Point(int x, int y)
 	{
 		this.x = x;
 		this.y = y;
@@ -38,7 +38,7 @@ public class Point implements Serializable
 		return y;
 	}
 	
-	public double dist(Point p)
+	double dist(Point p)
 	{
 		return Math.sqrt(Math.pow((double)(this.x - p.x), 2) + Math.pow((double)(this.y - p.y), 2));
 	}
@@ -68,22 +68,13 @@ public class Point implements Serializable
 		  return false;
 	}
 	
-	public Point klon()
+	Point klon()
 	{
 		return new Point(this.x, this.y);
 	}
 	
-	public static Point getRandom(int dx, int dy, int breite, int hoehe)
+	Point2D.Double toPoint2dDouble()
 	{
-		int x = Utils.random(breite) + dx;
-		int y = Utils.random(hoehe) + dy;
-		
-		return new Point(x,y);
+		return new Point2D.Double(this.x, this.y);
 	}
-	
-	public boolean isPlanetTooClose(Point p)
-	{
-		return (Math.abs(this.x - p.x) < Constants.PLANETEN_MINDESTABSTAND &&
-				Math.abs(this.y - p.y) < Constants.PLANETEN_MINDESTABSTAND);
-	}	
 }

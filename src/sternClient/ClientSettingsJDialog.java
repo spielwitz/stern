@@ -50,8 +50,7 @@ import commonUi.ServerFunctions;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial")
-public class ClientSettingsJDialog extends JDialog implements ChangeListener, ActionListener
+@SuppressWarnings("serial") class ClientSettingsJDialog extends JDialog implements ChangeListener, ActionListener
 {
 	private ButtonDark butConnect;
 	private ButtonDark butClose;
@@ -65,7 +64,7 @@ public class ClientSettingsJDialog extends JDialog implements ChangeListener, Ac
 	private SternClient parent;
 	private static Font font;
 	
-	public ClientSettingsJDialog(
+	ClientSettingsJDialog(
 			SternClient parent,
 			String title,
 			boolean modal,

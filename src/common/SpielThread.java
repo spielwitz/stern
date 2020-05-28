@@ -40,52 +40,52 @@ public class SpielThread extends Thread
 			this.spiel.initAfterLoad(this);
 	}
 	
-	public void updateDisplay(ScreenDisplayContent cont)
+	void updateDisplay(ScreenDisplayContent cont)
 	{
 		this.screenUpdateListener.update(new ScreenUpdateEvent(this, cont));
 	}
 	
-	public void checkMenueEnabled()
+	void checkMenueEnabled()
 	{
 		this.screenUpdateListener.checkMenuEnabled();
 	}
 	
-	public void speichern(Spiel spiel, boolean autoSave)
+	void speichern(Spiel spiel, boolean autoSave)
 	{
 		this.screenUpdateListener.speichern(spiel, autoSave);
 	}
 	
-	public boolean launchEmail(String recipient, String subject, String bodyText, EmailTransportBase obj)
+	boolean launchEmail(String recipient, String subject, String bodyText, EmailTransportBase obj)
 	{
 		return this.screenUpdateListener.launchEmail(recipient, subject, bodyText, obj);
 	}
 	
-	public PostMovesResult postMovesToServer(String gameId, String spielerName, SpielzuegeEmailTransport set)
+	PostMovesResult postMovesToServer(String gameId, String spielerName, SpielzuegeEmailTransport set)
 	{
 		return this.screenUpdateListener.postMovesToServer(gameId, spielerName, set);
 	}
 	
-	public Hashtable<Integer,Archiv> getEvaluations(String gameId, int vonJahr, int bisJahr)
+	Hashtable<Integer,Archiv> getEvaluations(String gameId, int vonJahr, int bisJahr)
 	{
 		return this.screenUpdateListener.getEvaluations(gameId, vonJahr, bisJahr);
 	}
 	
-	public SpielzuegeEmailTransport importSpielzuegeAusEmail()
+	SpielzuegeEmailTransport importSpielzuegeAusEmail()
 	{
 		return this.screenUpdateListener.importSpielzuegeAusEmail();
 	}
 	
-	public boolean openPdf(byte[] pdfBytes, String clientId)
+	boolean openPdf(byte[] pdfBytes, String clientId)
 	{
 		return this.screenUpdateListener.openPdf(pdfBytes, clientId);
 	}
 	
-	public void addToHighscore(Archiv spielstand, Spieler[] spieler)
+	void addToHighscore(Archiv spielstand, Spieler[] spieler)
 	{
 		this.screenUpdateListener.addToHighscore(spielstand, spieler);
 	}
 	
-	public KeyEventExtended waitForKeyInput()
+	KeyEventExtended waitForKeyInput()
 	{
 		// Key-Event programmatisch erzeugen:
 		// https://coderanch.com/t/330281/java/Creating-Key-Event-Component
@@ -132,7 +132,7 @@ public class SpielThread extends Thread
 		return spiel;
 	}
 	
-	public void pause(int milliseconds)
+	void pause(int milliseconds)
 	{
 		this.screenUpdateListener.pause(milliseconds);
 		
@@ -149,7 +149,7 @@ public class SpielThread extends Thread
 		}
 	}
 	
-	public void triggerGameInfoUpdate()
+	void triggerGameInfoUpdate()
 	{
 		this.screenUpdateListener.triggerGameInfoUpdate();
 	}

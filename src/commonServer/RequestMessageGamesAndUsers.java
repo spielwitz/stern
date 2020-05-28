@@ -28,11 +28,4 @@ public class RequestMessageGamesAndUsers
 		return gson.toJson(this);
 	}
 	
-	public static RequestMessageGamesAndUsers fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageGamesAndUsers user = gson.fromJson(json, RequestMessageGamesAndUsers.class);
-		
-		return user;
-	}
 }

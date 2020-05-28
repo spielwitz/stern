@@ -44,8 +44,7 @@ import commonUi.PanelDark;
 import commonUi.PasswordFieldDark;
 import commonUi.SpringUtilities;
 
-@SuppressWarnings("serial")
-public class ClipboardImportJDialog<T> extends JDialog
+@SuppressWarnings("serial") class ClipboardImportJDialog<T> extends JDialog
 				implements ActionListener
 {
 	private static Font font;
@@ -62,10 +61,10 @@ public class ClipboardImportJDialog<T> extends JDialog
 	
 	private boolean passwordProtected;
 	
-	public int dlgResult = JOptionPane.CANCEL_OPTION;
-	public Object obj;
+	int dlgResult = JOptionPane.CANCEL_OPTION;
+	Object obj;
 	
-	public ClipboardImportJDialog(
+	ClipboardImportJDialog(
 			JDialog parent, 
 			Class<T> expectedClass,
 			boolean passwordProtected)
@@ -76,7 +75,7 @@ public class ClipboardImportJDialog<T> extends JDialog
 		this.setLocationRelativeTo(parent);	
 	}
 	
-	public ClipboardImportJDialog(
+	ClipboardImportJDialog(
 			Frame parent, 
 			Class<T> expectedClass,
 			boolean passwordProtected)

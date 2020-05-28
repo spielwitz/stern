@@ -42,9 +42,9 @@ public class PaintPanel extends Panel implements KeyListener
 	private IHostComponentMethods parent;
 	
 	public static final int		SCREEN_SIZE_W = 640;
-	public static final int		SCREEN_SIZE_H = 480;
+	private static final int	SCREEN_SIZE_H = 480;
 	public static final int		RAND = 10;
-	public static final double	RATIO = (double)SCREEN_SIZE_W / (double)SCREEN_SIZE_H;
+	private static final double	RATIO = (double)SCREEN_SIZE_W / (double)SCREEN_SIZE_H;
 	
 	public static final int		FONT_SIZE_PLANETEN = 11;
 	public static final int		FONT_SIZE_FELDER = 8;

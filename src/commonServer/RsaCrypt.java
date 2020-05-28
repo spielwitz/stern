@@ -37,7 +37,7 @@ import javax.crypto.Cipher;
 public class RsaCrypt {
 
 	private static final String ALGORITHM = "RSA";
-	public static final String STRING_ENCODING = "UTF-8"; 
+	private static final String STRING_ENCODING = "UTF-8"; 
 	private static final int encryptChunkLength = 50;
 	
 	private static final String CODES = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -225,7 +225,7 @@ public class RsaCrypt {
 		return privateKey;
 	}
 	
-	public static byte[] base64Decode(String input)
+	private static byte[] base64Decode(String input)
 	{
         if (input.length() % 4 != 0)    {
             throw new IllegalArgumentException("Invalid base64 input");
@@ -253,7 +253,7 @@ public class RsaCrypt {
         return decoded;
     }
 	
-	public static String base64Encode(byte[] in)
+	private static String base64Encode(byte[] in)
 	{
         StringBuilder out = new StringBuilder((in.length * 4) / 3);
         int b;

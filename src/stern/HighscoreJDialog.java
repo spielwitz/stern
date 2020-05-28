@@ -41,13 +41,12 @@ import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 
-@SuppressWarnings("serial")
-public class HighscoreJDialog extends JDialog implements ActionListener
+@SuppressWarnings("serial") class HighscoreJDialog extends JDialog implements ActionListener
 {
 	private ButtonDark butOk;
 	private static Font font;
 	
-	public HighscoreJDialog(
+	HighscoreJDialog(
 			Frame owner,
 			String title,
 			boolean modal,

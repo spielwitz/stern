@@ -18,17 +18,17 @@ package common;
 
 import java.util.ArrayList;
 
-public class InventurPdfDaten
+class InventurPdfDaten
 {
-	public String spielerName;
-	public int jahr;
-	public int jahrMax;
-	public int score;
-	public boolean nurSpielfeld;
+	String spielerName;
+	int jahr;
+	int jahrMax;
+	int score;
+	boolean nurSpielfeld;
 	
-	public ArrayList<InventurPdfChapter> chapters;
+	ArrayList<InventurPdfChapter> chapters;
 	
-	public InventurPdfDaten(
+	InventurPdfDaten(
 			String spielerName, 
 			int jahr, 
 			int jahrMax,

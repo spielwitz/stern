@@ -47,7 +47,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import commonUi.PaintPanel;
 
-public class InventurPdf extends PdfPageEventHelper
+class InventurPdf extends PdfPageEventHelper
 {
 	private ByteArrayOutputStream outputStream;
 	private Document document;
@@ -56,13 +56,14 @@ public class InventurPdf extends PdfPageEventHelper
 	
 	private com.itextpdf.text.Font chapterFont;
 	private com.itextpdf.text.Font paragraphFont;
+	private com.itextpdf.text.Font tableFontSmall;
 	private com.itextpdf.text.Font linkFont;
 	private float charWidth;
 		
     // store the chapters and sections with their title here.
     private final Map<String, Integer>     pageByTitle    = new HashMap<>();
     
-	public static byte[] create(InventurPdfDaten daten) throws Exception
+	static byte[] create(InventurPdfDaten daten) throws Exception
 	{
 		return new InventurPdf(daten).outputStream.toByteArray();
 	}
@@ -75,6 +76,7 @@ public class InventurPdf extends PdfPageEventHelper
 		
 		this.chapterFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 12, Font.BOLD);
 		this.paragraphFont = FontFactory.getFont(FontFactory.COURIER, fontSizeParagraph, Font.PLAIN);
+		this.tableFontSmall = FontFactory.getFont(FontFactory.COURIER_BOLD, 4, Font.PLAIN);
 		this.linkFont = FontFactory.getFont(FontFactory.COURIER, 8, Font.PLAIN, BaseColor.BLUE);
 		
 		this.outputStream = new ByteArrayOutputStream();
@@ -132,6 +134,14 @@ public class InventurPdf extends PdfPageEventHelper
 	
 	private void addTable(InventurPdfTable tableData) throws Exception
 	{
+		float charWidth = tableData.smallFont ?
+							this.tableFontSmall.getBaseFont().getWidthPoint("H", 4) :
+							this.charWidth;
+							
+		com.itextpdf.text.Font font = tableData.smallFont ?
+							this.tableFontSmall :
+							this.paragraphFont;
+		
 		// Maximale Breite der Spalten ermitteln
 		float[] colWidth = new float[tableData.colAlignRight.length];
 		
@@ -144,7 +154,7 @@ public class InventurPdf extends PdfPageEventHelper
 			
 			for (int j = 0; j < cellTextLines.length; j++)
 			{
-				float width = (float)(cellTextLines[j].length() + 1) * this.charWidth;
+				float width = (float)(cellTextLines[j].length() + 1) * charWidth;
 				if (width > colWidth[col])
 					colWidth[col] = width;
 			}
@@ -162,7 +172,7 @@ public class InventurPdf extends PdfPageEventHelper
 			int row = i / tableData.colAlignRight.length;
 			int col = i % tableData.colAlignRight.length;
 			
-			PdfPCell cell = new PdfPCell(new Phrase(tableData.cells.get(i), this.paragraphFont));
+			PdfPCell cell = new PdfPCell(new Phrase(tableData.cells.get(i), font));
 			cell.setHorizontalAlignment(
 					(row == 0 || !tableData.colAlignRight[col]) ?
 							Element.ALIGN_LEFT :
@@ -224,7 +234,7 @@ public class InventurPdf extends PdfPageEventHelper
 
 	}
 	
-	public static String formatDate (long time)
+	private static String formatDate (long time)
 	{
 		return time > 0 ? DateFormat.getDateTimeInstance().format(new Date(time)) : "";
 	}

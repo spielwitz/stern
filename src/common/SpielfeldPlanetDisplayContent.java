@@ -19,8 +19,7 @@ package common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("serial")
-public class SpielfeldPlanetDisplayContent implements Serializable
+@SuppressWarnings("serial") class SpielfeldPlanetDisplayContent implements Serializable
 {
 	// Informationen ueber einen Planeten, wie er von einem Client im Spielfeld
 	// dargestellt wird
@@ -30,7 +29,7 @@ public class SpielfeldPlanetDisplayContent implements Serializable
 	private boolean i;
 	private ArrayList<Byte> f; // Rahmenfarben, beginnend mit dem innersten
 	
-	public SpielfeldPlanetDisplayContent(String name, Point pos, byte col, boolean invers,
+	SpielfeldPlanetDisplayContent(String name, Point pos, byte col, boolean invers,
 			ArrayList<Byte> frameCols) {
 		super();
 		this.n = name;

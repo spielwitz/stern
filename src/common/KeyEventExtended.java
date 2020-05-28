@@ -20,9 +20,9 @@ import java.awt.event.KeyEvent;
 
 public class KeyEventExtended
 {
-	public KeyEvent keyEvent;
-	public String ClientId;
-	public String languageCode;
+	KeyEvent keyEvent;
+	String ClientId;
+	String languageCode;
 	
 	public KeyEventExtended(KeyEvent event, String clientId, String languageCode)
 	{

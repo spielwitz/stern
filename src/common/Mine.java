@@ -19,15 +19,14 @@ package common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("serial")
-public class Mine implements Serializable
+@SuppressWarnings("serial") class Mine implements Serializable
 {
 	private Point pos; // Ort
 	private int staerke; // Momentane Staerke
 
 	private ArrayList<MineHistorie> historie;
 
-	public Mine(Point pos, int staerke, ArrayList<MineHistorie> historie) {
+	Mine(Point pos, int staerke, ArrayList<MineHistorie> historie) {
 		super();
 		this.pos = pos;
 		this.staerke = staerke;
@@ -50,7 +49,7 @@ public class Mine implements Serializable
 		return historie;
 	}
 	
-	public void addHistorie(MineHistorie historie)
+	void addHistorie(MineHistorie historie)
 	{
 		if (this.historie == null)
 			this.historie = new ArrayList<MineHistorie>();
@@ -58,13 +57,13 @@ public class Mine implements Serializable
 		this.historie.add(historie);
 	}
 	
-	public void add(int staerke, MineHistorie historie)
+	void add(int staerke, MineHistorie historie)
 	{
 		this.staerke += staerke;
 		this.addHistorie(historie);
 	}
 	
-	public Mine getSpielerInfo(int spIndex)
+	Mine getSpielerInfo(int spIndex)
 	{
 		if (this.historie == null)
 			return null;

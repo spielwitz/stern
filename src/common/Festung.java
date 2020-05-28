@@ -18,55 +18,115 @@ package common;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class Festung implements Serializable
+@SuppressWarnings("serial") 
+class Festung implements Serializable
 {
 	private int faktor; // 1=einfache oder 2=doppelte Festung
-	private int intakt; // Wert in Prozent, also z.B. 100
+	private int intakt; // Wert in Prozent, also z.B. 100 -> War in frueheren STERN-Versionen
+	private int raumer; // Anzahl der Festungsraumer
 	
-	public Festung(int faktor, int intakt) {
-		super();
-		this.faktor = faktor;
-		this.intakt = intakt;
-	}
-
-	public int getFaktor() {
-		return faktor;
-	}
-
-	public int getIntakt() {
-		return intakt;
-	}
-
-	public void addFestung()
+	Festung()
 	{
-		this.faktor++;
+		this.faktor = 0;
+		this.raumer = 0;
 		
-		double i2 = (double)this.intakt;
-		this.intakt = Utils.round(((i2*(double)(this.faktor-1)) + 100.) / (double)this.faktor);
+		this.intakt = -1; // Kennzeichen, dass neue Festungsdefinition gilt
+		
+		this.add(); // Gleich eine Festung hinzufuegen
 	}
 	
-	public void subFestung()
+	void add()
 	{
-		if (this.faktor > 1)
+		if (this.faktor < Constants.MAX_ANZ_FESTUNGEN)
+		{
+			this.faktor++;
+			this.raumer += Constants.FESTUNG_STAERKE;
+		}
+	}
+	
+	void subtract()
+	{
+		if (this.faktor > 0)
+		{
+			this.raumer -= 
+					Utils.round(Constants.FESTUNG_STAERKE * this.getZustand());
 			this.faktor--;
+			
+			if (this.raumer <= 0)
+			{
+				this.faktor = 0;
+				this.raumer = 0;
+			}
+		}
 	}
 	
-	public void incIntakt()
+	void repair()
 	{
-		if (this.intakt < 100)
-			this.intakt++;
+		int maxRepairRaumer = Math.min(
+								this.faktor * Constants.FESTUNG_STAERKE - this.raumer,
+								Constants.FESTUNG_REPARATUR_ANZ_RAUMER);
+		
+		if (maxRepairRaumer > 0)
+			this.raumer += maxRepairRaumer;
+				
 	}
 	
-	public void subIntakt()
+	boolean istVollIntakt()
 	{
-		if (this.intakt > 0)
-			this.intakt--;
+		return this.raumer == this.faktor * Constants.FESTUNG_STAERKE;
 	}
 	
-	public void setIntakt(int arg)
+	int getRaumer()
 	{
-		if (arg > 0 && arg <= 100)
-			this.intakt = arg;
+		return this.raumer;
+	}
+	
+	void setRaumer(int raumer)
+	{
+		this.raumer = raumer;
+		
+		if (this.raumer <= 0)
+		{
+			this.raumer = 0;
+			this.faktor = 0;
+		}
+	}
+	
+	int getFaktor()
+	{
+		return this.faktor;
+	}
+	
+	double getZustand()
+	{
+		if (this.faktor > 0)
+			return (double)this.raumer / (double)(this.faktor * Constants.FESTUNG_STAERKE); 
+		else
+			return 0;
+	}
+	
+	static Festung migrieren(int faktor, int intakt)
+	{
+		Festung festung = new Festung();
+		festung.faktor = faktor;
+		festung.intakt = intakt;
+		
+		festung.migrieren();
+		
+		return festung;
+	}
+	
+	private void migrieren()
+	{
+		// Alte Festungsdefinition (mit intakt) auf neue Definition (mit Raumern) umstellen
+		if (this.intakt >= 0)
+		{
+			this.raumer = Utils.round(
+					(double)Constants.FESTUNG_STAERKE * 
+					(double)this.faktor *
+					(double)this.intakt / (double)100);
+			
+			this.intakt = -1; // Zeichen, dass migriert wurde
+		}
 	}
 }

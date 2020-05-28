@@ -105,8 +105,8 @@ import commonUi.SpringUtilities;
 import commonUi.SternAbout;
 import commonUi.UpdateChecker;
 
-@SuppressWarnings("serial")
-public class Stern extends Frame 
+@SuppressWarnings("serial") 
+public class Stern extends Frame  // NO_UCD (use default)
 	implements 
 		WindowListener, 
 		ISpielThreadEventListener, 
@@ -124,14 +124,14 @@ public class Stern extends Frame
 	transient private static final String HIGHSCORES_FILE_NAME = "SternHighscores";
 	transient private static final String PROPERTY_NAME_LETZTES_VERZEICHNIS = "lastDir";
 	transient private static final String PROPERTY_EMAIL_ADRESSEN = "emailAdressen";
-	transient public static final String PROPERTY_EMAIL_SEPARATOR = "emailSeparator";
+	transient static final String PROPERTY_EMAIL_SEPARATOR = "emailSeparator";
 	transient private static final String PROPERTY_LAST_UPDATE_FOUND = "lastUpdateFound";
 	transient private static final String PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE = "serverAdminCredentials";
 	transient private static final String PROPERTY_SERVER_USER_CREDENTIAL_FILE = "serverUserCredentials";
 	transient private static final String PROPERTY_SERVER_COMMUNICATION_ENABLED = "serverCommunicationEnabled";
 	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
 	
-	public static final int HIGHSCORE_NUM_ENTRIES = 20;
+	static final int HIGHSCORE_NUM_ENTRIES = 20;
 	
 	private SpielThread t;
 	private SpielThreadCommunicationStructure threadCommunicationStructure;
@@ -139,7 +139,7 @@ public class Stern extends Frame
 	private Spiel letztesSpielRohdaten;
 	private String letztesFile;
 	private String letztesVerzeichnis;
-	public String emailSeparator;
+	String emailSeparator;
 	
 	private Properties props;
 	
@@ -205,7 +205,7 @@ public class Stern extends Frame
 		new Stern(meineIp);
 	}
 
-	public Stern(String meineIp)
+	private Stern(String meineIp)
 	{
 		super();
 		
@@ -287,7 +287,7 @@ public class Stern extends Frame
 		tUpdateChecker.start();
 	}
 	
-	public void keyPressed(KeyEventExtended event)
+	private void keyPressed(KeyEventExtended event)
 	{
 		if (this.inputEnabled && 
 			this.threadCommunicationStructure != null&&
@@ -1010,7 +1010,7 @@ public class Stern extends Frame
 		}
 	}
 	
-	public void setProperty(String propName, String propValue)
+	void setProperty(String propName, String propValue)
 	{
 		if (propValue == null)
 			return;
@@ -1447,7 +1447,7 @@ public class Stern extends Frame
 	public void mouseExited(MouseEvent e) {
 	}
 	
-	public void openServerCredentialsDialog()
+	private void openServerCredentialsDialog()
 	{
 		this.inputEnabled = false;
 		this.redrawScreen();
@@ -1478,7 +1478,7 @@ public class Stern extends Frame
 
 	}
 	
-	public void openServerGamesDialog()
+	private void openServerGamesDialog()
 	{
 		this.inputEnabled = false;
 		this.redrawScreen();

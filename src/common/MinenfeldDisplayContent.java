@@ -19,8 +19,8 @@ package common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("serial")
-public class MinenfeldDisplayContent implements Serializable
+@SuppressWarnings("serial") 
+class MinenfeldDisplayContent implements Serializable
 {
 	private Point p;
 	private int s;
@@ -35,7 +35,7 @@ public class MinenfeldDisplayContent implements Serializable
 	public ArrayList<Byte> getSpielerCol() {
 		return c;
 	}
-	public MinenfeldDisplayContent(Point pos, int staerke,
+	MinenfeldDisplayContent(Point pos, int staerke,
 			ArrayList<Byte> spielerCol) {
 		super();
 		this.p = pos;

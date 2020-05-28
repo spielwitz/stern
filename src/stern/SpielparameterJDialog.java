@@ -58,8 +58,8 @@ import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial")
-public class SpielparameterJDialog extends JDialog implements ActionListener, IColorChooserCallback
+@SuppressWarnings("serial") 
+class SpielparameterJDialog extends JDialog implements ActionListener, IColorChooserCallback
 {
 	private ArrayList<Spieler> spieler;
 	private String emailAdresseSpielleiter;
@@ -87,7 +87,7 @@ public class SpielparameterJDialog extends JDialog implements ActionListener, IC
 	
 	private final static String MAX_JAHRE_UNENDLICH = SternResources.SpielparameterJDialogUnendlich(false);
 	
-	public SpielparameterJDialog (
+	SpielparameterJDialog (
 			Frame owner,
 			String title,
 			SpielparameterDialogModus modus,
@@ -311,7 +311,7 @@ public class SpielparameterJDialog extends JDialog implements ActionListener, IC
 		{
 			if (option == SpielOptionen.AUTO_SAVE)
 				this.cbOptionen.get(option).setEnabled(this.modus != SpielparameterDialogModus.EMAIL_SPIEL);
-			else if (option == SpielOptionen.SIMPEL || option == SpielOptionen.ZUFAELLIGE_VERTEILUNG)
+			else if (option == SpielOptionen.SIMPEL)
 				this.cbOptionen.get(option).setEnabled(this.modus == SpielparameterDialogModus.NEUES_SPIEL);
 			else if (option == SpielOptionen.EMAIL)
 				this.cbOptionen.get(option).setEnabled(
@@ -506,18 +506,14 @@ public class SpielparameterJDialog extends JDialog implements ActionListener, IC
 				
 				if (this.optionen.contains(SpielOptionen.SIMPEL))
 				{
-					this.optionen.remove(SpielOptionen.AUSSERIRDISCHE);
 					this.optionen.remove(SpielOptionen.FESTUNGEN);
 					this.optionen.remove(SpielOptionen.KOMMANDOZENTRALEN);
 					this.optionen.remove(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH);
-					this.optionen.remove(SpielOptionen.SCHWARZES_LOCH);
 				}
 				else
 				{
-					this.optionen.add(SpielOptionen.AUSSERIRDISCHE);
 					this.optionen.add(SpielOptionen.FESTUNGEN);
 					this.optionen.add(SpielOptionen.KOMMANDOZENTRALEN);
-					this.optionen.add(SpielOptionen.SCHWARZES_LOCH);
 				}
 				
 				// Max. Jahre
@@ -632,7 +628,7 @@ public class SpielparameterJDialog extends JDialog implements ActionListener, IC
 		}
 	}
 	
-	public static boolean checkEmailSettings(Component c, String emailAdresseSpielleiter, ArrayList<Spieler> spieler)
+	static boolean checkEmailSettings(Component c, String emailAdresseSpielleiter, ArrayList<Spieler> spieler)
 	{
 		boolean ok = true;
 		

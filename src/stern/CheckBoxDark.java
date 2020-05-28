@@ -21,10 +21,9 @@ import java.awt.Font;
 
 import javax.swing.JCheckBox;
 
-@SuppressWarnings("serial")
-public class CheckBoxDark extends JCheckBox 
+@SuppressWarnings("serial") class CheckBoxDark extends JCheckBox 
 {
-	public CheckBoxDark(String text, boolean selected, Font f)
+	CheckBoxDark(String text, boolean selected, Font f)
 	{
 		super(text, selected);
 		

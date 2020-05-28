@@ -67,7 +67,7 @@ import commonServer.RsaCrypt;
 import commonServer.ServerConstants;
 import commonServer.ServerUtils;
 
-public class SternServer
+public class SternServer // NO_UCD (unused code)
 {
 	private static ServerConfiguration serverConfig;
 	
@@ -691,7 +691,7 @@ public class SternServer
 		    	resp.errorMsg = SternResources.ServerBuildFalsch(
 						true,
 						ReleaseGetter.format(Constants.MIN_BUILD),
-						ReleaseGetter.format(msg.build));
+						msg.build == null ? "" : ReleaseGetter.format(msg.build));
 		    }
 		    else
 		    {
@@ -826,6 +826,9 @@ public class SternServer
 		    	this.closeSocket();
 		    	return;
 		    }
+		    
+		    // Set build in response message
+		    resp.build = ReleaseGetter.getRelease();
 		    
 		    // Send response message
 		    byte[] byteResponse = RsaCrypt.encrypt(resp.toJson(), user.userPublicKeyObject);
@@ -1316,7 +1319,16 @@ public class SternServer
 	{
 		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME, gameId).toFile();
 		
-		return Utils.readSpielFromFile(file);
+		Spiel spiel = Utils.readSpielFromFile(file);
+		
+		if (spiel != null)
+		{
+			// Alte Spiele ggf. migrieren
+			spiel.migrieren();
+			spiel.updateSaveBuild();
+		}
+		
+		return spiel;
 	}
 	
 	private String gameUpdate(Spiel spiel, boolean create)

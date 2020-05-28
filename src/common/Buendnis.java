@@ -18,13 +18,12 @@ package common;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
-public class Buendnis implements Serializable
+@SuppressWarnings("serial") class Buendnis implements Serializable
 {
 	private boolean[] mitglieder;
 	private int[] raumer;
 	
-	public Buendnis(int anzSpieler)
+	Buendnis(int anzSpieler)
 	{
 		this.mitglieder = new boolean[anzSpieler];
 		this.raumer = new int[anzSpieler];
@@ -35,12 +34,12 @@ public class Buendnis implements Serializable
 		return this.mitglieder.length;
 	}
 	
-	public void setRaumer(int spieler, int anz)
+	private void setRaumer(int spieler, int anz)
 	{
 		this.mitglieder[spieler] = true;
 		this.raumer[spieler] = anz;
 	}
-	public void addRaumer(int spieler, int anz)
+	void addRaumer(int spieler, int anz)
 	{
 		if (this.mitglieder[spieler])
 			this.raumer[spieler] += anz;
@@ -48,7 +47,7 @@ public class Buendnis implements Serializable
 			this.setRaumer(spieler, anz);
 	}
 	
-	public void subRaumer(int spieler, int anz)
+	void subRaumer(int spieler, int anz)
 	{
 		if (this.mitglieder[spieler])
 		{
@@ -58,12 +57,12 @@ public class Buendnis implements Serializable
 		}
 	}
 	
-	public void addSpieler(int spieler)
+	void addSpieler(int spieler)
 	{
 		this.mitglieder[spieler] = true;
 	}
 	
-	public void removeSpieler(int spieler, boolean raumerLoeschen)
+	void removeSpieler(int spieler, boolean raumerLoeschen)
 	{
 		this.mitglieder[spieler] = false;
 		
@@ -82,7 +81,7 @@ public class Buendnis implements Serializable
 		return sum;
 	}
 	
-	public int getAnz(int spieler)
+	int getAnz(int spieler)
 	{
 		if (this.istMitglied(spieler))
 			return this.raumer[spieler];
@@ -90,7 +89,7 @@ public class Buendnis implements Serializable
 			return 0;
 	}
 	
-	public boolean istMitglied(int spieler)
+	boolean istMitglied(int spieler)
 	{
 		if (spieler != Constants.BESITZER_NEUTRAL)
 			return this.mitglieder[spieler];
@@ -98,7 +97,7 @@ public class Buendnis implements Serializable
 			return false;
 	}
 	
-	public int[] subtract(int anz, int bevorzugterSpieler)
+	int[] subtract(int anz, int bevorzugterSpieler)
 	{
 		// Dem "bevorzugten" Spieler wird immer zuerst abgezogen
 		int summeStart = this.getSum();
@@ -176,7 +175,7 @@ public class Buendnis implements Serializable
 		return rest;
 	}	
 	
-	public void spielerErsetzen(int spielerAlt, int spielerNeu)
+	void spielerErsetzen(int spielerAlt, int spielerNeu)
 	{
 		if (!this.istMitglied(spielerAlt))
 			return;
@@ -203,7 +202,7 @@ public class Buendnis implements Serializable
 		return this.mitglieder;
 	}
 	
-	public int[] aufraeumen()
+	int[] aufraeumen()
 	{
 		int[] abzuege = new int[this.getAnzSp()];
 		

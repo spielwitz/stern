@@ -25,8 +25,8 @@ public class Colors
 	private static Color[] colors;
 	private static Color[] colorsDarker;
 	
-	public static final byte INDEX_SCHWARZ = 0;
-	public static final byte INDEX_WEISS = 1;
+	static final byte INDEX_SCHWARZ = 0;
+	static final byte INDEX_WEISS = 1;
 	public static final byte INDEX_NEUTRAL = 2;
 	public static final byte SPIELER_FARBEN_OFFSET = 3;
 	
@@ -61,7 +61,7 @@ public class Colors
 			return colors[index];
 	}
 	
-	public static byte getColorIndexDarker(byte index)
+	static byte getColorIndexDarker(byte index)
 	{
 		return (byte)(-(index + 1));
 	}
