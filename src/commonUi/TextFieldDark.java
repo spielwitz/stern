@@ -29,6 +29,12 @@ public class TextFieldDark extends JTextField
 		super(text);
 		this.init(f);
 	}
+	public TextFieldDark(String text, Font f, boolean editable)
+	{
+		super(text);
+		this.init(f);
+		this.setEditable(editable);
+	}
 	public TextFieldDark(Font f, int size)
 	{
 		super(size);

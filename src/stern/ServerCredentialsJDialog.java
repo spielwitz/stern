@@ -64,9 +64,10 @@ import commonUi.TextFieldDark;
 	private ButtonDark butAuthBrowse;
 	private ButtonDark butAuthActivate;
 	private LabelDark labPing;
-	private LabelDark labAuthUrl;
-	private LabelDark labAuthPort;
-	private LabelDark labAuthUserId;
+	private TextFieldDark tfAuthUrl;
+	private TextFieldDark tfAuthPort;
+	private TextFieldDark tfAuthUserId;
+	private TextFieldDark tfAdminEmail;
 	private TextFieldDark tfAuthFile;
 	
 	private CheckBoxDark cbServerCommunicationEnabled;
@@ -133,21 +134,25 @@ import commonUi.TextFieldDark;
 		PanelDark panAuthInfo = new PanelDark(new SpringLayout());
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminUrl(false)+":", font));
-		this.labAuthUrl = new LabelDark("", font); 
-		panAuthInfo.add(this.labAuthUrl);
+		this.tfAuthUrl = new TextFieldDark("", font, false); 
+		panAuthInfo.add(this.tfAuthUrl);
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminPort(false)+":", font));
-		this.labAuthPort = new LabelDark("", font);
-		panAuthInfo.add(this.labAuthPort);
+		this.tfAuthPort = new TextFieldDark("", font, false);
+		panAuthInfo.add(this.tfAuthPort);
 		
 		panAuthInfo.add(new LabelDark(SternResources.UserId(false)+":", font));
-		this.labAuthUserId = new LabelDark("", font);
-		panAuthInfo.add(this.labAuthUserId);
+		this.tfAuthUserId = new TextFieldDark("", font, false);
+		panAuthInfo.add(this.tfAuthUserId);
+		
+		panAuthInfo.add(new LabelDark(SternResources.ServerEmailAdmin(false)+":", font));
+		this.tfAdminEmail = new TextFieldDark("", font, false);
+		panAuthInfo.add(this.tfAdminEmail);
 		
 		this.fillAuthCredentials(this.cuc);
 		
 		SpringUtilities.makeCompactGrid(panAuthInfo,
-			      3, 2, //rows, cols
+			      4, 2, //rows, cols
 			      5, 5, //initialX, initialY
 			      20, 5);//xPad, yPad
 		
@@ -343,6 +348,7 @@ import commonUi.TextFieldDark;
 					cucTemp.port = newUser.serverPort;
 					cucTemp.serverPublicKey = newUser.serverPublicKey;
 					cucTemp.userPrivateKey = RsaCrypt.encodePrivateKeyToBase64(userKeyPair.getPrivate());
+					cucTemp.adminEmail = newUser.adminEmail;
 					
 					cucTemp.serverPublicKeyObject = RsaCrypt.decodePublicKeyFromBase64(cucTemp.serverPublicKey);
 					cucTemp.userPrivateKeyObject = RsaCrypt.decodePrivateKeyFromBase64(cucTemp.userPrivateKey); 
@@ -421,14 +427,17 @@ import commonUi.TextFieldDark;
 		}
 		
 		
-		this.labAuthUrl.setText(
+		this.tfAuthUrl.setText(
 				cuc == null || cuc.url == null ? SternResources.KeineDateiAusgewaehlt(false): cuc.url);
 		
-		this.labAuthPort.setText(
+		this.tfAuthPort.setText(
 				cuc == null || cuc.port == 0 ? "" : Integer.toString(cuc.port));
 		
-		this.labAuthUserId.setText(
+		this.tfAuthUserId.setText(
 				cuc == null || cuc.userId == null ? "" : cuc.userId);		
+		
+		this.tfAdminEmail.setText(
+				cuc == null || cuc.adminEmail == null ? "" : cuc.adminEmail);
 	}
 	
 	private void setControlsEnabled()

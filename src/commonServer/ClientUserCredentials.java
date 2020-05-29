@@ -28,6 +28,7 @@ public class ClientUserCredentials
 	public int port;
 	public String userPrivateKey; // Persoenlicher privater Schluessel zur Entschluesselung einer Response auf Client-Seite
 	public String serverPublicKey; // Allgemeiner public Key des Servers zur Verschluesselung eines Requests auf Client-Seite
+	public String adminEmail;
 	
 	public transient PrivateKey userPrivateKeyObject;
 	public transient PublicKey serverPublicKeyObject;
