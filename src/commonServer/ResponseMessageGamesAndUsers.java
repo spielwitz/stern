@@ -32,6 +32,7 @@ public class ResponseMessageGamesAndUsers
 	public ArrayList<SpielInfo> gamesZugeingabe;
 	public ArrayList<SpielInfo> gamesWarten;
 	public ArrayList<SpielInfo> gamesBeendet;
+	public ArrayList<SpielInfo> gamesSpielleiter;
 	
 	public String toJson()
 	{

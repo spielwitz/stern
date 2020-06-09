@@ -25,6 +25,7 @@ public class SpielInfo
 {
 	public String name;
 	public long startDatum;
+	public long letztesUpdate;
 	public int maxJahre;
 	public int jahr; // Momentanes Jahr (startet mit 0)
 	public boolean simpleStern;

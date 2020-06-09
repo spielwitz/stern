@@ -19,5 +19,5 @@ package common;
 public class EmailTransportBase 
 {
 	public String className;
-	public String build;
+	public String build; // NO_UCD (unused code)
 }

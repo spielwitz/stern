@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 
 public class RequestMessageGamesAndUsers
 {
-	public String userId;
+	public String userId; // NO_UCD (unused code)
 	
 	public String toJson()
 	{

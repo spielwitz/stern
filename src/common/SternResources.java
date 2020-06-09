@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: GV
+		// Hoechstes vergebenes Symbol: HH
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -419,8 +419,7 @@ public class SternResources
 		symbolDict.put("BT","ServerGamesSubmitFrage_BT");
 		symbolDict.put("BU","ServerGamesSubmitAngelegt_BU");
 		symbolDict.put("BV","ServerGamesLaden_BV");
-		symbolDict.put("BW","ServerGamesPlaneten_BW");
-		symbolDict.put("BX","ServerGamesSpieler_BX");
+		symbolDict.put("BW","ServerGamesSpielerPlaneten_BW");
 		symbolDict.put("BY","ServerGamesBegonnen_BY");
 		symbolDict.put("BZ","ServerGamesSpielname_BZ");
 		symbolDict.put("CA","ServerWillkommen_CA");
@@ -549,6 +548,16 @@ public class SternResources
 		symbolDict.put("GS","InventurPatrouillenOrientierung_GS");
 		symbolDict.put("GT","SpielinformationenKommandozentralenUnterwegs2_GT");
 		symbolDict.put("GV","ServerBuildVeraltet_GV");
+		symbolDict.put("GW","ServerGamesLetzteAktivitaet_GW");
+		symbolDict.put("GY","ServerGamesSpielleiteraktionen_GY");
+		symbolDict.put("GZ","ServerGamesLoeschen_GZ");
+		symbolDict.put("HA","ServerGamesBeenden_HA");
+		symbolDict.put("HC","ServerErrorKeinSpielleiter_HC");
+		symbolDict.put("HD","ServerGamesGameDeleted_HD");
+		symbolDict.put("HE","ServerGamesLoeschenAys_HE");
+		symbolDict.put("HF","ServerGamesAbgeschlossen_HF");
+		symbolDict.put("HG","ServerGamesBeendenAys_HG");
+		symbolDict.put("HH","ServerGamesGameFinalized_HH");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -3252,21 +3261,14 @@ public class SternResources
 	}
 
 	/**
-	   * {0} Planeten [BW]
+	   * {0} Spieler, {1} Planeten [BW]
 	   */
-	public static String ServerGamesPlaneten(boolean symbol, String arg0) {
-		return symbol ? "$BW§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesPlaneten_BW"), arg0);
+	public static String ServerGamesSpielerPlaneten(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$BW§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerGamesSpielerPlaneten_BW"), arg0, arg1);
 	}
 
 	/**
-	   * {0} Spieler [BX]
-	   */
-	public static String ServerGamesSpieler(boolean symbol, String arg0) {
-		return symbol ? "$BX§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesSpieler_BX"), arg0);
-	}
-
-	/**
-	   * Begonnen am {0} [BY]
+	   * Beginn: {0} [BY]
 	   */
 	public static String ServerGamesBegonnen(boolean symbol, String arg0) {
 		return symbol ? "$BY§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesBegonnen_BY"), arg0);
@@ -4159,5 +4161,75 @@ public class SternResources
 	   */
 	public static String ServerBuildVeraltet(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$GV§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerBuildVeraltet_GV"), arg0, arg1);
+	}
+
+	/**
+	   * Letzte Aktivit\u00E4t: {0} [GW]
+	   */
+	public static String ServerGamesLetzteAktivitaet(boolean symbol, String arg0) {
+		return symbol ? "$GW§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesLetzteAktivitaet_GW"), arg0);
+	}
+
+	/**
+	   * Spielleiteraktionen [GY]
+	   */
+	public static String ServerGamesSpielleiteraktionen(boolean symbol) {
+		return symbol ? "$GY$":messages.getString("ServerGamesSpielleiteraktionen_GY");
+	}
+
+	/**
+	   * Spiel l\u00F6schen [GZ]
+	   */
+	public static String ServerGamesLoeschen(boolean symbol) {
+		return symbol ? "$GZ$":messages.getString("ServerGamesLoeschen_GZ");
+	}
+
+	/**
+	   * Spiel beenden [HA]
+	   */
+	public static String ServerGamesBeenden(boolean symbol) {
+		return symbol ? "$HA$":messages.getString("ServerGamesBeenden_HA");
+	}
+
+	/**
+	   * Sie sind nicht der Spielleiter des Spiels {0}. [HC]
+	   */
+	public static String ServerErrorKeinSpielleiter(boolean symbol, String arg0) {
+		return symbol ? "$HC§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorKeinSpielleiter_HC"), arg0);
+	}
+
+	/**
+	   * Spiel {0} wurde erfolgreich gel\u00F6scht. [HD]
+	   */
+	public static String ServerGamesGameDeleted(boolean symbol, String arg0) {
+		return symbol ? "$HD§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesGameDeleted_HD"), arg0);
+	}
+
+	/**
+	   * M\u00F6chten Sie das Spiel {0} wirklich vom Server l\u00F6schen? [HE]
+	   */
+	public static String ServerGamesLoeschenAys(boolean symbol, String arg0) {
+		return symbol ? "$HE§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesLoeschenAys_HE"), arg0);
+	}
+
+	/**
+	   * Das Spiel ist bereits abgeschlossen. [HF]
+	   */
+	public static String ServerGamesAbgeschlossen(boolean symbol) {
+		return symbol ? "$HF$":messages.getString("ServerGamesAbgeschlossen_HF");
+	}
+
+	/**
+	   * M\u00F6chten Sie das Spiel {0} wirklich sofort beenden? Alle Spielz\u00FCge der Spieler gehen verloren. [HG]
+	   */
+	public static String ServerGamesBeendenAys(boolean symbol, String arg0) {
+		return symbol ? "$HG§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesBeendenAys_HG"), arg0);
+	}
+
+	/**
+	   * Spiel {0} wurde erfolgreich beendet. [HH]
+	   */
+	public static String ServerGamesGameFinalized(boolean symbol, String arg0) {
+		return symbol ? "$HH§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesGameFinalized_HH"), arg0);
 	}
 }

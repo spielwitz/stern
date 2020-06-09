@@ -22,10 +22,10 @@ import java.io.FileReader;
 
 public class ServerUtils
 {
-	public static final String ARG_PORT = "port";
-	public static final String ARG_HOSTNAME = "host";
-	public static final String ARG_LOGLEVEL = "log";
-	public static final String ARG_CLIENT_CREDENTIALS = "credentials";
+	public static final String ARG_PORT = "port"; // NO_UCD (unused code)
+	public static final String ARG_HOSTNAME = "host"; // NO_UCD (unused code)
+	public static final String ARG_LOGLEVEL = "log"; // NO_UCD (unused code)
+	public static final String ARG_CLIENT_CREDENTIALS = "credentials"; // NO_UCD (unused code)
 	
 	public static byte[] convertIntToByteArray(int a)
 	{

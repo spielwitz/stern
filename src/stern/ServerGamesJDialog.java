@@ -53,10 +53,13 @@ import javax.swing.event.ListSelectionListener;
 
 import common.Colors;
 import common.Constants;
+import common.ReleaseGetter;
 import common.Spiel;
 import common.Spiel.PlanetenInfo;
 import commonServer.ClientUserCredentials;
 import commonServer.RequestMessage;
+import commonServer.RequestMessageGameHostDeleteGame;
+import commonServer.RequestMessageGameHostFinalizeGame;
 import commonServer.RequestMessageType;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
@@ -142,7 +145,7 @@ import common.Utils;
 		if (this.gamesAndUsers.gamesZugeingabe.size() > 0)
 		{
 			PanelSpielSelector panZugeingabe = new PanelSpielSelector(
-					this.gamesAndUsers.gamesZugeingabe, currentGameId);
+					this.gamesAndUsers.gamesZugeingabe, false, currentGameId);
 			tabpane.add(SternResources.ServerGamesSpielerWarten(false), panZugeingabe);
 		}
 		
@@ -150,7 +153,7 @@ import common.Utils;
 		if (this.gamesAndUsers.gamesWarten.size() > 0)
 		{
 			PanelSpielSelector panWarten = new PanelSpielSelector(
-					this.gamesAndUsers.gamesWarten, currentGameId);
+					this.gamesAndUsers.gamesWarten, false, currentGameId);
 			tabpane.add(SternResources.ServerGamesIchWarte(false), panWarten);
 		}
 		
@@ -158,8 +161,16 @@ import common.Utils;
 		if (this.gamesAndUsers.gamesBeendet.size() > 0)
 		{
 			PanelSpielSelector panBeendet = new PanelSpielSelector(
-					this.gamesAndUsers.gamesBeendet, currentGameId);
+					this.gamesAndUsers.gamesBeendet, false, currentGameId);
 			tabpane.add(SternResources.ServerGamesBeendeteSpiele(false), panBeendet);
+		}
+		
+		// ---------------
+		if (this.gamesAndUsers.gamesSpielleiter.size() > 0)
+		{
+			PanelSpielSelector panSpielleiter = new PanelSpielSelector(
+					this.gamesAndUsers.gamesSpielleiter, true, currentGameId);
+			tabpane.add(SternResources.ServerGamesSpielleiteraktionen(false), panSpielleiter);
 		}
 
 		// ---------------
@@ -302,6 +313,76 @@ import common.Utils;
 		{
 			// Jetzt das Spiel wie ein E-Mail-Spiel laden.
 			this.spielGeladen = (Spiel)Utils.base64ToObject(respMsg.payloadSerialized, Spiel.class, null);
+			this.close();
+		}
+	}
+	
+	private void deleteGame(String gameId)
+	{
+		int dialogResult = JOptionPane.showConfirmDialog(this,
+			    SternResources.ServerGamesLoeschenAys(false, gameId),
+			    SternResources.ServerGamesLoeschen(false),
+			    JOptionPane.YES_NO_OPTION);
+		
+		if (dialogResult != JOptionPane.YES_OPTION)
+			return;
+		
+		RequestMessage msg = new RequestMessage(RequestMessageType.GAME_HOST_DELETE_GAME);
+		
+		RequestMessageGameHostDeleteGame msgPayload = new RequestMessageGameHostDeleteGame();
+		
+		msgPayload.gameHostUserId = this.cuc.userId;
+		msgPayload.gameId = gameId;
+		
+		msg.payloadSerialized = Utils.objectToBase64(msgPayload, null);
+		
+		ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
+		
+		if (!respMsg.error)
+		{
+			// Erfolgmeldung
+			JOptionPane.showMessageDialog(
+					this, 
+					SternResources.ServerGamesGameDeleted(false, gameId), 
+					SternResources.ServerGamesLoeschen(false), 
+					JOptionPane.INFORMATION_MESSAGE);
+			
+			// Dialog schließen
+			this.close();
+		}
+	}
+	
+	private void finalizeGame(String gameId)
+	{
+		int dialogResult = JOptionPane.showConfirmDialog(this,
+			    SternResources.ServerGamesBeendenAys(false, gameId),
+			    SternResources.ServerGamesBeenden(false),
+			    JOptionPane.YES_NO_OPTION);
+		
+		if (dialogResult != JOptionPane.YES_OPTION)
+			return;
+		
+		RequestMessage msg = new RequestMessage(RequestMessageType.GAME_HOST_FINALIZE_GAME);
+		
+		RequestMessageGameHostFinalizeGame msgPayload = new RequestMessageGameHostFinalizeGame();
+		
+		msgPayload.gameHostUserId = this.cuc.userId;
+		msgPayload.gameId = gameId;
+		
+		msg.payloadSerialized = Utils.objectToBase64(msgPayload, null);
+		
+		ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
+		
+		if (!respMsg.error)
+		{
+			// Erfolgmeldung
+			JOptionPane.showMessageDialog(
+					this, 
+					SternResources.ServerGamesGameFinalized(false, gameId), 
+					SternResources.ServerGamesBeenden(false), 
+					JOptionPane.INFORMATION_MESSAGE);
+			
+			// Dialog schließen
 			this.close();
 		}
 	}
@@ -757,6 +838,8 @@ import common.Utils;
 			MouseListener
 	{
 		private ButtonDark butOk;
+		private ButtonDark butSpielLoeschen;
+		private ButtonDark butSpielBeenden;
 		
 		private SpielfeldDisplay spielfeld;
 		
@@ -768,14 +851,16 @@ import common.Utils;
 		
 		private SpielInfo selectedGame;
 
-		
-		private LabelDark labSpieler;
-		private LabelDark labPlaneten;
+		private LabelDark labSpielerUndPlaneten;
 		private LabelDark labJahr;
 		private LabelDark labStartDatum;
+		private LabelDark labLetztesUpdate;
 		private CheckBoxDark cbSimple;
 		
-		public PanelSpielSelector(ArrayList<SpielInfo> games, String currentGameId)
+		public PanelSpielSelector(
+				ArrayList<SpielInfo> games, 
+				boolean spielleiterAktionen,
+				String currentGameId)
 		{
 			super();
 			
@@ -783,7 +868,7 @@ import common.Utils;
 			
 			PanelDark panShell = new PanelDark(new BorderLayout(10, 10));
 			
-			PanelDark panMain = new PanelDark(new BorderLayout(10, 10));
+			PanelDark panMain = new PanelDark(new BorderLayout(20, 10));
 			
 			this.gamesDict = new Hashtable<String,SpielInfo>();
 			DefaultListModel<String> lm = new DefaultListModel<String>();
@@ -818,33 +903,33 @@ import common.Utils;
 			
 			// ----
 			
-			PanelDark panGrid = new PanelDark(new GridLayout(6, 2, 20, 0));
+			PanelDark panGrid = new PanelDark(new GridLayout(6, 2, 0, 0));
 			
 			this.spielerPanels = new SpielerPanel[Constants.ANZAHL_SPIELER_MAX];
 			
 			this.spielerPanels[0] = new SpielerPanel();
 			panGrid.add(this.spielerPanels[0]);
 			
-			this.labSpieler = new LabelDark("6 Spieler", font);
-			panGrid.add(this.labSpieler);
+			this.labSpielerUndPlaneten = new LabelDark("6 Spieler, 42 Planeten", font);
+			panGrid.add(this.labSpielerUndPlaneten);
 			
 			this.spielerPanels[1] = new SpielerPanel();
 			panGrid.add(this.spielerPanels[1]);
 			
-			this.labPlaneten = new LabelDark("42 Planeten", font);
-			panGrid.add(this.labPlaneten);
+			this.labJahr = new LabelDark("Jahr 1 von 30", font);
+			panGrid.add(this.labJahr);
 			
 			this.spielerPanels[2] = new SpielerPanel();
 			panGrid.add(this.spielerPanels[2]);
 			
-			this.labJahr = new LabelDark("Jahr 1 von 30", font);
-			panGrid.add(this.labJahr);
+			this.labStartDatum = new LabelDark("Begonnen am 24.04.2019 00:00", font);
+			panGrid.add(this.labStartDatum);
 			
 			this.spielerPanels[3] = new SpielerPanel();
 			panGrid.add(this.spielerPanels[3]);
 			
-			this.labStartDatum = new LabelDark("Begonnen am 24.04.2019", font);
-			panGrid.add(this.labStartDatum);
+			this.labLetztesUpdate = new LabelDark("Letzte Aktivität 24.04.2019", font);
+			panGrid.add(this.labLetztesUpdate);
 			
 			this.spielerPanels[4] = new SpielerPanel();
 			panGrid.add(this.spielerPanels[4]);
@@ -871,6 +956,15 @@ import common.Utils;
 			panShell.add(panMain, BorderLayout.CENTER);
 			// ----
 			PanelDark panButtons = new PanelDark(new FlowLayout(FlowLayout.RIGHT));
+			
+			if (spielleiterAktionen)
+			{
+				this.butSpielBeenden = new ButtonDark(this, SternResources.ServerGamesBeenden(false), font);
+				panButtons.add(this.butSpielBeenden);
+				
+				this.butSpielLoeschen = new ButtonDark(this, SternResources.ServerGamesLoeschen(false), font);
+				panButtons.add(this.butSpielLoeschen);
+			}
 
 			this.butOk = new ButtonDark(this, SternResources.ServerGamesLaden(false), font);
 			panButtons.add(this.butOk);
@@ -896,9 +990,20 @@ import common.Utils;
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
-			if (e.getSource() == this.butOk && this.selectedGame != null)
+			if (this.selectedGame != null)
 			{
-				selectGame(this.selectedGame.name);
+				if (e.getSource() == this.butOk)
+				{
+					selectGame(this.selectedGame.name);
+				}
+				else if (e.getSource() == this.butSpielLoeschen)
+				{
+					deleteGame(this.selectedGame.name);
+				}
+				else if (e.getSource() == this.butSpielBeenden)
+				{
+					finalizeGame(this.selectedGame.name);
+				}
 			}
 		}
 
@@ -938,8 +1043,8 @@ import common.Utils;
 			this.spielfeld.refresh(this.selectedGame == null ? null : this.selectedGame.planetenInfo);
 			
 			this.labJahr.setVisible(this.selectedGame != null);
-			this.labPlaneten.setVisible(this.selectedGame != null);
-			this.labSpieler.setVisible(this.selectedGame != null);
+			this.labSpielerUndPlaneten.setVisible(this.selectedGame != null);
+			//this.labSpieler.setVisible(this.selectedGame != null);
 			this.labStartDatum.setVisible(this.selectedGame != null);
 			this.cbSimple.setVisible(this.selectedGame != null);
 			
@@ -957,19 +1062,23 @@ import common.Utils;
 									Integer.toString(this.selectedGame.jahr + 1),
 									Integer.toString(this.selectedGame.maxJahre)));
 				
-				this.labPlaneten.setText(
-						SternResources.ServerGamesPlaneten(
+				this.labSpielerUndPlaneten.setText(
+						SternResources.ServerGamesSpielerPlaneten(
 								false, 
+								Integer.toString(this.selectedGame.spieler.length),
 								Integer.toString(this.selectedGame.planetenInfo.size())));
-				this.labSpieler.setText(
-						SternResources.ServerGamesSpieler(
-								false,
-								Integer.toString(this.selectedGame.spieler.length)));
+				
+				this.labLetztesUpdate.setText(
+						SternResources.ServerGamesLetzteAktivitaet(
+								false, 
+								ReleaseGetter.format(
+										Utils.millisecondsToString(this.selectedGame.letztesUpdate))));
 				
 				this.labStartDatum.setText(
 						SternResources.ServerGamesBegonnen(
 								false, 
-								Utils.dateToString(this.selectedGame.startDatum)));
+								ReleaseGetter.format(
+										Utils.millisecondsToString(this.selectedGame.startDatum))));
 				
 				this.cbSimple.setSelected(this.selectedGame.simpleStern);
 			}

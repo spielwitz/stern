@@ -34,6 +34,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	private String saveBuild; // Build, mit dem das Spiel abgespeichert wurde
 	private String name;
 	private long startDatum;
+	private long letztesUpdate;
 	private String minBuild; // Mindestens vorausgesetzter Build
 	private HashSet<SpielOptionen> optionen; // Entspricht "setup" im alten Vega 
 	private int maxJahre;
@@ -281,6 +282,16 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.name = name;
 	}
 	
+	public void setLetztesUpdate()
+	{
+		this.letztesUpdate = System.currentTimeMillis();
+	}
+	
+	public long getLetztesUpdate()
+	{
+		return this.letztesUpdate;
+	}
+	
 	public String getMinBuild()
 	{
 		return this.minBuild;
@@ -403,6 +414,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		info.name = this.name;
 		info.spieler = this.spieler;
 		info.startDatum = this.startDatum;
+		info.letztesUpdate = this.letztesUpdate;
 		info.simpleStern = (this.optionen.contains(SpielOptionen.SIMPEL));
 		info.planetenInfo = this.getPlanetenInfo();
 		
@@ -461,6 +473,12 @@ public class Spiel extends EmailTransportBase implements Serializable
 		Spiel spClone = (Spiel)Utils.klon(this);
 		
 		spClone.setMinBuild(Constants.MIN_BUILD);
+		
+		// Spielleiter bei einem serverbasierten Spiel ist der erste Spieler
+		if (spClone.optionen.contains(SpielOptionen.SERVER_BASIERT))
+		{
+			spClone.emailAdresseSpielleiter = spClone.spieler[0].getEmailAdresse();
+		}
 		
 		// Von einem abgeschlossenen Spiel darf der Spieler alles sehen
 		if (spClone.abgeschlossen)
@@ -1067,6 +1085,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 		}
 		
 		this.console.clear();
+	}
+	
+	public void abschliessenServer()
+	{
+		// Loesche alle Zugeingaben
+		this.spielzuege = new Hashtable<Integer,ArrayList<Spielzug>>();
+		this.maxJahre = this.jahr;
+		this.abgeschlossen = true;
 	}
 	
 	private void siegerehrung()

@@ -54,6 +54,8 @@ import commonServer.RequestMessage;
 import commonServer.RequestMessageActivateUser;
 import commonServer.RequestMessageGetEvaluations;
 import commonServer.RequestMessageChangeUser;
+import commonServer.RequestMessageGameHostDeleteGame;
+import commonServer.RequestMessageGameHostFinalizeGame;
 import commonServer.RequestMessagePostMoves;
 import commonServer.RequestMessageSetLogLevel;
 import commonServer.ResponseMessage;
@@ -785,6 +787,16 @@ public class SternServer // NO_UCD (unused code)
 							resp = processRequestGetEvaluations(
 									(RequestMessageGetEvaluations)Utils.base64ToObject(msg.payloadSerialized, RequestMessageGetEvaluations.class, null));
 							break;
+						case GAME_HOST_DELETE_GAME:
+							resp = processRequestGameHostDeleteGame(
+									(RequestMessageGameHostDeleteGame)Utils.base64ToObject(
+											msg.payloadSerialized, RequestMessageGameHostDeleteGame.class, null));
+							break;
+						case GAME_HOST_FINALIZE_GAME:
+							resp = processRequestGameHostFinalizeGame(
+									(RequestMessageGameHostFinalizeGame)Utils.base64ToObject(
+											msg.payloadSerialized, RequestMessageGameHostFinalizeGame.class, null));
+							break;
 						default:
 							resp = this.notAuthorized(userId);
 							break;
@@ -964,6 +976,84 @@ public class SternServer // NO_UCD (unused code)
 
 		return msgResponse;
 	}
+	
+	private ResponseMessage processRequestGameHostDeleteGame(RequestMessageGameHostDeleteGame msg)
+	{
+		ResponseMessage msgResponse = new ResponseMessage();
+		
+		synchronized(this.users)
+		{		
+			synchronized(this.getLockObject(msg.gameId))
+			{
+				Spiel spiel = this.gameRead(msg.gameId);
+				
+				if (spiel == null)
+				{
+					msgResponse.error = true;
+					msgResponse.errorMsg = SternResources.ServerErrorSpielExistiertNicht(true, msg.gameId);
+				}
+				else
+				{
+					// Ist der User der Spielleiter?
+					if (msg.gameHostUserId.equals(spiel.getSpieler()[0].getName()))
+					{
+						this.gameDelete(spiel);
+						msgResponse.error = false;
+					}
+					else
+					{
+						msgResponse.error = true;
+						msgResponse.errorMsg = SternResources.ServerErrorKeinSpielleiter(true, msg.gameId);
+					}
+				}
+			}
+		}
+
+		return msgResponse;
+	}
+	
+	private ResponseMessage processRequestGameHostFinalizeGame(RequestMessageGameHostFinalizeGame msg)
+	{
+		ResponseMessage msgResponse = new ResponseMessage();
+		
+		synchronized(this.getLockObject(msg.gameId))
+		{
+			Spiel spiel = this.gameRead(msg.gameId);
+			
+			if (spiel == null)
+			{
+				msgResponse.error = true;
+				msgResponse.errorMsg = SternResources.ServerErrorSpielExistiertNicht(true, msg.gameId);
+			}
+			else
+			{
+				if (spiel.getAbgeschlossen())
+				{
+					msgResponse.error = true;
+					msgResponse.errorMsg = 
+							SternResources.ServerGamesAbgeschlossen(true);
+				}
+				else
+				{
+					// Ist der User der Spielleiter?
+					if (msg.gameHostUserId.equals(spiel.getSpieler()[0].getName()))
+					{
+						spiel.abschliessenServer();
+						this.gameUpdate(spiel, false);
+						msgResponse.error = false;
+					}
+					else
+					{
+						msgResponse.error = true;
+						msgResponse.errorMsg = SternResources.ServerErrorKeinSpielleiter(true, msg.gameId);
+					}
+				}
+			}
+		}
+
+		return msgResponse;
+	}
+
 
 	
 	private Object getLockObject(String uuid)
@@ -1354,11 +1444,27 @@ public class SternServer // NO_UCD (unused code)
 			spiel.setName(file.getName());
 		}
 		
+		spiel.setLetztesUpdate();
 		Utils.writeSpielToFile(spiel, file);
 		
 		this.games.put(spiel.getName(), spiel.getSpielInfo());
 		
 		return spiel.getName();
+	}
+	
+	private void gameDelete(Spiel spiel)
+	{
+		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME, spiel.getName()).toFile();
+		
+		if (file.exists())
+			file.delete();
+		
+		this.games.remove(spiel.getName());
+		
+		for (UserServer user: this.users.values())
+		{
+			user.games.remove(spiel.getName());
+		}
 	}
 	
 	private boolean isUserNameAllowed(String userId)
@@ -1471,28 +1577,37 @@ public class SternServer // NO_UCD (unused code)
 			}
 			else
 			{
-				int spIndex = spiel.spielzuegeEinfuegen(msg.zuege);
-				
-				if (spIndex >= 0)
-				{
-					// Haben alle Spieler ihre Spielzuege eingegeben?
-					// Wenn ja, Auswertung machen
-					auswertungVerfuegbar = spiel.starteAuswertungServer();
-					
-					// Spiel abspeichern
-					this.gameUpdate(spiel, false);
-					
-					msgResponse.payloadSerialized =
-							auswertungVerfuegbar ?
-									PostMovesResult.AUSWERTUNG_VERFUEGBAR.toString() :
-									PostMovesResult.WARTE.toString();
-							
-				}
-				else
+				if (spiel.getAbgeschlossen())
 				{
 					msgResponse.error = true;
 					msgResponse.errorMsg = 
-							SternResources.ServerErrorJahrVorbei(true);
+							SternResources.ServerGamesAbgeschlossen(true);
+				}
+				else
+				{
+					int spIndex = spiel.spielzuegeEinfuegen(msg.zuege);
+					
+					if (spIndex >= 0)
+					{
+						// Haben alle Spieler ihre Spielzuege eingegeben?
+						// Wenn ja, Auswertung machen
+						auswertungVerfuegbar = spiel.starteAuswertungServer();
+						
+						// Spiel abspeichern
+						this.gameUpdate(spiel, false);
+						
+						msgResponse.payloadSerialized =
+								auswertungVerfuegbar ?
+										PostMovesResult.AUSWERTUNG_VERFUEGBAR.toString() :
+										PostMovesResult.WARTE.toString();
+								
+					}
+					else
+					{
+						msgResponse.error = true;
+						msgResponse.errorMsg = 
+								SternResources.ServerErrorJahrVorbei(true);
+					}
 				}
 			}
 			
@@ -1511,6 +1626,7 @@ public class SternServer // NO_UCD (unused code)
 			msgResponse.gamesZugeingabe = new ArrayList<SpielInfo>();
 			msgResponse.gamesWarten = new ArrayList<SpielInfo>();
 			msgResponse.gamesBeendet = new ArrayList<SpielInfo>();
+			msgResponse.gamesSpielleiter = new ArrayList<SpielInfo>();
 			
 			msgResponse.emailAdresseSpielleiter = SternServer.serverConfig.adminEmail;
 			
@@ -1535,6 +1651,9 @@ public class SternServer // NO_UCD (unused code)
 					else
 						msgResponse.gamesZugeingabe.add(spielInfo);
 				}
+				
+				if (spielInfo.spieler[0].getName().equals(userId))
+					msgResponse.gamesSpielleiter.add(spielInfo);
 			}
 			
 			ResponseMessage msg = new ResponseMessage(); 
