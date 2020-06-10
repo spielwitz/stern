@@ -5746,10 +5746,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 			}
 			
+			this.taste();
+			
 			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
 			this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
-			
-			this.taste();
 			
 			if (kz != null)
 				this.kommandozentraleErobert(
