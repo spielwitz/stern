@@ -2897,7 +2897,7 @@ public class SternResources
 	}
 
 	/**
-	   * Sie m\u00FCssen erst alle Ihre Raumer abziehen, bevor Sie kuendigen k\u00F6nnen. [9W]
+	   * Sie m\u00FCssen erst alle Ihre Raumer abziehen, bevor Sie k\u00FCndigen k\u00F6nnen. [9W]
 	   */
 	public static String ZugeingabeZuerstKuendigen(boolean symbol) {
 		return symbol ? "$9W$":messages.getString("ZugeingabeZuerstKuendigen_9W");
