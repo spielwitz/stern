@@ -27,6 +27,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -38,18 +39,22 @@ public class RsaCrypt {
 
 	private static final String ALGORITHM = "RSA";
 	private static final String STRING_ENCODING = "UTF-8"; 
-	private static final int encryptChunkLength = 50;
+	private static final int ENCRYPT_CHUNK_LENGTH = 50;
+	private static final int KEY_SIZE = 512;
+	private static final int CHUNK_LENGTH_BYTE_SIZE = 1;
 	
 	private static final String CODES = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	
 	private static Hashtable<Character,Integer> codeIndices;
+	
+	public static final int BYTE_ARRAY_LENGTH = 64;
 	
 	static
 	{
 		codeIndices = new Hashtable<Character,Integer>(CODES.length());
 		
 		for (int i = 0; i < CODES.length(); i++)
-			codeIndices.put(new Character(CODES.charAt(i)), new Integer(i));
+			codeIndices.put(CODES.charAt(i), i);
 	}
 	
 	public static void init()
@@ -63,17 +68,20 @@ public class RsaCrypt {
 	{
 		KeyPairGenerator keyGen = null;
 		try {
-			keyGen = KeyPairGenerator.getInstance("RSA");
+			keyGen = KeyPairGenerator.getInstance(ALGORITHM);
 		} catch (NoSuchAlgorithmException e) {
 			return null;
 		}
-		keyGen.initialize(512);
+		keyGen.initialize(KEY_SIZE);
 		return keyGen.generateKeyPair();
 	}
 
 	public static byte[] encrypt(String text, PublicKey key)
 	{
-		byte[] encryptedBytes = null;
+		ArrayList<byte[]> chunkBytesEncrypted = new ArrayList<byte[]>();
+
+		int pos = 0;
+		int encryptedBytesTotalLength = 0;
 
 		try {
 			final Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -82,18 +90,16 @@ public class RsaCrypt {
 			// Zip the text
 			byte[] textBytesZipped = compress(text.getBytes(STRING_ENCODING));
 
-			int pos = 0;
-
 			// Split zipped text into chunks of a maximum length. This is because
 			// the RSA algorithm can only zip 53 bytes.
 			while (pos < textBytesZipped.length)
 			{
 				byte[] chunkBytes = null;
 
-				if (textBytesZipped.length - pos > encryptChunkLength)
+				if (textBytesZipped.length - pos > ENCRYPT_CHUNK_LENGTH)
 				{
-					chunkBytes = new byte[encryptChunkLength];
-					System.arraycopy(textBytesZipped, pos, chunkBytes, 0, encryptChunkLength);
+					chunkBytes = new byte[ENCRYPT_CHUNK_LENGTH];
+					System.arraycopy(textBytesZipped, pos, chunkBytes, 0, ENCRYPT_CHUNK_LENGTH);
 				}
 				else
 				{
@@ -103,38 +109,44 @@ public class RsaCrypt {
 
 				pos += chunkBytes.length;
 
-				byte[] chunkBytesEncrypted = cipher.doFinal(chunkBytes);
-
-				if (encryptedBytes == null)
-				{
-					encryptedBytes = new byte[chunkBytesEncrypted.length + 1];
-					encryptedBytes[0] = (byte)chunkBytesEncrypted.length; // Insert the length of the encrypted chunk
-					System.arraycopy(chunkBytesEncrypted, 0, encryptedBytes, 1, chunkBytesEncrypted.length);
-				}
-				else
-				{
-					byte[] encryptedBytes2 = new byte[encryptedBytes.length + chunkBytesEncrypted.length + 1];
-					System.arraycopy(encryptedBytes, 0, encryptedBytes2, 0, encryptedBytes.length);
-					encryptedBytes2[encryptedBytes.length] = (byte)chunkBytesEncrypted.length;
-					System.arraycopy(chunkBytesEncrypted, 0, encryptedBytes2, encryptedBytes.length+1, chunkBytesEncrypted.length);
-
-					encryptedBytes = encryptedBytes2;
-				}
+				chunkBytesEncrypted.add(cipher.doFinal(chunkBytes));
+				encryptedBytesTotalLength += 
+						chunkBytesEncrypted.get(chunkBytesEncrypted.size() - 1).length 
+						+ CHUNK_LENGTH_BYTE_SIZE;
 			}
 		} catch (Exception e) {
 			return null;
 		}
+		
+		byte[] encryptedBytes = new byte[encryptedBytesTotalLength];
+		pos = 0;
+		
+		for (byte[] chunkBytesEncryptedSingle: chunkBytesEncrypted)
+		{
+			encryptedBytes[pos] = (byte)chunkBytesEncryptedSingle.length;
+			
+			System.arraycopy(
+					chunkBytesEncryptedSingle, 
+					0, 
+					encryptedBytes, 
+					pos + CHUNK_LENGTH_BYTE_SIZE, 
+					chunkBytesEncryptedSingle.length);
+			
+			pos += (chunkBytesEncryptedSingle.length + CHUNK_LENGTH_BYTE_SIZE);
+		}
+		
 		return encryptedBytes;
 	}
-
+	
 	public static String decrypt(byte[] text, PrivateKey key) throws Exception 
 	{
-		byte[] textBytesZipped = null;
+		ArrayList<byte[]> textBytesZipped = new ArrayList<byte[]>(); 
 
 		final Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.DECRYPT_MODE, key);
 
 		int pos = 0;
+		int textBytesZippedTotalLength = 0;
 
 		while (pos < text.length)
 		{	      
@@ -142,30 +154,61 @@ public class RsaCrypt {
 
 			byte[] chunkBytesEncrypted = new byte[chunkLength];
 
-			System.arraycopy(text, pos + 1, chunkBytesEncrypted, 0, chunkLength);
+			System.arraycopy(
+					text, 
+					pos + CHUNK_LENGTH_BYTE_SIZE, 
+					chunkBytesEncrypted, 
+					0, 
+					chunkLength);
 
-			pos+= (chunkLength + 1);
+			pos+= (chunkLength + CHUNK_LENGTH_BYTE_SIZE);
 
-			byte[] chunkBytes = cipher.doFinal(chunkBytesEncrypted);
-
-			if (textBytesZipped == null)
-			{
-				textBytesZipped = new byte[chunkBytes.length];
-				System.arraycopy(chunkBytes, 0, textBytesZipped, 0, chunkBytes.length);
-			}
-			else
-			{
-				byte[] textBytesZipped2 = new byte[textBytesZipped.length + chunkBytes.length];
-				System.arraycopy(textBytesZipped, 0, textBytesZipped2, 0, textBytesZipped.length);
-				System.arraycopy(chunkBytes, 0, textBytesZipped2, textBytesZipped.length, chunkBytes.length);
-
-				textBytesZipped = textBytesZipped2;
-			}
+			textBytesZipped.add(cipher.doFinal(chunkBytesEncrypted));
+			textBytesZippedTotalLength += textBytesZipped.get(textBytesZipped.size()-1).length;
+		}
+		
+		byte[] textBytesZipped2 = new byte[textBytesZippedTotalLength];
+		pos = 0;
+		
+		for (byte[] textBytesZippedSingle: textBytesZipped)
+		{
+			System.arraycopy(
+					textBytesZippedSingle, 
+					0, 
+					textBytesZipped2, 
+					pos, 
+					textBytesZippedSingle.length);
+			
+			pos += textBytesZippedSingle.length;
 		}
 
-		byte[] textBytes = decompress(textBytesZipped);
+		byte[] textBytes = decompress(textBytesZipped2);
 
 		return new String(textBytes, STRING_ENCODING);
+	}
+	
+	public static byte[] encryptIntValue(int value, PublicKey key)
+	{
+		try {
+			Cipher cipher = Cipher.getInstance(ALGORITHM);
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+			
+			byte[] byteArray = ServerUtils.convertIntToByteArray(value);
+			
+			return cipher.doFinal(byteArray);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static int decryptIntValue(byte[] byteArrayEncrypted, PrivateKey key) throws Exception 
+	{
+		final Cipher cipher = Cipher.getInstance(ALGORITHM);
+		cipher.init(Cipher.DECRYPT_MODE, key);
+		
+		byte[] byteArray = cipher.doFinal(byteArrayEncrypted);
+		
+		return ServerUtils.convertByteArrayToInt(byteArray);
 	}
 
 	public static String encodePublicKeyToBase64(PublicKey publicKey)

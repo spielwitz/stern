@@ -113,75 +113,11 @@ public class SternServer // NO_UCD (unused code)
 		
 		RsaCrypt.init();
 		
-		// Wird der Server zum ersten Mal gestartet?
-		File dir = new File(homeDir, FOLDER_NAME_DATA);
-		boolean setupServer = !dir.exists();
-		
-		String serverUrl = null;
-		int port = 0;
-		String adminEmail = null;
-		String locale = null;
-		
-		if (setupServer)
-		{
-			// Ein paar Fragen beantworten
-			while (true)
-			{
-				System.out.println("Deutsch [de] / English [en]: ");
-				
-				String language = this.getInput();
-				
-				if (language.toLowerCase().equals("de"))
-				{
-					locale = "de-DE";
-					break;
-				}
-				else if (language.toLowerCase().equals("en"))
-				{
-					locale = "en-US";
-					break;
-				}
-			}
-			
-			SternResources.setLocale(locale);
-			
-			System.out.println("\n"+SternResources.ServerWillkommen(false)+"\n");
-
-			System.out.print(SternResources.ServerAdminUrl(false)+ " ("+SternResources.ServerVoreingestellt(false)+": "+ServerConstants.SERVER_HOSTNAME+"): ");
-		    serverUrl = this.getInput();
-		    
-		    serverUrl = serverUrl.length() == 0 ?
-		    				ServerConstants.SERVER_HOSTNAME :
-		    				serverUrl;
-			
-		    System.out.print(SternResources.ServerAdminPort(false ) + " ("+SternResources.ServerVoreingestellt(false)+": "+ServerConstants.SERVER_PORT+"): ");
-		    String serverPort = this.getInput();
-		    
-		    port = serverPort.length() == 0 ? 
-		    		ServerConstants.SERVER_PORT :
-		    		Integer.parseInt(serverPort);
-		    
-		    System.out.print(SternResources.ServerEmailAdmin(false)+": ");
-		    adminEmail = this.getInput();
-		    
-		    System.out.println("\n"+SternResources.ServerAdminUrl(false)+": " + serverUrl);
-		    System.out.println(SternResources.ServerAdminPort(false )+": " + port);
-		    System.out.println(SternResources.ServerEmailAdmin(false)+": " + adminEmail);
-		    
-		    System.out.print("\n"+SternResources.ServerInitConfirm(false)+": ");
-		    String ok = this.getInput();
-		    		    
-		    if (!ok.equals("1"))
-		    {
-		    	 System.out.print(SternResources.ServerInitAbort(false));
-		    	 return;
-		    }
-		}
-
+		// Initialisierung der Serverdaten
 		this.initCreateDataFolders();
-		this.initServerConfig(serverUrl, port, adminEmail, locale);
+		this.initServerConfig();
 		this.initReadAllUsers();
-		this.initCreateAdmin(serverUrl, port);
+		this.initCreateAdmin();
 		this.initReadAllGames();
 		
 		this.logMessage(
@@ -287,7 +223,7 @@ public class SternServer // NO_UCD (unused code)
 			dirGame.mkdir();
 	}
 	
-	private void initCreateAdmin(String url, int port)
+	private void initCreateAdmin()
 	{
 		if (!this.adminCreated)
 		{
@@ -313,13 +249,16 @@ public class SternServer // NO_UCD (unused code)
 			aca.userPrivateKey = RsaCrypt.encodePrivateKeyToBase64(userKeyPair.getPrivate());
 			
 			aca.serverPublicKey = serverConfig.serverPublicKey;
-			aca.url = url;
-			aca.port = port;
+			aca.url = serverConfig.url;
+			aca.port = serverConfig.port;
 			
 			File fileClientInfo = Paths.get(
 					homeDir, 
 					FOLDER_NAME_DATA, 
-					ServerUtils.getCredentialFileName(ServerConstants.ADMIN_USER, url, port)).toFile();
+					ServerUtils.getCredentialFileName(
+							ServerConstants.ADMIN_USER, 
+							serverConfig.url, 
+							serverConfig.port)).toFile();
 			
 			try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileClientInfo.getAbsoluteFile())))
 			{
@@ -338,7 +277,7 @@ public class SternServer // NO_UCD (unused code)
 		}
 	}
 	
-	private void initServerConfig(String url, int port, String adminEmail, String locale)
+	private void initServerConfig()
 	{
 		File fileServerCredentials = Paths.get(homeDir, FOLDER_NAME_DATA, ServerConstants.SERVER_CONFIG_FILE).toFile();
 		
@@ -361,6 +300,65 @@ public class SternServer // NO_UCD (unused code)
 		else
 		{
 			// neu anlegen
+			String serverUrl = null;
+			int port = 0;
+			String adminEmail = null;
+			String locale = null;
+			
+			// Ein paar Fragen beantworten
+			while (true)
+			{
+				System.out.println("Deutsch [de] / English [en]: ");
+				
+				String language = this.getInput();
+				
+				if (language.toLowerCase().equals("de"))
+				{
+					locale = "de-DE";
+					break;
+				}
+				else if (language.toLowerCase().equals("en"))
+				{
+					locale = "en-US";
+					break;
+				}
+			}
+			
+			SternResources.setLocale(locale);
+			
+			System.out.println("\n"+SternResources.ServerWillkommen(false)+"\n");
+
+			System.out.print(SternResources.ServerAdminUrl(false)+ " ("+SternResources.ServerVoreingestellt(false)+": "+ServerConstants.SERVER_HOSTNAME+"): ");
+		    serverUrl = this.getInput();
+		    
+		    serverUrl = serverUrl.length() == 0 ?
+		    				ServerConstants.SERVER_HOSTNAME :
+		    				serverUrl;
+			
+		    System.out.print(SternResources.ServerAdminPort(false ) + " ("+SternResources.ServerVoreingestellt(false)+": "+ServerConstants.SERVER_PORT+"): ");
+		    String serverPort = this.getInput();
+		    
+		    port = serverPort.length() == 0 ? 
+		    		ServerConstants.SERVER_PORT :
+		    		Integer.parseInt(serverPort);
+		    
+		    System.out.print(SternResources.ServerEmailAdmin(false)+": ");
+		    adminEmail = this.getInput();
+		    
+		    System.out.println("\n"+SternResources.ServerAdminUrl(false)+": " + serverUrl);
+		    System.out.println(SternResources.ServerAdminPort(false )+": " + port);
+		    System.out.println(SternResources.ServerEmailAdmin(false)+": " + adminEmail);
+		    
+		    System.out.print("\n"+SternResources.ServerInitConfirm(false)+": ");
+		    String ok = this.getInput();
+		    		    
+		    if (!ok.equals("1"))
+		    {
+		    	 System.out.print(SternResources.ServerInitAbort(false));
+		    	 System.exit(0);
+		    }
+			
+			// Jetzt Objekte anlegen
 			KeyPair keyPairRequest = RsaCrypt.getNewKeyPair();
 			
 			serverConfig = new ServerConfiguration();
@@ -372,7 +370,7 @@ public class SternServer // NO_UCD (unused code)
 			serverConfig.serverPrivateKey = RsaCrypt.encodePrivateKeyToBase64(serverConfig.serverPrivateKeyObject);
 			serverConfig.serverPublicKey = RsaCrypt.encodePublicKeyToBase64(keyPairRequest.getPublic());
 			
-			serverConfig.url = url;
+			serverConfig.url = serverUrl;
 			serverConfig.port = port;
 			serverConfig.adminEmail = adminEmail;
 			
@@ -505,10 +503,12 @@ public class SternServer // NO_UCD (unused code)
 			    in = new DataInputStream(this.socket.getInputStream());
 			    out = this.socket.getOutputStream();
 			    
-			    byte[] userBytesLength = new byte[4];
+			    byte[] userBytesLength = new byte[RsaCrypt.BYTE_ARRAY_LENGTH];
 			    in.readFully(userBytesLength);
 			    
-			    int userLength = ServerUtils.convertByteArrayToInt(userBytesLength);
+			    int userLength = RsaCrypt.decryptIntValue(
+			    		userBytesLength, 
+			    		serverConfig.serverPrivateKeyObject);
 			    
 			    byte[] userIdBytes = new byte[userLength]; // User-ID, mit Server-Credentials verschluesselt
 			    in.readFully(userIdBytes);
@@ -616,10 +616,12 @@ public class SternServer // NO_UCD (unused code)
 			// Das vereinbarte Token steckt im Payload			
 			try
 			{
-			    byte[] lengthBytes = new byte[4]; // Laenge des nachfolgenden Payloads
+			    byte[] lengthBytes = new byte[RsaCrypt.BYTE_ARRAY_LENGTH]; // Laenge des nachfolgenden Payloads
 			    in.readFully(lengthBytes);
 			    
-			    int payloadLength = ServerUtils.convertByteArrayToInt(lengthBytes);
+			    int payloadLength = RsaCrypt.decryptIntValue(
+			    		lengthBytes, 
+			    		serverConfig.serverPrivateKeyObject);
 			    payloadBytes = new byte[payloadLength]; // Die eigentliche Nachricht
 			    in.readFully(payloadBytes);
 			}
@@ -846,7 +848,7 @@ public class SternServer // NO_UCD (unused code)
 		    byte[] byteResponse = RsaCrypt.encrypt(resp.toJson(), user.userPublicKeyObject);
 		    
 		    int length = (byteResponse.length); 
-			byte[] lengthBytes = ServerUtils.convertIntToByteArray(length);
+			byte[] lengthBytes = RsaCrypt.encryptIntValue(length, user.userPublicKeyObject);
 
 			try
 			{

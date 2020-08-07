@@ -16,24 +16,8 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
 public class RequestMessageGameHostFinalizeGame
 {
 	public String gameHostUserId;
 	public String gameId;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessageGameHostFinalizeGame fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageGameHostFinalizeGame user = gson.fromJson(json, RequestMessageGameHostFinalizeGame.class);
-		
-		return user;
-	}
 }

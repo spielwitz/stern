@@ -269,7 +269,7 @@ public class Utils
 		return date.getTime();
 	}
 	
-	public static String dateToString(long dateLong)
+	static String dateToString(long dateLong)
 	{
 		Date date = new Date(dateLong);
 		DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM); 

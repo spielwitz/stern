@@ -71,8 +71,7 @@ class ClientSocketManager
 			
 			// Zuerst User ID an den Server schicken.
 			byte[] userIdBytes = RsaCrypt.encrypt(user.userId, user.serverPublicKeyObject);
-					
-			byte[] userIdBytesLength = ServerUtils.convertIntToByteArray(userIdBytes.length);
+			byte[] userIdBytesLength = RsaCrypt.encryptIntValue(userIdBytes.length, user.serverPublicKeyObject);
 
 			out.write(userIdBytesLength);
 			out.write(userIdBytes);
@@ -96,16 +95,16 @@ class ClientSocketManager
 			byte[] payload = RsaCrypt.encrypt(msg.toJson(), user.serverPublicKeyObject);
 			
 			int length = (payload.length); 
-			byte[] lengthBytes = ServerUtils.convertIntToByteArray(length);
+			byte[] lengthBytes = RsaCrypt.encryptIntValue(length, user.serverPublicKeyObject);
 			
 			out.write(lengthBytes);
 			out.write(payload);
 			
 			// Warte auf die Response-Nachricht
-			lengthBytes = new byte[4]; // Laenge des nachfolgenden Payloads
+			lengthBytes = new byte[RsaCrypt.BYTE_ARRAY_LENGTH]; // Laenge des nachfolgenden Payloads
 		    in.readFully(lengthBytes);
 		    
-		    int payloadLength = ServerUtils.convertByteArrayToInt(lengthBytes);
+		    int payloadLength = RsaCrypt.decryptIntValue(lengthBytes, user.userPrivateKeyObject);
 		    payloadBytes = new byte[payloadLength]; // Die eigentliche Nachricht
 		    in.readFully(payloadBytes);
 		  
