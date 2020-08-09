@@ -58,6 +58,8 @@ public class ScreenPainter
 	private static final int			CONSOLE_ZEILENHOEHE = 16;
 	private static final int			CONSOLE_HOEHE = CONSOLE_LINES * CONSOLE_ZEILENHOEHE;
 	
+	private static final int	    PROGRESS_BAR_RAND = 2;
+	
 	private double factor;
 	
 	private Graphics2D dbGraphics;
@@ -184,14 +186,63 @@ public class ScreenPainter
 		int w = SCREEN_SIZE_W - 2 * SPIELFELD_XOFF;
 		
 		this.drawRect(x0, y0, w, CONSOLE_HOEHE);
-
+		this.drawRect(x0, y0, w, CONSOLE_ZEILENHOEHE);
+		
+		// --------------
+		// Console-Inhalt
+		// --------------
+		if (cdc.getEvaluationProgressBar() != null)
+		{
+			ConsoleEvaluationProgressBarDisplayContent pb = cdc.getEvaluationProgressBar();
+			
+			int pbX = x0 + w/2;
+			int pbY = y0 + PROGRESS_BAR_RAND;
+			int pbW = w/2 - PROGRESS_BAR_RAND;
+			int pbH = Math.max(1, CONSOLE_ZEILENHOEHE - 2 * PROGRESS_BAR_RAND) + 1;
+			
+			int wpb = 0;
+			String text = "";
+			
+			if (pb.isJahresbeginn())
+			{
+				wpb = 0;
+				text = SternResources.AuswertungEreignisJahresbeginn2(false);
+			}
+			else if (pb.isJahresenede())
+			{
+				wpb = pbW;
+				text = SternResources.AuswertungEreignisJahresende2(false);
+			}
+			else
+			{
+				wpb = Utils.round(
+						(double) pbW * (double)pb.getTag() / 
+						(double)Constants.ANZ_TAGE_JAHR);
+				text = SternResources.AuswertungEreignisTag2(
+						false,
+						Integer.toString(pb.getTag()),
+						Integer.toString(Constants.ANZ_TAGE_JAHR));
+			}
+			
+			this.drawRect(pbX, pbY, pbW, pbH);
+			this.fillRect(pbX, pbY, wpb, pbH);
+			
+			this.setColor(Colors.get(cdc.getHeaderCol()));
+			
+			this.dbGraphics.setFont(this.fontFelder);
+			
+			int textWidth = fmFelder.stringWidth(text);
+			int textHeight = this.fmFelder.getAscent() - this.fmFelder.getDescent();
+			int textX = Utils.round(
+					this.factor * (pbX + (pbW - textWidth) / 2));
+			int textY = this.consoleGetY(0, y0, textHeight);
+			this.dbGraphics.drawString(text, textX, textY);
+		}
+		
+		// Header
 		this.dbGraphics.setFont(this.fontPlaneten);
 		int fontHeight = this.fmPlaneten.getAscent() - this.fmPlaneten.getDescent();
 		int charWidth = this.fmPlaneten.charWidth('H');
-		
-		// Console-Inhalt
-		// Header
-		this.drawRect(x0, y0, w, CONSOLE_ZEILENHOEHE);
 		
 		this.setColor(Colors.get(cdc.getHeaderCol()));
 		

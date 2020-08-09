@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: HH
+		// Hoechstes vergebenes Symbol: HK
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -558,6 +558,9 @@ public class SternResources
 		symbolDict.put("HF","ServerGamesAbgeschlossen_HF");
 		symbolDict.put("HG","ServerGamesBeendenAys_HG");
 		symbolDict.put("HH","ServerGamesGameFinalized_HH");
+		symbolDict.put("HI","AuswertungEreignisJahresbeginn2_HI");
+		symbolDict.put("HJ","AuswertungEreignisJahresende2_HJ");
+		symbolDict.put("HK","AuswertungEreignisTag2_HK");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -860,7 +863,7 @@ public class SternResources
 	}
 
 	/**
-	   * Flugobjekte starten, Planeten produzieren. [19]
+	   * Flugobjekte starten, die Planeten produzieren Raumer und Energie. [19]
 	   */
 	public static String AuswertungBeginnt(boolean symbol) {
 		return symbol ? "$19$":messages.getString("AuswertungBeginnt_19");
@@ -4231,5 +4234,26 @@ public class SternResources
 	   */
 	public static String ServerGamesGameFinalized(boolean symbol, String arg0) {
 		return symbol ? "$HH§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesGameFinalized_HH"), arg0);
+	}
+
+	/**
+	   * Jahresbeginn [HI]
+	   */
+	public static String AuswertungEreignisJahresbeginn2(boolean symbol) {
+		return symbol ? "$HI$":messages.getString("AuswertungEreignisJahresbeginn2_HI");
+	}
+
+	/**
+	   * Jahresende [HJ]
+	   */
+	public static String AuswertungEreignisJahresende2(boolean symbol) {
+		return symbol ? "$HJ$":messages.getString("AuswertungEreignisJahresende2_HJ");
+	}
+
+	/**
+	   * Tag {0} von {1} [HK]
+	   */
+	public static String AuswertungEreignisTag2(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$HK§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungEreignisTag2_HK"), arg0, arg1);
 	}
 }

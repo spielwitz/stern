@@ -28,6 +28,7 @@ class Console
 	private String headerText;
 	private byte headerCol;
 	private ConsoleModus mode;
+	private ConsoleEvaluationProgressBarDisplayContent evaluationProgressBar;
 	
 	private int outputLine;
 	
@@ -320,7 +321,8 @@ class Console
 						this.headerText,
 						this.headerCol,
 						this.outputLine,
-						(!noCursor && this.mode != ConsoleModus.AUSWERTUNG)),
+						(!noCursor && this.mode != ConsoleModus.AUSWERTUNG),
+						this.evaluationProgressBar),
 				this.isBackground());
 	}
 	
@@ -335,7 +337,27 @@ class Console
 		this.appendText(SternResources.UngueltigeEingabe(true));
 		this.lineBreak();
 	}
-		
+	
+	public void enableEvaluationProgressBar(boolean enabled)
+	{
+		if (enabled)
+			this.evaluationProgressBar = 
+				ConsoleEvaluationProgressBarDisplayContent.setJahrersbeginn();
+		else
+			this.evaluationProgressBar = null;
+	}
+	
+	public void setEvaluationProgressBarDay(int day)
+	{
+		this.evaluationProgressBar = 
+				ConsoleEvaluationProgressBarDisplayContent.setTag(day);
+	}
+	
+	public void setEvaluationProgressBarYearEnd()
+	{
+		this.evaluationProgressBar = 
+				ConsoleEvaluationProgressBarDisplayContent.setJahrersende();
+	}
 
 	
 	enum ConsoleModus

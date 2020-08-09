@@ -4753,6 +4753,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 
 			this.taste();
 			
+			this.spiel.console.enableEvaluationProgressBar(false);
 			this.spiel.console.setModus(Console.ConsoleModus.TEXT_INPUT);
 			
 			this.spiel.archiv.get(this.spiel.jahr).setReplay(this.replay);
@@ -5069,40 +5070,21 @@ public class Spiel extends EmailTransportBase implements Serializable
   				writeEreignisDatumJahresende();
   			else
   			{		
-	  			// this.spiel.console.setLineColor(Colors.INDEX_WEISS);
-					
-				this.spiel.console.appendText(
-					SternResources.AuswertungEreignisTag(
-							true, 
-							Integer.toString(this.spiel.jahr + 1), 
-							Integer.toString(tag)));
-	  			
-				// this.spiel.console.lineBreak();
+  				this.spiel.console.appendText(">>> ");
+  				this.spiel.console.setEvaluationProgressBarDay(tag);
   			}
   		}
   		
   		private void writeEreignisDatumJahresbeginn()
   		{
-  			// this.spiel.console.setLineColor(Colors.INDEX_WEISS);
-				
-			this.spiel.console.appendText(
-					SternResources.AuswertungEreignisJahresbeginn(
-							true, 
-							Integer.toString(this.spiel.jahr + 1)));
-
-  			// this.spiel.console.lineBreak();
+			this.spiel.console.appendText(">>> ");
+			this.spiel.console.enableEvaluationProgressBar(true);
   		}
   		
   		private void writeEreignisDatumJahresende()
   		{
-  			// this.spiel.console.setLineColor(Colors.INDEX_WEISS);
-				
-			this.spiel.console.appendText(
-					SternResources.AuswertungEreignisJahresende(
-							true, 
-							Integer.toString(this.spiel.jahr + 1)));
-
-  			// this.spiel.console.lineBreak();
+  			this.spiel.console.appendText(">>> ");
+			this.spiel.console.setEvaluationProgressBarYearEnd();
   		}
   		
   		private void patrouillenBeobachten(boolean jahresende)
