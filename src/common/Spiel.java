@@ -1638,7 +1638,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						"");
 	}
 	
-	private void pause(int milliseconds)
+	void pause(int milliseconds)
 	{
 		if (!this.console.isBackground())
 			this.spielThread.pause(milliseconds);
@@ -5052,15 +5052,15 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.replay.add(cont);
   		}
   		
-//  		private void pause(int milliseconds)
-//  		{
-//  			this.spiel.console.pause(milliseconds);
-//  			
-//  			ScreenDisplayContent cont = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
-//  			cont.setPlEdit(null);
-//  			cont.setPause(true);
-//			this.replay.add(cont);
-//  		}
+  		private void pause(int milliseconds)
+  		{
+  			this.spiel.console.pause(milliseconds);
+  			
+  			ScreenDisplayContent cont = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
+  			cont.setPlEdit(null);
+  			cont.setPause(true);
+			this.replay.add(cont);
+  		}
   		
   		private void writeEreignisDatum(int tag)
   		{
@@ -5640,7 +5640,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				obj.setZuLoeschen();
 			}
   		}
-  		
+  		  		
   		private void raumerAngriff(AuswertungEreignis ereignis, int plIndex)
   		{
   			Flugobjekt obj = ereignis.obj;
@@ -5648,7 +5648,9 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
   			this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
   			
-			int angr = obj.getAnz();
+  			KampfStruct struct = new KampfStruct();
+  			
+			struct.angr = obj.getAnz();
 			
 			this.spiel.console.setLineColor(pl.getCol(this.spiel.spieler));
 			this.spiel.console.appendText(
@@ -5664,51 +5666,46 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			if (festungStaerke > 0)
 			{
-				this.spiel.console.appendText(
-						SternResources.AuswertungAngriffAngreiferFestung(
-								true, Integer.toString(angr), Integer.toString(festungStaerke)) + " ");
-				this.spiel.console.lineBreak();
+				struct.vert = festungStaerke;
+				struct.festung = true;
 				
-				if (angr >= festungStaerke)
+				this.kampf(struct);
+				
+				if (struct.vert == 0)
 				{
 					// Festung zerstoert
-					angr -= festungStaerke;
 					pl.deleteFestung();
 				}
 				else
 				{
 					// Angriff gescheitert, Festung dezimiert
-					festungStaerke -= angr;
-					angr = 0;
-					
-					if (festungStaerke <= 0)
+					if (struct.vert <= 0)
 						pl.deleteFestung();
 					else
-						pl.setFestungRaumer(festungStaerke);
+						pl.setFestungRaumer(struct.vert);
 					
 				}
 				
-				if (angr <= 0)
+				if (struct.angr <= 0)
 					this.spiel.console.appendText(
 							SternResources.AuswertungAngriffAngriffGescheitert(true));
 			}
 
 			Kommandozentrale kz = null;
 			
-			if (angr > 0)
+			if (struct.angr > 0)
 			{			
+				struct.festung = false;
+				
 				// Angreifer stellt sich den regulären Truppen
-				int vert = pl.getAnz(ObjektTyp.RAUMER);
+				struct.vert = pl.getAnz(ObjektTyp.RAUMER);
 				
-				this.spiel.console.appendText(
-						SternResources.AuswertungAngriffAngreiferPlanet(
-								true, Integer.toString(angr), Integer.toString(vert)));
-				this.spiel.console.lineBreak();
+				this.kampf(struct);
 				
-				if (angr > vert)
+				if (struct.angr > struct.vert)
 				{
 					// Verluste von der Flotte abziehen
-					obj.subtractRaumer(vert,obj.getBes());
+					obj.subtractRaumer(obj.getAnz() - struct.angr,obj.getBes());
 					
 					// Eigentum uebertragen. Evtl. Produktion halbieren, wenn Planet wieder neutral ist
 					kz = pl.erobert(this.spiel.anzSp, obj.getBes(), obj);
@@ -5721,17 +5718,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 				else
 				{
 					// Raumer auf Planet reduzieren
-					pl.subtractRaumer(this.spiel.anzSp, angr, pl.getBes(), true);
+					pl.subtractRaumer(this.spiel.anzSp, pl.getAnz(ObjektTyp.RAUMER) - struct.vert, pl.getBes(), true);
 					
 					this.spiel.console.appendText(
 							SternResources.AuswertungAngriffAngriffGescheitert(true));					
 				}
 			}
 			
-			this.taste();
-			
 			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
 			this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+			
+			this.taste();
 			
 			if (kz != null)
 				this.kommandozentraleErobert(
@@ -5739,6 +5736,66 @@ public class Spiel extends EmailTransportBase implements Serializable
 						obj.getBes(), 
 						false,
 						ereignis.getTag());
+  		}
+  		
+  		private void kampf(KampfStruct struct)
+  		{
+  			boolean ersterDurchgang = true;
+  			
+			do
+			{
+				if (struct.festung)
+	  			{
+		  			this.spiel.console.appendText(
+							SternResources.AuswertungAngriffAngreiferFestung(
+									true, Integer.toString(struct.angr), Integer.toString(struct.vert)) + " ");
+	  			}
+	  			else
+	  			{
+	  				this.spiel.console.appendText(
+							SternResources.AuswertungAngriffAngreiferPlanet(
+									true, Integer.toString(struct.angr), Integer.toString(struct.vert)));
+	  			}
+				
+				if (struct.angr == 0 || struct.vert == 0)
+				{
+					this.spiel.console.lineBreak();
+					break;
+				}
+				
+				this.pause(Constants.PAUSE_MILLISECS);
+				
+				if (ersterDurchgang)
+				{
+					this.spiel.console.lineBreak();
+					ersterDurchgang = false;
+				}
+				else
+					this.spiel.console.deleteLine();
+				
+				int saMax = Math.max(1, Utils.round((double)struct.angr / (double)6));
+				int sbMax = Math.max(1, Utils.round((double)struct.vert *  Constants.VERT_BONUS / (double)6));
+				
+				int sa = Utils.random(saMax) + 1;
+				int sb = Utils.random(sbMax) + 1;
+				
+				struct.angr -= sb;
+				struct.vert -= sa;
+				
+				if (struct.angr < 0)
+					struct.angr = 0;
+				if (struct.vert < 0)
+					struct.vert = 0;
+				
+			} while (true);
+
+  		}
+  		
+  		private class KampfStruct
+  		{
+  			public int angr;
+  			public int vert;
+  			public boolean festung;
   		}
   		
   		private void mineLegen(Flugobjekt obj)

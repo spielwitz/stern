@@ -46,6 +46,7 @@ import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.ServerFunctions;
 import commonUi.SpringUtilities;
+import commonUi.TextFieldDark;
 
 @SuppressWarnings("serial") class ServerSettingsJDialog extends JDialog implements ChangeListener, ActionListener
 {
@@ -100,12 +101,12 @@ import commonUi.SpringUtilities;
 		panServerCodes.setLayout(new SpringLayout());
 		
 		panServerCodes.add(new LabelDark(SternResources.ServerSettingsJDialogIpServer(false), font));
-		panServerCodes.add(new LabelDark(serverFunctions.getMeineIp(), font));
+		panServerCodes.add(new TextFieldDark(serverFunctions.getMeineIp(), font, false));
 		
 		panServerCodes.add(new LabelDark(SternResources.ThinClientCode(false), font));
-		panServerCodes.add(new LabelDark(serverFunctions.getClientCode(), font));
+		panServerCodes.add(new TextFieldDark(serverFunctions.getClientCode(), font, false));
 		
-		SpringUtilities.makeGrid(panServerCodes,
+		SpringUtilities.makeCompactGrid(panServerCodes,
                 2, 2, //rows, cols
                 5, 5, //initialX, initialY
                 20, 5);//xPad, yPad

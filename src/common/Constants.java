@@ -21,14 +21,14 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	MIN_BUILD = "202008081000";
+	public static final String 	MIN_BUILD = "202009270000";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	RECOMMENDED_BUILD = "202008081000";
+	public static final String 	RECOMMENDED_BUILD = "202009270000";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
-	static final String 		MIGRATION_BUILD_LIMIT = "202005280000";
+	static final String 		MIGRATION_BUILD_LIMIT = "202009270000";
 	
 	public static final String 	STERN_URL = "https://stern.dyndns1.de";
 	public static final String 	NO_BUILD_INFO = "000000000000";
@@ -59,11 +59,12 @@ public class Constants
 	public static final int SPIELER_NAME_MIN_LAENGE = 3;
 	public static final int SPIELER_NAME_MAX_LAENGE = 10;
 	static final int 		PLANETEN_NAME_MAX_LAENGE = 5;
-	public static final String SPIELER_REGEX_PATTERN = "[0-9a-zA-Z]*";
+	public static final 	String SPIELER_REGEX_PATTERN = "[0-9a-zA-Z]*";
 	static final int 		EPROD_MAX = 100;
 	static final int 		ANZ_NAHE_PLANETEN_MAX_REISEDAUER_JAHRE = 2;
 	static final int 		ANZ_NAHE_PLANETEN = 4;
 	static final int 		SENDER_JAHRE = 5;
+	static final double		VERT_BONUS = 1.25;
 	
 	// Default-Werte bei neuem Spiel
 	public static final int DEFAULT_ANZAHL_PLANETEN = 42;

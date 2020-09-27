@@ -83,6 +83,11 @@ class Console
 		this.textCol[outputLine] = currentCol; 		
 	}
 	
+	public void deleteLine()
+	{
+		this.text[outputLine] = "";
+	}
+	
 	@SuppressWarnings("unchecked") ConsoleInput waitForKeyPressed(
 			ArrayList<ConsoleKey> allowedKeys, 
 			boolean hidden)
@@ -136,6 +141,14 @@ class Console
 			this.keys.add(new ConsoleKey("ESC", SternResources.Abbrechen(true)));
 		
 		this.keyInput(1, false, true, "");
+	}
+	
+	public void pause(int milliseconds)
+	{
+		this.keys = new ArrayList<ConsoleKey>();
+		this.updateScreen(true);
+		
+		this.parent.pause(milliseconds);
 	}
 	
 	boolean waitForTasteReplay()
