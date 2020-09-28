@@ -417,6 +417,9 @@ public class ScreenPainter
 		
 		// Linien mit Objekten
 		this.zeichneLinienObjekte(sdc.getLines());		
+		
+		// Punkte
+		this.zeichnePunkte(sdc.getPoints());
 
 	}
 
@@ -928,7 +931,6 @@ public class ScreenPainter
 		
 		for (Point2D.Double point: points)
 		{
-			//this.setColor(new Color(Constants.FARBE_WEISS));
 			this.drawCircleSpielfeld(point, 0.8, Color.white);
 			
 			this.setColor(Color.white);
@@ -1046,7 +1048,18 @@ public class ScreenPainter
 			// Zeichne Punkt
 			this.fillCircleSpielfeld(line.getPos(), LINIE_OBJEKT_RADIUS, Color.black);
 			this.drawCircleSpielfeld(line.getPos(), LINIE_OBJEKT_RADIUS, Colors.get(line.getCol()));
-			//this.drawCircleSpielfeld(line.getPos(), LINIE_OBJEKT_RADIUS, Constants.FARBE_WEISS);
+		}
+	}
+	
+	private void zeichnePunkte(ArrayList<SpielfeldPointDisplayContent> points)
+	{
+		if (points == null)
+			return;
+		
+		for (SpielfeldPointDisplayContent point: points)
+		{
+			this.fillCircleSpielfeld(point.getPos(), LINIE_OBJEKT_RADIUS, Color.black);
+			this.drawCircleSpielfeld(point.getPos(), LINIE_OBJEKT_RADIUS, Colors.get(point.getCol()));
 		}
 	}
 	

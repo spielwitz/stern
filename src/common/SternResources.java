@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: HK
+		// Hoechstes vergebenes Symbol: HP
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -561,6 +561,11 @@ public class SternResources
 		symbolDict.put("HI","AuswertungEreignisJahresbeginn2_HI");
 		symbolDict.put("HJ","AuswertungEreignisJahresende2_HJ");
 		symbolDict.put("HK","AuswertungEreignisTag2_HK");
+		symbolDict.put("HL","ZugeingabeObjekteAusblenden_HL");
+		symbolDict.put("HM","ZugeingabeObjekteAusblendenAn_HM");
+		symbolDict.put("HN","ZugeingabeObjekteAusblendenAus_HN");
+		symbolDict.put("HO","ZugeingabeObjekteAusblendenAlleAus_HO");
+		symbolDict.put("HP","ZugeingabeObjekteAusblendenAlleAn_HP");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4255,5 +4260,40 @@ public class SternResources
 	   */
 	public static String AuswertungEreignisTag2(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$HK§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungEreignisTag2_HK"), arg0, arg1);
+	}
+
+	/**
+	   * Flugobjekte aus-/einblenden [HL]
+	   */
+	public static String ZugeingabeObjekteAusblenden(boolean symbol) {
+		return symbol ? "$HL$":messages.getString("ZugeingabeObjekteAusblenden_HL");
+	}
+
+	/**
+	   * an [HM]
+	   */
+	public static String ZugeingabeObjekteAusblendenAn(boolean symbol) {
+		return symbol ? "$HM$":messages.getString("ZugeingabeObjekteAusblendenAn_HM");
+	}
+
+	/**
+	   * aus [HN]
+	   */
+	public static String ZugeingabeObjekteAusblendenAus(boolean symbol) {
+		return symbol ? "$HN$":messages.getString("ZugeingabeObjekteAusblendenAus_HN");
+	}
+
+	/**
+	   * Alle aus [HO]
+	   */
+	public static String ZugeingabeObjekteAusblendenAlleAus(boolean symbol) {
+		return symbol ? "$HO$":messages.getString("ZugeingabeObjekteAusblendenAlleAus_HO");
+	}
+
+	/**
+	   * Alle an [HP]
+	   */
+	public static String ZugeingabeObjekteAusblendenAlleAn(boolean symbol) {
+		return symbol ? "$HP$":messages.getString("ZugeingabeObjekteAusblendenAlleAn_HP");
 	}
 }

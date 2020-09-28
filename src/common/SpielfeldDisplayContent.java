@@ -25,17 +25,20 @@ import java.util.ArrayList;
 	private ArrayList<SpielfeldPlanetDisplayContent> p;
 	private ArrayList<PointLowRes> m; // Markierte Felder
 	private ArrayList<SpielfeldLineDisplayContent> l;
+	private ArrayList<SpielfeldPointDisplayContent> o;
 	private ArrayList<MinenfeldDisplayContent> n;
 	
 	SpielfeldDisplayContent(
 			ArrayList<SpielfeldPlanetDisplayContent> planets,
 			ArrayList<Point2D.Double> markedFields,
 			ArrayList<SpielfeldLineDisplayContent> lines,
+			ArrayList<SpielfeldPointDisplayContent> points,
 			ArrayList<MinenfeldDisplayContent> minen) {
 
 		this.p = planets;
 		this.m = markedFields == null ? null : PointLowRes.toArrayList(markedFields);
 		this.l = lines;
+		this.o = points;
 		this.n = minen;
 	}
 
@@ -49,6 +52,10 @@ import java.util.ArrayList;
 
 	public ArrayList<SpielfeldLineDisplayContent> getLines() {
 		return l;
+	}
+	
+	public ArrayList<SpielfeldPointDisplayContent> getPoints() {
+		return o;
 	}
 
 	public ArrayList<MinenfeldDisplayContent> getMinen() {

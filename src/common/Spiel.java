@@ -78,6 +78,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	transient private boolean goToReplay;
 	
+	transient private BitSet flugobjekteSpielerAusgeblendet; 
+	
 	transient private Flugzeit[][] distanzMatrix;
 	transient private int[][] distanzMatrixJahre;
 		
@@ -170,7 +172,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spielThread.checkMenueEnabled();
 			
 			this.updateSpielfeldDisplayNeuesSpiel();
-			this.updatePlanetenlisteDisplay(true, this.isSimple());
+			this.updatePlanetenlisteDisplay(true);
 			
 			this.console.clear();
 			this.console.appendText(
@@ -450,7 +452,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.maxJahre = maxJahre;
 		
 		this.updateSpielfeldDisplay();
-		this.updatePlanetenlisteDisplay(false, this.isSimple());
+		this.updatePlanetenlisteDisplay(false);
 	}
 	
 	private int[] getPlanetenSortiert()
@@ -908,7 +910,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		do
 		{
 			this.updateSpielfeldDisplay();
-			this.updatePlanetenlisteDisplay(false, this.isSimple());
+			this.updatePlanetenlisteDisplay(false);
 			
 			this.console.clear();
 			
@@ -1214,17 +1216,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 		
 	private void updateSpielfeldDisplay ()
 	{
-		this.updateSpielfeldDisplay(null, null);
+		this.updateSpielfeldDisplay(null, null, 0);
 	}
 	
-	private void updateSpielfeldDisplay (Hashtable<Integer,ArrayList<Byte>> frames)
+	private void updateSpielfeldDisplay (Hashtable<Integer,ArrayList<Byte>> frames, int tag)
 	{
-		this.updateSpielfeldDisplay(frames, null);
+		this.updateSpielfeldDisplay(frames, null, tag);
 	}
 	
-	private void updateSpielfeldDisplay (ArrayList<Point2D.Double> markedField)
+	private void updateSpielfeldDisplay (ArrayList<Point2D.Double> markedField, int tag)
 	{
-		this.updateSpielfeldDisplay(null, markedField);
+		this.updateSpielfeldDisplay(null, markedField, tag);
 	}
 	
 	private void updateSpielfeldDisplayNeuesSpiel()
@@ -1259,6 +1261,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				new SpielfeldDisplayContent(plData,
 				null,
 				null,
+				null,
 				null));
 		
 		this.spielThread.updateDisplay(this.screenDisplayContent);
@@ -1266,7 +1269,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private void updateSpielfeldDisplay (
 			Hashtable<Integer, ArrayList<Byte>> frames, 
-			ArrayList<Point2D.Double> markedField)
+			ArrayList<Point2D.Double> markedField, int tag)
 	{
 		ArrayList<SpielfeldPlanetDisplayContent> plData = new ArrayList<SpielfeldPlanetDisplayContent>(this.anzPl);
 		
@@ -1298,22 +1301,29 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 		}
 		
-		//Flugobjekte zeichnen (nur bei Simple-Stern)
-		ArrayList<SpielfeldLineDisplayContent> lines = new ArrayList<SpielfeldLineDisplayContent>();
+		//Flugobjekte zeichnen
+		ArrayList<SpielfeldPointDisplayContent> points = new ArrayList<SpielfeldPointDisplayContent>();
 
-		if (this.optionen.contains(SpielOptionen.SIMPEL))
+		for (Flugobjekt obj: this.objekte)
 		{
-			for (Flugobjekt obj: this.objekte)
+			if (obj.istZuLoeschen() || obj.getNeu()
+				|| obj.getTyp() == ObjektTyp.KAPITULATION)
+				continue;
+			
+			int bes = obj.getBes();
+			
+			if (this.flugobjekteSpielerAusgeblendet != null &&
+				this.flugobjekteSpielerAusgeblendet.get(bes))
 			{
-				if (obj.istZuLoeschen() || obj.getNeu()
-					|| obj.getTyp() == ObjektTyp.KAPITULATION)
-					continue;
-				
-				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
-	 					null, null, obj.getExactPos(), Colors.INDEX_WEISS);
-				
-				lines.add(line);
+				// Objekte eines Spielers sollen nicht angezeigt werden
+				continue;
 			}
+			
+			SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
+ 					obj.getExactPos(tag), 
+ 					this.spieler[obj.getBes()].getColIndex());
+			
+			points.add(point);
 		}
 				
 		if (this.screenDisplayContent == null)
@@ -1322,14 +1332,15 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.screenDisplayContent.setSpielfeld(
 				new SpielfeldDisplayContent(plData,
 				markedField,
-				lines, // lines, wenn Flugobjekte gezeichnet werden sollen, sonst null.
+				null, // lines, wenn Flugobjekte gezeichnet werden sollen, sonst null.
+				points,
 				null));
 		
 		if (!this.console.isBackground())
 			this.spielThread.updateDisplay(this.screenDisplayContent);
 	}
 	
-	private void updatePlanetenlisteDisplay (boolean newGame, boolean showNeutral)
+	private void updatePlanetenlisteDisplay (boolean newGame)
 	{
 		ArrayList<String> text = new ArrayList<String>();
 		ArrayList<Byte> textCol = new ArrayList<Byte>();
@@ -1341,9 +1352,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 		
 	    for (int i = Constants.BESITZER_NEUTRAL; i < this.anzSp; i++)
 		{
-	    	if (i == Constants.BESITZER_NEUTRAL && !showNeutral)
-	    		continue;
-	    	
 			int sp = i == Constants.BESITZER_NEUTRAL ? Constants.BESITZER_NEUTRAL : reihenfolge[i];
 			boolean ersteZeile = true;
 			
@@ -1359,12 +1367,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 				if (ersteZeile)
 				{
-					if (sp == Constants.BESITZER_NEUTRAL)
-					{
-						text.add(SternResources.Neutral(false));
-						textCol.add(Colors.INDEX_NEUTRAL);
-					}
-					else
+					if (sp != Constants.BESITZER_NEUTRAL)
 					{
 						text.add(this.spieler[sp].getName());
 						textCol.add(this.spieler[sp].getColIndex());
@@ -2516,7 +2519,9 @@ public class Spiel extends EmailTransportBase implements Serializable
  				// Gibt es noch gestoppte Objekte?
  				boolean raus = this.gestoppteObjekte();
 				if (raus)
+				{
 					return true;
+				}
 		
  				ConsoleInput consoleInput = this.spiel.console.waitForKeyPressed(keys, true);
 				String input = consoleInput.getInputText().toUpperCase();
@@ -2558,13 +2563,15 @@ public class Spiel extends EmailTransportBase implements Serializable
 				{
 					raus = this.undo();
 					if (raus)
+					{
 						return true;
+					}
 				}
 				else
-						this.spiel.console.outUngueltigeEingabe();
+					this.spiel.console.outUngueltigeEingabe();
 				
 				if (spiel.emailSpieler)
-					spiel.updatePlanetenlisteDisplay(false, spiel.isSimple());
+					spiel.updatePlanetenlisteDisplay(false);
 
  			} while (!exit);
  			
@@ -2580,7 +2587,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			keys.add(new ConsoleKey("ESC",SternResources.Zurueck(true)));
 			
-			keys.add(new ConsoleKey("0",SternResources.ZugeingabeRaumerAufPlanet(true)));
+			keys.add(new ConsoleKey("8",SternResources.ZugeingabeObjekteAusblenden(true)));
 			keys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
 			keys.add(new ConsoleKey("-",SternResources.ZugeingabeKapitulieren(true)));
 	
@@ -2600,8 +2607,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.clear();
 					exit = true;
 				}
-				else if (input.equals("0"))
-					this.raumerAnzeigen();
+				else if (input.equals("8"))
+					this.objekteAusblenden();
 				else if (input.equals("9"))
 					this.inventur();
 				else if (input.equals("-"))
@@ -2661,63 +2668,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 			this.spiel.console.appendText(SternResources.ZugeingabeStartErfolgreich(true));
 			this.spiel.console.lineBreak();
- 		}
- 		
- 		private void raumerAnzeigen()
- 		{
- 			// Einstieg: Startplanet
- 			this.spiel.console.setHeaderText(
- 					this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Zugeingabe(true)+" " + this.spiel.spieler[this.spielerJetzt].getName() + " -> "+SternResources.ZugeingabeRaumerAufPlanet(true),
- 					this.spiel.spieler[this.spielerJetzt].getColIndex());
-
- 			this.spiel.console.clear();
-
- 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
-
- 			int plIndex = -1;
- 			Planet pl = null;
-
- 			do
- 			{
- 				this.spiel.console.appendText(SternResources.ZugeingabePlanet(true)+": ");
-
- 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.emailSpieler, true);
-
- 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
- 				{
- 					this.spiel.console.outAbbruch();
- 					plIndex = -1;
- 					return;
- 				}
-
- 				plIndex = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
- 				if (plIndex < 0 || plIndex >= this.spiel.anzPl)
- 				{
- 					this.spiel.console.outUngueltigeEingabe();
- 					continue;
- 				}
-
- 				pl = this.spiel.planeten[plIndex];
-
- 				if (pl.getBes() != this.spielerJetzt && 
- 				   !pl.hatSender(this.spielerJetzt, this.spiel.jahr))
- 				{
- 					console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
- 					console.lineBreak();
- 					continue;
- 				}
-
- 				break;
- 			} while (true);
-
- 			if (plIndex < 0)
- 				return;
-
- 			console.appendText((SternResources.ZugeingabeRaumerAnzeigen(
- 					true, 
- 					Integer.toString(pl.getAnz(ObjektTyp.RAUMER)))));
- 			console.lineBreak();
  		}
  		
  		private void emailMenu()
@@ -3828,6 +3778,76 @@ public class Spiel extends EmailTransportBase implements Serializable
  			new Inventur(this.spiel, this.spielerJetzt);
  		}
  		
+ 		private void objekteAusblenden()
+ 		{
+ 			this.spiel.console.setHeaderText(
+ 					this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Zugeingabe(true)+" " + this.spiel.spieler[this.spielerJetzt].getName() + " -> "+SternResources.ZugeingabeObjekteAusblenden(true),
+ 					this.spiel.spieler[this.spielerJetzt].getColIndex());
+
+ 			this.spiel.console.clear();
+			this.spiel.flugobjekteSpielerAusgeblendet = new BitSet(this.spiel.anzSp);
+ 			
+ 			do
+ 			{
+	 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
+				
+				keys.add(new ConsoleKey("ESC",SternResources.Zurueck(true)));
+				keys.add(new ConsoleKey("-",SternResources.ZugeingabeObjekteAusblendenAlleAus(true)));
+				keys.add(new ConsoleKey("+",SternResources.ZugeingabeObjekteAusblendenAlleAn(true)));
+		 				
+				for (int i = 1; i <= spiel.anzSp; i++)
+				{
+					String onOff = 
+							spiel.flugobjekteSpielerAusgeblendet.get(i-1) ?
+									SternResources.ZugeingabeObjekteAusblendenAn(true) :
+									SternResources.ZugeingabeObjekteAusblendenAus(true);
+					keys.add(
+							new ConsoleKey(
+									Integer.toString(i), 
+								spiel.spieler[i-1].getName() + " " + onOff));
+				}
+				
+				ConsoleInput input = this.spiel.console.waitForKeyPressed(keys, false);
+				
+				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+					break;
+				
+				String key = input.getInputText().toLowerCase();
+				boolean error = false;
+				
+				if (key.equals("+"))
+					this.spiel.flugobjekteSpielerAusgeblendet.clear();
+				else if (key.equals("-"))
+					this.spiel.flugobjekteSpielerAusgeblendet.set(0, spiel.anzSp);
+				else
+				{
+					try
+					{
+						int sp = Integer.parseInt(key) - 1;
+						
+						if (sp < 0 || sp >= spiel.anzSp)
+							error = true;
+						else
+							this.spiel.flugobjekteSpielerAusgeblendet.flip(sp);
+					}
+					catch (Exception x)
+					{
+						error = true;
+					}
+				}
+				
+				if (error)
+					this.spiel.console.outUngueltigeEingabe();
+				else
+					this.spiel.updateSpielfeldDisplay();
+				
+ 			} while (true);
+ 			
+ 			this.spiel.flugobjekteSpielerAusgeblendet = null;
+ 			this.spiel.updateSpielfeldDisplay();
+ 			this.spiel.console.clear();
+ 		}
+ 		
  		private boolean gestoppteObjekte()
  		{
  			boolean zugeingabeVerlassen = false;
@@ -3851,7 +3871,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				// Position markieren
  				ArrayList<Point2D.Double> markedFields = new ArrayList<Point2D.Double>();
  				markedFields.add(Utils.toPoint2D(obj.getStart()));
- 				this.spiel.updateSpielfeldDisplay(markedFields);
+ 				this.spiel.updateSpielfeldDisplay(markedFields, 0);
  				
  				// Console-Keys
  				ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
@@ -4641,12 +4661,15 @@ public class Spiel extends EmailTransportBase implements Serializable
 				pl.produziereRaumer();
 			}
 			
-			// Das Kennzeichen "Neu" bei allen Flugobjekten loeschen
+			// Die Kennzeichen "Neu" und "Bewegt" bei allen Flugobjekten loeschen
 			for (Flugobjekt obj: this.spiel.objekte)
+			{
 				obj.resetNeu();
+				obj.resetBewegt();
+			}
 			
 			// Alle Bildschirminhalte aktualisieren
-			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
+			this.spiel.updatePlanetenlisteDisplay(false);
 			this.spiel.updateSpielfeldDisplay();
 			
 			// Buendnisse aufraeumen
@@ -4743,8 +4766,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 
 			// Ende der Auwertung
+			// Kennzeichen "Bewegt" bei allen Flugobjekten loeschen
+			for (Flugobjekt obj: this.spiel.objekte)
+			{
+				obj.resetBewegt();
+			}
+			
 			this.spiel.updateSpielfeldDisplay();
-			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
+			this.spiel.updatePlanetenlisteDisplay(false);
 			
 			this.checkSpielerTot();
 
@@ -4838,7 +4867,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		  						
   		  						if (!ok)
   		  						{
-  		  							this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(obj.getSpl(), Colors.INDEX_WEISS));
+  		  							this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(obj.getSpl(), Colors.INDEX_WEISS), 0);
   		  							this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
   		  							this.spiel.console.appendText(
   		  								SternResources.AuswertungRaumerNichtGestartet(true,
@@ -4853,7 +4882,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		  						// Kein Buendnisraumer
   		  						if (pl.getRaumerProSpieler(obj.getBes()) < obj.getAnz())
   		  						{
-  		  							this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(obj.getSpl(), Colors.INDEX_WEISS));
+  		  							this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(obj.getSpl(), Colors.INDEX_WEISS), 0);
   		  							this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
   		  							this.spiel.console.appendText(
 		  								SternResources.AuswertungRaumerNichtGestartet(true,
@@ -4891,7 +4920,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		  				// Buendnis geaendert
   		  				if (!this.spiel.planeten[zug.getPlIndex()].spielzugUebernahmeBuendnis(spieler, zug.getBuendnis()))
   		  				{
-  		  					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(spieler, Colors.INDEX_WEISS));
+  		  					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(spieler, Colors.INDEX_WEISS), 0);
   							this.spiel.console.setLineColor(this.spiel.spieler[spieler].getColIndex());
   							
   							this.spiel.console.appendText(
@@ -4942,7 +4971,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 
   						this.spiel.objekte.add(obj);
   						
-  						this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+  						this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS), 0);
   						
   	 	 				this.spiel.console.setLineColor(this.spiel.spieler[sp].getColIndex());
   	 	 				
@@ -5185,7 +5214,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					// Sektor markieren
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleMarkedField(
-									ereignis.markierungPos));
+									ereignis.markierungPos),
+							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 					
 					this.spiel.console.appendText(
 							SternResources.AuswertungPatrouillePatrouilleZerstoert(true));
@@ -5199,7 +5229,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					// Meldung machen. Kleinobjekte kapern
 					// Feld markieren
 					this.spiel.updateSpielfeldDisplay(
-							this.spiel.getSimpleMarkedField(ereignis.markierungPos));
+							this.spiel.getSimpleMarkedField(ereignis.markierungPos),
+							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 					
 					this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
 					this.spiel.console.appendText(
@@ -5369,7 +5400,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				return;
 			
 			// Spielfeld aktualisieren
-			this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleMarkedField(feld));
+			this.spiel.updateSpielfeldDisplay(
+					this.spiel.getSimpleMarkedField(feld),
+					ereignis.getTag());
 			
 			// Taste.
 			this.taste();
@@ -5396,7 +5429,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 				if (pl.getBes() == obj.getBes())
 				{
-					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+							ereignis.getTag());
 					
 					pl.incObjekt(obj.getTyp(), 1);
 					
@@ -5425,7 +5460,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				this.writeEreignisDatum(ereignis.getTag());
 				this.spiel.console.setLineColor(this.getColByPlanet(pl));
 				
-				this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+				this.spiel.updateSpielfeldDisplay(
+						this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+						ereignis.getTag());
 				
 				// Energie uebertragen
 				pl.addEvorrat(obj.getAnz());
@@ -5477,7 +5514,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 						this.writeEreignisDatum(ereignis.getTag());
 						this.spiel.console.setLineColor(this.getColByPlanet(pl));
 						
-						this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+						this.spiel.updateSpielfeldDisplay(
+								this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+								ereignis.getTag());
 						if (obj.getBes() == pl.getBes())
 						{
 							pl.incObjekt(obj.getTyp(), 1);
@@ -5503,7 +5542,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.writeEreignisDatum(ereignis.getTag());
 					this.spiel.console.setLineColor(this.getColByPlanet(pl));
 					
-					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+							ereignis.getTag());
 					this.spiel.console.appendText(
 						SternResources.AuswertungPatrouilleZerschellt(
 								true, 
@@ -5522,7 +5563,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 				if (obj.isTransfer())
 				{
-					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+							ereignis.getTag());
 					if (obj.getBes() == pl.getBes())
 					{
 						pl.incObjekt(obj.getTyp(), 1);
@@ -5594,7 +5637,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				else
 				{
-					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+							ereignis.getTag());
 					
 					this.writeEreignisDatum(ereignis.getTag());
 					this.spiel.console.setLineColor(this.getColByPlanet(pl));
@@ -5622,7 +5667,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.planeten[obj.getZpl()].istBuendnisMitglied(obj.getBes()))
 				{
 					// Freund
-					this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+							ereignis.getTag());
 					this.spiel.planeten[obj.getZpl()].mergeRaumer(this.spiel.anzSp, obj);
 					
 					this.spiel.console.appendText(
@@ -5630,7 +5677,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 									Integer.toString(obj.getAnz()),
 									this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 					
-					this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
+					this.spiel.updatePlanetenlisteDisplay(false);
 					this.taste();
 				}
 				else
@@ -5646,7 +5693,9 @@ public class Spiel extends EmailTransportBase implements Serializable
   			Flugobjekt obj = ereignis.obj;
   			Planet pl = this.spiel.planeten[plIndex];
   			
-  			this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+  			this.spiel.updateSpielfeldDisplay(
+  					this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+  					ereignis.getTag());
   			
   			KampfStruct struct = new KampfStruct();
   			
@@ -5725,8 +5774,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 			}
 			
-			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
-			this.spiel.updateSpielfeldDisplay(this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS));
+			this.spiel.updatePlanetenlisteDisplay(false);
+			this.spiel.updateSpielfeldDisplay(
+					this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
+					ereignis.getTag());
 			
 			this.taste();
 			
@@ -5869,7 +5920,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				pl.spielerwechsel(spVerlierer, spGewinner);
   			}
   				
-  			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
+  			this.spiel.updatePlanetenlisteDisplay(false);
   			this.spiel.updateSpielfeldDisplay();
   			
   			this.taste();
@@ -6040,7 +6091,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					break;
 			}
 			
-			this.spiel.updatePlanetenlisteDisplay(false, this.spiel.isSimple());
+			this.spiel.updatePlanetenlisteDisplay(false);
 			this.spiel.updateSpielfeldDisplay();
  		}
  		
@@ -6099,7 +6150,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				this.spiel.console.clear();
  				
  				this.spiel.updateSpielfeldDisplay();
- 				this.spiel.updatePlanetenlisteDisplay(false, simpel);
+ 				this.spiel.updatePlanetenlisteDisplay(false);
  				
  				this.spiel.console.setHeaderText(
  						this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true), Colors.INDEX_NEUTRAL);
@@ -6192,6 +6243,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					null,
+ 					null,
  					null));
  			
  			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
@@ -6204,7 +6256,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			this.spiel.console.setHeaderText(
  					this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenNeutralePlanetenTitel(true), Colors.INDEX_NEUTRAL);
  			
- 			this.spiel.updatePlanetenlisteDisplay(false, true);
+ 			this.spiel.updatePlanetenlisteDisplay(false);
 
  			this.spiel.console.waitForTaste();
  		}
@@ -6242,6 +6294,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
+ 					null,
  					null,
  					null,
  					minen));
@@ -6283,6 +6336,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
+ 					null,
  					null,
  					null,
  					null));
@@ -6366,6 +6420,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
+ 					null,
  					null,
  					null,
  					null));
@@ -6473,6 +6528,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					lines,
+ 					null,
  					null));
  			
  			
@@ -6542,6 +6598,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					lines,
+ 					null,
  					null));
  			
  			
@@ -6761,6 +6818,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			ArrayList<Flugzeit> restflugzeiten = new ArrayList<Flugzeit>();
   			ArrayList<Flugobjekt> objekte = new ArrayList<Flugobjekt>();
   			ArrayList<SpielfeldLineDisplayContent> lines = new ArrayList<SpielfeldLineDisplayContent>();
+  			ArrayList<SpielfeldPointDisplayContent> points = new ArrayList<SpielfeldPointDisplayContent>();
   			
   			for (Flugobjekt obj: spiel.objekte)
   			{
@@ -6770,13 +6828,14 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!obj.istBeteiligt(spieler))
   				{
   					// Fremde Objekte als Punkte hinzufuegen (nur bei Simple-Stern)
-  					if (spiel.optionen.contains(SpielOptionen.SIMPEL))
-  					{
-		  				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
-			 	 					null, null, obj.getExactPos(), Colors.INDEX_WEISS);
-		 				
-		 				lines.add(line);
-  					}
+//  					if (spiel.optionen.contains(SpielOptionen.SIMPEL))
+//  					{
+  					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
+		 	 					obj.getExactPos(), 
+		 	 					spiel.spieler[obj.getBes()].getColIndex());
+	 				
+	 				points.add(point);
+//  					}
 	 				continue;
   				}
   				
@@ -6971,6 +7030,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					markedFields,
  					lines,
+ 					points,
  					null));
  			
  			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -6988,7 +7048,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   			boolean found = false;
   			
   			HashSet<Integer> brighterPlanets = null;
-  			ArrayList<SpielfeldLineDisplayContent> lines = new ArrayList<SpielfeldLineDisplayContent>();;
+  			ArrayList<SpielfeldLineDisplayContent> lines = new ArrayList<SpielfeldLineDisplayContent>();
+  			ArrayList<SpielfeldPointDisplayContent> points = new ArrayList<SpielfeldPointDisplayContent>();
   			Hashtable<String, Integer> patPerLine = null;
   			
   			for (Flugobjekt obj: spiel.objekte)
@@ -6999,13 +7060,14 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!obj.istBeteiligt(this.spieler ))
   				{
   					// Fremde Objekte als Punkte hinzufuegen (nur Simple-Stern)
-  					if (spiel.optionen.contains(SpielOptionen.SIMPEL))
-  					{
-		  				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
-			 	 					null, null, obj.getExactPos(), Colors.INDEX_WEISS);
-		 				
-		 				lines.add(line);
-  					}
+//  					if (spiel.optionen.contains(SpielOptionen.SIMPEL))
+//  					{
+  					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
+		 	 					obj.getExactPos(), 
+		 	 					spiel.spieler[obj.getBes()].getColIndex());
+	 				
+	 				points.add(point);
+
 	 				continue;
   				}
   				
@@ -7084,6 +7146,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	 					new SpielfeldDisplayContent(plData,
 	 					null,
 	 					lines,
+	 					points,
 	 					null));
 	 			
 	 			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -7266,6 +7329,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					null, // lines,
+ 					null,
  					this.minen()));
  			
  			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -7441,6 +7505,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
+ 					null,
  					null,
  					null,
  					null));
@@ -7757,7 +7822,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			this.console = new Console(this, true);
   			
 			this.updateSpielfeldDisplay();
-			this.updatePlanetenlisteDisplay(false, this.isSimple());
+			this.updatePlanetenlisteDisplay(false);
   			
 	  		new Auswertung(this);
 	  		

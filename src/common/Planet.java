@@ -514,6 +514,9 @@ import java.util.Hashtable;
 			if (this.buendnis.getAnzahlMitglieder() <= 1)
 				this.buendnis = null;
 		}
+		
+		// Planet produziert wieder nur Raumer
+		this.eraum = this.eprod;
 	}
 	
 	void buendnisKuendigen(int spieler)

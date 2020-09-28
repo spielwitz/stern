@@ -44,6 +44,7 @@ class Flugobjekt implements Serializable
 	// Felder, die zur Laufzeit berechnet werden
 	transient private boolean angekommen;
 	transient private boolean zuLoeschen;
+	transient private boolean bewegt;
 	private transient Point2D.Double exactPosStart;
 	private transient Point2D.Double exactPosZiel;
 	
@@ -107,6 +108,11 @@ class Flugobjekt implements Serializable
 	void resetNeu()
 	{
 		this.neu = false;
+	}
+	
+	void resetBewegt()
+	{
+		this.bewegt = false;
 	}
 
 	public int getZpl() {
@@ -221,6 +227,30 @@ class Flugobjekt implements Serializable
 		else	
 			return new Point2D.Double(this.ziel.getX(), this.ziel.getY());
 	}
+	
+	public Point2D.Double getExactPos(int tag)
+	{
+		if (this.bewegt)
+		{
+			double dist = this.start.dist(this.ziel);
+			int v = getGeschwindigkeit(this.getTyp(), this.transfer);
+			
+			double x0 = (double)this.start.getX() + (double)(this.pos-v) * (double)((double)this.ziel.getX()-(double)this.start.getX()) / dist;
+			double y0 = (double)this.start.getY() + (double)(this.pos-v) * (double)((double)this.ziel.getY()-(double)this.start.getY()) / dist;
+			
+			double x1 = (double)this.start.getX() + (double)this.pos * (double)((double)this.ziel.getX()-(double)this.start.getX()) / dist;
+			double y1 = (double)this.start.getY() + (double)this.pos * (double)((double)this.ziel.getY()-(double)this.start.getY()) / dist;
+			
+			double bruchteilJahr = AuswertungEreignis.getBruchteilTag(tag);
+			
+			double x = x0 + bruchteilJahr * (x1 - x0);
+			double y = y0 + bruchteilJahr * (y1 - y0);
+			
+			return new Point2D.Double(x, y);
+		}
+		else
+			return this.getExactPos();
+	}
 
 	public Kommandozentrale getKz() {
 		return kz;
@@ -322,6 +352,7 @@ class Flugobjekt implements Serializable
 		this.pos += geschwindigkeit;
 		
 		this.angekommen = (this.pos >= this.start.dist(this.ziel));
+		this.bewegt = true;
 		
 		// Zielpunkt
 		Point feldZiel = this.getCurrentField();
