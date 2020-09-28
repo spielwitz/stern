@@ -209,8 +209,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 	{
 		super();
 		
-		System.setProperty("java.net.preferIPv4Stack" , "true");
-		
 		try {
 		    UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() );
 		    UIManager.put("ComboBox.disabledBackground", Color.black);

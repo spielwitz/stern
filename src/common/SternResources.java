@@ -651,10 +651,10 @@ public class SternResources
 	}
 
 	/**
-	   * Angriff auf Planet {0} [08]
+	   * {0} greift Planet {1} an [08]
 	   */
-	public static String AuswertungAngriffAngriffAufPlanet(boolean symbol, String arg0) {
-		return symbol ? "$08§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngriffAufPlanet_08"), arg0);
+	public static String AuswertungAngriffAngriffAufPlanet(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$08§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngriffAufPlanet_08"), arg0, arg1);
 	}
 
 	/**
@@ -861,10 +861,10 @@ public class SternResources
 	}
 
 	/**
-	   * 1 Aufkl\u00E4rer auf Planet {0} angekommen. [17]
+	   * {0}: 1 Aufkl\u00E4rer auf Planet {1} angekommen. [17]
 	   */
-	public static String AuswertungAufklaererAngekommen(boolean symbol, String arg0) {
-		return symbol ? "$17§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAufklaererAngekommen_17"), arg0);
+	public static String AuswertungAufklaererAngekommen(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$17§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAufklaererAngekommen_17"), arg0, arg1);
 	}
 
 	/**
@@ -1050,7 +1050,7 @@ public class SternResources
 	}
 
 	/**
-	   * Nachricht an {0}: B\u00FCndnis auf Planet {1} kann nicht ge\u00E4ndert werden. [20]
+	   * {0}: B\u00FCndnis auf Planet {1} kann nicht ge\u00E4ndert werden. [20]
 	   */
 	public static String AuswertungBuendnisNichtGeaendert(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$20§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungBuendnisNichtGeaendert_20"), arg0, arg1);
@@ -1078,7 +1078,7 @@ public class SternResources
 	}
 
 	/**
-	   * Nachricht an {0}: Mine wurde gelegt. [24]
+	   * {0}: Mine wurde gelegt. [24]
 	   */
 	public static String AuswertungMineGelegt(boolean symbol, String arg0) {
 		return symbol ? "$24§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMineGelegt_24"), arg0);
@@ -1092,24 +1092,24 @@ public class SternResources
 	}
 
 	/**
-	   * 1 Minenleger auf Planet {0} angekommen. [27]
+	   * {0}: 1 Minenleger auf Planet {1} angekommen. [27]
 	   */
-	public static String AuswertungMinenlegerAngekommen(boolean symbol, String arg0) {
-		return symbol ? "$27§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerAngekommen_27"), arg0);
+	public static String AuswertungMinenlegerAngekommen(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$27§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerAngekommen_27"), arg0, arg1);
 	}
 
 	/**
-	   * 1 Minenleger auf Planet {0} zerschellt. [28]
+	   * {0}: 1 Minenleger auf Planet {1} zerschellt. [28]
 	   */
-	public static String AuswertungMinenlegerZerschellt(boolean symbol, String arg0) {
-		return symbol ? "$28§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerZerschellt_28"), arg0);
+	public static String AuswertungMinenlegerZerschellt(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$28§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerZerschellt_28"), arg0, arg1);
 	}
 
 	/**
-	   * 1 Minenr\u00E4umer auf Planet {0} angekommen. [29]
+	   * {0}: 1 Minenr\u00E4umer auf Planet {1} angekommen. [29]
 	   */
-	public static String AuswertungMinenraeumerAngekommen(boolean symbol, String arg0) {
-		return symbol ? "$29§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerAngekommen_29"), arg0);
+	public static String AuswertungMinenraeumerAngekommen(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$29§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerAngekommen_29"), arg0, arg1);
 	}
 
 	/**
@@ -1288,66 +1288,66 @@ public class SternResources
 	}
 
 	/**
-	   * 1 Minenr\u00E4umer auf Planet {0} zerschellt. [30]
+	   * {0}: 1 Minenr\u00E4umer auf Planet {1} zerschellt. [30]
 	   */
-	public static String AuswertungMinenraeumerZerschellt(boolean symbol, String arg0) {
-		return symbol ? "$30§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerZerschellt_30"), arg0);
+	public static String AuswertungMinenraeumerZerschellt(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$30§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerZerschellt_30"), arg0, arg1);
 	}
 
 	/**
-	   * Nachricht an {0} aus Sektor {1}: [31]
+	   * {0}: Nachricht aus Sektor {1}: [31]
 	   */
 	public static String AuswertungNachrichtAnAusSektor(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$31§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungNachrichtAnAusSektor_31"), arg0, arg1);
 	}
 
 	/**
-	   * 1 Patrouille auf Planet {0} angekommen. [33]
+	   * {0}: 1 Patrouille auf Planet {1} angekommen. [33]
 	   */
-	public static String AuswertungPatrouilleAngekommen(boolean symbol, String arg0) {
-		return symbol ? "$33§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleAngekommen_33"), arg0);
+	public static String AuswertungPatrouilleAngekommen(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$33§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleAngekommen_33"), arg0, arg1);
 	}
 
 	/**
-	   * 1 Aufkl\u00E4rer angehalten und gekapert. [34]
+	   * 1 Aufkl\u00E4rer von {0} angehalten und gekapert. [34]
 	   */
-	public static String AuswertungPatrouilleAufklaererGekapert(boolean symbol) {
-		return symbol ? "$34$":messages.getString("AuswertungPatrouilleAufklaererGekapert_34");
+	public static String AuswertungPatrouilleAufklaererGekapert(boolean symbol, String arg0) {
+		return symbol ? "$34§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleAufklaererGekapert_34"), arg0);
 	}
 
 	/**
-	   * Patrouille meldet an {0} aus Sektor {1}: [35]
+	   * {0}: Patrouille meldet aus Sektor {1}: [35]
 	   */
 	public static String AuswertungPatrouilleMeldetAusSektor(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$35§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleMeldetAusSektor_35"), arg0, arg1);
 	}
 
 	/**
-	   * 1 Minenleger angehalten und gekapert. [36]
+	   * 1 Minenleger von {0} angehalten und gekapert. [36]
 	   */
-	public static String AuswertungPatrouilleMinenlegerGekapert(boolean symbol) {
-		return symbol ? "$36$":messages.getString("AuswertungPatrouilleMinenlegerGekapert_36");
+	public static String AuswertungPatrouilleMinenlegerGekapert(boolean symbol, String arg0) {
+		return symbol ? "$36§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenlegerGekapert_36"), arg0);
 	}
 
 	/**
-	   * 1 Minenr\u00E4umer angehalten und gekapert. [37]
+	   * 1 Minenr\u00E4umer von {0} angehalten und gekapert. [37]
 	   */
-	public static String AuswertungPatrouilleMinenraeumerGekapert(boolean symbol) {
-		return symbol ? "$37$":messages.getString("AuswertungPatrouilleMinenraeumerGekapert_37");
+	public static String AuswertungPatrouilleMinenraeumerGekapert(boolean symbol, String arg0) {
+		return symbol ? "$37§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenraeumerGekapert_37"), arg0);
 	}
 
 	/**
-	   * 1 Patrouille angehalten und gekapert. [38]
+	   * 1 Patrouille von {0} angehalten und gekapert. [38]
 	   */
-	public static String AuswertungPatrouillePatrouilleGekapert(boolean symbol) {
-		return symbol ? "$38$":messages.getString("AuswertungPatrouillePatrouilleGekapert_38");
+	public static String AuswertungPatrouillePatrouilleGekapert(boolean symbol, String arg0) {
+		return symbol ? "$38§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleGekapert_38"), arg0);
 	}
 
 	/**
-	   * 1 Patrouille zerst\u00F6rt. [39]
+	   * 1 Patrouille von {0} zerst\u00F6rt. [39]
 	   */
-	public static String AuswertungPatrouillePatrouilleZerstoert(boolean symbol) {
-		return symbol ? "$39$":messages.getString("AuswertungPatrouillePatrouilleZerstoert_39");
+	public static String AuswertungPatrouillePatrouilleZerstoert(boolean symbol, String arg0) {
+		return symbol ? "$39§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleZerstoert_39"), arg0);
 	}
 
 	/**
@@ -1533,63 +1533,63 @@ public class SternResources
 	}
 
 	/**
-	   * {0} Raumer angehalten und gekapert. [40]
+	   * {0} Raumer von {1} angehalten und gekapert. [40]
 	   */
-	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0) {
-		return symbol ? "$40§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0);
+	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$40§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0, arg1);
 	}
 
 	/**
-	   * {0} Raumer gesichtet. [41]
+	   * {0} Raumer von {1} gesichtet. [41]
 	   */
-	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0) {
-		return symbol ? "$41§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0);
+	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$41§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1);
 	}
 
 	/**
-	   * 1 Transporter angehalten und gekapert. [42]
+	   * 1 Transporter von {0} angehalten und gekapert. [42]
 	   */
-	public static String AuswertungPatrouilleTransporterGekapert(boolean symbol) {
-		return symbol ? "$42$":messages.getString("AuswertungPatrouilleTransporterGekapert_42");
+	public static String AuswertungPatrouilleTransporterGekapert(boolean symbol, String arg0) {
+		return symbol ? "$42§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleTransporterGekapert_42"), arg0);
 	}
 
 	/**
-	   * 1 Patrouille auf Planet {0} zerschellt. [43]
+	   * {0}: 1 Patrouille auf Planet {1} zerschellt. [43]
 	   */
-	public static String AuswertungPatrouilleZerschellt(boolean symbol, String arg0) {
-		return symbol ? "$43§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleZerschellt_43"), arg0);
+	public static String AuswertungPatrouilleZerschellt(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$43§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleZerschellt_43"), arg0, arg1);
 	}
 
 	/**
-	   * {0} Raumer auf Planet {1} angekommen. [44]
+	   * {0}: {1} Raumer auf Planet {2} angekommen. [44]
 	   */
-	public static String AuswertungRaumerAngekommen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$44§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerAngekommen_44"), arg0, arg1);
+	public static String AuswertungRaumerAngekommen(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "$44§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAngekommen_44"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * {0} Raumer auf eine Mine gelaufen. Die Mine wurde zerst\u00F6rt. [45]
+	   * {0}: {1} Raumer auf eine Mine gelaufen. Die Mine wurde zerst\u00F6rt. [45]
 	   */
-	public static String AuswertungRaumerAufMineGelaufenZerstoert(boolean symbol, String arg0) {
-		return symbol ? "$45§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufenZerstoert_45"), arg0);
+	public static String AuswertungRaumerAufMineGelaufenZerstoert(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$45§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufenZerstoert_45"), arg0, arg1);
 	}
 
 	/**
-	   * {0} Raumer auf eine Mine gelaufen. [46]
+	   * {0}: {1} Raumer auf eine Mine gelaufen. [46]
 	   */
-	public static String AuswertungRaumerAufMineGelaufen(boolean symbol, String arg0) {
-		return symbol ? "$46§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufen_46"), arg0);
+	public static String AuswertungRaumerAufMineGelaufen(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$46§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufen_46"), arg0, arg1);
 	}
 
 	/**
-	   * Nachricht an {0}: Raumer k\u00F6nnen nicht vom Planeten {1} gestartet werden. [47]
+	   * {0}: Raumer k\u00F6nnen nicht vom Planeten {1} gestartet werden. [47]
 	   */
 	public static String AuswertungRaumerNichtGestartet(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$47§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerNichtGestartet_47"), arg0, arg1);
 	}
 
 	/**
-	   * {0} Raumer von {1} wurden von Planet {2} vertrieben. [48]
+	   * {1}: {0} Raumer wurden von Planet {2} vertrieben. [48]
 	   */
 	public static String AuswertungRaumerVertrieben(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "$48§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerVertrieben_48"), arg0, arg1, arg2);
@@ -1764,17 +1764,17 @@ public class SternResources
 	}
 
 	/**
-	   * 1 Transporter auf Planet {0} angekommen. [58]
+	   * {0}: 1 Transporter auf Planet {1} angekommen. [58]
 	   */
-	public static String AuswertungTransporterAngekommen(boolean symbol, String arg0) {
-		return symbol ? "$58§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungTransporterAngekommen_58"), arg0);
+	public static String AuswertungTransporterAngekommen(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$58§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungTransporterAngekommen_58"), arg0, arg1);
 	}
 
 	/**
-	   * 1 Transporter auf Planet {0} zerschellt. [59]
+	   * {0}: 1 Transporter auf Planet {1} zerschellt. [59]
 	   */
-	public static String AuswertungTransporterZerschellt(boolean symbol, String arg0) {
-		return symbol ? "$59§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungTransporterZerschellt_59"), arg0);
+	public static String AuswertungTransporterZerschellt(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$59§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungTransporterZerschellt_59"), arg0, arg1);
 	}
 
 	/**
@@ -3731,10 +3731,10 @@ public class SternResources
 	}
 
 	/**
-	   * Nachricht an {0}: Spionagesender installiert. [EJ]
+	   * {0}: Spionagesender auf Planet {1} installiert. [EJ]
 	   */
-	public static String AuswertungAufklaererSender(boolean symbol, String arg0) {
-		return symbol ? "$EJ§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0);
+	public static String AuswertungAufklaererSender(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$EJ§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0, arg1);
 	}
 
 	/**

@@ -115,7 +115,6 @@ public class SternClient extends Frame // NO_UCD (use default)
 	{
 		super();
 		
-		System.setProperty("java.net.preferIPv4Stack" , "true");
 		this.settings = new ClientSettings();
 		
 		UUID uuid = UUID.randomUUID();

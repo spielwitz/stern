@@ -4777,6 +4777,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			this.checkSpielerTot();
 
+			this.spiel.console.setLineColor(Colors.INDEX_WEISS);
 			this.writeEreignisDatumJahresende();
 			this.spiel.console.appendText(SternResources.AuswertungEnde(true));
 
@@ -5059,19 +5060,6 @@ public class Spiel extends EmailTransportBase implements Serializable
   			}
   		}
   		
-  		private byte getColByPlanet(Planet pl)
-  		{
-  			if (pl == null)
-  				return Colors.INDEX_WEISS;
-  			else
-  			{
-	  			if (pl.getBes() == Constants.BESITZER_NEUTRAL)
-	  				return Colors.INDEX_NEUTRAL;
-	  			else
-	  				return this.spiel.spieler[pl.getBes()].getColIndex();
-  			}
-  		}
-  		
   		private void taste()
   		{
   			this.spiel.console.waitForTaste();
@@ -5198,13 +5186,14 @@ public class Spiel extends EmailTransportBase implements Serializable
   					this.writeEreignisDatumJahresende();
   				else
   					this.writeEreignisDatumJahresbeginn();
+  				
+				this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
   					
   				if (anderesObj.getTyp() == ObjektTyp.PATROUILLE &&
   					!anderesObj.isTransfer())
   				{
   					// Kampf zweier Patrouillen. Die beobachtende Patrouille
   					// war schneller und vernichtet die andere
-					this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
 					this.spiel.console.appendText(
 						SternResources.AuswertungPatrouilleMeldetAusSektor(true,
 									this.spiel.spieler[objPatr.getBes()].getName(),
@@ -5218,7 +5207,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 					
 					this.spiel.console.appendText(
-							SternResources.AuswertungPatrouillePatrouilleZerstoert(true));
+							SternResources.AuswertungPatrouillePatrouilleZerstoert(
+									true, this.spiel.spieler[anderesObj.getBes()].getName()));
 					
 					this.taste();
 					anderesObj.setZuLoeschen();
@@ -5232,7 +5222,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 							this.spiel.getSimpleMarkedField(ereignis.markierungPos),
 							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 					
-					this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
 					this.spiel.console.appendText(
 							SternResources.AuswertungPatrouilleMeldetAusSektor(true,
 									this.spiel.spieler[objPatr.getBes()].getName(),
@@ -5240,32 +5229,33 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.lineBreak();
 					
 					boolean kapern = true;
+					String name = this.spiel.spieler[anderesObj.getBes()].getName();
 					
 					if (anderesObj.getTyp() == ObjektTyp.AUFKLAERER)
 						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleAufklaererGekapert(true));
+										SternResources.AuswertungPatrouilleAufklaererGekapert(true, name));
 					else if (anderesObj.getTyp() == ObjektTyp.TRANSPORTER)
 						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleTransporterGekapert(true));
+										SternResources.AuswertungPatrouilleTransporterGekapert(true, name));
 					else if (anderesObj.getTyp() == ObjektTyp.MINENRAEUMER)
 						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleMinenraeumerGekapert(true));
+										SternResources.AuswertungPatrouilleMinenraeumerGekapert(true, name));
 					else if (anderesObj.getTyp() == ObjektTyp.MINE50 || 
 							 anderesObj.getTyp() == ObjektTyp.MINE100 ||
 							 anderesObj.getTyp() == ObjektTyp.MINE250 ||
 							 anderesObj.getTyp() == ObjektTyp.MINE500)
 						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleMinenlegerGekapert(true));
+										SternResources.AuswertungPatrouilleMinenlegerGekapert(true, name));
 					else if (anderesObj.getTyp() == ObjektTyp.PATROUILLE)
 						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouillePatrouilleGekapert(true));
+										SternResources.AuswertungPatrouillePatrouilleGekapert(true, name));
 					else if (anderesObj.getTyp() == ObjektTyp.RAUMER)
 					{
 						if (anderesObj.getAnz() > Constants.PATROUILLE_KAPERT_RAUMER)
 						{
 							this.spiel.console.appendText(
 									SternResources.AuswertungPatrouilleRaumerGesichtet(true, 
-											Integer.toString(anderesObj.getAnz())));
+											Integer.toString(anderesObj.getAnz()), name));
 							kapern = false;
 							this.taste();
 						}
@@ -5273,7 +5263,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						{
 							this.spiel.console.appendText(
 									SternResources.AuswertungPatrouilleRaumerGekapert(true, 
-											Integer.toString(anderesObj.getAnz())));
+											Integer.toString(anderesObj.getAnz()), name));
 						}
 					}
 					
@@ -5346,16 +5336,20 @@ public class Spiel extends EmailTransportBase implements Serializable
 			if (mine == null)
 				return;
 			
+			String name = this.spiel.spieler[obj.getBes()].getName();
+			this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
+			
 			if (obj.getTyp() == ObjektTyp.RAUMER)
 			{
 				this.writeEreignisDatum(ereignis.getTag());
-				this.spiel.console.setLineColor(Colors.INDEX_NEUTRAL);
 				
 				if (obj.getAnz() >= mine.getStaerke())
 				{
 					// Mine wurde geraeumt
 					this.spiel.console.appendText(
-						SternResources.AuswertungRaumerAufMineGelaufenZerstoert(true, 
+						SternResources.AuswertungRaumerAufMineGelaufenZerstoert(
+								true,
+								name,
 								Integer.toString(Math.min(obj.getAnz(),mine.getStaerke()))));
 					
 					// Anzahl der Raumerflotte reduzieren
@@ -5371,6 +5365,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.appendText(
 							SternResources.AuswertungRaumerAufMineGelaufen(
 									true, 
+									name,
 									Integer.toString(Math.min(obj.getAnz(),mine.getStaerke()))));
 					
 					// Flotte wurde zerstoert
@@ -5383,7 +5378,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			else if (obj.getTyp() == ObjektTyp.MINENRAEUMER)
 			{
 				this.writeEreignisDatum(ereignis.getTag());
-				this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
 				this.spiel.console.appendText (
 						SternResources.AuswertungNachrichtAnAusSektor(true,
 								this.spiel.spieler[obj.getBes()].getName(),
@@ -5422,10 +5416,12 @@ public class Spiel extends EmailTransportBase implements Serializable
 			if (plIndex != Constants.KEIN_PLANET)
 				pl = this.spiel.planeten[plIndex];
 			
+			String name = this.spiel.spieler[obj.getBes()].getName();
+			this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
+			
 			if (obj.getTyp() == ObjektTyp.AUFKLAERER)
 			{
 				this.writeEreignisDatum(ereignis.getTag());
-				this.spiel.console.setLineColor(this.getColByPlanet(pl));
 				
 				if (pl.getBes() == obj.getBes())
 				{
@@ -5438,6 +5434,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.appendText(
 							SternResources.AuswertungAufklaererAngekommen(
 									true,
+									name,
 									this.spiel.getPlanetenNameFromIndex(plIndex)));
 				}
 				else
@@ -5446,11 +5443,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.updateSpielfeldDisplay();
 					pl.setSender(obj.getBes(), this.spiel.jahr + Constants.SENDER_JAHRE);
 					
-					this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
 					this.spiel.console.appendText(
 							SternResources.AuswertungAufklaererSender(
 									true,
-									this.spiel.spieler[obj.getBes()].getName()));								
+									this.spiel.spieler[obj.getBes()].getName(),
+									this.spiel.getPlanetenNameFromIndex(plIndex)));								
 				}
 				this.taste();
 				obj.setZuLoeschen();
@@ -5458,7 +5455,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			else if (obj.getTyp() == ObjektTyp.TRANSPORTER)
 			{
 				this.writeEreignisDatum(ereignis.getTag());
-				this.spiel.console.setLineColor(this.getColByPlanet(pl));
 				
 				this.spiel.updateSpielfeldDisplay(
 						this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
@@ -5474,12 +5470,15 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.appendText(
 							SternResources.AuswertungTransporterAngekommen(
 									true, 
+									name,
 									this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 				}
 				else
 					this.spiel.console.appendText(
 							SternResources.AuswertungTransporterZerschellt(
-									true, this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
+									true,
+									name,
+									this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 				
 				Kommandozentrale kz = obj.getKz();
 				
@@ -5512,7 +5511,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 					if (obj.isTransfer())
 					{
 						this.writeEreignisDatum(ereignis.getTag());
-						this.spiel.console.setLineColor(this.getColByPlanet(pl));
 						
 						this.spiel.updateSpielfeldDisplay(
 								this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
@@ -5523,12 +5521,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 							this.spiel.console.appendText(
 									SternResources.AuswertungPatrouilleAngekommen(
 											true, 
+											name,
 											this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 						}
 						else
 							this.spiel.console.appendText(
 									SternResources.AuswertungPatrouilleZerschellt(
 											true,
+											name,
 											this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 						this.taste();
 						obj.setZuLoeschen();
@@ -5540,7 +5540,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				else
 				{
 					this.writeEreignisDatum(ereignis.getTag());
-					this.spiel.console.setLineColor(this.getColByPlanet(pl));
 					
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
@@ -5548,6 +5547,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.appendText(
 						SternResources.AuswertungPatrouilleZerschellt(
 								true, 
+								name,
 								this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 					this.taste();
 					obj.setZuLoeschen();
@@ -5559,7 +5559,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 					 obj.getTyp() == ObjektTyp.MINE500)
 			{
 				this.writeEreignisDatum(ereignis.getTag());
-				this.spiel.console.setLineColor(this.getColByPlanet(pl));
 				
 				if (obj.isTransfer())
 				{
@@ -5572,12 +5571,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 						this.spiel.console.appendText(
 								SternResources.AuswertungMinenlegerAngekommen(
 										true, 
+										name,
 										this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 					}
 					else
 						this.spiel.console.appendText(
 							SternResources.AuswertungMinenlegerZerschellt(
 									true, 
+									name,
 									this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 					
 					this.taste();
@@ -5587,9 +5588,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 				{
 					obj.setZuLoeschen();
 					this.spiel.updateSpielfeldDisplay();
-					this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
 					this.spiel.console.appendText(
-							SternResources.AuswertungMineGelegt(true, this.spiel.spieler[obj.getBes()].getName()));
+							SternResources.AuswertungMineGelegt(
+									true, 
+									this.spiel.spieler[obj.getBes()].getName()));
 					this.mineLegen(obj);
 					this.taste();
 					
@@ -5642,17 +5644,22 @@ public class Spiel extends EmailTransportBase implements Serializable
 							ereignis.getTag());
 					
 					this.writeEreignisDatum(ereignis.getTag());
-					this.spiel.console.setLineColor(this.getColByPlanet(pl));
 					
 					if (obj.getBes() == pl.getBes())
 					{
 						pl.incObjekt(obj.getTyp(), 1);
 						this.spiel.console.appendText(
-							SternResources.AuswertungMinenraeumerAngekommen(true, this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
+							SternResources.AuswertungMinenraeumerAngekommen(
+									true,
+									name,
+									this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 					}
 					else
 						this.spiel.console.appendText(
-							SternResources.AuswertungMinenraeumerZerschellt(true, this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
+							SternResources.AuswertungMinenraeumerZerschellt(
+									true,
+									name,
+									this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 					this.taste();
 					obj.setZuLoeschen();
 
@@ -5661,7 +5668,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			else if (obj.getTyp() == ObjektTyp.RAUMER)
 			{
 				this.writeEreignisDatum(ereignis.getTag());
-				this.spiel.console.setLineColor(this.getColByPlanet(pl));
 
 				if (this.spiel.planeten[obj.getZpl()].getBes() == obj.getBes() ||
 					this.spiel.planeten[obj.getZpl()].istBuendnisMitglied(obj.getBes()))
@@ -5674,6 +5680,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					
 					this.spiel.console.appendText(
 						SternResources.AuswertungRaumerAngekommen(true,
+									name,
 									Integer.toString(obj.getAnz()),
 									this.spiel.getPlanetenNameFromIndex(obj.getZpl())));
 					
@@ -5691,6 +5698,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   		private void raumerAngriff(AuswertungEreignis ereignis, int plIndex)
   		{
   			Flugobjekt obj = ereignis.obj;
+  			String name = this.spiel.spieler[obj.getBes()].getName();
+  			
   			Planet pl = this.spiel.planeten[plIndex];
   			
   			this.spiel.updateSpielfeldDisplay(
@@ -5701,10 +5710,10 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
 			struct.angr = obj.getAnz();
 			
-			this.spiel.console.setLineColor(pl.getCol(this.spiel.spieler));
 			this.spiel.console.appendText(
 							SternResources.AuswertungAngriffAngriffAufPlanet(
 									true,
+									name,
 									this.spiel.getPlanetenNameFromIndex(plIndex)));
 
 			this.spiel.console.lineBreak();
@@ -5762,7 +5771,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
 					this.spiel.console.appendText(
 							SternResources.AuswertungAngriffSpielerErobert(true,
-									this.spiel.spieler[obj.getBes()].getName()));
+									name));
 				}
 				else
 				{
