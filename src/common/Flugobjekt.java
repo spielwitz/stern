@@ -332,16 +332,6 @@ class Flugobjekt implements Serializable
 	{
 		ArrayList<AuswertungEreignis> ereignisse = new ArrayList<AuswertungEreignis>();
 		
-		if (this.typ == ObjektTyp.KAPITULATION)
-		{
-			AuswertungEreignis ereignis = new AuswertungEreignis(AuswertungEreignisTyp.ANKUNFT, this);
-			ereignis.setTag(0);
-			
-			ereignisse.add(ereignis);
-			
-			return ereignisse;
-		}
-		
 		double geschwindigkeit = (double)getGeschwindigkeit(this.typ, this.transfer);
 		
 		// Startpunkt

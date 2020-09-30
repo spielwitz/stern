@@ -27,7 +27,6 @@ class AuswertungEreignis implements Comparator<AuswertungEreignis>
 	
 	public AuswertungEreignis()
 	{
-		
 	}
 	AuswertungEreignis(AuswertungEreignisTyp typ, Flugobjekt obj)
 	{

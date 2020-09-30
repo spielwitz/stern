@@ -2520,6 +2520,9 @@ public class Spiel extends EmailTransportBase implements Serializable
  				boolean raus = this.gestoppteObjekte();
 				if (raus)
 				{
+					this.spiel.flugobjekteSpielerAusgeblendet = null;
+		 			this.spiel.updateSpielfeldDisplay();
+
 					return true;
 				}
 		
@@ -2564,6 +2567,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 					raus = this.undo();
 					if (raus)
 					{
+						this.spiel.flugobjekteSpielerAusgeblendet = null;
+			 			this.spiel.updateSpielfeldDisplay();
+
 						return true;
 					}
 				}
@@ -2575,6 +2581,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 
  			} while (!exit);
  			
+ 			this.spiel.flugobjekteSpielerAusgeblendet = null;
+ 			this.spiel.updateSpielfeldDisplay();
+
  			return false;
  		}
  		
@@ -2582,6 +2591,8 @@ public class Spiel extends EmailTransportBase implements Serializable
  		{
  			this.spielerJetzt = spieler; 			
 			this.spiel.console.clear();
+			
+			this.spiel.flugobjekteSpielerAusgeblendet = new BitSet(this.spiel.anzSp);
 			
 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
 			
@@ -3785,7 +3796,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  					this.spiel.spieler[this.spielerJetzt].getColIndex());
 
  			this.spiel.console.clear();
-			this.spiel.flugobjekteSpielerAusgeblendet = new BitSet(this.spiel.anzSp);
  			
  			do
  			{
@@ -3843,8 +3853,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
  			} while (true);
  			
- 			this.spiel.flugobjekteSpielerAusgeblendet = null;
- 			this.spiel.updateSpielfeldDisplay();
  			this.spiel.console.clear();
  		}
  		
@@ -4675,6 +4683,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 			// Buendnisse aufraeumen
 			this.buendnisseAufraeumen();
 			
+			// Kapitulationen einarbeiten
+			this.kapitulationen();
+			
 			// Patrouillen beobachten, bevor sich andere Objekte bewegt haben
 			this.patrouillenBeobachten(false);
 
@@ -4730,18 +4741,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				if (ereignis.obj.isStop() || ereignis.obj.istZuLoeschen())
 					continue;
 
-				// Eine Kapitulation
-				if (ereignis.obj.getTyp() == ObjektTyp.KAPITULATION)
-				{
-					this.kommandozentraleErobert(
-							ereignis.obj.getBes(), 
-							Constants.BESITZER_NEUTRAL, 
-							true,
-							ereignis.getTag());
-					ereignis.obj.setZuLoeschen();
-					continue;
-				}
-				
 				if (ereignis.typ == AuswertungEreignisTyp.SEKTOR_BETRETEN)
 				{
 					// Minen pruefen
@@ -4986,6 +4985,26 @@ public class Spiel extends EmailTransportBase implements Serializable
   	 	 						SternResources.AuswertungRaumerVertrieben2(true));
   	 	 				this.taste();
   					}
+  				}
+  			}
+  		}
+  		
+  		private void kapitulationen()
+  		{
+  			int[] seq = Utils.randomList(spiel.objekte.size());
+  			
+  			for (int i = 0; i < spiel.objekte.size(); i++)
+  			{
+  				Flugobjekt obj = spiel.objekte.get(seq[i]);
+  				
+  				if (!obj.istZuLoeschen() && obj.getTyp() == ObjektTyp.KAPITULATION)
+  				{
+  					this.kommandozentraleErobert(
+							obj.getBes(), 
+							Constants.BESITZER_NEUTRAL, 
+							true,
+							0);
+					obj.setZuLoeschen();
   				}
   			}
   		}
@@ -5290,8 +5309,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			for (Flugobjekt otherObj: this.spiel.objekte)
   			{
   				if (otherObj == objPatr ||
-  					otherObj.istZuLoeschen() ||
-  					otherObj.getTyp() == ObjektTyp.KAPITULATION)
+  					otherObj.istZuLoeschen())
   					continue;
   				
   				Point2D.Double momPosOther = otherObj.getExactPos();
