@@ -644,7 +644,7 @@ public class SternResources
 	}
 
 	/**
-	   * Angreifer: {0}, Festung: {1} [07]
+	   * Angreifer: {0}, Abwehrschild: {1} [07]
 	   */
 	public static String AuswertungAngriffAngreiferFestung(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$07§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferFestung_07"), arg0, arg1);
@@ -1386,14 +1386,14 @@ public class SternResources
 	}
 
 	/**
-	   * Festungsraumer (Kauf +{0}) [3F]
+	   * Abwehrschild-Raumer (Kauf +{0}) [3F]
 	   */
 	public static String PlEditFestungRaumer(boolean symbol, String arg0) {
 		return symbol ? "$3F§"+arg0+"$":MessageFormat.format(messages.getString("PlEditFestungRaumer_3F"), arg0);
 	}
 
 	/**
-	   * Festungen [3G]
+	   * Abwehrschilde [3G]
 	   */
 	public static String PlEditFestungen(boolean symbol) {
 		return symbol ? "$3G$":messages.getString("PlEditFestungen_3G");
@@ -1736,14 +1736,14 @@ public class SternResources
 	}
 
 	/**
-	   * Festungen [4X]
+	   * Abwehrschilde [4X]
 	   */
 	public static String SpielinformationenFestungen(boolean symbol) {
 		return symbol ? "$4X$":messages.getString("SpielinformationenFestungen_4X");
 	}
 
 	/**
-	   * Festungen [4Y]
+	   * Abwehrschilde [4Y]
 	   */
 	public static String SpielinformationenFestungenTitel(boolean symbol) {
 		return symbol ? "$4Y$":messages.getString("SpielinformationenFestungenTitel_4Y");
@@ -2737,14 +2737,14 @@ public class SternResources
 	}
 
 	/**
-	   * Fe [98]
+	   * As [98]
 	   */
 	public static String InventurFestungKurz(boolean symbol) {
 		return symbol ? "$98$":messages.getString("InventurFestungKurz_98");
 	}
 
 	/**
-	   * FeRa [99]
+	   * AsRa [99]
 	   */
 	public static String InventurFestungRaumerKurz(boolean symbol) {
 		return symbol ? "$99$":messages.getString("InventurFestungRaumerKurz_99");

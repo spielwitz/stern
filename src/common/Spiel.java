@@ -2476,6 +2476,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 			boolean exit = false;
 			this.kapituliert = false;
 			
+			this.spiel.flugobjekteSpielerAusgeblendet = new BitSet(spiel.anzSp);
+			
  			do
  			{ 				
  				this.spiel.console.setHeaderText(
@@ -2512,6 +2514,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					else
  					{
  						keys.add(new ConsoleKey("5",SternResources.ZugeingabeKapitulieren(true)));
+ 						keys.add(new ConsoleKey("8",SternResources.ZugeingabeObjekteAusblenden(true))); 						
  						keys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
  					}
  				}
@@ -2551,6 +2554,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.minenUndRaeumer(ObjektTyp.MINENRAEUMER);
 				else if (!kapituliert && !simpel && (input.equals("8")))
 					this.buendnis();
+				else if (!kapituliert && simpel && (input.equals("8")))
+					this.objekteAusblenden();
 				else if (!kapituliert && !simpel && (input.equals("0")))
 					this.planeteneditor();
 				else if (!kapituliert && simpel && (input.equals("0")))
