@@ -32,6 +32,7 @@ public class LabelDark extends JLabel implements ActionListener
 	private Timer timer;
 	private boolean colorToggled;
 	private ImageIcon iconOrig;
+	private ImageIcon iconDark;
 	
 	public LabelDark(Font f)
 	{
@@ -58,7 +59,7 @@ public class LabelDark extends JLabel implements ActionListener
 		this.setFont(f);
 	}
 	
-	public LabelDark(ImageIcon icon, int size, boolean blink)
+	public LabelDark(ImageIcon icon, int size, boolean blink, ImageIcon iconDark)
 	{
 		super();
 
@@ -69,6 +70,7 @@ public class LabelDark extends JLabel implements ActionListener
 		this.setIcon(icon);
 		
 		this.iconOrig = icon;
+		this.iconDark = iconDark;
 		
 		if (blink)
 			this.startBlinking();
@@ -85,19 +87,14 @@ public class LabelDark extends JLabel implements ActionListener
 			this.timer.restart();
 	}
 	
-	private void resetColors()
-	{
-		this.setIcon(this.iconOrig);
-	}
-	
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
 		if (this.colorToggled)
-			this.resetColors();
+			this.setIcon(this.iconOrig);
 		else
 		{
-			this.setIcon(null);
+			this.setIcon(this.iconDark);
 		}
 		
 		this.colorToggled = !this.colorToggled;

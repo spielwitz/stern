@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: HP
+		// Hoechstes vergebenes Symbol: HQ
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -566,6 +566,7 @@ public class SternResources
 		symbolDict.put("HN","ZugeingabeObjekteAusblendenAus_HN");
 		symbolDict.put("HO","ZugeingabeObjekteAusblendenAlleAus_HO");
 		symbolDict.put("HP","ZugeingabeObjekteAusblendenAlleAn_HP");
+		symbolDict.put("HQ","AuswertungVerfuegbarSymbol_HQ");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -3136,7 +3137,7 @@ public class SternResources
 	}
 
 	/**
-	   * Ihre Mitspieler warten auf Ihre Zugeingaben [BD]
+	   * Mitspieler warten auf Ihre Zugeingaben [BD]
 	   */
 	public static String MitspielerWarten(boolean symbol) {
 		return symbol ? "$BD$":messages.getString("MitspielerWarten_BD");
@@ -3570,7 +3571,7 @@ public class SternResources
 	}
 
 	/**
-	   * Bitte warten Sie bis zur n\u00E4chsten Zugeingabeaufforderung. [DQ]
+	   * Bitte warten Sie, bis das Neuladen-Symbol erscheint. [DQ]
 	   */
 	public static String WartenBisNaechsteZugeingabe(boolean symbol) {
 		return symbol ? "$DQ$":messages.getString("WartenBisNaechsteZugeingabe_DQ");
@@ -3759,7 +3760,7 @@ public class SternResources
 	}
 
 	/**
-	   * Klicken Sie auf das blinkende Stern-Symbol, um das Spiel neu zu laden. [EN]
+	   * Klicken Sie auf das blinkende Neuladen-Symbol. [EN]
 	   */
 	public static String AuswertungVerfuegbar2(boolean symbol) {
 		return symbol ? "$EN$":messages.getString("AuswertungVerfuegbar2_EN");
@@ -4295,5 +4296,12 @@ public class SternResources
 	   */
 	public static String ZugeingabeObjekteAusblendenAlleAn(boolean symbol) {
 		return symbol ? "$HP$":messages.getString("ZugeingabeObjekteAusblendenAlleAn_HP");
+	}
+
+	/**
+	   * Das Jahr ist ausgewertet. Klicken Sie hier, um das Spiel neu zu laden. [HQ]
+	   */
+	public static String AuswertungVerfuegbarSymbol(boolean symbol) {
+		return symbol ? "$HQ$":messages.getString("AuswertungVerfuegbarSymbol_HQ");
 	}
 }

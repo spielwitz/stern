@@ -87,11 +87,13 @@ import commonServer.ClientUserCredentials;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageGamesAndUsers;
 import commonServer.RequestMessageGetEvaluations;
+import commonServer.RequestMessageGetStatus;
 import commonServer.RequestMessagePostMoves;
 import commonServer.RequestMessageType;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
 import commonServer.ResponseMessageGetEvaluations;
+import commonServer.ResponseMessageGetStatus;
 import commonServer.ServerUtils;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
@@ -180,15 +182,19 @@ public class Stern extends Frame  // NO_UCD (use default)
 	private PaintPanel paintPanel;
 	private PanelDark panToolbar;
 	private LabelDark labConnectionStatus;
-	private LabelDark labRefresh;
+	private LabelDark labGamesWaitingForInput;
+	private LabelDark labCurrentGameNextYear;
 	
 	private ImageIcon iconConnected;
 	private ImageIcon iconNotConnected;
-	private ImageIcon iconStern;
-	
+	private ImageIcon iconWaitingForInput;
+	private ImageIcon iconWaitingForInputDark;
+	private ImageIcon iconReload;
+	private ImageIcon iconReloadDark;
 	
 	private boolean inputEnabled;
 	private String currentGameId;
+	private int currentGameJahr;
 	
 	private Timer gameInfoUpdateTimer;
 	
@@ -236,21 +242,34 @@ public class Stern extends Frame  // NO_UCD (use default)
 		this.add(this.paintPanel, BorderLayout.CENTER);
 		
 		// Toolbar
-		this.iconConnected = new ImageIcon (ClassLoader.getSystemResource("iconConnected.png"));
-		this.iconNotConnected = new ImageIcon (ClassLoader.getSystemResource("iconNotConnected.png"));
-		this.iconStern = new ImageIcon (ClassLoader.getSystemResource("iconStern.png"));
+		this.iconConnected = new ImageIcon (ClassLoader.getSystemResource("ic_cloud_done.png"));
+		this.iconNotConnected = new ImageIcon (ClassLoader.getSystemResource("ic_cloud_off.png"));
+		this.iconWaitingForInput = new ImageIcon (ClassLoader.getSystemResource("ic_assignment_late.png"));
+		this.iconWaitingForInputDark = new ImageIcon (ClassLoader.getSystemResource("ic_assignment_late2.png"));
+		this.iconReload = new ImageIcon (ClassLoader.getSystemResource("ic_refresh.png"));
+		this.iconReloadDark = new ImageIcon (ClassLoader.getSystemResource("ic_refresh2.png"));
 		
 		this.panToolbar = new PanelDark(new SpringLayout());
 		PanelDark panToolBarShell = new PanelDark(new BorderLayout());
-		PanelDark panToolBar = new PanelDark(new GridLayout(2,1,10,5));
+		PanelDark panToolBar = new PanelDark(new GridLayout(3,1,10,5));
 		
-		this.labRefresh = new LabelDark(this.iconStern, 30, true);
-		this.labRefresh.setVisible(false);
-		this.labRefresh.addMouseListener(this);
+		this.labCurrentGameNextYear = new LabelDark(
+				this.iconReload, 
+				30, 
+				true,
+				this.iconReloadDark);
+		this.labCurrentGameNextYear.setVisible(false);
+		this.labCurrentGameNextYear.addMouseListener(this);
 		
-		panToolBar.add(this.labRefresh);
+		panToolBar.add(this.labCurrentGameNextYear);
 		
-		this.labConnectionStatus = new LabelDark(this.iconNotConnected, 30, false);
+		this.labGamesWaitingForInput = new LabelDark(this.iconWaitingForInput, 30, true, this.iconWaitingForInputDark);
+		this.labGamesWaitingForInput.setVisible(false);
+		this.labGamesWaitingForInput.addMouseListener(this);
+		
+		panToolBar.add(this.labGamesWaitingForInput);
+		
+		this.labConnectionStatus = new LabelDark(this.iconNotConnected, 30, false, null);
 		this.labConnectionStatus.addMouseListener(this);
 		panToolBar.add(this.labConnectionStatus);
 		
@@ -1379,17 +1398,33 @@ public class Stern extends Frame  // NO_UCD (use default)
 			return;
 		
 		boolean connected = false;
-		int count = 0;
+		boolean currentGameNextYear = false;
+		boolean gamesWaitingForInput = false;
 		
 		if (this.cuc != null)
 		{
-			RequestMessage msg = new RequestMessage(RequestMessageType.GET_GAMES_ZUGEINGABE);
+			RequestMessageGetStatus msgPayload = new RequestMessageGetStatus();
+			
+			if (this.t != null && this.t.getSpiel() != null &&
+				this.t.getSpiel().getOptionen().contains(SpielOptionen.SERVER_BASIERT))
+			{
+				msgPayload.currentGameId = this.currentGameId;
+				msgPayload.currentGameJahr = this.currentGameJahr;
+			}
+								
+			RequestMessage msg = new RequestMessage(RequestMessageType.GET_STATUS);
+			msg.payloadSerialized = msgPayload.toJson();
 			
 			ResponseMessage respMsg = ClientSocketManager.sendAndReceive(this.cuc, msg);
 			if (!respMsg.error)
 			{
 				connected = true;
-				count = Integer.parseInt(respMsg.payloadSerialized);
+				
+				ResponseMessageGetStatus respMsgPayload = 
+						ResponseMessageGetStatus.fromJson(respMsg.payloadSerialized);
+				
+				currentGameNextYear = respMsgPayload.currentGameNextYear;
+				gamesWaitingForInput = respMsgPayload.gamesWaitingForInput;
 			}
 		}
 		
@@ -1403,8 +1438,11 @@ public class Stern extends Frame  // NO_UCD (use default)
 							Integer.toString(this.cuc.port),
 							this.cuc.userId));
 			
-			this.labRefresh.setVisible(count > 0);
-			this.labRefresh.setToolTipText(SternResources.MitspielerWarten(false));
+			this.labGamesWaitingForInput.setVisible(gamesWaitingForInput);
+			this.labGamesWaitingForInput.setToolTipText(SternResources.MitspielerWarten(false));
+			
+			this.labCurrentGameNextYear.setVisible(currentGameNextYear);
+			this.labCurrentGameNextYear.setToolTipText(SternResources.AuswertungVerfuegbarSymbol(false));
 		}
 		else
 		{
@@ -1418,7 +1456,8 @@ public class Stern extends Frame  // NO_UCD (use default)
 					SternResources.ClientSettingsJDialogKeineVerbindung2(
 							false, this.cuc.url));
 					
-			this.labRefresh.setVisible(false);
+			this.labCurrentGameNextYear.setVisible(false);
+			this.labGamesWaitingForInput.setVisible(false);
 		}
 		
 	}
@@ -1433,8 +1472,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (e.getSource() == this.labRefresh)
+		if (e.getSource() == this.labGamesWaitingForInput)
 			this.openServerGamesDialog();
+		else if (e.getSource() == this.labCurrentGameNextYear)
+			this.reloadCurrentGame();
 		else if (e.getSource() == this.labConnectionStatus)
 			this.openServerCredentialsDialog();
 	}
@@ -1517,6 +1558,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 				{
 					if (MinBuildChecker.doCheck(this, dlg.spielGeladen.getMinBuild()))
 					{
+						this.currentGameJahr = dlg.spielGeladen.getJahr();
 						this.setNeuesSpiel(dlg.spielGeladen, true);
 					}
 				}
@@ -1527,6 +1569,36 @@ public class Stern extends Frame  // NO_UCD (use default)
 		this.inputEnabled = true;
 		this.redrawScreen();
 
+	}
+	
+	private void reloadCurrentGame()
+	{
+		this.inputEnabled = false;
+		this.redrawScreen();
+		
+		// Spiel vom Server laden
+		RequestMessage msg = new RequestMessage(RequestMessageType.GET_GAME);
+		
+		msg.payloadSerialized = this.currentGameId;
+		
+		ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
+		
+		if (!respMsg.error)
+		{
+			// Jetzt das Spiel wie ein E-Mail-Spiel laden.
+			Spiel spielGeladen = (Spiel)Utils.base64ToObject(respMsg.payloadSerialized, Spiel.class, null);
+			
+			if (MinBuildChecker.doCheck(this, spielGeladen.getMinBuild()))
+			{
+				this.currentGameJahr = spielGeladen.getJahr();
+				this.setNeuesSpiel(spielGeladen, true);
+			}		
+		}
+		
+		this.getGameInfoByTimer();
+		
+		this.inputEnabled = true;
+		this.redrawScreen();
 	}
 
 	@Override

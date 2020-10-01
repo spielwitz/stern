@@ -41,4 +41,5 @@ This project is licensed under the [GNU Affero General Public License](http://ww
 * [GSON](https://github.com/google/gson/blob/master/LICENSE) (c) Google. See also file [src/AGPL_License.txt](src/AGPL_License.txt)
 * [iText PDF](http://www.gnu.org/licenses/agpl-3.0.de.html) (c) ITEXT GROUP NV. See also file [src/ApacheLicense-2.0.txt](src/ApacheLicense-2.0.txt)
 * [JetBrains Mono](https://www.jetbrains.com) (c) JetBrains. See also file [src/AGPL_License.txt](src/AGPL_License.txt)
+* [Material Design Icons](https://material.io/resources/icons/?style=baseline). See also file [src/AGPL_License.txt](src/AGPL_License.txt)
 * SpringUtilities (c) 1995, 2008, Oracle and/or its affiliates

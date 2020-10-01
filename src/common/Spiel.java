@@ -274,6 +274,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.spieler = spielerNeu;
 	}
 	
+	public int getJahr()
+	{
+		return this.jahr;
+	}
+	
 	public String getName()
 	{
 		return this.name;

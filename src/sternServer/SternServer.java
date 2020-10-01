@@ -53,6 +53,7 @@ import commonServer.LogEventType;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageActivateUser;
 import commonServer.RequestMessageGetEvaluations;
+import commonServer.RequestMessageGetStatus;
 import commonServer.RequestMessageChangeUser;
 import commonServer.RequestMessageGameHostDeleteGame;
 import commonServer.RequestMessageGameHostFinalizeGame;
@@ -63,6 +64,7 @@ import commonServer.ResponseMessageGamesAndUsers;
 import commonServer.ResponseMessageGetEvaluations;
 import commonServer.ResponseMessageGetLog;
 import commonServer.ResponseMessageGetServerStatus;
+import commonServer.ResponseMessageGetStatus;
 import commonServer.ResponseMessageGetUsers;
 import commonServer.ResponseMessageChangeUser;
 import commonServer.RsaCrypt;
@@ -782,8 +784,10 @@ public class SternServer // NO_UCD (unused code)
 									user.userId, 
 									(RequestMessagePostMoves)Utils.base64ToObject(msg.payloadSerialized, RequestMessagePostMoves.class, null));
 							break;
-						case GET_GAMES_ZUGEINGABE:
-							resp = processRequestGetGamesZugeingabe(userId);
+						case GET_STATUS:
+							resp = processRequestGetStatus(
+									userId,
+									RequestMessageGetStatus.fromJson(msg.payloadSerialized));
 					    	break;
 						case GET_EVALUATIONS:
 							resp = processRequestGetEvaluations(
@@ -1666,28 +1670,44 @@ public class SternServer // NO_UCD (unused code)
 		}
 	}
 	
-	private ResponseMessage processRequestGetGamesZugeingabe(String userId)
+	private ResponseMessage processRequestGetStatus(
+			String userId,
+			RequestMessageGetStatus msg) 
 	{
 		synchronized(this.users)
 		{
-			int count = 0;
-			
 			// Zaehle Spiele eines Spielers, die auf Zugeingabe warten.
+			ResponseMessageGetStatus msgPayload = new ResponseMessageGetStatus();
+			
+			boolean currentGameProvided = msg.currentGameId != null && msg.currentGameId.length() > 0;
+			
 			UserServer user = this.users.get(userId);
 			
 			for (String gameId: user.games)
 			{
 				SpielInfo spielInfo = this.games.get(gameId);
 				
-				if (!spielInfo.abgeschlossen && !spielInfo.zugeingabeBeendet.contains(userId))
-					count++;
+				if (currentGameProvided &&
+					msg.currentGameId.equals(gameId))
+				{
+					msgPayload.currentGameNextYear = spielInfo.jahr > msg.currentGameJahr;
+				}
+				
+				if (!spielInfo.abgeschlossen && 
+						 !spielInfo.zugeingabeBeendet.contains(userId))
+				{
+					msgPayload.gamesWaitingForInput = true;
+				}
+				
+				if (msgPayload.currentGameNextYear && msgPayload.gamesWaitingForInput)
+					break;
 			}
 			
-			ResponseMessage msg = new ResponseMessage(); 
+			ResponseMessage respMsg = new ResponseMessage(); 
 			
-			msg.payloadSerialized = Integer.toString(count);
+			respMsg.payloadSerialized = msgPayload.toJson();
 		
-			return msg;
+			return respMsg;
 		}
 	}
 

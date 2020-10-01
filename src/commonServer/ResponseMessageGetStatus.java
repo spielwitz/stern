@@ -16,25 +16,24 @@
 
 package commonServer;
 
-public enum RequestMessageType
+import com.google.gson.Gson;
+
+public class ResponseMessageGetStatus 
 {
-	//GET_GAME_INFO,
-	GET_GAMES_AND_USERS,
-	POST_MOVES,
-	POST_NEW_GAME,
-	ADMIN_CHANGE_USER,
-	ADMIN_SERVER_SHUTDOWN,
-	ADMIN_PING,
-	ADMIN_GET_USERS,
-	ADMIN_DELETE_USER,
-	ADMIN_GET_SERVER_STATUS,
-	ADMIN_GET_LOG,
-	ADMIN_SET_LOG_LEVEL,
-	PING,
-	GET_GAME,
-	GET_STATUS,
-	GET_EVALUATIONS,
-	GAME_HOST_FINALIZE_GAME,
-	GAME_HOST_DELETE_GAME,
-	ACTIVATE_USER
+	public boolean currentGameNextYear;
+	public boolean gamesWaitingForInput;
+	
+	public String toJson()
+	{
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
+	
+	public static ResponseMessageGetStatus fromJson(String json)
+	{
+		Gson gson = new Gson();
+		ResponseMessageGetStatus obj = gson.fromJson(json, ResponseMessageGetStatus.class);
+		
+		return obj;
+	}	
 }
