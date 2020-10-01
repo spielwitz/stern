@@ -644,13 +644,6 @@ import java.util.Hashtable;
 		return objBuendnis;
 	}
 	
-	byte getCol(Spieler[] spieler)
-	{
-		return this.isNeutral() ?
-				Colors.INDEX_NEUTRAL :
-				spieler[this.getBes()].getColIndex();
-	}
-	
 	void setSender(int spieler, int jahr)
 	{
 		if (this.sender == null)
