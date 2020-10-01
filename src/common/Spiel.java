@@ -486,21 +486,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		if (spClone.abgeschlossen)
 			return spClone;
 		
-		// Flugobjekte
-		if (!spClone.optionen.contains(SpielOptionen.SIMPEL))
-		{	
-			spClone.objekte = new ArrayList<Flugobjekt>();
-			
-			for (Flugobjekt objOrig: this.objekte)
-			{
-				if (objOrig.istBeteiligt(spIndex))
-				{
-					spClone.objekte.add((Flugobjekt)Utils.klon(objOrig));
-				}
-			}
-		}
-		
-		// Spielzuege, Referenzcodes, Preise
+		// Spielzuege, Referenzcodes
 		for (int sp = 0; sp < this.anzSp; sp++)
 		{
 			if (sp != spIndex)
@@ -553,11 +539,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 	{
 		HashSet<SpielOptionen> optionen = new HashSet<SpielOptionen>();
 		
-//		optionen.add(SpielOptionen.KOMPAKTES_SPIELFELD);
-//		optionen.add(SpielOptionen.AUSSERIRDISCHE);
 		optionen.add(SpielOptionen.KEIN_ENDLOSSPIEL);
 		optionen.add(SpielOptionen.KOMMANDOZENTRALEN);
-//		optionen.add(SpielOptionen.SCHWARZES_LOCH);
 		optionen.add(SpielOptionen.FESTUNGEN);
 		optionen.add(SpielOptionen.AUTO_SAVE);
 		

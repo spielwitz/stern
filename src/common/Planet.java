@@ -681,13 +681,7 @@ import java.util.Hashtable;
 		}
 
 		plClone.anz = new Hashtable<ObjektTyp,Integer>();
-		
-		if ((this.bes == Constants.BESITZER_NEUTRAL && zeigeNeutralePlaneten) ||
-			 this.bes != Constants.BESITZER_NEUTRAL)
-		{
-			if (this.getAnz(ObjektTyp.RAUMER) > 0)
-				plClone.anz.put(ObjektTyp.RAUMER, this.getAnz(ObjektTyp.RAUMER));
-		}
+		plClone.anz.put(ObjektTyp.RAUMER, this.getAnz(ObjektTyp.RAUMER));
 		
 		plClone.eprod = 0;
 		plClone.eraum = 0;

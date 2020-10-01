@@ -21,11 +21,11 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	MIN_BUILD = "202009270000";
+	public static final String 	MIN_BUILD = "202010010000";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	RECOMMENDED_BUILD = "202009270000";
+	public static final String 	RECOMMENDED_BUILD = "202010010000";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
 	static final String 		MIGRATION_BUILD_LIMIT = "202009270000";
