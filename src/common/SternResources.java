@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: HQ
+		// Hoechstes vergebenes Symbol: HR
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -567,6 +567,7 @@ public class SternResources
 		symbolDict.put("HO","ZugeingabeObjekteAusblendenAlleAus_HO");
 		symbolDict.put("HP","ZugeingabeObjekteAusblendenAlleAn_HP");
 		symbolDict.put("HQ","AuswertungVerfuegbarSymbol_HQ");
+		symbolDict.put("HR","ServerErrorDh_HR");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4303,5 +4304,12 @@ public class SternResources
 	   */
 	public static String AuswertungVerfuegbarSymbol(boolean symbol) {
 		return symbol ? "$HQ$":messages.getString("AuswertungVerfuegbarSymbol_HQ");
+	}
+
+	/**
+	   * Diffie\u2013Hellman-Schl\u00FCsselaustausch gescheitert: {0} [HR]
+	   */
+	public static String ServerErrorDh(boolean symbol, String arg0) {
+		return symbol ? "$HR§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorDh_HR"), arg0);
 	}
 }

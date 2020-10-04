@@ -44,8 +44,8 @@ public class ClientUserCredentials
 		Gson gson = new Gson();
 		ClientUserCredentials user = gson.fromJson(json, ClientUserCredentials.class);
 		
-		user.serverPublicKeyObject = RsaCrypt.decodePublicKeyFromBase64(user.serverPublicKey);
-		user.userPrivateKeyObject = RsaCrypt.decodePrivateKeyFromBase64(user.userPrivateKey); 
+		user.serverPublicKeyObject = CryptoLib.decodePublicKeyFromBase64(user.serverPublicKey);
+		user.userPrivateKeyObject = CryptoLib.decodePrivateKeyFromBase64(user.userPrivateKey); 
 		
 		return user;
 	}

@@ -14,50 +14,32 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package sternServer;
-
-import java.security.PrivateKey;
+package commonServer;
 
 import com.google.gson.Gson;
 
-import commonServer.CryptoLib;
-import commonServer.LogEventType;
-import commonServer.ServerConstants;
-
-class ServerConfiguration
+public class ResponseMessageUserId
 {
-	String url;
-	int port;
-	String adminEmail;
-	LogEventType logLevel;
+	public String sessionId;
+	public String token;
 	
-	String serverPrivateKey; 
-	String serverPublicKey;	
-	
-	String locale;
-	
-	transient PrivateKey serverPrivateKeyObject;
-	
-	public ServerConfiguration()
+	public ResponseMessageUserId()
 	{
-		this.port = ServerConstants.SERVER_PORT;
-		this.logLevel = LogEventType.valueOf(ServerConstants.SERVER_LOGLEVEL);
+		this.sessionId = CryptoLib.NULL_UUID;
+		this.token = CryptoLib.NULL_UUID;
 	}
 	
-	String toJson()
+	public String toJson()
 	{
 		Gson gson = new Gson();
 		return gson.toJson(this);
 	}
 	
-	static ServerConfiguration fromJson(String json) throws Exception
+	public static ResponseMessageUserId fromJson(String json)
 	{
 		Gson gson = new Gson();
-		ServerConfiguration sc = gson.fromJson(json, ServerConfiguration.class);
+		ResponseMessageUserId user = gson.fromJson(json, ResponseMessageUserId.class);
 		
-		sc.serverPrivateKeyObject = CryptoLib.decodePrivateKeyFromBase64(sc.serverPrivateKey);
-		
-		return sc;
+		return user;
 	}
-	
 }

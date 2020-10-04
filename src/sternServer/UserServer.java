@@ -21,7 +21,7 @@ import java.util.HashSet;
 
 import com.google.gson.Gson;
 
-import commonServer.RsaCrypt;
+import commonServer.CryptoLib;
 
 class UserServer
 {
@@ -60,7 +60,7 @@ class UserServer
 		UserServer user = gson.fromJson(json, UserServer.class);
 		user.games = new HashSet<String>();
 		
-		user.userPublicKeyObject = RsaCrypt.decodePublicKeyFromBase64(user.userPublicKey);
+		user.userPublicKeyObject = CryptoLib.decodePublicKeyFromBase64(user.userPublicKey);
 		
 		return user;
 	}

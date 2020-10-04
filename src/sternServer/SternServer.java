@@ -48,7 +48,9 @@ import common.SpielInfo;
 import common.Spieler;
 import common.SternResources;
 import common.Utils;
+import commonServer.Ciphers;
 import commonServer.ClientUserCredentials;
+import commonServer.CryptoLib;
 import commonServer.LogEventType;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageActivateUser;
@@ -59,6 +61,7 @@ import commonServer.RequestMessageGameHostDeleteGame;
 import commonServer.RequestMessageGameHostFinalizeGame;
 import commonServer.RequestMessagePostMoves;
 import commonServer.RequestMessageSetLogLevel;
+import commonServer.RequestMessageUserId;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
 import commonServer.ResponseMessageGetEvaluations;
@@ -66,8 +69,8 @@ import commonServer.ResponseMessageGetLog;
 import commonServer.ResponseMessageGetServerStatus;
 import commonServer.ResponseMessageGetStatus;
 import commonServer.ResponseMessageGetUsers;
+import commonServer.ResponseMessageUserId;
 import commonServer.ResponseMessageChangeUser;
-import commonServer.RsaCrypt;
 import commonServer.ServerConstants;
 import commonServer.ServerUtils;
 
@@ -85,6 +88,7 @@ public class SternServer // NO_UCD (unused code)
 	
 	private Hashtable<String,UserServer> users;
 	private Hashtable<String,SpielInfo> games;
+	private Hashtable<String, Ciphers> ciphersPerUser;
 	private boolean shutdown = false;
 	private boolean adminCreated;
 	private long serverStartDate;
@@ -112,8 +116,7 @@ public class SternServer // NO_UCD (unused code)
 	{
 		// Init server
 		this.lockObjects = new Hashtable<String, Object>();
-		
-		RsaCrypt.init();
+		this.ciphersPerUser = new Hashtable<String, Ciphers>();
 		
 		// Initialisierung der Serverdaten
 		this.initCreateDataFolders();
@@ -229,7 +232,7 @@ public class SternServer // NO_UCD (unused code)
 	{
 		if (!this.adminCreated)
 		{
-			KeyPair userKeyPair = RsaCrypt.getNewKeyPair();
+			KeyPair userKeyPair = CryptoLib.getNewKeyPair();
 			
 			String user = ServerConstants.ADMIN_USER;
 			
@@ -241,14 +244,14 @@ public class SternServer // NO_UCD (unused code)
 			adminUser.active = true;
 			
 			adminUser.userPublicKey = 
-					RsaCrypt.encodePublicKeyToBase64(userKeyPair.getPublic());
+					CryptoLib.encodePublicKeyToBase64(userKeyPair.getPublic());
 			
 			this.userUpdate(adminUser);
 			
 			// Die Anmeldedaten für den Client in eine Datei schreiben.
 			ClientUserCredentials aca = new ClientUserCredentials();
 			aca.userId = user;
-			aca.userPrivateKey = RsaCrypt.encodePrivateKeyToBase64(userKeyPair.getPrivate());
+			aca.userPrivateKey = CryptoLib.encodePrivateKeyToBase64(userKeyPair.getPrivate());
 			
 			aca.serverPublicKey = serverConfig.serverPublicKey;
 			aca.url = serverConfig.url;
@@ -361,7 +364,7 @@ public class SternServer // NO_UCD (unused code)
 		    }
 			
 			// Jetzt Objekte anlegen
-			KeyPair keyPairRequest = RsaCrypt.getNewKeyPair();
+			KeyPair keyPairRequest = CryptoLib.getNewKeyPair();
 			
 			serverConfig = new ServerConfiguration();
 			
@@ -369,8 +372,8 @@ public class SternServer // NO_UCD (unused code)
 			
 			serverConfig.serverPrivateKeyObject = keyPairRequest.getPrivate();
 			
-			serverConfig.serverPrivateKey = RsaCrypt.encodePrivateKeyToBase64(serverConfig.serverPrivateKeyObject);
-			serverConfig.serverPublicKey = RsaCrypt.encodePublicKeyToBase64(keyPairRequest.getPublic());
+			serverConfig.serverPrivateKey = CryptoLib.encodePrivateKeyToBase64(serverConfig.serverPrivateKeyObject);
+			serverConfig.serverPublicKey = CryptoLib.encodePublicKeyToBase64(keyPairRequest.getPublic());
 			
 			serverConfig.url = serverUrl;
 			serverConfig.port = port;
@@ -495,8 +498,8 @@ public class SternServer // NO_UCD (unused code)
 		}
 		public void run()
 		{
-			byte[] payloadBytes = null;
 			String userId = null;
+			String sessionId = null;
 			OutputStream out = null;
 			DataInputStream in = null;
 			
@@ -505,17 +508,14 @@ public class SternServer // NO_UCD (unused code)
 			    in = new DataInputStream(this.socket.getInputStream());
 			    out = this.socket.getOutputStream();
 			    
-			    byte[] userBytesLength = new byte[RsaCrypt.BYTE_ARRAY_LENGTH];
-			    in.readFully(userBytesLength);
+			    // Empfange die User ID
+			    RequestMessageUserId msgRequest = 
+			    		RequestMessageUserId.fromJson(
+			    				CryptoLib.receiveStringRsaEncrypted(in, 
+			    				serverConfig.serverPrivateKeyObject));
 			    
-			    int userLength = RsaCrypt.decryptIntValue(
-			    		userBytesLength, 
-			    		serverConfig.serverPrivateKeyObject);
-			    
-			    byte[] userIdBytes = new byte[userLength]; // User-ID, mit Server-Credentials verschluesselt
-			    in.readFully(userIdBytes);
-			    
-			    userId = RsaCrypt.decrypt(userIdBytes, serverConfig.serverPrivateKeyObject);
+			    userId = msgRequest.userId;
+			    sessionId = msgRequest.sessionId;
 			    
 			    if (userId.length() < Constants.SPIELER_NAME_MIN_LAENGE || 
 				    	userId.length() > Constants.SPIELER_NAME_MAX_LAENGE)
@@ -526,7 +526,7 @@ public class SternServer // NO_UCD (unused code)
 								LogEventType.Error,
 								SternResources.ServerErrorUngueltigeLaengeBenutzer(
 										false,
-										Integer.toString(userLength)));
+										Integer.toString(userId.length())));
 				    	
 				    	this.closeSocket();
 					    return;
@@ -581,72 +581,71 @@ public class SternServer // NO_UCD (unused code)
 				return;
 			}
 			
-			// ######
-			// 1. Token (Guid) vereinbaren
-			String token = userId.equals(ServerConstants.ACTIVATION_USER) ?
-					null :
-					UUID.randomUUID().toString();
+			String token = 
+					userId.equals(ServerConstants.ACTIVATION_USER) ?
+							CryptoLib.NULL_UUID :
+							UUID.randomUUID().toString();
 			
-			if (token != null)
-			{
-				// 2. Token verschluesselt mit dem oeffentlichen Schluessel des Users an Client schicken
-				byte[] byteToken = RsaCrypt.encrypt(token, user.userPublicKeyObject);
-			    
-			    int lengthToken = (byteToken.length); 
-				byte[] byteLengthToken = ServerUtils.convertIntToByteArray(lengthToken);
-	
-				try
-				{
-					out.write(byteLengthToken);
-					out.write(byteToken);
-				}
-				catch (Exception x)
-				{
-					// Im Fehlerfall den Socket schliessen
-					logMessage(
-							LogEventId.M11,
-							this.getId(),
-							LogEventType.Error,
-							SternResources.ServerErrorSendResponse(false, x.getMessage()));
-					
-					this.closeSocket();
-					return;
-				}
-			}
+			ResponseMessageUserId respMsg = new ResponseMessageUserId();
+			respMsg.token = token;
+
+			// User schickt eine Session ID mit. Pruefen, ob die Session-ID
+			// noch gueltig ist. Wenn ja, eine zufaellige UUID  mit RSA zurueckschicken.
+			Ciphers ciphers = getCiphers(userId, sessionId);
 			
-			// 3. Der Client schickt die Laenge deseigentlichen Payloads und dann den Payload
-			// Das vereinbarte Token steckt im Payload			
 			try
 			{
-			    byte[] lengthBytes = new byte[RsaCrypt.BYTE_ARRAY_LENGTH]; // Laenge des nachfolgenden Payloads
-			    in.readFully(lengthBytes);
-			    
-			    int payloadLength = RsaCrypt.decryptIntValue(
-			    		lengthBytes, 
-			    		serverConfig.serverPrivateKeyObject);
-			    payloadBytes = new byte[payloadLength]; // Die eigentliche Nachricht
-			    in.readFully(payloadBytes);
+				if (ciphers != null)
+				{
+					respMsg.sessionId = sessionId;
+					
+					CryptoLib.sendStringRsaEncrypted(
+							out, 
+							respMsg.toJson(), 
+							user.userPublicKeyObject);
+				}
+				else
+				{			
+					// ODER: User schickt eine leere Session ID mit, ODER Session ist
+					// abgelaufen, ODER Session ID und User passen nicht, dann
+					// eine initiale GUID mit RSA zurueckschicken.
+					if (!userId.equals(ServerConstants.ACTIVATION_USER))
+					{
+						respMsg.sessionId = CryptoLib.NULL_UUID;
+						
+						CryptoLib.sendStringRsaEncrypted(
+								out, 
+								respMsg.toJson(), 
+								user.userPublicKeyObject);
+					}
+					
+					// Ab jetzt neue Ciphers verhandeln
+					ciphers = CryptoLib.diffieHellmanKeyAgreementServer(in, out);
+					
+					setCiphers(userId, ciphers);
+					
+				}
 			}
 			catch (Exception x)
 			{
-				// Im Fehlerfall den Socket schliessen
+				// CIphers konnten nicht ausgetauscht werden
 				logMessage(
-						LogEventId.M9, // #### Neue Fehlernummer!
+						LogEventId.M25,
 						this.getId(),
 						LogEventType.Error,
-						SternResources.ServerErrorRequestReceive(false, x.getMessage()));
+						SternResources.ServerErrorDh(false, x.getMessage()));
 				
 				this.closeSocket();
 				return;
 			}
 
-			// Nachricht entschluesseln
+			// Jetzt kommt die eigentliche Payload-Nachricht, mit AES verschluesselt
 			RequestMessage msg = null;
 			
 			try
 			{
-			    String json = RsaCrypt.decrypt(payloadBytes, serverConfig.serverPrivateKeyObject);
-			    msg = RequestMessage.fromJson(json);
+				msg = RequestMessage.fromJson(
+						CryptoLib.receiveStringAesEncrypted(in, ciphers.cipherDecrypt));
 			    
 			    // Stimmt der Token?
 			    if (token!= null && !token.equals(msg.token))
@@ -849,15 +848,9 @@ public class SternServer // NO_UCD (unused code)
 		    resp.build = ReleaseGetter.getRelease();
 		    
 		    // Send response message
-		    byte[] byteResponse = RsaCrypt.encrypt(resp.toJson(), user.userPublicKeyObject);
-		    
-		    int length = (byteResponse.length); 
-			byte[] lengthBytes = RsaCrypt.encryptIntValue(length, user.userPublicKeyObject);
-
 			try
 			{
-				out.write(lengthBytes);
-				out.write(byteResponse);
+				 CryptoLib.sendStringAesEncrypted(out, resp.toJson(), ciphers.cipherEncrypt);
 			}
 			catch (Exception x)
 			{
@@ -1348,7 +1341,7 @@ public class SternServer // NO_UCD (unused code)
 				
 			}
 			
-			user.userPublicKeyObject = RsaCrypt.decodePublicKeyFromBase64(user.userPublicKey);
+			user.userPublicKeyObject = CryptoLib.decodePublicKeyFromBase64(user.userPublicKey);
 			
 			if (this.users.containsKey(user.userId))
 				this.users.replace(user.userId, user);
@@ -1728,6 +1721,53 @@ public class SternServer // NO_UCD (unused code)
 		} catch (IOException e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	private Ciphers getCiphers(String userId, String sessionId)
+	{
+		if (userId.equals(ServerConstants.ACTIVATION_USER) ||
+			sessionId == null || 
+			sessionId.equals(CryptoLib.NULL_UUID))
+		{
+			return null;
+		}
+		
+		synchronized (this.ciphersPerUser)
+		{
+			Ciphers ciphers = this.ciphersPerUser.get(userId);
+			
+			if (ciphers == null)
+				return null;
+			
+			if (!ciphers.sessionId.equals(sessionId))
+				return null;
+			
+			long timeNow = System.currentTimeMillis();
+			
+			if (timeNow - ciphers.lastUsed <= CryptoLib.CIPHERS_VALIDITY_MILLISECONDS)
+			{
+				ciphers.lastUsed = timeNow;
+				return ciphers;
+			}
+			else
+				return null;
+		}
+	}
+	
+	private void setCiphers(String userId, Ciphers ciphers)
+	{
+		if (userId == null || 
+			userId.equals(ServerConstants.ACTIVATION_USER) ||
+			ciphers == null)
+		{
+			return;
+		}
+		
+		synchronized (this.ciphersPerUser)
+		{
+			ciphers.lastUsed = System.currentTimeMillis();
+			this.ciphersPerUser.put(userId, ciphers);
 		}
 	}
 }

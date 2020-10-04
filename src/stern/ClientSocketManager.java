@@ -24,15 +24,27 @@ import java.net.Socket;
 import common.Constants;
 import common.ReleaseGetter;
 import common.SternResources;
+import commonServer.Ciphers;
 import commonServer.ClientUserCredentials;
+import commonServer.CryptoLib;
 import commonServer.RequestMessage;
+import commonServer.RequestMessageUserId;
 import commonServer.ResponseMessage;
-import commonServer.RsaCrypt;
+import commonServer.ResponseMessageUserId;
 import commonServer.ServerConstants;
-import commonServer.ServerUtils;
 
 class ClientSocketManager
 {
+	private static ClientSocketManager obj;
+	private static Object lockObj = new Object();
+	
+	private Ciphers aesCiphers;
+	// private String lastUserId;
+	
+	static {
+		obj = new ClientSocketManager();
+	}
+	
 	static ResponseMessage sendAndReceive (
 			ClientUserCredentials user,
 			RequestMessage msg)
@@ -57,7 +69,7 @@ class ClientSocketManager
 	    	return msgResponse;
 		}
 		
-		byte[] payloadBytes = null;
+		ResponseMessage msgResponse  = null;
 		Socket kkSocket = null;
 		OutputStream out = null;
 		
@@ -70,48 +82,70 @@ class ClientSocketManager
 			DataInputStream in = new DataInputStream(kkSocket.getInputStream());
 			
 			// Zuerst User ID an den Server schicken.
-			byte[] userIdBytes = RsaCrypt.encrypt(user.userId, user.serverPublicKeyObject);
-			byte[] userIdBytesLength = RsaCrypt.encryptIntValue(userIdBytes.length, user.serverPublicKeyObject);
-
-			out.write(userIdBytesLength);
-			out.write(userIdBytes);
-
-			// Nur wenn es nicht um das Aktivieren eines Users warten: Nun auf den Token warten
+			RequestMessageUserId msgRequest = new RequestMessageUserId();
+			
+			msgRequest.userId = user.userId;
+			
+			Ciphers ciphers = obj.getAesCiphers();
+			
+			if (ciphers == null ||
+				ciphers.userId == null ||
+				!ciphers.userId.equals(user.userId))
+			{
+				msgRequest.sessionId = CryptoLib.NULL_UUID;
+			}
+			else
+			{
+				msgRequest.sessionId = ciphers.sessionId;
+			}
+			
+			CryptoLib.sendStringRsaEncrypted(
+					out, 
+					msgRequest.toJson(), 
+					user.serverPublicKeyObject);
+			
+			ResponseMessageUserId respMsg = null;
+			
 			if (!user.userId.equals(ServerConstants.ACTIVATION_USER))
 			{
-				byte lengthTokenBytes[] = new byte[4];
-				in.readFully(lengthTokenBytes);
-				
-				int lengthToken = ServerUtils.convertByteArrayToInt(lengthTokenBytes);			
-				byte tokenBytes[] = new byte[lengthToken];
-				in.readFully(tokenBytes);
-				
-				// Das Token mit dem persönlichen privaten Schlüssel des Users entschlüsseln
-				msg.token = RsaCrypt.decrypt(tokenBytes, user.userPrivateKeyObject);
+				respMsg = 
+						ResponseMessageUserId.fromJson(
+							CryptoLib.receiveStringRsaEncrypted(in, user.userPrivateKeyObject));
 			}
+			else
+			{
+				respMsg = new ResponseMessageUserId();
+			}
+			
+			if (respMsg.sessionId.equals(CryptoLib.NULL_UUID))
+			{
+				// Ciphers sind nicht mehr gueltig. Neue aushandeln.
+				ciphers = CryptoLib.diffieHellmanKeyAgreementClient(in, out);
+			}
+			
+			// Token mit der eigentlichen Nachricht schicken!
+			msg.token = respMsg.token;
 			
 			// Jetzt erst die eigentliche Request-Nachricht an den Server schicken.
 			// Die Request-Nachricht enthält das vereinbarte Token.
-			byte[] payload = RsaCrypt.encrypt(msg.toJson(), user.serverPublicKeyObject);
-			
-			int length = (payload.length); 
-			byte[] lengthBytes = RsaCrypt.encryptIntValue(length, user.serverPublicKeyObject);
-			
-			out.write(lengthBytes);
-			out.write(payload);
+			CryptoLib.sendStringAesEncrypted(
+					out, 
+					msg.toJson(), 
+					ciphers.cipherEncrypt);
 			
 			// Warte auf die Response-Nachricht
-			lengthBytes = new byte[RsaCrypt.BYTE_ARRAY_LENGTH]; // Laenge des nachfolgenden Payloads
-		    in.readFully(lengthBytes);
-		    
-		    int payloadLength = RsaCrypt.decryptIntValue(lengthBytes, user.userPrivateKeyObject);
-		    payloadBytes = new byte[payloadLength]; // Die eigentliche Nachricht
-		    in.readFully(payloadBytes);
-		  
+			msgResponse = 
+					ResponseMessage.fromJson(
+							CryptoLib.receiveStringAesEncrypted(in, ciphers.cipherDecrypt));
+			
+			ciphers.userId = user.userId;
+			kkSocket.close();
+			
+			obj.setAesCiphers(ciphers);
 		}
 	    catch (EOFException e)
 		{
-	    	ResponseMessage msgResponse = new ResponseMessage();
+	    	msgResponse = new ResponseMessage();
 	    	
 	    	msgResponse.error = true;
 	    	msgResponse.errorMsg = "Der Server hat die Verbindung beendet. Prüfen Sie Ihre Anmeldedaten oder probieren Sie es nochmal.";
@@ -120,7 +154,7 @@ class ClientSocketManager
 		}
 	    catch (Exception e)
 		{
-	    	ResponseMessage msgResponse = new ResponseMessage();
+	    	msgResponse = new ResponseMessage();
 	    	
 	    	msgResponse.error = true;
 	    	msgResponse.errorMsg = "Keine Verbindung mit dem Server:\n" + e.getMessage();
@@ -128,41 +162,38 @@ class ClientSocketManager
 	    	return msgResponse;
 		}
 	    
-	    try
-	    {
-		    kkSocket.close();
-		    
-		    // Die Response-Nachricht mit dem persönlichen privaten Schlüssel
-		    // des Users entschlüsseln.
-		    String json = RsaCrypt.decrypt(payloadBytes, user.userPrivateKeyObject);
-		    ResponseMessage msgResponse = ResponseMessage.fromJson(json);
-		    
-		    if (!ReleaseGetter.getRelease().equals(Constants.NO_BUILD_INFO)) // Wenn Stern aus Eclipse heraus gestartet wird
-			{
-				 if (!(msgResponse.build != null && msgResponse.build.equals(Constants.NO_BUILD_INFO)))
+	    if (!ReleaseGetter.getRelease().equals(Constants.NO_BUILD_INFO)) // Wenn Stern aus Eclipse heraus gestartet wird
+		{
+			 if (!(msgResponse.build != null && msgResponse.build.equals(Constants.NO_BUILD_INFO)))
+			 {
+				 if (msgResponse.build == null || msgResponse.build.compareTo(Constants.MIN_BUILD) < 0)
 				 {
-					 if (msgResponse.build == null || msgResponse.build.compareTo(Constants.MIN_BUILD) < 0)
-					 {
-						 msgResponse.error = true;
-						 msgResponse.errorMsg = SternResources.ServerBuildVeraltet(
-									false,
-									msgResponse.build == null ? "[null]" : ReleaseGetter.format(msgResponse.build),
-									ReleaseGetter.format(Constants.MIN_BUILD)
-									);
-					 }
+					 msgResponse.error = true;
+					 msgResponse.errorMsg = SternResources.ServerBuildVeraltet(
+								false,
+								msgResponse.build == null ? "[null]" : ReleaseGetter.format(msgResponse.build),
+								ReleaseGetter.format(Constants.MIN_BUILD)
+								);
 				 }
-			}
-		    
-		    return msgResponse;
-	    }
-	    catch (Exception x)
-	    {
-	    	ResponseMessage msgResponse = new ResponseMessage();
-	    	
-	    	msgResponse.error = true;
-	    	msgResponse.errorMsg = "Fehler beim Entschlüsseln der Serverantwort: " + x.getMessage();
-	    	
-	    	return msgResponse;
-	    }
+			 }
+		}
+	    
+	    return msgResponse;
+    }
+
+	private Ciphers getAesCiphers()
+	{
+		synchronized(lockObj)
+		{
+			return aesCiphers;
+		}
+	}
+
+	private void setAesCiphers(Ciphers aesCiphers)
+	{
+		synchronized(lockObj)
+		{
+			this.aesCiphers = aesCiphers;
+		}
 	}
 }

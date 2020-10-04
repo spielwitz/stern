@@ -41,12 +41,12 @@ import javax.swing.SpringLayout;
 
 import common.SternResources;
 import commonServer.ClientUserCredentials;
+import commonServer.CryptoLib;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageActivateUser;
 import commonServer.RequestMessageType;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageChangeUser;
-import commonServer.RsaCrypt;
 import commonServer.ServerConstants;
 import commonServer.ServerUtils;
 import commonUi.ButtonDark;
@@ -332,13 +332,13 @@ import commonUi.TextFieldDark;
 					String directory = fd.getDirectory();
 					
 					// Eigenen Key anlegen
-					KeyPair userKeyPair = RsaCrypt.getNewKeyPair();
+					KeyPair userKeyPair = CryptoLib.getNewKeyPair();
 					
 					RequestMessageActivateUser msg = new RequestMessageActivateUser();
 					
 					msg.userId = newUser.userId;
 					msg.activationCode = newUser.activationCode;
-					msg.userPublicKey = RsaCrypt.encodePublicKeyToBase64(userKeyPair.getPublic());
+					msg.userPublicKey = CryptoLib.encodePublicKeyToBase64(userKeyPair.getPublic());
 					
 					// Client Credential Objekt anlegen
 					ClientUserCredentials cucTemp = new ClientUserCredentials();
@@ -347,11 +347,11 @@ import commonUi.TextFieldDark;
 					cucTemp.url = newUser.serverUrl;
 					cucTemp.port = newUser.serverPort;
 					cucTemp.serverPublicKey = newUser.serverPublicKey;
-					cucTemp.userPrivateKey = RsaCrypt.encodePrivateKeyToBase64(userKeyPair.getPrivate());
+					cucTemp.userPrivateKey = CryptoLib.encodePrivateKeyToBase64(userKeyPair.getPrivate());
 					cucTemp.adminEmail = newUser.adminEmail;
 					
-					cucTemp.serverPublicKeyObject = RsaCrypt.decodePublicKeyFromBase64(cucTemp.serverPublicKey);
-					cucTemp.userPrivateKeyObject = RsaCrypt.decodePrivateKeyFromBase64(cucTemp.userPrivateKey); 
+					cucTemp.serverPublicKeyObject = CryptoLib.decodePublicKeyFromBase64(cucTemp.serverPublicKey);
+					cucTemp.userPrivateKeyObject = CryptoLib.decodePrivateKeyFromBase64(cucTemp.userPrivateKey); 
 					
 					// Aktivieren-Nachricht an den Server schicken
 					RequestMessage reqMsg = new RequestMessage(RequestMessageType.ACTIVATE_USER);
