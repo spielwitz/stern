@@ -360,7 +360,7 @@ import commonUi.TextFieldDark;
 		getRootPane().setDefaultButton(this.butClose);
 		
 		if (this.cuc == null)
-			tabpane.setSelectedComponent(panAuth);
+			tabpane.setSelectedComponent(panAuthOuter);
 		
 		this.pack();
 		this.setLocationRelativeTo(parent);	
