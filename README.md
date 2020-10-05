@@ -16,7 +16,7 @@ Michael Schweitzer
 
 STERN is a digital board game with many strategic, but only a few random elements. Two to six real players sit around a computer and enter their moves one after the other. Communication among other players for the purpose of cooperation or bluffing is an important part of the game. That's why a really exciting game requires at least four participants and several hours or days. The computer only monitors the rules of the game and evaluates the moves.
 
-Place of action: space. Conquer as many planets as possible and secure supremacy in the universe. In addition to spaceships to conquer and defend planets, you can complete your fleet with spy spaceships, patrols, mines, mine clearers and transporters. You can also upgrade planets and protect them against attacks with fortresses. Make alliances with other players to go on conquests or defend planets together.
+Place of action: space. Conquer as many planets as possible and secure supremacy in the universe. In addition to spaceships to conquer and defend planets, you can complete your fleet with spy spaceships, patrols, mines, mine clearers and transporters. You can also upgrade planets and protect them against attacks with defence shields. Make alliances with other players to go on conquests or defend planets together.
 
 STERN offers two game modes: the STERN CLASSIC mode with all the features mentioned and the slimmed-down STERN LIGHT mode with many simplifications for starters. The LIGHT mode offers the possibility to play against computer opponents.
 
