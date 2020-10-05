@@ -39,6 +39,8 @@ public class ScreenPainter
 	
 	private static final double		LINIE_OBJEKT_RADIUS = 0.25;
 	private static final double		LINIE_OBJEKT_GROESSE = 0.5;
+	private static final double		OBJEKT_GROESSE = 0.75;
+	private static final int		OBJEKT_MIN_PIXEL = 2;
 	
 	private static final int 		sp1 = 5; // Objekttyp
 	private static final int 		sp2 = 46; //Kaufpreis
@@ -1053,14 +1055,159 @@ public class ScreenPainter
 	
 	private void zeichnePunkte(ArrayList<SpielfeldPointDisplayContent> points)
 	{
-		if (points == null)
+		if (points == null || points.size() == 0)
 			return;
+
+		int size = Math.max(
+				Utils.round(4 * OBJEKT_GROESSE * this.factor),
+				OBJEKT_MIN_PIXEL);
 		
 		for (SpielfeldPointDisplayContent point: points)
 		{
-			this.fillCircleSpielfeld(point.getPos(), LINIE_OBJEKT_RADIUS, Color.black);
-			this.drawCircleSpielfeld(point.getPos(), LINIE_OBJEKT_RADIUS, Colors.get(point.getCol()));
+			int sp = point.getCol() - Colors.SPIELER_FARBEN_OFFSET;
+			
+			Point2D.Double pt = point.getPos();
+			this.setColor(Colors.get(point.getCol()));
+			
+			switch (sp)
+			{
+			case 0:
+				// X
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+						
+				break;
+			case 1:
+				// +
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y),
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y));
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) - size);
+				break;
+			case 2:
+				// Sanduhr
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				break;
+			case 3:
+				// Sanduhr (90 Grad)
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+				break;
+			case 4:
+				// Rechteck
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size);
+
+
+				break;
+			case 5:
+				// Stern
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y),
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y));
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) - size);
+				break;
+			default:
+				// Kreis
+				this.fillCircleSpielfeld(pt, LINIE_OBJEKT_RADIUS, Color.black);
+				this.drawCircleSpielfeld(pt, LINIE_OBJEKT_RADIUS, Colors.get(point.getCol()));
+			}
 		}
+	}
+
+	private int getPtSpielfeldX(double ptX)
+	{
+		return  Utils.round(((double)SPIELFELD_XOFF + (ptX + 0.5) * (double)SPIELFELD_DX) * this.factor);
+	}
+	
+	private int getPtSpielfeldY(double ptY)
+	{
+		return  Utils.round(((double)SPIELFELD_YOFF + (ptY + 0.5)* (double)SPIELFELD_DX) * this.factor);
 	}
 	
 	private void drawTitelbild()

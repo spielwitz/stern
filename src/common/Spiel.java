@@ -6193,8 +6193,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  					keys.add(new ConsoleKey("5", SternResources.SpielinformationenKommandozentralen(true)));
  				if (!simpel)
  					keys.add(new ConsoleKey("6",SternResources.SpielinformationenBuendnisse(true)));
- 				if (!simpel)
- 					keys.add(new ConsoleKey("7",SternResources.SpielinformationenNeutralePlaneten(true)));
  				 				
  				ConsoleInput input = this.spiel.console.waitForKeyPressed(keys, false);
  				
@@ -6220,8 +6218,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  						( this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN) ||
  								this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH)))
  					this.kommandozentralen();
- 				else if (!simpel && inputString.equals("7"))
- 					this.neutralePlaneten();
  				else if (inputString.equals("0"))
  					this.editor();
  				else
@@ -6270,17 +6266,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 
  			this.spiel.console.waitForTaste();
  		}
- 		
- 		private void neutralePlaneten()
- 		{
- 			this.spiel.console.setHeaderText(
- 					this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenNeutralePlanetenTitel(true), Colors.INDEX_NEUTRAL);
- 			
- 			this.spiel.updatePlanetenlisteDisplay(false);
-
- 			this.spiel.console.waitForTaste();
- 		}
-
  		
  		private void minenfelder()
  		{
