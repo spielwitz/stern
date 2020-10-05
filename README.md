@@ -12,7 +12,7 @@ Michael Schweitzer
 
 ## What is it?
 
-![STERN](https://stern.dyndns1.de/img/stern.png)
+![STERN](sternEN.png)
 
 STERN is a digital board game with many strategic, but only a few random elements. Two to six real players sit around a computer and enter their moves one after the other. Communication among other players for the purpose of cooperation or bluffing is an important part of the game. That's why a really exciting game requires at least four participants and several hours or days. The computer only monitors the rules of the game and evaluates the moves.
 

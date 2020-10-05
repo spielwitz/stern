@@ -1273,7 +1273,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				plData.add(new SpielfeldPlanetDisplayContent(
 						this.getPlanetenNameFromIndex(plIndex),
 						this.planeten[plIndex].getPos(),
-						Colors.INDEX_NEUTRAL,
+						Colors.getColorIndexDarker(Colors.INDEX_NEUTRAL),
 						false,
 						frameCol));
 			else
@@ -1282,7 +1282,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				plData.add(new SpielfeldPlanetDisplayContent(
 						this.getPlanetenNameFromIndex(plIndex),
 						this.planeten[plIndex].getPos(),
-						this.spieler[this.planeten[plIndex].getBes()].getColIndex(),
+						Colors.getColorIndexDarker(this.spieler[this.planeten[plIndex].getBes()].getColIndex()),
 						invers,
 						frameCol));
 			}

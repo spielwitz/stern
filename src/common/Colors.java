@@ -79,9 +79,9 @@ public class Colors
 	
 	private static Color getColorDarker(Color color)
 	{
-		int red = color.getRed() / 2;
-		int green = color.getGreen() / 2;
-		int blue = color.getBlue() / 2;
+		int red = (int)(color.getRed() *0.66);
+		int green = (int)(color.getGreen() *0.66);
+		int blue = (int)(color.getBlue() *0.66);
 		
 		return new Color(getColorRGB(red, green, blue));
 	}
