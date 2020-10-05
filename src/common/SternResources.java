@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: HR
+		// Hoechstes vergebenes Symbol: HT
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -568,6 +568,8 @@ public class SternResources
 		symbolDict.put("HP","ZugeingabeObjekteAusblendenAlleAn_HP");
 		symbolDict.put("HQ","AuswertungVerfuegbarSymbol_HQ");
 		symbolDict.put("HR","ServerErrorDh_HR");
+		symbolDict.put("HS","ServerNeueSession_HS");
+		symbolDict.put("HT","ServerILogSessionId_HT");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4311,5 +4313,19 @@ public class SternResources
 	   */
 	public static String ServerErrorDh(boolean symbol, String arg0) {
 		return symbol ? "$HR§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorDh_HR"), arg0);
+	}
+
+	/**
+	   * Neue Session {0} f\u00FCr User {1} erzeugt. [HS]
+	   */
+	public static String ServerNeueSession(boolean symbol, String arg0, String arg1) {
+		return symbol ? "$HS§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerNeueSession_HS"), arg0, arg1);
+	}
+
+	/**
+	   * Session ID [HT]
+	   */
+	public static String ServerILogSessionId(boolean symbol) {
+		return symbol ? "$HT$":messages.getString("ServerILogSessionId_HT");
 	}
 }

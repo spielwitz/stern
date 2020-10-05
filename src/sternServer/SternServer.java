@@ -88,7 +88,7 @@ public class SternServer // NO_UCD (unused code)
 	
 	private Hashtable<String,UserServer> users;
 	private Hashtable<String,SpielInfo> games;
-	private Hashtable<String, Ciphers> ciphersPerUser;
+	private Hashtable<String, Ciphers> ciphersPerSession;
 	private boolean shutdown = false;
 	private boolean adminCreated;
 	private long serverStartDate;
@@ -116,7 +116,7 @@ public class SternServer // NO_UCD (unused code)
 	{
 		// Init server
 		this.lockObjects = new Hashtable<String, Object>();
-		this.ciphersPerUser = new Hashtable<String, Ciphers>();
+		this.ciphersPerSession = new Hashtable<String, Ciphers>();
 		
 		// Initialisierung der Serverdaten
 		this.initCreateDataFolders();
@@ -420,9 +420,14 @@ public class SternServer // NO_UCD (unused code)
 	
 	private void logMessage(int eventId, LogEventType severity, String msg)
 	{
-		this.logMessage(eventId, 0, severity, msg);
+		this.logMessage(eventId, 0, severity, null, msg);
 	}
-	private void logMessage(int eventId, long threadId, LogEventType severity, String msg)
+	private void logMessage(
+			int eventId, 
+			long threadId, 
+			LogEventType severity,
+			String sessionId,
+			String msg)
 	{
 		if (serverConfig.logLevel == LogEventType.Information &&
 				severity == LogEventType.Verbose)
@@ -446,6 +451,7 @@ public class SternServer // NO_UCD (unused code)
 			sb.append(SternResources.ServerILogDatum(false) + "\t");
 			sb.append(SternResources.ServerILogEventId(false) + "\t");
 			sb.append(SternResources.ServerILogThreadId(false) + "\t");
+			sb.append(SternResources.ServerILogSessionId(false) + "\t");
 			sb.append(SternResources.ServerILogLevel(false) + "\t");
 			sb.append(SternResources.ServerILogMeldung(false) + "\n\n");
 		}
@@ -458,6 +464,10 @@ public class SternServer // NO_UCD (unused code)
 		
 		if (threadId > 0)
 			sb.append(threadId);
+		sb.append("\t");
+		
+		if (sessionId != null)
+			sb.append(sessionId);
 		sb.append("\t");
 		
 		sb.append(severity.toString());
@@ -518,17 +528,18 @@ public class SternServer // NO_UCD (unused code)
 			    sessionId = msgRequest.sessionId;
 			    
 			    if (userId.length() < Constants.SPIELER_NAME_MIN_LAENGE || 
-				    	userId.length() > Constants.SPIELER_NAME_MAX_LAENGE)
+				    userId.length() > Constants.SPIELER_NAME_MAX_LAENGE)
 				{
 				    	logMessage(
 								LogEventId.M21,
 								this.getId(),
 								LogEventType.Error,
+								sessionId,
 								SternResources.ServerErrorUngueltigeLaengeBenutzer(
 										false,
 										Integer.toString(userId.length())));
 				    	
-				    	this.closeSocket();
+				    	this.closeSocket(sessionId);
 					    return;
 			    }
 			    
@@ -536,6 +547,7 @@ public class SternServer // NO_UCD (unused code)
 						LogEventId.M6,
 						this.getId(),
 						LogEventType.Verbose,
+						sessionId,
 						SternResources.ServerBenutzer(false, userId));
 			    
 			    // Pruefen, ob es den user gibt. Wenn nicht, dann sofort aussteigen.
@@ -545,9 +557,10 @@ public class SternServer // NO_UCD (unused code)
 								LogEventId.M16,
 								this.getId(),
 								LogEventType.Error,
+								sessionId,
 								SternResources.ServerErrorUngueltigerBenutzer(false, userId));
 				    	
-				    	this.closeSocket();
+				    	this.closeSocket(sessionId);
 					    return;
 			    }
 			}
@@ -558,9 +571,10 @@ public class SternServer // NO_UCD (unused code)
 						LogEventId.M9,
 						this.getId(),
 						LogEventType.Error,
+						sessionId,
 						SternResources.ServerErrorRequestReceive(false, x.getMessage()));
 				
-				this.closeSocket();
+				this.closeSocket(sessionId);
 				return;
 			}
 			
@@ -575,9 +589,10 @@ public class SternServer // NO_UCD (unused code)
 						LogEventId.M24,
 						this.getId(),
 						LogEventType.Error,
+						sessionId,
 						SternResources.ServerErrorLogonWithInactiveUser(false, user.userId));
 				
-				this.closeSocket();
+				this.closeSocket(sessionId);
 				return;
 			}
 			
@@ -586,44 +601,40 @@ public class SternServer // NO_UCD (unused code)
 							CryptoLib.NULL_UUID :
 							UUID.randomUUID().toString();
 			
-			ResponseMessageUserId respMsg = new ResponseMessageUserId();
-			respMsg.token = token;
-
 			// User schickt eine Session ID mit. Pruefen, ob die Session-ID
 			// noch gueltig ist. Wenn ja, eine zufaellige UUID  mit RSA zurueckschicken.
-			Ciphers ciphers = getCiphers(userId, sessionId);
+			Ciphers ciphers = getCiphers(sessionId);
 			
 			try
 			{
-				if (ciphers != null)
+				if (!userId.equals(ServerConstants.ACTIVATION_USER))
 				{
-					respMsg.sessionId = sessionId;
-					
+					ResponseMessageUserId respMsg = new ResponseMessageUserId();
+					respMsg.token = token;
+					respMsg.sessionValid = ciphers != null;
+
 					CryptoLib.sendStringRsaEncrypted(
 							out, 
 							respMsg.toJson(), 
 							user.userPublicKeyObject);
 				}
-				else
-				{			
-					// ODER: User schickt eine leere Session ID mit, ODER Session ist
-					// abgelaufen, ODER Session ID und User passen nicht, dann
-					// eine initiale GUID mit RSA zurueckschicken.
+				
+				if (ciphers == null)
+				{
+					ciphers = CryptoLib.diffieHellmanKeyAgreementServer(in, out);
+					sessionId = ciphers.sessionId;
+					
 					if (!userId.equals(ServerConstants.ACTIVATION_USER))
 					{
-						respMsg.sessionId = CryptoLib.NULL_UUID;
-						
-						CryptoLib.sendStringRsaEncrypted(
-								out, 
-								respMsg.toJson(), 
-								user.userPublicKeyObject);
+						setCiphers(sessionId, ciphers);
 					}
 					
-					// Ab jetzt neue Ciphers verhandeln
-					ciphers = CryptoLib.diffieHellmanKeyAgreementServer(in, out);
-					
-					setCiphers(userId, ciphers);
-					
+					logMessage(
+							LogEventId.M26,
+							this.getId(),
+							LogEventType.Information,
+							sessionId,
+							SternResources.ServerNeueSession(false, ciphers.sessionId, userId));
 				}
 			}
 			catch (Exception x)
@@ -633,9 +644,10 @@ public class SternServer // NO_UCD (unused code)
 						LogEventId.M25,
 						this.getId(),
 						LogEventType.Error,
+						sessionId,
 						SternResources.ServerErrorDh(false, x.getMessage()));
 				
-				this.closeSocket();
+				this.closeSocket(sessionId);
 				return;
 			}
 
@@ -658,9 +670,10 @@ public class SternServer // NO_UCD (unused code)
 						LogEventId.M10,
 						this.getId(),
 						LogEventType.Error,
+						sessionId,
 						SternResources.ServerErrorDecode(false, x.getMessage()));
 				
-				this.closeSocket();
+				this.closeSocket(sessionId);
 				return;
 			}
 			
@@ -685,6 +698,7 @@ public class SternServer // NO_UCD (unused code)
 					LogEventId.M17,
 					this.getId(),
 					LogEventType.Information,
+					sessionId,
 					SternResources.ServerInfoMessageType(false, msg.type.toString(), userId));
 			
 		    ResponseMessage resp = null;
@@ -710,6 +724,7 @@ public class SternServer // NO_UCD (unused code)
 							resp = processRequestAdminChangeUser(
 									userId, 
 									this.getId(), 
+									sessionId,
 									RequestMessageChangeUser.fromJson(msg.payloadSerialized));
 							break;
 						case ADMIN_DELETE_USER:
@@ -833,6 +848,7 @@ public class SternServer // NO_UCD (unused code)
 							LogEventId.M23,
 							this.getId(),
 							LogEventType.Critical,
+							sessionId,
 							sb.toString());
 		    	}
 		    }
@@ -840,7 +856,7 @@ public class SternServer // NO_UCD (unused code)
 		    if (resp == null)
 		    {
 		    	// Unberechtigter Zugriff oder irgendein anderer Grund, keine Antwort zu schicken
-		    	this.closeSocket();
+		    	this.closeSocket(sessionId);
 		    	return;
 		    }
 		    
@@ -859,22 +875,24 @@ public class SternServer // NO_UCD (unused code)
 						LogEventId.M11,
 						this.getId(),
 						LogEventType.Error,
+						sessionId,
 						SternResources.ServerErrorSendResponse(false, x.getMessage()));
 				
-				this.closeSocket();
+				this.closeSocket(sessionId);
 				return;
 			}
 			
 		    // Socket schliessen
-			this.closeSocket();
+			this.closeSocket(sessionId);
 		}
 		
-		private void closeSocket()
+		private void closeSocket(String sessionId)
 		{
 			logMessage(
 					LogEventId.M7,
 					this.getId(),
 					LogEventType.Verbose,
+					sessionId,
 					SternResources.ServerInfoClientClosing(false, socket.getInetAddress().toString()));
 
 		    try {
@@ -885,6 +903,7 @@ public class SternServer // NO_UCD (unused code)
 						LogEventId.M12,
 						this.getId(),
 						LogEventType.Error,
+						sessionId,
 						SternResources.ServerErrorClientClosing(false, x.getMessage()));
 			}
 		    
@@ -892,6 +911,7 @@ public class SternServer // NO_UCD (unused code)
 					LogEventId.M8,
 					this.getId(),
 					LogEventType.Verbose,
+					sessionId,
 					SternResources.ServerThreadClosing(false));
 		}
 		
@@ -1068,7 +1088,11 @@ public class SternServer // NO_UCD (unused code)
 		}
 	}
 	
-	private ResponseMessage processRequestAdminChangeUser(String adminUserId, long threadId, RequestMessageChangeUser msgNeuerSpieler)
+	private ResponseMessage processRequestAdminChangeUser(
+			String adminUserId, 
+			long threadId,
+			String sessionId,
+			RequestMessageChangeUser msgNeuerSpieler)
 	{
 		ResponseMessage msgResponse = new ResponseMessage();
 		
@@ -1084,6 +1108,7 @@ public class SternServer // NO_UCD (unused code)
 					LogEventId.M14,
 					threadId,
 					LogEventType.Error,
+					sessionId,
 					SternResources.ServerErrorAdminNeuerUser(false));
 
 			return msgResponse;
@@ -1132,6 +1157,7 @@ public class SternServer // NO_UCD (unused code)
 					LogEventId.M15,
 					threadId,
 					LogEventType.Information,
+					sessionId,
 					SternResources.ServerInfoInaktiverBenutzerAngelegt(false, user.userId));
 			
 			this.userUpdate(user);
@@ -1724,18 +1750,17 @@ public class SternServer // NO_UCD (unused code)
 		}
 	}
 	
-	private Ciphers getCiphers(String userId, String sessionId)
+	private Ciphers getCiphers(String sessionId)
 	{
-		if (userId.equals(ServerConstants.ACTIVATION_USER) ||
-			sessionId == null || 
+		if (sessionId == null || 
 			sessionId.equals(CryptoLib.NULL_UUID))
 		{
 			return null;
 		}
 		
-		synchronized (this.ciphersPerUser)
+		synchronized (this.ciphersPerSession)
 		{
-			Ciphers ciphers = this.ciphersPerUser.get(userId);
+			Ciphers ciphers = this.ciphersPerSession.get(sessionId);
 			
 			if (ciphers == null)
 				return null;
@@ -1745,29 +1770,40 @@ public class SternServer // NO_UCD (unused code)
 			
 			long timeNow = System.currentTimeMillis();
 			
-			if (timeNow - ciphers.lastUsed <= CryptoLib.CIPHERS_VALIDITY_MILLISECONDS)
+			if (timeNow - ciphers.lastUsed > CryptoLib.CIPHERS_MAX_INACTIVITY_MILLISECONDS)
 			{
-				ciphers.lastUsed = timeNow;
-				return ciphers;
-			}
-			else
+				// Inaktivitaet
 				return null;
+			}				
+			
+			if (timeNow - ciphers.created > CryptoLib.CIPHERS_MAX_VALIDITY_MILLISECONDS)
+			{
+				// Maximale Haltbarkeit
+				return null;
+			}
+			
+			ciphers.lastUsed = timeNow;
+			return ciphers;
 		}
 	}
 	
-	private void setCiphers(String userId, Ciphers ciphers)
+	private void setCiphers(String sessionId, Ciphers ciphers)
 	{
-		if (userId == null || 
-			userId.equals(ServerConstants.ACTIVATION_USER) ||
+		if (sessionId == null || 
+			sessionId.equals(CryptoLib.NULL_UUID) ||
 			ciphers == null)
 		{
 			return;
 		}
 		
-		synchronized (this.ciphersPerUser)
+		synchronized (this.ciphersPerSession)
 		{
 			ciphers.lastUsed = System.currentTimeMillis();
-			this.ciphersPerUser.put(userId, ciphers);
+			
+			if (ciphers.created == 0)
+				ciphers.created = ciphers.lastUsed;
+			
+			this.ciphersPerSession.put(sessionId, ciphers);
 		}
 	}
 }

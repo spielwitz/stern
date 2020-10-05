@@ -23,7 +23,7 @@ public class Ciphers
 	public Cipher cipherEncrypt;
 	public Cipher cipherDecrypt;
 	public String sessionId;
-	public String userId;
+	public long created;
 	public long lastUsed;
 	
 	public Ciphers(Cipher cipherEncrypt, Cipher cipherDecrypt, String sessionId)
@@ -32,5 +32,6 @@ public class Ciphers
 		this.cipherDecrypt = cipherDecrypt;
 		this.sessionId = sessionId;
 		this.lastUsed = 0;
+		this.created = 0;
 	}
 }

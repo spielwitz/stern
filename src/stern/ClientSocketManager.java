@@ -39,7 +39,8 @@ class ClientSocketManager
 	private static Object lockObj = new Object();
 	
 	private Ciphers aesCiphers;
-	// private String lastUserId;
+	
+	private static boolean isBusy;
 	
 	static {
 		obj = new ClientSocketManager();
@@ -69,6 +70,8 @@ class ClientSocketManager
 	    	return msgResponse;
 		}
 		
+		setBusy(true);
+		
 		ResponseMessage msgResponse  = null;
 		Socket kkSocket = null;
 		OutputStream out = null;
@@ -87,44 +90,48 @@ class ClientSocketManager
 			msgRequest.userId = user.userId;
 			
 			Ciphers ciphers = obj.getAesCiphers();
+			String sessionId = null;
 			
-			if (ciphers == null ||
-				ciphers.userId == null ||
-				!ciphers.userId.equals(user.userId))
+			if (ciphers == null || user.userId.equals(ServerConstants.ACTIVATION_USER))
 			{
-				msgRequest.sessionId = CryptoLib.NULL_UUID;
+				sessionId = CryptoLib.NULL_UUID;
 			}
 			else
 			{
-				msgRequest.sessionId = ciphers.sessionId;
+				sessionId = ciphers.sessionId;
 			}
+			
+			msgRequest.sessionId = sessionId;
 			
 			CryptoLib.sendStringRsaEncrypted(
 					out, 
 					msgRequest.toJson(), 
 					user.serverPublicKeyObject);
 			
-			ResponseMessageUserId respMsg = null;
+			String token = null;
 			
-			if (!user.userId.equals(ServerConstants.ACTIVATION_USER))
+			if (user.userId.equals(ServerConstants.ACTIVATION_USER))
 			{
-				respMsg = 
-						ResponseMessageUserId.fromJson(
-							CryptoLib.receiveStringRsaEncrypted(in, user.userPrivateKeyObject));
+				token = CryptoLib.NULL_UUID;
 			}
 			else
 			{
-				respMsg = new ResponseMessageUserId();
+				ResponseMessageUserId respMsg = 
+						ResponseMessageUserId.fromJson(
+							CryptoLib.receiveStringRsaEncrypted(in, user.userPrivateKeyObject));
+				
+				sessionId = respMsg.sessionValid ? sessionId : CryptoLib.NULL_UUID;
+				token = respMsg.token;
 			}
 			
-			if (respMsg.sessionId.equals(CryptoLib.NULL_UUID))
+			if (sessionId.equals(CryptoLib.NULL_UUID))
 			{
 				// Ciphers sind nicht mehr gueltig. Neue aushandeln.
 				ciphers = CryptoLib.diffieHellmanKeyAgreementClient(in, out);
 			}
 			
 			// Token mit der eigentlichen Nachricht schicken!
-			msg.token = respMsg.token;
+			msg.token = token;
 			
 			// Jetzt erst die eigentliche Request-Nachricht an den Server schicken.
 			// Die Request-Nachricht enthält das vereinbarte Token.
@@ -138,10 +145,16 @@ class ClientSocketManager
 					ResponseMessage.fromJson(
 							CryptoLib.receiveStringAesEncrypted(in, ciphers.cipherDecrypt));
 			
-			ciphers.userId = user.userId;
 			kkSocket.close();
 			
-			obj.setAesCiphers(ciphers);
+			if (user.userId.equals(ServerConstants.ACTIVATION_USER))
+			{
+				obj.setAesCiphers(null);
+			}
+			else
+			{
+				obj.setAesCiphers(ciphers);
+			}
 		}
 	    catch (EOFException e)
 		{
@@ -149,6 +162,8 @@ class ClientSocketManager
 	    	
 	    	msgResponse.error = true;
 	    	msgResponse.errorMsg = "Der Server hat die Verbindung beendet. Prüfen Sie Ihre Anmeldedaten oder probieren Sie es nochmal.";
+	    	
+	    	setBusy(false);
 	    	
 	    	return msgResponse;
 		}
@@ -158,6 +173,8 @@ class ClientSocketManager
 	    	
 	    	msgResponse.error = true;
 	    	msgResponse.errorMsg = "Keine Verbindung mit dem Server:\n" + e.getMessage();
+	    	
+	    	setBusy(false);
 	    	
 	    	return msgResponse;
 		}
@@ -178,6 +195,8 @@ class ClientSocketManager
 			 }
 		}
 	    
+	    setBusy(false);
+	    
 	    return msgResponse;
     }
 
@@ -194,6 +213,22 @@ class ClientSocketManager
 		synchronized(lockObj)
 		{
 			this.aesCiphers = aesCiphers;
+		}
+	}
+	
+	static boolean isBusy()
+	{
+		synchronized(lockObj)
+		{
+			return isBusy;
+		}
+	}
+	
+	private static void setBusy(boolean busy)
+	{
+		synchronized(lockObj)
+		{
+			isBusy = busy;
 		}
 	}
 }

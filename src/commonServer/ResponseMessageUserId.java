@@ -20,12 +20,12 @@ import com.google.gson.Gson;
 
 public class ResponseMessageUserId
 {
-	public String sessionId;
+	public boolean sessionValid;
 	public String token;
 	
 	public ResponseMessageUserId()
 	{
-		this.sessionId = CryptoLib.NULL_UUID;
+		this.sessionValid = false;
 		this.token = CryptoLib.NULL_UUID;
 	}
 	

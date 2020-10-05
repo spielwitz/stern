@@ -55,7 +55,8 @@ public class CryptoLib
 	private static Hashtable<Character,Integer> codeIndices;
 	
 	public static final String NULL_UUID = "00000000-0000-0000-0000-000000000000";
-	public static final long CIPHERS_VALIDITY_MILLISECONDS = 120000;
+	public static final long CIPHERS_MAX_INACTIVITY_MILLISECONDS = 2 * 60 * 1000;
+	public static final long CIPHERS_MAX_VALIDITY_MILLISECONDS = 30 * 60 * 1000;
 	
 	static
 	{

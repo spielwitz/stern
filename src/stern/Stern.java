@@ -1394,7 +1394,8 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	private void getGameInfoByTimer()
 	{
-		if (!this.serverCommunicationEnabled)
+		if (!this.serverCommunicationEnabled ||
+			 ClientSocketManager.isBusy())
 			return;
 		
 		boolean connected = false;

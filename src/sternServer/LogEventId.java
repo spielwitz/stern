@@ -39,4 +39,5 @@ class LogEventId
 	final static int M23 = 23;
 	final static int M24 = 24;
 	final static int M25 = 25;
+	final static int M26 = 26;
 }
