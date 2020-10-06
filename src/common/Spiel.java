@@ -1207,6 +1207,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.updateSpielfeldDisplay(null, null, 0);
 	}
 	
+	private void updateSpielfeldDisplay (int tag)
+	{
+		this.updateSpielfeldDisplay(null, null, tag);
+	}
+	
 	private void updateSpielfeldDisplay (Hashtable<Integer,ArrayList<Byte>> frames, int tag)
 	{
 		this.updateSpielfeldDisplay(frames, null, tag);
@@ -5451,14 +5456,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 				else
 				{
 					// Aufklaerer installiert einen Spionagesender
-					this.spiel.updateSpielfeldDisplay();
+					this.spiel.updateSpielfeldDisplay(ereignis.getTag());
 					pl.setSender(obj.getBes(), this.spiel.jahr + Constants.SENDER_JAHRE);
 					
 					this.spiel.console.appendText(
 							SternResources.AuswertungAufklaererSender(
 									true,
-									this.spiel.spieler[obj.getBes()].getName(),
-									this.spiel.getPlanetenNameFromIndex(plIndex)));								
+									this.spiel.spieler[obj.getBes()].getName()));								
 				}
 				this.taste();
 				obj.setZuLoeschen();
@@ -5597,14 +5601,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				else
 				{
-					obj.setZuLoeschen();
-					this.spiel.updateSpielfeldDisplay();
+					this.spiel.updateSpielfeldDisplay(ereignis.getTag());
 					this.spiel.console.appendText(
 							SternResources.AuswertungMineGelegt(
 									true, 
 									this.spiel.spieler[obj.getBes()].getName()));
 					this.mineLegen(obj);
 					this.taste();
+					obj.setZuLoeschen();
 					
 					// Pruefe, ob sich gerade Raumer auf dem Minenfeld befinden
 					ArrayList<AuswertungEreignis> minenEreignisse = new ArrayList<AuswertungEreignis>();
@@ -5941,7 +5945,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			}
   				
   			this.spiel.updatePlanetenlisteDisplay(false);
-  			this.spiel.updateSpielfeldDisplay();
+  			this.spiel.updateSpielfeldDisplay(ereignisTag);
   			
   			this.taste();
   			

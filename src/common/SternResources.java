@@ -3735,10 +3735,10 @@ public class SternResources
 	}
 
 	/**
-	   * {0}: Spionagesender auf Planet {1} installiert. [EJ]
+	   * {0}: Spionagesender installiert. [EJ]
 	   */
-	public static String AuswertungAufklaererSender(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$EJ§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0, arg1);
+	public static String AuswertungAufklaererSender(boolean symbol, String arg0) {
+		return symbol ? "$EJ§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0);
 	}
 
 	/**
