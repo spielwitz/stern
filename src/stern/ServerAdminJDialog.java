@@ -108,7 +108,6 @@ import commonUi.TextFieldDark;
 	private JList<String> listUsers;
 	private Hashtable<String, ResponseMessageGetUsers.UserInfo> usersOnServer;
 
-	
 	private static Font font;
 	
 	ServerAdminJDialog(
@@ -367,9 +366,13 @@ import commonUi.TextFieldDark;
 		this.setResizable(false);
 		
 		if (this.cuc != null)
+		{
+			parent.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			this.refreshUserList(false);
-		
-		this.setControlsEnabledUsers();
+			parent.setCursor(Cursor.getDefaultCursor());
+		}
+
+		this.setControlsEnabledUsers();		
 	}
 	
 	@Override
