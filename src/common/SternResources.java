@@ -1761,7 +1761,7 @@ public class SternResources
 	}
 
 	/**
-	   * ### Tja, {0}. Das Spiel ist aus! ### [57]
+	   * Tja, {0}. Das Spiel ist aus! [57]
 	   */
 	public static String AuswertungSpielerTot(boolean symbol, String arg0) {
 		return symbol ? "$57§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungSpielerTot_57"), arg0);

@@ -5065,8 +5065,9 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!kommandozentraleOk)
   				{
   					this.spiel.spieler[sp].setTot(true);
-  					
+
   					this.spiel.console.setLineColor(this.spiel.spieler[sp].getColIndex());
+  	 				this.writeEreignisDatumJahresende();
   	 				this.spiel.console.appendText(
   	 						SternResources.AuswertungSpielerTot(
   	 								true, this.spiel.spieler[sp].getName()));
