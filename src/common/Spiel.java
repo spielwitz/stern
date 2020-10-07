@@ -68,8 +68,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 	transient private ScreenDisplayContent screenDisplayContent;
 	transient private SpielThread spielThread;
 	
-	transient private Hashtable<String,String> mapPlanetIndexToName;
-	transient private Hashtable<String,String> mapPlanetNameToIndex;
+	transient private Hashtable<Integer,String> mapPlanetIndexToName;
+	transient private Hashtable<String,Integer> mapPlanetNameToIndex;
 	transient private Hashtable<String,Integer> planetenByPoint;
 	transient private int[] planetenSortiert;
 	transient static private ArrayList<Point> heimatPlanetUmkreis;
@@ -1421,48 +1421,41 @@ public class Spiel extends EmailTransportBase implements Serializable
 		if (this.mapPlanetIndexToName == null)
 			this.buildPlanetenNameMap();
 		
-		return this.mapPlanetIndexToName.get(Integer.toString(plIndex));
+		return this.mapPlanetIndexToName.get(plIndex);
 	}
 	
 	private int getPlanetenIndexFromName(String name)
 	{
 		if (this.mapPlanetNameToIndex == null)
 			this.buildPlanetenNameMap();
-
-		try
-		{
-			int plIndex = Integer.parseInt(name) - 1;
-			
-			if (plIndex >= 0 && plIndex < this.anzPl)
-				return plIndex;
-			else
-				return -1;
-		}
-		catch (Exception x)
-		{
+		
+		Integer index = this.mapPlanetNameToIndex.get(name.toUpperCase());
+		
+		if (index == null)
 			return -1;
-		}
+		else
+			return index;
 	}
 	
 	private void buildPlanetenNameMap()
 	{
-		this.mapPlanetIndexToName = new Hashtable<String,String>();
-		this.mapPlanetNameToIndex = new Hashtable<String,String>();
+		this.mapPlanetIndexToName = new Hashtable<Integer,String>();
+		this.mapPlanetNameToIndex = new Hashtable<String,Integer>();
 		this.planetenByPoint = new Hashtable<String,Integer>();
 		
 		String[] planetenUnsortiert = new String[this.anzPl];
 		
 		for (int index = 0; index < this.anzPl; index++)
 		{
-			String name = Integer.toString(index + 1);
-			
-			this.mapPlanetIndexToName.put(Integer.toString(index), name);
-			this.mapPlanetNameToIndex.put(name, Integer.toString(index));
-			
-			planetenUnsortiert[index] = Utils.padString("00" + name, 2);
-			
 			Planet pl = this.planeten[index];
 			String pos = Integer.toString(pl.getPos().getX()) + ";" + Integer.toString(pl.getPos().getY());
+
+			String name = this.getFeldNameFromPoint(pl.getPos());
+			
+			this.mapPlanetIndexToName.put(index, name);
+			this.mapPlanetNameToIndex.put(name, index);
+			
+			planetenUnsortiert[index] = name;
 			
 			this.planetenByPoint.put(pos, index);
 		}
@@ -7590,13 +7583,17 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
   			for (int plVon = 0; plVon < this.spiel.anzPl; plVon++)
   			{
-  				chapter.table.cells.add(Utils.padString(" "+this.spiel.getPlanetenNameFromIndex(plVon), 2));
+  				int plIndexVon = spiel.getPlanetenSortiert()[plVon];
+  				
+  				chapter.table.cells.add(this.spiel.getPlanetenNameFromIndex(plIndexVon));
   				
   				for (int plNach = 0; plNach < this.spiel.anzPl; plNach++)
   				{
+  					int plIndexNach = spiel.getPlanetenSortiert()[plNach];
+  					
   					chapter.table.cells.add(
-  							plVon != plNach ?
-  										this.spiel.getDistanzMatrix()[plVon][plNach].toOutputStringDistanzmatrix(false) :
+  							plIndexVon != plIndexNach ?
+  										this.spiel.getDistanzMatrix()[plIndexVon][plIndexNach].toOutputStringDistanzmatrix(false) :
   										"");
   				}
   			}
