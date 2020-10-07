@@ -31,13 +31,15 @@ import java.util.ArrayList;
 	
 	PointLowRes(Point2D.Double pt)
 	{
-		this.x = Utils.round(pt.x * 10.);
-		this.y = Utils.round(pt.y * 10.);
+		this.x = Utils.round(pt.x * 100.);
+		this.y = Utils.round(pt.y * 100.);
 	}
 	
 	Point2D.Double toPoint2D()
 	{
-		return new Point2D.Double((double)this.x / 10., (double)this.y / 10.);
+		return new Point2D.Double(
+				(double)this.x / (double)100, 
+				(double)this.y / (double)100);
 	}
 	
 	static ArrayList<PointLowRes> toArrayList(ArrayList<Point2D.Double> list)

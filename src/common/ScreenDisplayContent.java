@@ -41,6 +41,7 @@ public class ScreenDisplayContent implements Serializable
 	
 	private int m;
 	private boolean u;
+	private int g;
 	
 	transient final static int MODUS_SPIELFELD = 0;
 	transient final static int MODUS_PLANETENEDITOR = 1;
@@ -62,6 +63,16 @@ public class ScreenDisplayContent implements Serializable
 			this.m = modus;
 		else
 			this.m = MODUS_SPIELFELD;
+	}
+	
+	public int getEreignisTag()
+	{
+		return this.g;
+	}
+	
+	public void setEreignisTag(int tag)
+	{
+		this.g = tag;
 	}
 
 	public ConsoleDisplayContent getCons() {

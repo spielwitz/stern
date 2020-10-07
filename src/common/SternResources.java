@@ -1572,17 +1572,17 @@ public class SternResources
 	}
 
 	/**
-	   * {0}: {1} Raumer auf eine Mine gelaufen. Die Mine wurde zerst\u00F6rt. [45]
+	   * {0}: {1} Raumer in Sektor {2} auf eine Mine gelaufen. Die Mine wurde zerst\u00F6rt. [45]
 	   */
-	public static String AuswertungRaumerAufMineGelaufenZerstoert(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$45§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufenZerstoert_45"), arg0, arg1);
+	public static String AuswertungRaumerAufMineGelaufenZerstoert(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "$45§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufenZerstoert_45"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * {0}: {1} Raumer auf eine Mine gelaufen. [46]
+	   * {0}: {1} Raumer in Sektor {2} auf eine Mine gelaufen. [46]
 	   */
-	public static String AuswertungRaumerAufMineGelaufen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$46§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufen_46"), arg0, arg1);
+	public static String AuswertungRaumerAufMineGelaufen(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "$46§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufen_46"), arg0, arg1, arg2);
 	}
 
 	/**

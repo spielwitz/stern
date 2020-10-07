@@ -24,6 +24,7 @@ class ArchivReplayIndexList implements Serializable
 	ConsoleDisplayContent c; // Console-Inhalt
 	int p; // Planeten Index
 	int s; // Spielfeld Index
+	int g; // Ereignistag
 		
 	private int u; // Pause (0 oder 1)
 	
@@ -31,12 +32,14 @@ class ArchivReplayIndexList implements Serializable
 			ConsoleDisplayContent c, 
 			int p, 
 			int s,
-			boolean u)
+			boolean u,
+			int g)
 	{
 		this.c = c;
 		this.p = p;
 		this.s = s;
 		this.u = u ? 1 : 0;
+		this.g = g;
 	}
 	
 	public boolean getPause()

@@ -1314,7 +1314,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
  					obj.getExactPos(tag), 
- 					this.spieler[obj.getBes()].getColIndex());
+ 					this.spieler[obj.getBes()].getColIndex(),
+ 					obj.hashCode());
 			
 			points.add(point);
 		}
@@ -1328,6 +1329,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 				null, // lines, wenn Flugobjekte gezeichnet werden sollen, sonst null.
 				points,
 				null));
+		
+		this.screenDisplayContent.setEreignisTag(tag);
 		
 		if (!this.console.isBackground())
 			this.spielThread.updateDisplay(this.screenDisplayContent);
@@ -1589,13 +1592,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return frames;
 	}
 	
-	private ArrayList<Point2D.Double> getSimpleMarkedField(Point pt)
-	{
-		ArrayList<Point2D.Double> markedFields = new ArrayList<Point2D.Double>();
-		markedFields.add(Utils.toPoint2D(pt));
-		
-		return markedFields;
-	}
+//	private ArrayList<Point2D.Double> getSimpleMarkedField(Point pt)
+//	{
+//		ArrayList<Point2D.Double> markedFields = new ArrayList<Point2D.Double>();
+//		markedFields.add(Utils.toPoint2D(pt));
+//		
+//		return markedFields;
+//	}
 	
 	private ArrayList<Point2D.Double> getSimpleMarkedField(Point2D.Double pt)
 	{
@@ -4678,6 +4681,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.updatePlanetenlisteDisplay(false);
 			this.spiel.updateSpielfeldDisplay();
 			
+			this.pause(0);
+			
 			// Buendnisse aufraeumen
 			this.buendnisseAufraeumen();
 			
@@ -4769,7 +4774,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				obj.resetBewegt();
 			}
 			
-			this.spiel.updateSpielfeldDisplay();
+			this.spiel.updateSpielfeldDisplay(Constants.ANZ_TAGE_JAHR+1);
 			this.spiel.updatePlanetenlisteDisplay(false);
 			
 			this.checkSpielerTot();
@@ -5093,6 +5098,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			ScreenDisplayContent cont = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
   			cont.setPlEdit(null);
   			cont.setPause(true);
+  			cont.getCons().clearKeys();
 			this.replay.add(cont);
   		}
   		
@@ -5355,6 +5361,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 			String name = this.spiel.spieler[obj.getBes()].getName();
 			this.spiel.console.setLineColor(this.spiel.spieler[obj.getBes()].getColIndex());
 			
+			boolean objLoeschen = false;
+			
 			if (obj.getTyp() == ObjektTyp.RAUMER)
 			{
 				this.writeEreignisDatum(ereignis.getTag());
@@ -5366,13 +5374,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 						SternResources.AuswertungRaumerAufMineGelaufenZerstoert(
 								true,
 								name,
-								Integer.toString(Math.min(obj.getAnz(),mine.getStaerke()))));
+								Integer.toString(Math.min(obj.getAnz(),mine.getStaerke())),
+								Spiel.getSectorNameFromPoint(mine.getPos())));
 					
 					// Anzahl der Raumerflotte reduzieren
 					obj.subtractRaumer(mine.getStaerke(), obj.getBes());
 					
 					if (obj.getAnz() <= 0)
-						obj.setZuLoeschen();
+						objLoeschen = true;
 					
 					this.spiel.minen.remove(feld.getString());
 				}
@@ -5382,10 +5391,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 							SternResources.AuswertungRaumerAufMineGelaufen(
 									true, 
 									name,
-									Integer.toString(Math.min(obj.getAnz(),mine.getStaerke()))));
+									Integer.toString(Math.min(obj.getAnz(),mine.getStaerke())),
+									Spiel.getSectorNameFromPoint(mine.getPos())));
 					
 					// Flotte wurde zerstoert
-					obj.setZuLoeschen();
+					objLoeschen = true;
 					
 					// Staerke des Minenfeldes reduzieren
 					mine.setStaerke(mine.getStaerke() - obj.getAnz());
@@ -5411,12 +5421,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			// Spielfeld aktualisieren
 			this.spiel.updateSpielfeldDisplay(
-					this.spiel.getSimpleMarkedField(feld),
+					this.spiel.getSimpleMarkedField(obj.getExactPos(ereignis.getTag())),
 					ereignis.getTag());
 			
 			// Taste.
 			this.taste();
 
+			if (objLoeschen)
+				obj.setZuLoeschen();
   		}
   		
   		private void ankunft(AuswertungEreignis ereignis)
@@ -6131,20 +6143,103 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			ArrayList<ScreenDisplayContent> replay = archiv.getReplay();
 			
-			for (ScreenDisplayContent cont: replay)
+			ScreenDisplayContent previousDay = null;
+			
+			for (ScreenDisplayContent currentDay: replay)
 			{
-				this.spiel.spielThread.updateDisplay(cont);
+				if (previousDay != null && 
+					currentDay.getEreignisTag() != previousDay.getEreignisTag())
+				{
+					// Animiere den Zeitverlauf
+					this.animation(
+							previousDay, 
+							currentDay);
+				}
 				
-				if (cont.getPause())
+				this.spiel.spielThread.updateDisplay(currentDay);
+				
+				if (currentDay.getPause())
 					this.spiel.pause(Constants.PAUSE_MILLISECS);
 				else
 					ende = this.spiel.console.waitForTasteReplay();
 				
 				if (ende)
 					break;
+				
+				previousDay = (ScreenDisplayContent)Utils.klon(currentDay);
 			}
 			
  			return ende;
+ 		}
+ 		
+ 		private void animation(ScreenDisplayContent previousDay, ScreenDisplayContent currentDay)
+ 		{
+ 			int tag = previousDay.getEreignisTag() + 2;
+ 			
+ 			if (tag >= currentDay.getEreignisTag() - 1)
+ 				return;
+ 			
+ 			previousDay.getSpielfeld().clearMarkedFieldsAndPlanets();
+ 			previousDay.getCons().clearKeys();
+ 			
+ 			Hashtable<Integer, SpielfeldPointDisplayContent> objPosPreviousDay = new Hashtable<Integer, SpielfeldPointDisplayContent>();
+ 			
+ 			for (SpielfeldPointDisplayContent pt: previousDay.getSpielfeld().getPoints())
+ 			{
+ 				objPosPreviousDay.put(pt.getHash(), pt);
+ 			}
+ 			
+ 			Hashtable<Integer, SpielfeldPointDisplayContent> objPosCurrentDay = new Hashtable<Integer, SpielfeldPointDisplayContent>();
+ 			
+ 			for (SpielfeldPointDisplayContent pt: currentDay.getSpielfeld().getPoints())
+ 			{
+ 				objPosCurrentDay.put(pt.getHash(), pt);
+ 			}
+ 			
+			ArrayList<SpielfeldPointDisplayContent> points = 
+					new ArrayList<SpielfeldPointDisplayContent>();
+
+ 			while (tag < currentDay.getEreignisTag())
+ 			{
+ 				this.spiel.pause(Constants.PAUSE_MILLISECS_ANIMATION);
+ 				
+	 			// Zeitanzeige in der Fortschrittsanzeige
+ 				previousDay.getCons().setEvaluationProgressBar(
+ 						ConsoleEvaluationProgressBarDisplayContent.setTag(tag));
+	 			
+ 				points.clear();
+ 				
+	 			// Flugobjekte
+ 				for (Integer hash: objPosPreviousDay.keySet())
+ 				{
+ 					if (!objPosCurrentDay.containsKey(hash))
+ 						// Zeige nur Objekte an, die in beiden Ereignissen vorkommen
+ 						continue;
+ 					
+ 					SpielfeldPointDisplayContent ptPreviousDay = objPosPreviousDay.get(hash);
+ 					SpielfeldPointDisplayContent ptCurrentDay = objPosCurrentDay.get(hash);
+ 					
+ 					// Interpolieren
+ 					double t = (double)(tag - previousDay.getEreignisTag()) / 
+ 							   (double)(currentDay.getEreignisTag() - previousDay.getEreignisTag());
+ 					
+ 					double x = ptPreviousDay.getPos().x + t * (ptCurrentDay.getPos().x - ptPreviousDay.getPos().x);
+ 					double y = ptPreviousDay.getPos().y + t * (ptCurrentDay.getPos().y - ptPreviousDay.getPos().y);
+ 					
+ 					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
+ 							new Point2D.Double(x, y), ptPreviousDay.getCol(), ptPreviousDay.getHash());
+ 					
+ 					points.add(point);
+ 				}
+ 				
+ 				previousDay.getSpielfeld().setPoints(points);
+ 				
+ 				this.spiel.spielThread.updateDisplay(previousDay);
+ 				
+ 				tag += 2;
+ 			}
+ 			
+ 			this.spiel.pause(Constants.PAUSE_MILLISECS_ANIMATION);
  		}
  	}
   	
@@ -6836,15 +6931,13 @@ public class Spiel extends EmailTransportBase implements Serializable
   				
   				if (!obj.istBeteiligt(spieler))
   				{
-  					// Fremde Objekte als Punkte hinzufuegen (nur bei Simple-Stern)
-//  					if (spiel.optionen.contains(SpielOptionen.SIMPEL))
-//  					{
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
 		 	 					obj.getExactPos(), 
-		 	 					spiel.spieler[obj.getBes()].getColIndex());
+		 	 					spiel.spieler[obj.getBes()].getColIndex(),
+		 	 					obj.hashCode());
 	 				
 	 				points.add(point);
-//  					}
+
 	 				continue;
   				}
   				
@@ -7068,12 +7161,10 @@ public class Spiel extends EmailTransportBase implements Serializable
   				
   				if (!obj.istBeteiligt(this.spieler ))
   				{
-  					// Fremde Objekte als Punkte hinzufuegen (nur Simple-Stern)
-//  					if (spiel.optionen.contains(SpielOptionen.SIMPEL))
-//  					{
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
 		 	 					obj.getExactPos(), 
-		 	 					spiel.spieler[obj.getBes()].getColIndex());
+		 	 					spiel.spieler[obj.getBes()].getColIndex(),
+		 	 					obj.hashCode());
 	 				
 	 				points.add(point);
 

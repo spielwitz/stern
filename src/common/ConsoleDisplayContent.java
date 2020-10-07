@@ -53,6 +53,11 @@ class ConsoleDisplayContent implements Serializable
 	public ArrayList<ConsoleKey> getKeys() {
 		return k;
 	}
+	
+	public void clearKeys()
+	{
+		this.k = new ArrayList<ConsoleKey>();
+	}
 
 	public boolean isWaitingForInput() {
 		return w;
@@ -65,6 +70,11 @@ class ConsoleDisplayContent implements Serializable
 	public ConsoleEvaluationProgressBarDisplayContent getEvaluationProgressBar()
 	{
 		return p;
+	}
+	
+	public void setEvaluationProgressBar(ConsoleEvaluationProgressBarDisplayContent p)
+	{
+		this.p = p;
 	}
 
 	ConsoleDisplayContent(

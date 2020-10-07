@@ -55,6 +55,11 @@ import java.util.ArrayList;
 		return f;
 	}
 	
+	public void clearFrameCols()
+	{
+		this.f = null;
+	}
+	
 	public boolean isInvers()
 	{
 		return this.i;

@@ -83,6 +83,7 @@ public class Archiv implements Serializable
 			sdc.setPlaneten(this.p.get(indices.p));
 			sdc.setSpielfeld(this.s.get(indices.s));
 			sdc.setPause(indices.getPause());
+			sdc.setEreignisTag(indices.g);
 			
 			replay.add(sdc);
 		}
@@ -97,7 +98,6 @@ public class Archiv implements Serializable
 		
 		this.p = new ArrayList<PlanetenlisteDisplayContent>();
 		this.s = new ArrayList<SpielfeldDisplayContent>();
-		
 		
 		// Parallele Listen mit den Darstellungen der Objekt als JSON
 		ArrayList<String> pJsonList = new ArrayList<String>();
@@ -139,7 +139,8 @@ public class Archiv implements Serializable
 							sdc.getCons(), 
 							pIndex, 
 							sIndex,
-							sdc.getPause()));
+							sdc.getPause(),
+							sdc.getEreignisTag()));
 		}
 	}
 	

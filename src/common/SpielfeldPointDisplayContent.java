@@ -24,11 +24,17 @@ import java.io.Serializable;
 	// Stellt einen Punkt dar, der im Spielfeld gezeichnet wird, z.B. um ein Objekt anzuzeigen
 	private PointLowRes p;
 	private byte c;
+	private int h;
 	
-	SpielfeldPointDisplayContent(Point2D.Double pos, byte col) {
+	SpielfeldPointDisplayContent(
+			Point2D.Double pos, 
+			byte col,
+			int hash)
+	{
 		super();
 		this.p = pos == null ? null : new PointLowRes(pos);
 		this.c = col;
+		this.h = hash;
 	}
 
 	public byte getCol() {
@@ -38,5 +44,10 @@ import java.io.Serializable;
 	public Point2D.Double getPos()
 	{
 		return this.p== null ? null : this.p.toPoint2D();
+	}
+	
+	public int getHash()
+	{
+		return this.h;
 	}
 }
