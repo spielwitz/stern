@@ -5189,15 +5189,19 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (objPatr.getBes() == anderesObj.getBes())
   					continue;
   				
-  				//Spezialfall Buendnisraumer. Wenn der Besitzer der Patrouille Buendnismitglied auf dem Zielplaneten ist, 
+  				//Spezialfall Buendnisraumer. Wenn der Besitzer der Raumer Buendnismitglied auf dem Zielplaneten ist, 
 				// dann nicht melden
 				if (anderesObj.getTyp() == ObjektTyp.RAUMER && 
-					this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(objPatr.getBes()))
+					this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(anderesObj.getBes()))
+				{
 					continue;
+				}
 				
 				// Wenn der Besitzer der Patrouille an der Buendnisflotte beteiligt ist, dann auch nicht melden.
 				if (anderesObj.istBeteiligt(objPatr.getBes()))
+				{
 					continue;
+				}
   				
   				if (jahresende)  					
   					this.writeEreignisDatumJahresende();
