@@ -2825,63 +2825,63 @@ public class SternResources
 	}
 
 	/**
-	   * Sie haben einen 100er-Minenleger gekapert. Auf welchen Planeten damit? [9K]
+	   * Auf welchen Planeten m\u00F6chten Sie einen 100er-Minenleger schicken? [9K]
 	   */
 	public static String ZugeingabeWohin100erMine(boolean symbol) {
 		return symbol ? "$9K$":messages.getString("ZugeingabeWohin100erMine_9K");
 	}
 
 	/**
-	   * Sie haben einen 250er-Minenleger gekapert. Auf welchen Planeten damit? [9L]
+	   * Auf welchen Planeten m\u00F6chten Sie einen 250er-Minenleger schicken? [9L]
 	   */
 	public static String ZugeingabeWohin250erMine(boolean symbol) {
 		return symbol ? "$9L$":messages.getString("ZugeingabeWohin250erMine_9L");
 	}
 
 	/**
-	   * Sie haben einen 500er-Minenleger gekapert. Auf welchen Planeten damit? [9M]
+	   * Auf welchen Planeten m\u00F6chten Sie einen 500er-Minenleger schicken? [9M]
 	   */
 	public static String ZugeingabeWohin500erMine(boolean symbol) {
 		return symbol ? "$9M$":messages.getString("ZugeingabeWohin500erMine_9M");
 	}
 
 	/**
-	   * Sie haben einen 50er-Minenleger gekapert. Auf welchen Planeten damit? [9N]
+	   * Auf welchen Planeten m\u00F6chten Sie einen 50er-Minenleger schicken? [9N]
 	   */
 	public static String ZugeingabeWohin50erMine(boolean symbol) {
 		return symbol ? "$9N$":messages.getString("ZugeingabeWohin50erMine_9N");
 	}
 
 	/**
-	   * Sie haben einen Aufkl\u00E4rer gekapert. Auf welchen Planeten damit? [9O]
+	   * Auf welchen Planeten m\u00F6chten Sie einen Aufkl\u00E4rer schicken? [9O]
 	   */
 	public static String ZugeingabeWohinAufklaerer(boolean symbol) {
 		return symbol ? "$9O$":messages.getString("ZugeingabeWohinAufklaerer_9O");
 	}
 
 	/**
-	   * Sie haben einen Minenr\u00E4umer gekapert. Auf welchen Planeten damit? [9P]
+	   * Auf welchen Planeten m\u00F6chten Sie einen Minenr\u00E4umer schicken? [9P]
 	   */
 	public static String ZugeingabeWohinMinenraumer(boolean symbol) {
 		return symbol ? "$9P$":messages.getString("ZugeingabeWohinMinenraumer_9P");
 	}
 
 	/**
-	   * Sie haben eine Patrouille gekapert. Auf welchen Planeten damit? [9Q]
+	   * Auf welchen Planeten m\u00F6chten Sie eine Patrouille schicken? [9Q]
 	   */
 	public static String ZugeingabeWohinPatrouille(boolean symbol) {
 		return symbol ? "$9Q$":messages.getString("ZugeingabeWohinPatrouille_9Q");
 	}
 
 	/**
-	   * Sie haben {0} Raumer gekapert. Auf welchen Planeten damit? [9R]
+	   * Auf welchen Planeten m\u00F6chten Sie {0} Raumer schicken? [9R]
 	   */
 	public static String ZugeingabeWohinRaumer(boolean symbol, String arg0) {
 		return symbol ? "$9R§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeWohinRaumer_9R"), arg0);
 	}
 
 	/**
-	   * Sie haben einen Transporter gekapert. Auf welchen Planeten damit? [9S]
+	   * Auf welchen Planeten m\u00F6chten Sie einen Transporter schicken? [9S]
 	   */
 	public static String ZugeingabeWohinTransporter(boolean symbol) {
 		return symbol ? "$9S$":messages.getString("ZugeingabeWohinTransporter_9S");

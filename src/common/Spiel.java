@@ -5191,7 +5191,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   				
   				//Spezialfall Buendnisraumer. Wenn der Besitzer der Raumer Buendnismitglied auf dem Zielplaneten ist, 
 				// dann nicht melden
-				if (anderesObj.getTyp() == ObjektTyp.RAUMER && 
+				if (anderesObj.getTyp() == ObjektTyp.RAUMER &&
+					anderesObj.getZpl() >= 0 &&
 					this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(anderesObj.getBes()))
 				{
 					continue;
