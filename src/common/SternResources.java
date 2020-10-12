@@ -2349,7 +2349,7 @@ public class SternResources
 	}
 
 	/**
-	   * Bitte warten Sie auf den n\u00E4chste E-Mail vom Spielleiter. [7O]
+	   * Bitte warten Sie auf die n\u00E4chste E-Mail vom Spielleiter. [7O]
 	   */
 	public static String ZugeingabeEMailEndlosschleife(boolean symbol) {
 		return symbol ? "$7O$":messages.getString("ZugeingabeEMailEndlosschleife_7O");
