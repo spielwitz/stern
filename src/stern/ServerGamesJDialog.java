@@ -100,6 +100,8 @@ import common.Utils;
 	private ComboBoxDark<String> comboPlaneten;
 	private TextFieldDark tfSpielName;
 	
+	private CheckBoxDark cbMuteNotificationSound;
+	
 	Spiel spielGeladen;
 	
 	private ClientUserCredentials cuc;
@@ -114,11 +116,14 @@ import common.Utils;
 	
 	private final static String MAX_JAHRE_UNENDLICH = SternResources.SpielparameterJDialogUnendlich(false);
 	
+	public boolean muteNotificationSound;
+	
 	ServerGamesJDialog(
 			Stern parent,
 			String title,
 			String currentGameId,
 			ClientUserCredentials cuc,
+			boolean muteNotificationSound,
 			ResponseMessageGamesAndUsers gamesAndUsers)
 	{
 		super (parent, title, true);
@@ -126,6 +131,7 @@ import common.Utils;
 		this.parent = parent;
 		this.cuc = cuc;
 		this.gamesAndUsers = gamesAndUsers;
+		this.muteNotificationSound = muteNotificationSound;
 		
 		// Font laden
 		font = DialogFontHelper.getFont();
@@ -183,6 +189,10 @@ import common.Utils;
 		
 		PanelDark panButtons = new PanelDark();
 		panButtons.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		
+		this.cbMuteNotificationSound = 
+				new CheckBoxDark(SternResources.BenachrichtigungStumm(false), muteNotificationSound, font);
+		panButtons.add(this.cbMuteNotificationSound);
 		
 		this.butClose = new ButtonDark(this, SternResources.Schliessen(false), font);
 		panButtons.add(this.butClose);
@@ -389,6 +399,7 @@ import common.Utils;
 	
 	private void close()
 	{
+		this.muteNotificationSound = this.cbMuteNotificationSound.isSelected();
 		this.setVisible(false);
 		this.dispose();
 	}

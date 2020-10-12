@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: HT
+		// Hoechstes vergebenes Symbol: HU
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -570,6 +570,7 @@ public class SternResources
 		symbolDict.put("HR","ServerErrorDh_HR");
 		symbolDict.put("HS","ServerNeueSession_HS");
 		symbolDict.put("HT","ServerILogSessionId_HT");
+		symbolDict.put("HU","BenachrichtigungStumm_HU");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4327,5 +4328,12 @@ public class SternResources
 	   */
 	public static String ServerILogSessionId(boolean symbol) {
 		return symbol ? "$HT$":messages.getString("ServerILogSessionId_HT");
+	}
+
+	/**
+	   * Benachrichtigungsklang stummschalten [HU]
+	   */
+	public static String BenachrichtigungStumm(boolean symbol) {
+		return symbol ? "$HU$":messages.getString("BenachrichtigungStumm_HU");
 	}
 }

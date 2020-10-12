@@ -58,6 +58,9 @@ import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SpringLayout;
@@ -132,6 +135,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 	transient private static final String PROPERTY_SERVER_USER_CREDENTIAL_FILE = "serverUserCredentials";
 	transient private static final String PROPERTY_SERVER_COMMUNICATION_ENABLED = "serverCommunicationEnabled";
 	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
+	transient private static final String PROPERTY_MUTE_NOTIFICATION_SOUND = "muteNotificationSound";
 	
 	static final int HIGHSCORE_NUM_ENTRIES = 20;
 	
@@ -200,6 +204,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	private String lastUpdateCheck;
 	
+	private Clip soundClipGlocke;
+	
+	private boolean muteNotificationSound;
+	
 	public static void main(String[] args)
 	{
 		Hashtable<String,String> argsTable = Utils.resolveProgramArgs(args);
@@ -240,6 +248,15 @@ public class Stern extends Frame  // NO_UCD (use default)
 		
 		this.paintPanel = new PaintPanel(this);
 		this.add(this.paintPanel, BorderLayout.CENTER);
+		
+		// Soundclip
+		try
+		{
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(ClassLoader.getSystemResource("ding.au"));
+			this.soundClipGlocke = AudioSystem.getClip();
+			this.soundClipGlocke.open(audioInputStream);
+		}
+		catch (Exception x) {}
 		
 		// Toolbar
 		this.iconConnected = new ImageIcon (ClassLoader.getSystemResource("ic_cloud_done.png"));
@@ -1006,6 +1023,9 @@ public class Stern extends Frame  // NO_UCD (use default)
 		if (prop.containsKey(PROPERTY_EMAIL_SEPARATOR))
 			this.emailSeparator = prop.getProperty(PROPERTY_EMAIL_SEPARATOR);
 		
+		if (prop.containsKey(PROPERTY_MUTE_NOTIFICATION_SOUND))
+			this.muteNotificationSound = Boolean.parseBoolean(prop.getProperty(PROPERTY_MUTE_NOTIFICATION_SOUND));
+		
 		return prop;
 	}
 	
@@ -1401,6 +1421,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		boolean connected = false;
 		boolean currentGameNextYear = false;
 		boolean gamesWaitingForInput = false;
+		boolean beep = false;
 		
 		if (this.cuc != null)
 		{
@@ -1439,8 +1460,20 @@ public class Stern extends Frame  // NO_UCD (use default)
 							Integer.toString(this.cuc.port),
 							this.cuc.userId));
 			
+			if (this.labGamesWaitingForInput.isVisible() == false &&
+				gamesWaitingForInput == true)
+			{
+				beep = true;
+			}
+			
 			this.labGamesWaitingForInput.setVisible(gamesWaitingForInput);
 			this.labGamesWaitingForInput.setToolTipText(SternResources.MitspielerWarten(false));
+			
+			if (this.labCurrentGameNextYear.isVisible() == false &&
+				currentGameNextYear == true)
+			{
+				beep = true;
+			}
 			
 			this.labCurrentGameNextYear.setVisible(currentGameNextYear);
 			this.labCurrentGameNextYear.setToolTipText(SternResources.AuswertungVerfuegbarSymbol(false));
@@ -1461,6 +1494,15 @@ public class Stern extends Frame  // NO_UCD (use default)
 			this.labGamesWaitingForInput.setVisible(false);
 		}
 		
+		if (this.muteNotificationSound == false &&
+				this.soundClipGlocke != null && 
+				beep)
+		{
+			if (this.soundClipGlocke.isRunning())
+				this.soundClipGlocke.stop();
+			this.soundClipGlocke.setFramePosition(0);
+			this.soundClipGlocke.start();
+		}
 	}
 
 	@Override
@@ -1552,8 +1594,13 @@ public class Stern extends Frame  // NO_UCD (use default)
 						SternResources.ServerbasierteSpiele(false, this.cuc.userId),
 						this.currentGameId,
 						this.cuc,
+						this.muteNotificationSound,
 						ResponseMessageGamesAndUsers.fromJson(respMsg.payloadSerialized));
 				dlg.setVisible(true);
+				
+				this.muteNotificationSound = dlg.muteNotificationSound;
+				this.setProperty(
+						Stern.PROPERTY_MUTE_NOTIFICATION_SOUND, Boolean.toString(this.muteNotificationSound));
 				
 				if (dlg.spielGeladen != null)
 				{
