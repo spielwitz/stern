@@ -655,7 +655,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			SpielparameterJDialog dlg = new SpielparameterJDialog(
 					this, 
 					SternResources.Spielparameter(false),
-					spiel.getEmailSpieler() ?
+					spiel.istSoloSpieler() ?
 							SpielparameterDialogModus.EMAIL_SPIEL :
 							spiel.getAbgeschlossen() ?
 									SpielparameterDialogModus.ABGESCHLOSSENES_SPIEL :
@@ -912,7 +912,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		if (this.t == null)
 		{
 			this.threadCommunicationStructure = new SpielThreadCommunicationStructure();
-			this.threadCommunicationStructure.emailSpieler = emailSpieler;
+			this.threadCommunicationStructure.istSoloSpieler = emailSpieler;
 			this.t = new SpielThread(this.threadCommunicationStructure, this, spiel);
 			this.t.start();
 		}
@@ -921,7 +921,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			synchronized(this.threadCommunicationStructure)
 			{
 				this.threadCommunicationStructure.neuesSpiel = spiel;
-				this.threadCommunicationStructure.emailSpieler = emailSpieler;
+				this.threadCommunicationStructure.istSoloSpieler = emailSpieler;
 				this.threadCommunicationStructure.notify();
 			}
 		}
@@ -933,7 +933,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		{
 			Spiel sp = this.t.getSpiel();
 			this.menuParameter.setEnabled(true);
-			this.menuSpeichern.setEnabled(sp.isParameterChangeEnabled() && !sp.getEmailSpieler());
+			this.menuSpeichern.setEnabled(sp.isParameterChangeEnabled() && !sp.istSoloSpieler());
 			this.menuEmail.setEnabled(sp.getOptionen().contains(SpielOptionen.EMAIL) ||
 					sp.getOptionen().contains(SpielOptionen.SERVER_BASIERT));
 		}

@@ -20,5 +20,5 @@ public class SpielThreadCommunicationStructure
 {
 	public KeyEventExtended keyEvent;
 	public Spiel neuesSpiel;
-	public boolean emailSpieler;
+	public boolean istSoloSpieler;
 }

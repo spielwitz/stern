@@ -29,7 +29,7 @@ public class SpielThread extends Thread
 		this.threadCommunicationStructure = threadCommunicationStructure;
 		this.screenUpdateListener = screenUpdateListener;
 		this.spiel = spiel;
-		this.spiel.setEmailSpieler(threadCommunicationStructure.emailSpieler);
+		this.spiel.setSoloSpieler(threadCommunicationStructure.istSoloSpieler);
 	}
 	
 	public void run()
@@ -101,7 +101,7 @@ public class SpielThread extends Thread
 				if (threadCommunicationStructure.neuesSpiel != null)
 				{
 					neuesSpiel = (Spiel)Utils.klon(threadCommunicationStructure.neuesSpiel);
-					neuesSpiel.setEmailSpieler(threadCommunicationStructure.emailSpieler);
+					neuesSpiel.setSoloSpieler(threadCommunicationStructure.istSoloSpieler);
 					if (threadCommunicationStructure.neuesSpiel.istInitial())
 						neuesSpiel.setInitial();
 					threadCommunicationStructure.neuesSpiel = null;

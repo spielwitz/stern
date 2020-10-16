@@ -494,7 +494,6 @@ public class SternResources
 		symbolDict.put("EP","LetztesJahr_EP");
 		symbolDict.put("EQ","LetztesJahr2_EQ");
 		symbolDict.put("ER","AbgeschlossenesSpiel_ER");
-		symbolDict.put("ES","PunkteAnzeigen_ES");
 		symbolDict.put("ET","ZugeingabeKapitulieren_ET");
 		symbolDict.put("EU","AuswertungKapitulation_EU");
 		symbolDict.put("EV","UpdateVerfuegbar_EV");
@@ -3796,13 +3795,6 @@ public class SternResources
 	   */
 	public static String AbgeschlossenesSpiel(boolean symbol, String arg0) {
 		return symbol ? "$ER§"+arg0+"$":MessageFormat.format(messages.getString("AbgeschlossenesSpiel_ER"), arg0);
-	}
-
-	/**
-	   * Punkte anzeigen [ES]
-	   */
-	public static String PunkteAnzeigen(boolean symbol) {
-		return symbol ? "$ES$":messages.getString("PunkteAnzeigen_ES");
 	}
 
 	/**
