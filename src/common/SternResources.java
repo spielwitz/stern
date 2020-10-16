@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: HU
+		// Hoechstes vergebenes Symbol: IA
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -570,6 +570,12 @@ public class SternResources
 		symbolDict.put("HS","ServerNeueSession_HS");
 		symbolDict.put("HT","ServerILogSessionId_HT");
 		symbolDict.put("HU","BenachrichtigungStumm_HU");
+		symbolDict.put("HV","ServerUserLesen_HV");
+		symbolDict.put("HW","ServerConfigLaden_HW");
+		symbolDict.put("HX","ServerConfigErzeugen_HX");
+		symbolDict.put("HY","ServerSpielLesen_HY");
+		symbolDict.put("HZ","ServerOrdnerErzeugen_HZ");
+		symbolDict.put("IA","ServerAdminErzeugen_IA");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4327,5 +4333,47 @@ public class SternResources
 	   */
 	public static String BenachrichtigungStumm(boolean symbol) {
 		return symbol ? "$HU$":messages.getString("BenachrichtigungStumm_HU");
+	}
+
+	/**
+	   * User {0} einlesen... [HV]
+	   */
+	public static String ServerUserLesen(boolean symbol, String arg0) {
+		return symbol ? "$HV§"+arg0+"$":MessageFormat.format(messages.getString("ServerUserLesen_HV"), arg0);
+	}
+
+	/**
+	   * Konfiguration lesen... [HW]
+	   */
+	public static String ServerConfigLaden(boolean symbol) {
+		return symbol ? "$HW$":messages.getString("ServerConfigLaden_HW");
+	}
+
+	/**
+	   * Konfiguration neu anlegen... [HX]
+	   */
+	public static String ServerConfigErzeugen(boolean symbol) {
+		return symbol ? "$HX$":messages.getString("ServerConfigErzeugen_HX");
+	}
+
+	/**
+	   * Spiel {0} einlesen... [HY]
+	   */
+	public static String ServerSpielLesen(boolean symbol, String arg0) {
+		return symbol ? "$HY§"+arg0+"$":MessageFormat.format(messages.getString("ServerSpielLesen_HY"), arg0);
+	}
+
+	/**
+	   * Order {0} erzeugen... [HZ]
+	   */
+	public static String ServerOrdnerErzeugen(boolean symbol, String arg0) {
+		return symbol ? "$HZ§"+arg0+"$":MessageFormat.format(messages.getString("ServerOrdnerErzeugen_HZ"), arg0);
+	}
+
+	/**
+	   * Admin-User erzeugen... [IA]
+	   */
+	public static String ServerAdminErzeugen(boolean symbol) {
+		return symbol ? "$IA$":messages.getString("ServerAdminErzeugen_IA");
 	}
 }

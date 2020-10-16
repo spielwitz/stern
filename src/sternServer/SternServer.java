@@ -114,6 +114,8 @@ public class SternServer // NO_UCD (unused code)
 	
 	private void run()
 	{
+		System.out.println(SternResources.ServerStarting(false));
+		
 		// Init server
 		this.lockObjects = new Hashtable<String, Object>();
 		this.ciphersPerSession = new Hashtable<String, Ciphers>();
@@ -211,27 +213,30 @@ public class SternServer // NO_UCD (unused code)
 	
 	private void initCreateDataFolders()
 	{
-		File dir = new File(homeDir, FOLDER_NAME_DATA);
+		this.createFolder(new File(homeDir, FOLDER_NAME_DATA));
+		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_LOG).toFile());
+		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER).toFile());
+		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME).toFile());
+	}
+	
+	private void createFolder(File dir)
+	{
 		if (!dir.exists())
+		{
+			System.out.println(
+					SternResources.ServerOrdnerErzeugen(
+							false, 
+							dir.getAbsolutePath().toString()));
 			dir.mkdir();
-		
-		File dirLog = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_LOG).toFile();
-		if (!dirLog.exists())
-			dirLog.mkdir();
-		
-		File dirUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER).toFile();
-		if (!dirUser.exists())
-			dirUser.mkdir();
-		
-		File dirGame = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME).toFile();
-		if (!dirGame.exists())
-			dirGame.mkdir();
+		}
 	}
 	
 	private void initCreateAdmin()
 	{
 		if (!this.adminCreated)
 		{
+			System.out.println(SternResources.ServerAdminErzeugen(false));
+			
 			KeyPair userKeyPair = CryptoLib.getNewKeyPair();
 			
 			String user = ServerConstants.ADMIN_USER;
@@ -288,6 +293,8 @@ public class SternServer // NO_UCD (unused code)
 		
 		if (fileServerCredentials.exists())
 		{
+			System.out.println(SternResources.ServerConfigLaden(false));
+			
 			// lesen
 			try (BufferedReader br = new BufferedReader(new FileReader(fileServerCredentials.getAbsoluteFile())))
 			{
@@ -391,8 +398,13 @@ public class SternServer // NO_UCD (unused code)
 		
 		File dirUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER).toFile();
 		for (String filename: dirUser.list())
+		{
 			if (filename.equals(ServerConstants.ADMIN_USER) || Pattern.matches(Constants.SPIELER_REGEX_PATTERN, filename))
+			{
+				System.out.println(SternResources.ServerUserLesen(false, filename));
 				this.userRead(filename);
+			}
+		}
 	}
 	
 	private void initReadAllGames()
@@ -402,6 +414,7 @@ public class SternServer // NO_UCD (unused code)
 		
 		for (String filename: dirGame.list())
 		{
+			System.out.println(SternResources.ServerSpielLesen(false, filename));
 			Spiel spiel = this.gameRead(filename);
 			
 			if (spiel == null)

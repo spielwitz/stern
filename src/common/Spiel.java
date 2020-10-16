@@ -487,6 +487,19 @@ public class Spiel extends EmailTransportBase implements Serializable
 			spClone.emailAdresseSpielleiter = spClone.spieler[0].getEmailAdresse();
 		}
 		
+		// Auswertungen
+		if (nurAuswertungVomLetztenJahr)
+		{
+			// Loesche die Auswertungen.
+			for(Integer j: spClone.archiv.keySet())
+			{
+				if (j < spClone.jahr - 1)
+				{
+					spClone.archiv.get(j).loescheAuswertung();
+				}
+			}
+		}
+		
 		// Von einem abgeschlossenen Spiel darf der Spieler alles sehen
 		if (spClone.abgeschlossen)
 			return spClone;
@@ -522,19 +535,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.optionen.contains(SpielOptionen.SIMPEL));
 			
 			spClone.planeten[plIndex] = plClone;
-		}
-		
-		// Auswertungen
-		if (nurAuswertungVomLetztenJahr)
-		{
-			// Loesche die Auswertungen.
-			for(Integer j: spClone.archiv.keySet())
-			{
-				if (j < spClone.jahr - 1)
-				{
-					spClone.archiv.get(j).loescheAuswertung();
-				}
-			}
 		}
 		
 		return spClone;
