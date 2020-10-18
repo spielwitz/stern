@@ -41,10 +41,8 @@ public class PaintPanel extends Panel implements KeyListener
 	// Das Panel ist ziemlich dumm. Es stellt nur Inhalte dar, die in der Struktur ScreenDisplayContent definiert sind 
 	private IHostComponentMethods parent;
 	
-	public static final int		SCREEN_SIZE_W = 640;
-	private static final int	SCREEN_SIZE_H = 480;
 	public static final int		RAND = 10;
-	private static final double	RATIO = (double)SCREEN_SIZE_W / (double)SCREEN_SIZE_H;
+	private static final double	RATIO = (double)ScreenPainter.SCREEN_SIZE_W / (double)ScreenPainter.SCREEN_SIZE_H;
 	
 	public static final int		FONT_SIZE_PLANETEN = 11;
 	public static final int		FONT_SIZE_FELDER = 8;
@@ -108,7 +106,7 @@ public class PaintPanel extends Panel implements KeyListener
 		// Berechne den Zoom-Faktor
 		this.calcZoomFactor();
 		
-		BufferedImage image = (BufferedImage)this.createImage(Utils.round(SCREEN_SIZE_W * this.factor), Utils.round(SCREEN_SIZE_H * this.factor));
+		BufferedImage image = (BufferedImage)this.createImage(Utils.round(ScreenPainter.SCREEN_SIZE_W * this.factor), Utils.round(ScreenPainter.SCREEN_SIZE_H * this.factor));
 		this.dbGraphics = image.createGraphics();
 		
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -136,18 +134,18 @@ public class PaintPanel extends Panel implements KeyListener
 		if (ratioAvailable > RATIO)
 		{
 			
-			this.factor = (double)hAvailable / (double)SCREEN_SIZE_H;
+			this.factor = (double)hAvailable / (double)ScreenPainter.SCREEN_SIZE_H;
 			
 			this.yOff = RAND;
-			this.xOff = Utils.round((((double)dim.width - 2. * (double)RAND) - (double)SCREEN_SIZE_W * this.factor) / 2. + (double)RAND);
+			this.xOff = Utils.round((((double)dim.width - 2. * (double)RAND) - (double)ScreenPainter.SCREEN_SIZE_W * this.factor) / 2. + (double)RAND);
 		}
 		else
 		{
 			
-			this.factor = (double)wAvailable / (double)SCREEN_SIZE_W;
+			this.factor = (double)wAvailable / (double)ScreenPainter.SCREEN_SIZE_W;
 			
 			this.xOff = RAND;
-			this.yOff = Utils.round((((double)dim.height - 2. * (double)RAND) - (double)SCREEN_SIZE_H * this.factor) / 2. + (double)RAND);
+			this.yOff = Utils.round((((double)dim.height - 2. * (double)RAND) - (double)ScreenPainter.SCREEN_SIZE_H * this.factor) / 2. + (double)RAND);
 		}			
 	}
 	

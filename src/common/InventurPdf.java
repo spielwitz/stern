@@ -199,8 +199,8 @@ class InventurPdf extends PdfPageEventHelper
 			width = (int)(width * 0.45);
 		
 		double factor = this.daten.nurSpielfeld ? 
-				(double)(width+ 2 * PaintPanel.RAND) / (double)(PaintPanel.SCREEN_SIZE_W - 220) :
-				(double)(width+ 2 * PaintPanel.RAND) / (double)(PaintPanel.SCREEN_SIZE_W);
+				(double)(width+ 2 * PaintPanel.RAND) / (double)(ScreenPainter.SCREEN_SIZE_W - 220) :
+				(double)(width+ 2 * PaintPanel.RAND) / (double)(ScreenPainter.SCREEN_SIZE_W);
 		
 		// Ohne Console-Bereich
 		int height = (int)((double)(Constants.FELD_MAX_Y * ScreenPainter.SPIELFELD_DX+ 2 * PaintPanel.RAND) * factor);

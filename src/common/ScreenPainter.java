@@ -28,8 +28,8 @@ import java.util.ArrayList;
 
 public class ScreenPainter
 {	
-	private static final int		SCREEN_SIZE_W = 640;
-	private static final int		SCREEN_SIZE_H = 480;
+	public static final int			SCREEN_SIZE_W = 640;
+	public static final int			SCREEN_SIZE_H = 480;
 	
 	private static final int		SPIELFELD_XOFF = 10;
 	private static final int		SPIELFELD_YOFF = 10;
