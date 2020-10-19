@@ -384,28 +384,12 @@ public class ScreenPainter
 		{
 			for (SpielfeldPlanetDisplayContent pl: sdc.getPlanets())
 			{
-				if (pl.isInvers())
-				{
-					this.fillCircleSpielfeld(
-							pl.getPos(), 
-							1.2, 
-							Colors.get(pl.getCol()));
-					this.drawCTextSpielfeld(
-							pl.getPos(), 
-							pl.getName(), 
-							Color.black, 
-							this.fontPlaneten, 
-							this.fmPlaneten);
-				}
-				else
-				{
-					this.fillCircleSpielfeld(pl.getPos(), 1.2, 
-							this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE ?
-									Color.white :
-									Color.black);
-					this.drawCircleSpielfeld(pl.getPos(), 1.2, Colors.get(pl.getCol()));
-					this.drawCTextSpielfeld(pl.getPos(), pl.getName(),Colors.get(pl.getCol()), this.fontPlaneten, this.fmPlaneten);
-				}
+				this.fillCircleSpielfeld(pl.getPos(), 1.2, 
+						this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE ?
+								Color.white :
+								Color.black);
+				this.drawCircleSpielfeld(pl.getPos(), 1.2, Colors.get(pl.getCol()));
+				this.drawCTextSpielfeld(pl.getPos(), pl.getName(),Colors.get(pl.getCol()), this.fontPlaneten, this.fmPlaneten);
 				
 				this.zeichneRahmenUmPlanet(pl);
 			}

@@ -26,16 +26,14 @@ import java.util.ArrayList;
 	private String n;
 	private Point p;
 	private byte c; // Farbe
-	private boolean i;
 	private ArrayList<Byte> f; // Rahmenfarben, beginnend mit dem innersten
 	
-	SpielfeldPlanetDisplayContent(String name, Point pos, byte col, boolean invers,
+	SpielfeldPlanetDisplayContent(String name, Point pos, byte col,
 			ArrayList<Byte> frameCols) {
 		super();
 		this.n = name;
 		this.p = pos;
 		this.c = col;
-		this.i = invers;
 		this.f = frameCols;
 	}
 
@@ -58,10 +56,5 @@ import java.util.ArrayList;
 	public void clearFrameCols()
 	{
 		this.f = null;
-	}
-	
-	public boolean isInvers()
-	{
-		return this.i;
-	}
+	}	
 }

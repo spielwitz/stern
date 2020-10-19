@@ -1232,14 +1232,12 @@ public class Spiel extends EmailTransportBase implements Serializable
 						"?",
 						this.planeten[plIndex].getPos(),
 						Colors.INDEX_NEUTRAL,
-						false,
 						null));
 			else
 				plData.add(new SpielfeldPlanetDisplayContent(
 						"??",
 						this.planeten[plIndex].getPos(),
 						Colors.INDEX_WEISS,
-						false,
 						null));
 				
 		}
@@ -1271,24 +1269,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 			if (frames != null)
 				frameCol = frames.get(plIndex);
 			
-			if (this.planeten[plIndex].isNeutral())
-				plData.add(new SpielfeldPlanetDisplayContent(
-						this.getPlanetenNameFromIndex(plIndex),
-						this.planeten[plIndex].getPos(),
-						Colors.getColorIndexDarker(Colors.INDEX_NEUTRAL),
-						false,
-						frameCol));
-			else
-			{
-				boolean invers = (this.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH) && this.planeten[plIndex].istKommandozentrale());
-				plData.add(new SpielfeldPlanetDisplayContent(
-						this.getPlanetenNameFromIndex(plIndex),
-						this.planeten[plIndex].getPos(),
-						Colors.getColorIndexDarker(this.spieler[this.planeten[plIndex].getBes()].getColIndex()),
-						invers,
-						frameCol));
-			}
-				
+			plData.add(new SpielfeldPlanetDisplayContent(
+					this.getPlanetenNameFromIndex(plIndex),
+					this.planeten[plIndex].getPos(),
+					this.planeten[plIndex].isNeutral() ?
+							Colors.getColorIndexDarker(Colors.INDEX_NEUTRAL) :
+							Colors.getColorIndexDarker(this.spieler[this.planeten[plIndex].getBes()].getColIndex()),
+					frameCol));
 		}
 		
 		//Flugobjekte zeichnen
@@ -6336,14 +6323,10 @@ public class Spiel extends EmailTransportBase implements Serializable
  						Colors.INDEX_NEUTRAL :
  						this.spiel.spieler[this.spiel.planeten[plIndex].getBes()].getColIndex();
  				
- 				boolean invers = (this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH) && 
- 								  this.spiel.planeten[plIndex].istKommandozentrale());
- 				
  				plData.add(new SpielfeldPlanetDisplayContent(
  							Integer.toString(this.spiel.planeten[plIndex].getEprod()),
  							this.spiel.planeten[plIndex].getPos(),
  							col,
- 							invers,
  							null)); 					
  			}
  			 			
@@ -6788,14 +6771,10 @@ public class Spiel extends EmailTransportBase implements Serializable
  					}
  				}
  				
- 				boolean invers = (this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH) && 
-						  this.spiel.planeten[plIndex].istKommandozentrale());
- 				
  				plData.add(new SpielfeldPlanetDisplayContent(
 							this.spiel.getPlanetenNameFromIndex(plIndex),
 							this.spiel.planeten[plIndex].getPos(),
 							col,
-							invers,
 							frameCols)); 				
  					
  			}
@@ -7626,7 +7605,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 							this.spiel.getPlanetenNameFromIndex(plIndex),
 							this.spiel.planeten[plIndex].getPos(),
 							Colors.INDEX_SCHWARZ,
-							false,
 							null)); 				
  					
  			}
