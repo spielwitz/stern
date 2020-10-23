@@ -83,7 +83,7 @@ public class CryptoLib
 		return keyGen.generateKeyPair();
 	}
 
-	public static byte[] encryptRsa(String text, PublicKey key)
+	private static byte[] encryptRsa(String text, PublicKey key)
 	{
 		ArrayList<byte[]> chunkBytesEncrypted = new ArrayList<byte[]>();
 
@@ -144,7 +144,7 @@ public class CryptoLib
 		return encryptedBytes;
 	}
 	
-	public static String decryptRsa(byte[] text, PrivateKey key) throws Exception 
+	private static String decryptRsa(byte[] text, PrivateKey key) throws Exception 
 	{
 		ArrayList<byte[]> textBytes2 = new ArrayList<byte[]>(); 
 
@@ -191,30 +191,6 @@ public class CryptoLib
 		return new String(textBytes, STRING_ENCODING);
 	}
 	
-	public static byte[] encryptIntValue(int value, PublicKey key)
-	{
-		try {
-			Cipher cipher = Cipher.getInstance(ALGORITHM_RSA);
-			cipher.init(Cipher.ENCRYPT_MODE, key);
-			
-			byte[] byteArray = convertIntToByteArray(value);
-			
-			return cipher.doFinal(byteArray);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	public static int decryptIntValueRsa(byte[] byteArrayEncrypted, PrivateKey key) throws Exception 
-	{
-		final Cipher cipher = Cipher.getInstance(ALGORITHM_RSA);
-		cipher.init(Cipher.DECRYPT_MODE, key);
-		
-		byte[] byteArray = cipher.doFinal(byteArrayEncrypted);
-		
-		return convertByteArrayToInt(byteArray);
-	}
-	
 	private static byte[] compress(byte[] content){
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		try{
@@ -252,7 +228,7 @@ public class CryptoLib
 		return out.toByteArray();
 	}
 
-	public static byte[] convertIntToByteArray(int a)
+	private static byte[] convertIntToByteArray(int a)
 	{
 		return new byte[] {
 		        (byte) ((a >> 24) & 0xFF),
@@ -262,7 +238,7 @@ public class CryptoLib
 		    };
 	}
 	
-	public static int convertByteArrayToInt(byte[] b)
+	private static int convertByteArrayToInt(byte[] b)
 	{
 		return   b[3] & 0xFF |
 	            (b[2] & 0xFF) << 8 |
@@ -333,7 +309,7 @@ public class CryptoLib
 	    return new String(recovered, STRING_ENCODING);
 	}
 	
-	public static void sendByteArray(
+	private static void sendByteArray(
 			OutputStream out,
 			byte[] bytesString) throws Exception
 	{
@@ -343,7 +319,7 @@ public class CryptoLib
 		out.write(bytesString);
 	}
 	
-	public static byte[] receiveByteArray(
+	private static byte[] receiveByteArray(
 			DataInputStream in) throws Exception
 	{
 		byte[] lengthBytes = new byte[4];

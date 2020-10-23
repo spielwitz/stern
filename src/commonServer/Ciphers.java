@@ -26,7 +26,7 @@ public class Ciphers
 	public long created;
 	public long lastUsed;
 	
-	public Ciphers(Cipher cipherEncrypt, Cipher cipherDecrypt, String sessionId)
+	Ciphers(Cipher cipherEncrypt, Cipher cipherDecrypt, String sessionId)
 	{
 		this.cipherEncrypt = cipherEncrypt;
 		this.cipherDecrypt = cipherDecrypt;

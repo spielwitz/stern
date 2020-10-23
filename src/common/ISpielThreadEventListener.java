@@ -17,7 +17,6 @@
 package common;
 
 import java.util.EventListener;
-import java.util.Hashtable;
 
 public interface ISpielThreadEventListener extends EventListener
 {
@@ -31,5 +30,4 @@ public interface ISpielThreadEventListener extends EventListener
 	PostMovesResult postMovesToServer(String gameId, String spielerName, SpielzuegeEmailTransport set);
 	SpielzuegeEmailTransport importSpielzuegeAusEmail();
 	void triggerGameInfoUpdate();
-	Hashtable<Integer,Archiv> getEvaluations(String gameId, int vonJahr, int bisJahr);
 }

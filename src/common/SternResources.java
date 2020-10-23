@@ -3846,7 +3846,7 @@ public class SternResources
 	}
 
 	/**
-	   * Jahr (evtl. Nachladen vom Server erforderlich) [FA]
+	   * Jahr [FA]
 	   */
 	public static String ReplayErstesJahrServer(boolean symbol) {
 		return symbol ? "$FA$":messages.getString("ReplayErstesJahrServer_FA");

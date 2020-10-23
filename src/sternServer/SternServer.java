@@ -54,7 +54,6 @@ import commonServer.CryptoLib;
 import commonServer.LogEventType;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageActivateUser;
-import commonServer.RequestMessageGetEvaluations;
 import commonServer.RequestMessageGetStatus;
 import commonServer.RequestMessageChangeUser;
 import commonServer.RequestMessageGameHostDeleteGame;
@@ -64,7 +63,6 @@ import commonServer.RequestMessageSetLogLevel;
 import commonServer.RequestMessageUserId;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
-import commonServer.ResponseMessageGetEvaluations;
 import commonServer.ResponseMessageGetLog;
 import commonServer.ResponseMessageGetServerStatus;
 import commonServer.ResponseMessageGetStatus;
@@ -816,10 +814,6 @@ public class SternServer // NO_UCD (unused code)
 									userId,
 									RequestMessageGetStatus.fromJson(msg.payloadSerialized));
 					    	break;
-						case GET_EVALUATIONS:
-							resp = processRequestGetEvaluations(
-									(RequestMessageGetEvaluations)Utils.base64ToObject(msg.payloadSerialized, RequestMessageGetEvaluations.class, null));
-							break;
 						case GAME_HOST_DELETE_GAME:
 							resp = processRequestGameHostDeleteGame(
 									(RequestMessageGameHostDeleteGame)Utils.base64ToObject(
@@ -984,26 +978,6 @@ public class SternServer // NO_UCD (unused code)
 						SternResources.ServerErrorSpielExistiertNicht(true, gameId);
 			}
 			
-		}
-
-		return msgResponse;
-	}
-	
-	private ResponseMessage processRequestGetEvaluations(RequestMessageGetEvaluations msg)
-	{
-		ResponseMessage msgResponse = new ResponseMessage();
-		
-		synchronized(this.getLockObject(msg.gameId))
-		{
-			ResponseMessageGetEvaluations msgResponseGetEvaluations = new ResponseMessageGetEvaluations();
-
-			Spiel spiel = this.gameRead(msg.gameId);
-			
-			if (spiel != null)
-				msgResponseGetEvaluations.archiv = spiel.getArchiv(msg.vonJahr, msg.bisJahr);
-			
-			msgResponse.error = false;
-			msgResponse.payloadSerialized = msgResponseGetEvaluations.toJson();
 		}
 
 		return msgResponse;

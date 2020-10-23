@@ -89,13 +89,11 @@ import common.Utils;
 import commonServer.ClientUserCredentials;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageGamesAndUsers;
-import commonServer.RequestMessageGetEvaluations;
 import commonServer.RequestMessageGetStatus;
 import commonServer.RequestMessagePostMoves;
 import commonServer.RequestMessageType;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
-import commonServer.ResponseMessageGetEvaluations;
 import commonServer.ResponseMessageGetStatus;
 import commonServer.ServerUtils;
 import commonUi.IHostComponentMethods;
@@ -1653,27 +1651,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 	public void triggerGameInfoUpdate()
 	{
 		this.getGameInfoByTimer();
-	}
-
-	@Override
-	public Hashtable<Integer, Archiv> getEvaluations(String gameId, int vonJahr, int bisJahr) 
-	{
-		RequestMessage msg = new RequestMessage(RequestMessageType.GET_EVALUATIONS);
-		
-		RequestMessageGetEvaluations msgPayload = new RequestMessageGetEvaluations();
-		
-		msgPayload.gameId = gameId;
-		msgPayload.vonJahr = vonJahr;
-		msgPayload.bisJahr = bisJahr;
-				
-		msg.payloadSerialized = Utils.objectToBase64(msgPayload, null);
-		
-		ResponseMessage respMessage = this.sendAndReceive(this.cuc, msg);
-		
-		if (respMessage.error == false && respMessage.payloadSerialized != null)
-			return ResponseMessageGetEvaluations.fromJson(respMessage.payloadSerialized).archiv;
-		else
-			return null;
 	}
 
 	@Override

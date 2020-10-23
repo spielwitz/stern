@@ -57,7 +57,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private boolean abgeschlossen;
 	
-	private Hashtable<Integer,Archiv> archiv; // Punktestaende und Auswertungen pro Jahr
+	private Hashtable<Integer,Archiv> archiv; // Punktestaende pro Jahr
+	private Replays replays;	// Auswertungen der vergangenen Jahre
 	
 	// Transiente Felder
 	transient private boolean istSoloSpieler; // Spieler, der allein vor dem Rechner sitzt (E-Mail oder serverbasiert)
@@ -337,25 +338,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return this.distanzMatrix;
 	}
 	
-	public Hashtable<Integer,Archiv> getArchiv(int vonJahr, int bisJahr)
-	{
-		Hashtable<Integer,Archiv> retval = new Hashtable<Integer,Archiv>();
-		
-		for (Integer j: this.archiv.keySet())
-		{
-			if (j >= vonJahr && j <= bisJahr)
-				retval.put(j, this.archiv.get(j));
-		}
-		
-		return retval;
-	}
-	
-	private void addArchiv(Hashtable<Integer,Archiv> neueArchive)
-	{
-		for (Integer j: neueArchive.keySet())
-			this.archiv.put(j, neueArchive.get(j));
-	}
-	
 	public void setMinBuild(String minBuild)
 	{
 		this.minBuild = minBuild;
@@ -487,19 +469,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			spClone.emailAdresseSpielleiter = spClone.spieler[0].getEmailAdresse();
 		}
 		
-		// Auswertungen
-		if (nurAuswertungVomLetztenJahr)
-		{
-			// Loesche die Auswertungen.
-			for(Integer j: spClone.archiv.keySet())
-			{
-				if (j < spClone.jahr - 1)
-				{
-					spClone.archiv.get(j).loescheAuswertung();
-				}
-			}
-		}
-		
 		// Von einem abgeschlossenen Spiel darf der Spieler alles sehen
 		if (spClone.abgeschlossen)
 			return spClone;
@@ -576,6 +545,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.initial = true;
 		
 		this.archiv = new Hashtable<Integer,Archiv>();
+		this.replays = new Replays();
 		this.jahr = 0;
 		
 		this.minen = new Hashtable<String,Mine>();
@@ -4765,7 +4735,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.console.enableEvaluationProgressBar(false);
 			this.spiel.console.setModus(Console.ConsoleModus.TEXT_INPUT);
 			
-			this.spiel.archiv.get(this.spiel.jahr).setReplay(this.replay);
+			this.spiel.replays.add(this.spiel.jahr, this.replay);
 			
 			// Neues Jahr beginnen
 			this.spiel.jahr++;
@@ -5977,13 +5947,9 @@ public class Spiel extends EmailTransportBase implements Serializable
  			{
  				spiel.goToReplay = false;
  				
- 				if (this.spiel.archiv.containsKey(this.spiel.jahr - 1))
+ 				if (this.spiel.replays.auswertungExists(this.spiel.jahr - 1))
  				{
- 					// Zeige die letzte Auswertung
- 					Archiv archiv = this.spiel.archiv.get(this.spiel.jahr - 1);
- 					
- 					if (archiv.getReplaySize() > 0)
- 						this.replayArchive(this.spiel.jahr - 1, archiv);
+ 					this.replayArchive(this.spiel.jahr - 1);
  				}
  				
  				return;
@@ -6060,51 +6026,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 				break;
 			} while (true);
 					
-			// Startjahr ausgewaehlt
-			
-			// Bei serverbasierten Spielen eventuell fehlende Jahre nachladen
-			if (this.spiel.optionen.contains(SpielOptionen.SERVER_BASIERT))
-			{
-				int vonJahr = -1;
-				int bisJahr = -1;
-				
-				for (Integer j = erstesJahr; j <  this.spiel.jahr - 1; j++)
-				{
-					if (!this.spiel.archiv.get(j).auswertungExists())
-					{
-						bisJahr = j;
-						
-						if (vonJahr == -1)
-							vonJahr = j;
-					}
-				}
-				
-				if (vonJahr != -1)
-				{
-					Hashtable<Integer,Archiv> neueArchive = this.spiel.spielThread.getEvaluations(
-							this.spiel.name, 
-							vonJahr, 
-							bisJahr);
-					
-					this.spiel.console.lineBreak();
-					
-					if (neueArchive != null)
-					{
-						this.spiel.addArchiv(neueArchive);
-					}
-				}
-			}
-			
+			// Startjahr ausgewaehlt			
 			boolean ende = false;
 			for (int jahrIndex = 0; jahrIndex < jahre.size(); jahrIndex++)
 			{
 				int jahr = jahre.get(jahrIndex);
 				if (jahr < erstesJahr ||
 					!this.spiel.archiv.containsKey(jahr) ||
-					this.spiel.archiv.get(jahr).getReplaySize() <= 0)
+					this.spiel.replays.getReplaySize(jahr) <= 0)
 					continue;
 				
-				ende = this.replayArchive(jahr, this.spiel.archiv.get(jahr));
+				ende = this.replayArchive(jahr);
 				
 				if (ende)
 					break;
@@ -6114,7 +6046,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.updateSpielfeldDisplay();
  		}
  		
- 		private boolean replayArchive(int jahr, Archiv archiv)
+ 		private boolean replayArchive(int jahr)
  		{
  			boolean ende = false;
  			
@@ -6124,7 +6056,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 							Integer.toString(jahr+1)),
 					Colors.INDEX_NEUTRAL);
 			
-			ArrayList<ScreenDisplayContent> replay = archiv.getReplay();
+			ArrayList<ScreenDisplayContent> replay = this.spiel.replays.get(jahr);
 			
 			ScreenDisplayContent previousDay = null;
 			
@@ -8037,14 +7969,9 @@ public class Spiel extends EmailTransportBase implements Serializable
   			return;
   		
   		// Loesche alte Aufzeichnungen
-  		if (this.archiv != null)
-  		{	
-	  		for (Archiv archiv: this.archiv.values())
-	  		{
-	  			archiv.loescheAuswertung();
-	  		}
-  		}
+  		this.replays = new Replays();
   		
+  		// Loesche Objekttypen, die es nicht mehr gibt
   		if (this.objekte != null)
   		{
 	  		for (int i = this.objekte.size() - 1; i>= 0; i--)

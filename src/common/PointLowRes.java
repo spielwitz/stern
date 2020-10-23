@@ -67,4 +67,17 @@ import java.util.ArrayList;
 		
 		return resultList;
 	}
+	
+	static ArrayList<Point2D.Double> fromArray(PointLowRes[] list)
+	{
+		if (list == null)
+			return null;
+		
+		ArrayList<Point2D.Double> resultList = new ArrayList<Point2D.Double>(list.length);
+		
+		for (int i = 0; i < list.length; i++)
+			resultList.add(i, list[i].toPoint2D());
+		
+		return resultList;
+	}
 }

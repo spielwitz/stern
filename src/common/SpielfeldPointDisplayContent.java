@@ -19,7 +19,8 @@ package common;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-@SuppressWarnings("serial") class SpielfeldPointDisplayContent implements Serializable
+@SuppressWarnings("serial") 
+class SpielfeldPointDisplayContent implements Serializable
 {
 	// Stellt einen Punkt dar, der im Spielfeld gezeichnet wird, z.B. um ein Objekt anzuzeigen
 	private PointLowRes p;

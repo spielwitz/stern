@@ -16,8 +16,6 @@
 
 package common;
 
-import java.util.Hashtable;
-
 public class SpielThread extends Thread
 {
 	private SpielThreadCommunicationStructure threadCommunicationStructure;
@@ -63,11 +61,6 @@ public class SpielThread extends Thread
 	PostMovesResult postMovesToServer(String gameId, String spielerName, SpielzuegeEmailTransport set)
 	{
 		return this.screenUpdateListener.postMovesToServer(gameId, spielerName, set);
-	}
-	
-	Hashtable<Integer,Archiv> getEvaluations(String gameId, int vonJahr, int bisJahr)
-	{
-		return this.screenUpdateListener.getEvaluations(gameId, vonJahr, bisJahr);
 	}
 	
 	SpielzuegeEmailTransport importSpielzuegeAusEmail()

@@ -27,24 +27,6 @@ public class ServerUtils
 	public static final String ARG_LOGLEVEL = "log"; // NO_UCD (unused code)
 	public static final String ARG_CLIENT_CREDENTIALS = "credentials"; // NO_UCD (unused code)
 	
-	public static byte[] convertIntToByteArray(int a)
-	{
-		return new byte[] {
-		        (byte) ((a >> 24) & 0xFF),
-		        (byte) ((a >> 16) & 0xFF),   
-		        (byte) ((a >> 8) & 0xFF),   
-		        (byte) (a & 0xFF)
-		    };
-	}
-	
-	public static int convertByteArrayToInt(byte[] b)
-	{
-		return   b[3] & 0xFF |
-	            (b[2] & 0xFF) << 8 |
-	            (b[1] & 0xFF) << 16 |
-	            (b[0] & 0xFF) << 24; 
-	}
-	
 	public static String getHomeFolder()
 	{
 		return System.getProperty("user.dir");

@@ -19,7 +19,8 @@ package common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@SuppressWarnings("serial") class SpielfeldPlanetDisplayContent implements Serializable
+@SuppressWarnings("serial") 
+class SpielfeldPlanetDisplayContent implements Serializable
 {
 	// Informationen ueber einen Planeten, wie er von einem Client im Spielfeld
 	// dargestellt wird

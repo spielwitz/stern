@@ -50,6 +50,11 @@ import java.util.ArrayList;
 		return this.m == null ? null : PointLowRes.fromArrayList(m);
 	}
 	
+	public ArrayList<PointLowRes> getMarkedFieldsRaw()
+	{
+		return this.m;
+	}
+	
 	public void clearMarkedFieldsAndPlanets()
 	{
 		this.m = null;
