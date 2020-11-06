@@ -24,6 +24,8 @@ Instead of sitting in front of a single computer, players can also enter their m
 
 But the best is still the classic game variant, which has been around since 1989: take an afternoon and an evening, sit down on a large couch in front of a large screen or projector, stand up for chips and unhealthy drinks, switch off all devices that did not exist in the 80s and have a good time together.
 
+STERN's presentation is consciously based on the computer systems of the early 80s. That means: text graphics, keyboard operation, no sound. Yes, I know, I'm already standing in the corner and I'm ashamed. But unfortunately my graphics programmer is on vacation and the sound artist is in the hospital with hearing damage. However, I promise you that the fun of STERN will more than make up for it!
+
 For me, STERN is a hobby to try out programming techniques in my spare time and to imitate the lifecycle management of a very important open source software. I am realistic enough not to believe in a placing in the top 10 of the major game rankings. For me, STERN is a learning project that has been going on for over 30 years. Perhaps there is some intelligent life form out there in the universe that shares the joy of STERN with me. If so: Please contact me!
 
 Have fun playing!
