@@ -387,8 +387,11 @@ public class ScreenPainter
 				this.fillCircleSpielfeld(pl.getPos(), 1.2, 
 						this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE ?
 								Color.white :
-								Color.black);
-				this.drawCircleSpielfeld(pl.getPos(), 1.2, Colors.get(pl.getCol()));
+								Colors.getColorDarker2(Colors.get(pl.getCol())));
+				
+				if (this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE)
+	                this.drawCircleSpielfeld(pl.getPos(), 1.2, Colors.get(pl.getCol())); 
+				
 				this.drawCTextSpielfeld(pl.getPos(), pl.getName(),Colors.get(pl.getCol()), this.fontPlaneten, this.fmPlaneten);
 				
 				this.zeichneRahmenUmPlanet(pl);

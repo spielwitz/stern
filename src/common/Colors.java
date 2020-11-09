@@ -85,6 +85,15 @@ public class Colors
 		
 		return new Color(getColorRGB(red, green, blue));
 	}
+	
+	static Color getColorDarker2(Color color)
+	{
+		int red = (int)(color.getRed() *0.33);
+		int green = (int)(color.getGreen() *0.33);
+		int blue = (int)(color.getBlue() *0.33);
+		
+		return new Color(getColorRGB(red, green, blue));
+	}
 
 
 }

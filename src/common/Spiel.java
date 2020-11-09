@@ -1243,8 +1243,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.getPlanetenNameFromIndex(plIndex),
 					this.planeten[plIndex].getPos(),
 					this.planeten[plIndex].isNeutral() ?
-							Colors.getColorIndexDarker(Colors.INDEX_NEUTRAL) :
-							Colors.getColorIndexDarker(this.spieler[this.planeten[plIndex].getBes()].getColIndex()),
+							Colors.INDEX_NEUTRAL :
+							this.spieler[this.planeten[plIndex].getBes()].getColIndex(),
 					frameCol));
 		}
 		
