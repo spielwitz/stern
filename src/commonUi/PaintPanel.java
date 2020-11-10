@@ -58,6 +58,7 @@ public class PaintPanel extends Panel implements KeyListener
 	
 	private ScreenDisplayContent cont;
 	private boolean inputEnabled;
+	private boolean showInputDisabled;
 	
 	public PaintPanel(IHostComponentMethods parent)
 	{
@@ -82,10 +83,14 @@ public class PaintPanel extends Panel implements KeyListener
 		}		
 	}
 	
-	public void redraw(ScreenDisplayContent screenDisplayContent, boolean inputEnabled)
+	public void redraw(
+			ScreenDisplayContent screenDisplayContent, 
+			boolean inputEnabled,
+			boolean showInputDisabled)
 	{
 		this.cont = screenDisplayContent;
 		this.inputEnabled = inputEnabled;
+		this.showInputDisabled = showInputDisabled;
 		this.repaint();
 	}
 	
@@ -115,7 +120,14 @@ public class PaintPanel extends Panel implements KeyListener
 		this.fontFelder = this.fontBasis.deriveFont((float)(Utils.round((double)FONT_SIZE_FELDER * factor)));
 		this.fontMinen = this.fontBasis.deriveFont((float)(Utils.round((double)FONT_SIZE_MINEN * factor)));
 		
-		new ScreenPainter(this.cont, this.inputEnabled, this.dbGraphics, this.fontPlaneten, this.fontMinen, this.fontFelder, this.factor);
+		new ScreenPainter(
+				this.cont, 
+				!this.showInputDisabled, 
+				this.dbGraphics, 
+				this.fontPlaneten, 
+				this.fontMinen, 
+				this.fontFelder, 
+				this.factor);
 				
 		// Offscreen anzeigen
 		g2.drawImage(image, this.xOff, this.yOff, this);
@@ -152,7 +164,10 @@ public class PaintPanel extends Panel implements KeyListener
 	@Override
 	public void keyPressed(KeyEvent arg0)
 	{
-		this.parent.hostKeyPressed(arg0, SternResources.getLocale());
+		if (this.inputEnabled)
+		{
+			this.parent.hostKeyPressed(arg0, SternResources.getLocale());
+		}
 	}
 	
 	@Override

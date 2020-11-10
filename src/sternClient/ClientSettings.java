@@ -23,4 +23,5 @@ class ClientSettings
 	String meinName;
 	String clientCode;
 	String clientId;
+	boolean inaktivBeiZugeingabe;
 }

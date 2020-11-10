@@ -14,16 +14,17 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package stern;
+package commonUi;
 
 import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.JCheckBox;
 
-@SuppressWarnings("serial") class CheckBoxDark extends JCheckBox 
+@SuppressWarnings("serial") 
+public class CheckBoxDark extends JCheckBox 
 {
-	CheckBoxDark(String text, boolean selected, Font f)
+	public CheckBoxDark(String text, boolean selected, Font f)
 	{
 		super(text, selected);
 		

@@ -50,6 +50,7 @@ import commonServer.ResponseMessageChangeUser;
 import commonServer.ServerConstants;
 import commonServer.ServerUtils;
 import commonUi.ButtonDark;
+import commonUi.CheckBoxDark;
 import commonUi.DialogFontHelper;
 import commonUi.LabelDark;
 import commonUi.PanelDark;

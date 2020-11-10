@@ -23,4 +23,5 @@ public class ScreenDisplayContentClient implements Serializable
 {
 	public ScreenDisplayContent content;
 	public boolean inputEnabled;
+	public boolean showInputDisabled;
 }

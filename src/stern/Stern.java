@@ -76,6 +76,7 @@ import common.ISpielThreadEventListener;
 import common.KeyEventExtended;
 import common.PostMovesResult;
 import common.ReleaseGetter;
+import common.ScreenDisplayContent;
 import common.ScreenDisplayContentClient;
 import common.ScreenUpdateEvent;
 import common.Spiel;
@@ -487,9 +488,21 @@ public class Stern extends Frame  // NO_UCD (use default)
 	public void update(ScreenUpdateEvent event)
 	{
 		if (this.serverFunctions != null && this.serverFunctions.isServerEnabled())
-			this.serverFunctions.updateClients(event.getContent(), this.inputEnabled);
+		{
+			ScreenDisplayContent contentWaehrendZugeingabe = null;
+			
+			if (this.t != null && this.t.getSpiel() != null)
+			{
+				contentWaehrendZugeingabe = this.t.getSpiel().getScreenDisplayContentWaehrendZugeingabe();
+			}
+			
+			this.serverFunctions.updateClients(
+					event.getContent(), 
+					contentWaehrendZugeingabe, 
+					this.inputEnabled);
+		}
 		
-		this.paintPanel.redraw(event.getContent(), this.inputEnabled);		
+		this.paintPanel.redraw(event.getContent(), this.inputEnabled, false);		
 	}
 	
 	private void redrawScreen ()
@@ -1101,11 +1114,22 @@ public class Stern extends Frame  // NO_UCD (use default)
 	}
 
 	@Override
-	public String rmiClientConnectionRequest(String clientId, String release, String ip,
-			String clientCode, String clientName) throws RemoteException
+	public String rmiClientConnectionRequest(
+			String clientId, 
+			String release, 
+			String ip,
+			String clientCode, 
+			String clientName,
+			boolean inaktivBeiZugeingabe) 
+					throws RemoteException
 	{
 		if (release.equals(ReleaseGetter.getRelease()))
-			return this.serverFunctions.connectClient(clientId, ip, clientCode, clientName);
+			return this.serverFunctions.connectClient(
+					clientId, 
+					ip, 
+					clientCode, 
+					clientName, 
+					inaktivBeiZugeingabe);
 		else
 			return SternResources.UnterschiedlicheBuilds(false);
 	}

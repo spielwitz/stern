@@ -64,6 +64,7 @@ import commonServer.RequestMessageType;
 import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
 import commonUi.ButtonDark;
+import commonUi.CheckBoxDark;
 import commonUi.ComboBoxDark;
 import commonUi.DialogFontHelper;
 import commonUi.LabelDark;

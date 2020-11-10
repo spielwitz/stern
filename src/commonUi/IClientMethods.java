@@ -23,6 +23,6 @@ import common.ScreenDisplayContent;
 
 public interface IClientMethods extends Remote
 {
-	public void updateScreenDisplayContent(ScreenDisplayContent content, boolean inputEnabled) throws RemoteException;
+	public void updateScreenDisplayContent(ScreenDisplayContent content, boolean inputEnabled, boolean showInputDisabled) throws RemoteException;
 	public boolean openPdf(byte[] pdfBytes) throws RemoteException;
 }

@@ -38,6 +38,7 @@ import common.Colors;
 import common.Spieler;
 import common.SternResources;
 import commonUi.ButtonDark;
+import commonUi.CheckBoxDark;
 import commonUi.ComboBoxDark;
 import commonUi.DialogFontHelper;
 import commonUi.LabelDark;

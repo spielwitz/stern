@@ -80,6 +80,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	transient private boolean goToReplay;
 	
 	transient private BitSet flugobjekteSpielerAusgeblendet; 
+	transient private ScreenDisplayContent contentWaehrendZugeingabe;
 	
 	transient private Flugzeit[][] distanzMatrix;
 	transient private int[][] distanzMatrixJahre;
@@ -453,6 +454,35 @@ public class Spiel extends EmailTransportBase implements Serializable
 	private void speichern(boolean autoSave)
 	{
 		this.spielThread.speichern(this, autoSave);
+	}
+	
+	public ScreenDisplayContent getScreenDisplayContentWaehrendZugeingabe()
+	{
+		return this.contentWaehrendZugeingabe;
+	}
+	
+	private void setScreenDisplayContentWaehrendZugeingabe()
+	{
+		this.contentWaehrendZugeingabe = 
+				(ScreenDisplayContent)Utils.klon(this.screenDisplayContent);
+		
+		ConsoleDisplayContent cons = this.contentWaehrendZugeingabe.getCons();
+		
+		String[] text = cons.getText();
+		text[Console.MAX_LINES - 1] = 
+				SternResources.ZugeingabeClientEingabeGesperrt(true);
+		
+		cons = new ConsoleDisplayContent(
+						text, 
+						cons.getTextCol(),
+						new ArrayList<ConsoleKey>(), 
+						cons.getHeaderText(),
+						cons.getHeaderCol(), 
+						0, 
+						false,
+						cons.getEvaluationProgressBar());
+		
+		this.contentWaehrendZugeingabe.setCons(cons);
 	}
 	
 	public Spiel copyWithReducedInfo(int spIndex, boolean nurAuswertungVomLetztenJahr)
@@ -938,8 +968,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 				else if (!this.abgeschlossen && input.equals("\t"))
 				{
 					this.console.clear();
+					
+					this.setScreenDisplayContentWaehrendZugeingabe();
+					
 					// Zur Zugeingabe
 					Zugeingabe ze = new Zugeingabe(this);
+					
+					this.contentWaehrendZugeingabe = null;
+					
 					if (ze.eingabeAbgeschlossen)
 						break;
 				}

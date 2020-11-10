@@ -24,7 +24,7 @@ import common.ScreenDisplayContentClient;
 public interface IServerMethods extends Remote
 {
 	public void rmiKeyPressed(String clientId, String languageCode, int id, long when, int modifiers, int keyCode, char keyChar) throws RemoteException;
-	public String rmiClientConnectionRequest(String clientId, String release, String ip, String code, String clientName) throws RemoteException;
+	public String rmiClientConnectionRequest(String clientId, String release, String ip, String code, String clientName, boolean inaktivBeiZugeingabe) throws RemoteException;
 	public ScreenDisplayContentClient rmiGetCurrentScreenDisplayContent(String clientId) throws RemoteException;
 	public void rmiClientLogoff(String clientId) throws RemoteException;
 	public boolean rmiClientCheckRegistration(String clientId) throws RemoteException;

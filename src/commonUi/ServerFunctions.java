@@ -77,11 +77,22 @@ public class ServerFunctions
 		return this.registeredClients.values().toArray();
 	}
 		
-	public void updateClients(ScreenDisplayContent content, boolean inputEnabled)
+	public void updateClients(
+			ScreenDisplayContent content, 
+			ScreenDisplayContent contentWaehrendZugeingabe,
+			boolean inputEnabled)
 	{
 		for (ClientScreenDisplayContentUpdater updater: this.registeredClients.values())
 		{
-			updater.setContent(content, inputEnabled);
+			if (contentWaehrendZugeingabe != null && updater.inaktivBeiZugeingabe)
+			{
+				// Tastatureingabe ist inaktiv weahrend der Zugeingabe
+				updater.setContent(contentWaehrendZugeingabe, false, false);
+			}
+			else
+			{
+				updater.setContent(content, inputEnabled, !inputEnabled);
+			}
 			
 			try
 			{
@@ -117,13 +128,19 @@ public class ServerFunctions
 			return false;
 	}
 	
-	public String connectClient(String clientId, String ip, String clientCode, String clientName)
+	public String connectClient(
+			String clientId, 
+			String ip, 
+			String clientCode, 
+			String clientName,
+			boolean inaktivBeiZugeingabe)
 	{
 		// Ueberpruefe den code
 		if (clientCode.equals(this.clientCode))
 		{
 			// Nimm den Client in die Liste der registrierten Clients auf
-			ClientScreenDisplayContentUpdater updater = new ClientScreenDisplayContentUpdater(clientId, ip, clientName);
+			ClientScreenDisplayContentUpdater updater = 
+					new ClientScreenDisplayContentUpdater(clientId, ip, clientName, inaktivBeiZugeingabe);
 			this.registeredClients.put(clientId, updater);
 			return "";
 		}
@@ -142,20 +159,31 @@ public class ServerFunctions
 		private String clientId;
 		private String clientIp;
 		private String clientName;
+		private boolean inaktivBeiZugeingabe;
 		private ScreenDisplayContent content;
 		private boolean inputEnabled;
+		private boolean showInputDisabled;
 		
-		private ClientScreenDisplayContentUpdater(String clientId, String clientIp, String clientName)
+		private ClientScreenDisplayContentUpdater(
+				String clientId, 
+				String clientIp, 
+				String clientName,
+				boolean inaktivBeiZugeingabe)
 		{
 			this.clientId = clientId;
 			this.clientIp = clientIp;
 			this.clientName = clientName;
+			this.inaktivBeiZugeingabe = inaktivBeiZugeingabe;
 		}
 		
-		private void setContent(ScreenDisplayContent content, boolean inputEnabled)
+		private void setContent(
+				ScreenDisplayContent content, 
+				boolean inputEnabled,
+				boolean showInputDisabled)
 		{
 			this.content = content;
 			this.inputEnabled = inputEnabled;
+			this.showInputDisabled = showInputDisabled;
 		}
 		
 		@Override
@@ -165,7 +193,10 @@ public class ServerFunctions
 				IClientMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(this.clientIp);
 				rmiServer = (IClientMethods) registry.lookup( this.clientId );
-				rmiServer.updateScreenDisplayContent(this.content, this.inputEnabled);
+				rmiServer.updateScreenDisplayContent(
+						this.content, 
+						this.inputEnabled,
+						this.showInputDisabled);
 			}
 			catch (Exception e)
 			{
@@ -182,6 +213,14 @@ public class ServerFunctions
 
 		public String getClientName() {
 			return clientName;
+		}
+
+		public boolean isInaktivBeiZugeingabe() {
+			return inaktivBeiZugeingabe;
+		}
+
+		public boolean isShowInputDisabled() {
+			return showInputDisabled;
 		}
 	}
 	

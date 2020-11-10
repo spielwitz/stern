@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IA
+		// Hoechstes vergebenes Symbol: IC
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -576,6 +576,8 @@ public class SternResources
 		symbolDict.put("HY","ServerSpielLesen_HY");
 		symbolDict.put("HZ","ServerOrdnerErzeugen_HZ");
 		symbolDict.put("IA","ServerAdminErzeugen_IA");
+		symbolDict.put("IB","ZugeingabeClientEingabeGesperrt_IB");
+		symbolDict.put("IC","ServerSettingsJDialogInaktiv_IC");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -675,7 +677,7 @@ public class SternResources
 	}
 
 	/**
-	   * Flugobjekte [0A]
+	   * Raumschiffe [0A]
 	   */
 	public static String InventurFlugobjekte(boolean symbol) {
 		return symbol ? "$0A$":messages.getString("InventurFlugobjekte_0A");
@@ -703,7 +705,7 @@ public class SternResources
 	}
 
 	/**
-	   * Es sind keine Flugobjekte unterwegs. [0E]
+	   * Es sind keine Raumschiffe unterwegs. [0E]
 	   */
 	public static String InventurKeineFlugobjekte(boolean symbol) {
 		return symbol ? "$0E$":messages.getString("InventurKeineFlugobjekte_0E");
@@ -724,7 +726,7 @@ public class SternResources
 	}
 
 	/**
-	   * Es sind keine Raumer unterwegs. [0H]
+	   * Es sind keine Kampfschiffe unterwegs. [0H]
 	   */
 	public static String InventurKeineRaumer(boolean symbol) {
 		return symbol ? "$0H$":messages.getString("InventurKeineRaumer_0H");
@@ -878,7 +880,7 @@ public class SternResources
 	}
 
 	/**
-	   * Flugobjekte starten, die Planeten produzieren Raumer und Energie. [19]
+	   * Raumschiffe starten, die Planeten produzieren Kampfschiffe und Energie. [19]
 	   */
 	public static String AuswertungBeginnt(boolean symbol) {
 		return symbol ? "$19$":messages.getString("AuswertungBeginnt_19");
@@ -934,28 +936,28 @@ public class SternResources
 	}
 
 	/**
-	   * Raumer [1H]
+	   * Kampfschiffe [1H]
 	   */
 	public static String InventurRaumer(boolean symbol) {
 		return symbol ? "$1H$":messages.getString("InventurRaumer_1H");
 	}
 
 	/**
-	   * Raum [1I]
+	   * Ks [1I]
 	   */
 	public static String InventurRaumerKurz(boolean symbol) {
 		return symbol ? "$1I$":messages.getString("InventurRaumerKurz_1I");
 	}
 
 	/**
-	   * Raumerproduktion/Jahr [1J]
+	   * Kampfschiffproduktion/Jahr [1J]
 	   */
 	public static String InventurRaumerproduktionJahr(boolean symbol) {
 		return symbol ? "$1J$":messages.getString("InventurRaumerproduktionJahr_1J");
 	}
 
 	/**
-	   * ERa [1K]
+	   * EKs [1K]
 	   */
 	public static String InventurRaumerproduktionKurz(boolean symbol) {
 		return symbol ? "$1K$":messages.getString("InventurRaumerproduktionKurz_1K");
@@ -1396,7 +1398,7 @@ public class SternResources
 	}
 
 	/**
-	   * Abwehrschild-Raumer (Kauf +{0}) [3F]
+	   * Abwehrschild-Kampfschiffe (Kauf +{0}) [3F]
 	   */
 	public static String PlEditFestungRaumer(boolean symbol, String arg0) {
 		return symbol ? "$3F§"+arg0+"$":MessageFormat.format(messages.getString("PlEditFestungRaumer_3F"), arg0);
@@ -1417,7 +1419,7 @@ public class SternResources
 	}
 
 	/**
-	   * Raumerproduktion/Jahr [3I]
+	   * Kampfschiffproduktion/Jahr [3I]
 	   */
 	public static String PlEditRaumerProd(boolean symbol) {
 		return symbol ? "$3I$":messages.getString("PlEditRaumerProd_3I");
@@ -1494,7 +1496,7 @@ public class SternResources
 	}
 
 	/**
-	   * Raumer [3T]
+	   * Kampfschiffe [3T]
 	   */
 	public static String Raumer(boolean symbol) {
 		return symbol ? "$3T$":messages.getString("Raumer_3T");
@@ -1543,14 +1545,14 @@ public class SternResources
 	}
 
 	/**
-	   * {0} Raumer von {1} angehalten und gekapert. [40]
+	   * {0} Kampfschiff(e) von {1} angehalten und gekapert. [40]
 	   */
 	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$40§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0, arg1);
 	}
 
 	/**
-	   * {0} Raumer von {1} gesichtet. [41]
+	   * {0} Kampfschiff(e) von {1} gesichtet. [41]
 	   */
 	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$41§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1);
@@ -1571,35 +1573,35 @@ public class SternResources
 	}
 
 	/**
-	   * {0}: {1} Raumer auf Planet {2} angekommen. [44]
+	   * {0}: {1} Kampfschiff(e) auf Planet {2} angekommen. [44]
 	   */
 	public static String AuswertungRaumerAngekommen(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "$44§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAngekommen_44"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * {0}: {1} Raumer in Sektor {2} auf eine Mine gelaufen. Die Mine wurde zerst\u00F6rt. [45]
+	   * {0}: {1} Kamfpschiff(e) in Sektor {2} auf eine Mine gelaufen. Die Mine wurde zerst\u00F6rt. [45]
 	   */
 	public static String AuswertungRaumerAufMineGelaufenZerstoert(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "$45§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufenZerstoert_45"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * {0}: {1} Raumer in Sektor {2} auf eine Mine gelaufen. [46]
+	   * {0}: {1} Kampfschiff(e) in Sektor {2} auf eine Mine gelaufen. [46]
 	   */
 	public static String AuswertungRaumerAufMineGelaufen(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "$46§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufen_46"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * {0}: Raumer k\u00F6nnen nicht vom Planeten {1} gestartet werden. [47]
+	   * {0}: Kampfschiffe k\u00F6nnen nicht vom Planeten {1} gestartet werden. [47]
 	   */
 	public static String AuswertungRaumerNichtGestartet(boolean symbol, String arg0, String arg1) {
 		return symbol ? "$47§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerNichtGestartet_47"), arg0, arg1);
 	}
 
 	/**
-	   * {1}: {0} Raumer wurden von Planet {2} vertrieben. [48]
+	   * {1}: {0} Kampfschiffe wurden von Planet {2} vertrieben. [48]
 	   */
 	public static String AuswertungRaumerVertrieben(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "$48§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerVertrieben_48"), arg0, arg1, arg2);
@@ -2096,7 +2098,7 @@ public class SternResources
 	}
 
 	/**
-	   * Raumer im Jahr {0} [6M]
+	   * Kampfschiffe im Jahr {0} [6M]
 	   */
 	public static String StatistikTitelRaumer(boolean symbol, String arg0) {
 		return symbol ? "$6M§"+arg0+"$":MessageFormat.format(messages.getString("StatistikTitelRaumer_6M"), arg0);
@@ -2278,7 +2280,7 @@ public class SternResources
 	}
 
 	/**
-	   * Alle Raumer [7D]
+	   * Alle Kampfschiffe [7D]
 	   */
 	public static String ZugeingabeAlleRaumer(boolean symbol) {
 		return symbol ? "$7D$":messages.getString("ZugeingabeAlleRaumer_7D");
@@ -2327,7 +2329,7 @@ public class SternResources
 	}
 
 	/**
-	   * B\u00FCndnisraumer [7K]
+	   * B\u00FCndnisflotte [7K]
 	   */
 	public static String ZugeingabeBuendRaumer(boolean symbol) {
 		return symbol ? "$7K$":messages.getString("ZugeingabeBuendRaumer_7K");
@@ -2530,7 +2532,7 @@ public class SternResources
 	}
 
 	/**
-	   * Sie k\u00F6nnen maximal {0} Raumer starten. [8D]
+	   * Sie k\u00F6nnen maximal {0} Kampfschiffe starten. [8D]
 	   */
 	public static String ZugeingabeMaxAnzahlRaumer(boolean symbol, String arg0) {
 		return symbol ? "$8D§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeMaxAnzahlRaumer_8D"), arg0);
@@ -2607,7 +2609,7 @@ public class SternResources
 	}
 
 	/**
-	   * So viele Raumer sind nicht verf\u00FCgbar. [8O]
+	   * So viele Kampfschiffe sind nicht verf\u00FCgbar. [8O]
 	   */
 	public static String ZugeingabeNichtGenugRaumer(boolean symbol) {
 		return symbol ? "$8O$":messages.getString("ZugeingabeNichtGenugRaumer_8O");
@@ -2656,7 +2658,7 @@ public class SternResources
 	}
 
 	/**
-	   * Raumer [8V]
+	   * Kampfschiffe [8V]
 	   */
 	public static String ZugeingabeRaumer(boolean symbol) {
 		return symbol ? "$8V$":messages.getString("ZugeingabeRaumer_8V");
@@ -2754,7 +2756,7 @@ public class SternResources
 	}
 
 	/**
-	   * AsRa [99]
+	   * AsKs [99]
 	   */
 	public static String InventurFestungRaumerKurz(boolean symbol) {
 		return symbol ? "$99$":messages.getString("InventurFestungRaumerKurz_99");
@@ -2880,7 +2882,7 @@ public class SternResources
 	}
 
 	/**
-	   * Auf welchen Planeten m\u00F6chten Sie {0} Raumer schicken? [9R]
+	   * Auf welchen Planeten m\u00F6chten Sie {0} Kampfschiffe schicken? [9R]
 	   */
 	public static String ZugeingabeWohinRaumer(boolean symbol, String arg0) {
 		return symbol ? "$9R§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeWohinRaumer_9R"), arg0);
@@ -2915,7 +2917,7 @@ public class SternResources
 	}
 
 	/**
-	   * Sie m\u00FCssen erst alle Ihre Raumer abziehen, bevor Sie k\u00FCndigen k\u00F6nnen. [9W]
+	   * Sie m\u00FCssen erst alle Ihre Kampfschiffe abziehen, bevor Sie k\u00FCndigen k\u00F6nnen. [9W]
 	   */
 	public static String ZugeingabeZuerstKuendigen(boolean symbol) {
 		return symbol ? "$9W$":messages.getString("ZugeingabeZuerstKuendigen_9W");
@@ -3755,14 +3757,14 @@ public class SternResources
 	}
 
 	/**
-	   * Raumer auf Planet anzeigen [EL]
+	   * Kampfschiffe auf Planet anzeigen [EL]
 	   */
 	public static String ZugeingabeRaumerAufPlanet(boolean symbol) {
 		return symbol ? "$EL$":messages.getString("ZugeingabeRaumerAufPlanet_EL");
 	}
 
 	/**
-	   * Auf dem Planeten befinden sich {0} Raumer. [EM]
+	   * Auf dem Planeten befinden sich {0} Kampfschiffe. [EM]
 	   */
 	public static String ZugeingabeRaumerAnzeigen(boolean symbol, String arg0) {
 		return symbol ? "$EM§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeRaumerAnzeigen_EM"), arg0);
@@ -4266,7 +4268,7 @@ public class SternResources
 	}
 
 	/**
-	   * Flugobjekte aus-/einblenden [HL]
+	   * Raumschiffe aus-/einblenden [HL]
 	   */
 	public static String ZugeingabeObjekteAusblenden(boolean symbol) {
 		return symbol ? "$HL$":messages.getString("ZugeingabeObjekteAusblenden_HL");
@@ -4375,5 +4377,19 @@ public class SternResources
 	   */
 	public static String ServerAdminErzeugen(boolean symbol) {
 		return symbol ? "$IA$":messages.getString("ServerAdminErzeugen_IA");
+	}
+
+	/**
+	   * >>> Spieler geben Ihre Spielz\u00FCge ein. Die Eingabe ist gesperrt. <<< [IB]
+	   */
+	public static String ZugeingabeClientEingabeGesperrt(boolean symbol) {
+		return symbol ? "$IB$":messages.getString("ZugeingabeClientEingabeGesperrt_IB");
+	}
+
+	/**
+	   * Inaktiv w\u00E4hrend der Zugeingabe [IC]
+	   */
+	public static String ServerSettingsJDialogInaktiv(boolean symbol) {
+		return symbol ? "$IC$":messages.getString("ServerSettingsJDialogInaktiv_IC");
 	}
 }
