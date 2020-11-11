@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IC
+		// Hoechstes vergebenes Symbol: IE
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -252,7 +252,6 @@ public class SternResources
 		symbolDict.put("6L","StatistikTitelPunkte_6L");
 		symbolDict.put("6M","StatistikTitelRaumer_6M");
 		symbolDict.put("6N","SternClientTitel_6N");
-		symbolDict.put("6O","SternClientTitelIp_6O");
 		symbolDict.put("6P","SternClientVerlassenFrage_6P");
 		symbolDict.put("6Q","SternTerminalServer_6Q");
 		symbolDict.put("6R","SternThinClientVerlassen_6R");
@@ -578,6 +577,8 @@ public class SternResources
 		symbolDict.put("IA","ServerAdminErzeugen_IA");
 		symbolDict.put("IB","ZugeingabeClientEingabeGesperrt_IB");
 		symbolDict.put("IC","ServerSettingsJDialogInaktiv_IC");
+		symbolDict.put("ID","ClientSettingsJDialogIpErmitteln_ID");
+		symbolDict.put("IE","ClientSettingsJDialogMeineIp_IE");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -1202,7 +1203,7 @@ public class SternResources
 	}
 
 	/**
-	   * STERN Thin Client verlassen [2M]
+	   * STERN Client verlassen [2M]
 	   */
 	public static String MenuSternClientVerlassen(boolean symbol) {
 		return symbol ? "$2M$":messages.getString("MenuSternClientVerlassen_2M");
@@ -2105,21 +2106,14 @@ public class SternResources
 	}
 
 	/**
-	   * STERN Thin Client [6N]
+	   * STERN Client [6N]
 	   */
 	public static String SternClientTitel(boolean symbol) {
 		return symbol ? "$6N$":messages.getString("SternClientTitel_6N");
 	}
 
 	/**
-	   * STERN Thin Client (IP: {0}) [6O]
-	   */
-	public static String SternClientTitelIp(boolean symbol, String arg0) {
-		return symbol ? "$6O§"+arg0+"$":MessageFormat.format(messages.getString("SternClientTitelIp_6O"), arg0);
-	}
-
-	/**
-	   * M\u00F6chten Sie den STERN Thin Client wirklich verlassen? [6P]
+	   * M\u00F6chten Sie den STERN Client wirklich verlassen? [6P]
 	   */
 	public static String SternClientVerlassenFrage(boolean symbol) {
 		return symbol ? "$6P$":messages.getString("SternClientVerlassenFrage_6P");
@@ -2133,7 +2127,7 @@ public class SternResources
 	}
 
 	/**
-	   * STERN Thin Client verlassen [6R]
+	   * STERN Client verlassen [6R]
 	   */
 	public static String SternThinClientVerlassen(boolean symbol) {
 		return symbol ? "$6R$":messages.getString("SternThinClientVerlassen_6R");
@@ -4391,5 +4385,19 @@ public class SternResources
 	   */
 	public static String ServerSettingsJDialogInaktiv(boolean symbol) {
 		return symbol ? "$IC$":messages.getString("ServerSettingsJDialogInaktiv_IC");
+	}
+
+	/**
+	   * Ermitteln [ID]
+	   */
+	public static String ClientSettingsJDialogIpErmitteln(boolean symbol) {
+		return symbol ? "$ID$":messages.getString("ClientSettingsJDialogIpErmitteln_ID");
+	}
+
+	/**
+	   * Meine IP-Adresse [IE]
+	   */
+	public static String ClientSettingsJDialogMeineIp(boolean symbol) {
+		return symbol ? "$IE$":messages.getString("ClientSettingsJDialogMeineIp_IE");
 	}
 }

@@ -18,8 +18,10 @@ package sternClient;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -38,8 +40,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import common.Constants;
 import common.ReleaseGetter;
 import common.SternResources;
+import common.Utils;
 import commonUi.ButtonDark;
 import commonUi.CheckBoxDark;
 import commonUi.DialogFontHelper;
@@ -47,7 +51,6 @@ import commonUi.IServerMethods;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.PasswordFieldDark;
-import commonUi.ServerFunctions;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
@@ -55,7 +58,9 @@ import commonUi.TextFieldDark;
 {
 	private ButtonDark butConnect;
 	private ButtonDark butClose;
+	private ButtonDark butGetIp;
 	private TextFieldDark tfServerIp;
+	private TextFieldDark tfMeineIp;
 	private PasswordFieldDark tfClientCode;
 	private TextFieldDark tfMeinName;
 	private LabelDark labStatus;
@@ -103,6 +108,19 @@ import commonUi.TextFieldDark;
 		PanelDark panServer = this.getGroupBox(SternResources.SternScreenSharingServer(false));
 		panServer.setLayout(new SpringLayout());
 		
+		panServer.add(new LabelDark(SternResources.ClientSettingsJDialogMeineIp(false), font));
+
+		PanelDark panIp = new PanelDark(new GridLayout(1,2, 10, 0));
+		
+		this.tfMeineIp = new TextFieldDark(font, 18);
+		this.tfMeineIp.setText(this.settings.meineIp);
+		panIp.add(this.tfMeineIp);
+		
+		this.butGetIp = new ButtonDark(this, SternResources.ClientSettingsJDialogIpErmitteln(false) , font);
+		panIp.add(this.butGetIp);
+		
+		panServer.add(panIp);
+		
 		panServer.add(new LabelDark(SternResources.ServerSettingsJDialogIpServer(false), font));
 		
 		this.tfServerIp = new TextFieldDark(this.settings.serverIp, font);
@@ -118,8 +136,8 @@ import commonUi.TextFieldDark;
 		this.tfMeinName = new TextFieldDark(this.settings.meinName, font);
 		panServer.add(this.tfMeinName);
 		
-		SpringUtilities.makeGrid(panServer,
-                3, 2, //rows, cols
+		SpringUtilities.makeCompactGrid(panServer,
+                4, 2, //rows, cols
                 5, 5, //initialX, initialY
                 20, 5);//xPad, yPad
 		
@@ -196,11 +214,18 @@ import commonUi.TextFieldDark;
 			
 			this.close();
 		}
+		else if (source == this.butGetIp)
+		{
+			this.tfMeineIp.setText(Utils.getMyIPAddress());
+		}
 		else if (source == this.butConnect)
 		{
 			this.updateSettings();
+			System.setProperty("java.rmi.server.hostname",this.settings.meineIp);
 			
 			String errorMsg = null;
+			
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			
 			try {
 				if (!InetAddress.getByName( this.settings.serverIp ).isReachable( 2000 ))
@@ -209,7 +234,7 @@ import commonUi.TextFieldDark;
 									this.settings.serverIp));
 				IServerMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( ServerFunctions.getServerId() );
+				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
 				
 				errorMsg = rmiServer.rmiClientConnectionRequest(
 						this.settings.clientId,
@@ -228,6 +253,8 @@ import commonUi.TextFieldDark;
 					this.parent.connected = true;
 			}
 			catch (Exception e) {
+				this.setCursor(Cursor.getDefaultCursor());
+				
 				JOptionPane.showMessageDialog(this,
 						SternResources.ClientSettingsJDialogKeineVerbindung(false, e.getMessage()),
 						SternResources.Fehler(false),
@@ -235,6 +262,8 @@ import commonUi.TextFieldDark;
 				
 				this.parent.connected = false;
 			}
+			
+			this.setCursor(Cursor.getDefaultCursor());
 			
 			this.updateConnectionStatus();
 		}
@@ -252,7 +281,7 @@ import commonUi.TextFieldDark;
 			try {
 				IServerMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( ServerFunctions.getServerId() );
+				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
 
 				authorized = rmiServer.rmiClientCheckRegistration(this.settings.clientId);
 			}
@@ -280,6 +309,7 @@ import commonUi.TextFieldDark;
 	{
 		this.settings.clientCode = this.tfClientCode.getText();
 		this.settings.meinName = this.tfMeinName.getText();
+		this.settings.meineIp = this.tfMeineIp.getText();
 		this.settings.serverIp = this.tfServerIp.getText();
 		this.settings.inaktivBeiZugeingabe = this.cbInaktivBeiZugeingabe.isSelected();
 	}

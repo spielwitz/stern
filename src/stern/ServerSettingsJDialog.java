@@ -18,6 +18,7 @@ package stern;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -40,12 +41,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import common.SternResources;
+import common.Utils;
 import commonUi.ButtonDark;
 import commonUi.CheckBoxDark;
 import commonUi.DialogFontHelper;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
-import commonUi.ServerFunctions;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
@@ -53,6 +54,9 @@ import commonUi.TextFieldDark;
 {
 	private ButtonDark butClose;
 	private ButtonDark butRefreshClients;
+	private ButtonDark butGetIp;
+	
+	private TextFieldDark tfIp;
 	
 	private CheckBoxDark cbServerEnabled;
 	private JList<String> listClients;
@@ -65,13 +69,19 @@ import commonUi.TextFieldDark;
 	
 	private static Font font;
 	
+	public String meineIp;
+	
 	ServerSettingsJDialog(
 			Stern parent,
 			String title,
+			String meineIp,
 			boolean modal,
 			ServerFunctions serverFunctions)
 	{
 		super (parent, title, modal);
+		
+		this.meineIp = meineIp == null || meineIp.equals("") ?
+				serverFunctions.getMeineIp() : meineIp;
 		
 		// Font laden
 		font = DialogFontHelper.getFont();
@@ -102,7 +112,17 @@ import commonUi.TextFieldDark;
 		panServerCodes.setLayout(new SpringLayout());
 		
 		panServerCodes.add(new LabelDark(SternResources.ServerSettingsJDialogIpServer(false), font));
-		panServerCodes.add(new TextFieldDark(serverFunctions.getMeineIp(), font, false));
+		
+		PanelDark panIp = new PanelDark(new GridLayout(1,2, 10, 0));
+		
+		this.tfIp = new TextFieldDark(font, 18);
+		this.tfIp.setText(this.meineIp);
+		panIp.add(this.tfIp);
+		
+		this.butGetIp = new ButtonDark(this, SternResources.ClientSettingsJDialogIpErmitteln(false) , font);
+		panIp.add(this.butGetIp);
+		
+		panServerCodes.add(panIp);
 		
 		panServerCodes.add(new LabelDark(SternResources.ThinClientCode(false), font));
 		panServerCodes.add(new TextFieldDark(serverFunctions.getClientCode(), font, false));
@@ -200,8 +220,12 @@ import commonUi.TextFieldDark;
 			this.close();
 		else if (source == this.cbServerEnabled)
 		{
+			this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			
 			if (this.cbServerEnabled.isSelected())
 			{
+				this.serverFunctions.setIp(this.tfIp.getText());
+				
 				// Start RMI
 				this.serverFunctions.startServer(this.parent);
 			}
@@ -210,9 +234,15 @@ import commonUi.TextFieldDark;
 				// Stop RMI
 				this.serverFunctions.stopServer(this.parent);
 			}
+			
+			this.setCursor(Cursor.getDefaultCursor());
 		}
 		else if (source == this.butRefreshClients)
 			this.updateClientList();
+		else if (source == this.butGetIp)
+		{
+			this.tfIp.setText(Utils.getMyIPAddress());
+		}
 	}
 
 	@Override
@@ -221,6 +251,8 @@ import commonUi.TextFieldDark;
 	
 	private void close()
 	{
+		this.meineIp = this.tfIp.getText();
+		
 		this.setVisible(false);
 		this.dispose();
 	}

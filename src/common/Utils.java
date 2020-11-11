@@ -310,28 +310,6 @@ public class Utils
 		return meineIP;
 	}
 	
-	public static Hashtable<String,String> resolveProgramArgs(String[] args)
-	{
-		Hashtable<String,String> retval = new Hashtable<String,String>();
-		
-		for (String arg: args)
-		{
-			try
-			{
-				String[] parts = arg.split("=");
-				
-				retval.put(parts[0].toLowerCase().trim(), parts[1].toLowerCase().trim());
-			}
-			catch (Exception x)
-			{
-				System.out.println(
-						SternResources.ProgramArgument(false, arg));
-			}
-		}
-		
-		return retval;
-	}
-	
 	static Point2D.Double toPoint2D(Point p)
 	{
 		return new Point2D.Double(p.getX(), p.getY());

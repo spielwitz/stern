@@ -43,27 +43,26 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Hashtable;
 import java.util.Properties;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import common.Constants;
 import common.PdfLauncher;
 import common.ScreenDisplayContent;
 import common.ScreenDisplayContentClient;
-import common.Utils;
 import commonUi.IClientMethods;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
 import commonUi.IUpdateCheckerCallback;
 import commonUi.PaintPanel;
-import commonUi.ServerFunctions;
 import commonUi.SpracheJDialog;
 import commonUi.SternAbout;
 import commonUi.UpdateChecker;
 import common.SternResources;
+import common.Utils;
 
 @SuppressWarnings("serial") 
 public class SternClient extends Frame // NO_UCD (use default)
@@ -96,6 +95,7 @@ public class SternClient extends Frame // NO_UCD (use default)
     
     transient private static final String PROPERTIES_FILE_NAME = "SternClientProperties";
 	transient private static final String PROPERTY_NAME_SERVER_IP = "serverIp";
+	transient private static final String PROPERTY_NAME_MEINE_IP = "ip";
 	transient private static final String PROPERTY_NAME_MEIN_NAME = "meinName";
 	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
 	transient private static final String PROPERTY_LAST_UPDATE_FOUND = "lastUpdateFound";
@@ -103,16 +103,10 @@ public class SternClient extends Frame // NO_UCD (use default)
 	
 	public static void main(String[] args)
 	{
-		Hashtable<String,String> argsTable = Utils.resolveProgramArgs(args);
-		
-		String meineIp = argsTable.containsKey("ip") ?
-								argsTable.get("ip") :
-								null;
-								
-		new SternClient(meineIp);
+		new SternClient();
 	}
 	
-	private SternClient(String meineIp)
+	private SternClient()
 	{
 		super();
 		
@@ -122,13 +116,15 @@ public class SternClient extends Frame // NO_UCD (use default)
         settings.clientId = uuid.toString();
         settings.clientCode = "";
         settings.meinName = "";
-        settings.meineIp = meineIp == null ? Utils.getMyIPAddress() : meineIp;
-        settings.serverIp = settings.meineIp;
-        
-        System.setProperty("java.rmi.server.hostname",settings.meineIp);
         
 		// Properties lesen
 		this.props = this.getProperties();
+		
+		if (settings.meineIp == null || settings.meineIp.equals(""))
+			settings.meineIp = Utils.getMyIPAddress();
+		
+		if (settings.serverIp == null || settings.serverIp.equals(""))
+			settings.serverIp = settings.meineIp;
 		
 		this.setTitle(SternResources.SternClientTitel(false));
         
@@ -163,11 +159,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 			stub = (IClientMethods) UnicastRemoteObject.exportObject( this, 0 );
 			Registry registry;
 			registry = LocateRegistry.getRegistry();
-			registry.rebind( this.settings.clientId, stub );
-			
-			this.setTitle(
-				SternResources.SternClientTitelIp(false, this.settings.meineIp));
-			
+			registry.rebind( this.settings.clientId, stub );			
 		} catch (AccessException e) {
 			e.printStackTrace();
 		} catch (RemoteException e) {
@@ -317,7 +309,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 			try {
 				IServerMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( ServerFunctions.getServerId() );
+				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
 				contentClient = rmiServer.rmiGetCurrentScreenDisplayContent(this.settings.clientId);
 			}
 			catch (Exception e) {
@@ -341,7 +333,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 		try {
 			IServerMethods rmiServer;
 			Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-			rmiServer = (IServerMethods) registry.lookup( ServerFunctions.getServerId() );
+			rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
 			rmiServer.rmiClientLogoff(this.settings.clientId);
 		}
 		catch (Exception e) {}
@@ -356,7 +348,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 			try {
 				IServerMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( ServerFunctions.getServerId() );
+				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
 				rmiServer.rmiKeyPressed(
 						this.settings.clientId, 
 						languageCode,
@@ -462,6 +454,8 @@ public class SternClient extends Frame // NO_UCD (use default)
 		// Properties den Feldern zuweisen
 		if (prop.containsKey(PROPERTY_NAME_SERVER_IP))
 			this.settings.serverIp = prop.getProperty(PROPERTY_NAME_SERVER_IP);
+		if (prop.containsKey(PROPERTY_NAME_SERVER_IP))
+			this.settings.meineIp = prop.getProperty(PROPERTY_NAME_MEINE_IP);
 		if (prop.containsKey(PROPERTY_NAME_MEIN_NAME))
 			this.settings.meinName = prop.getProperty(PROPERTY_NAME_MEIN_NAME);
 		if (prop.containsKey(PROPERTY_NAME_SPRACHE))
@@ -483,6 +477,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 	private void setProperties()
 	{
 		this.props.setProperty(PROPERTY_NAME_SERVER_IP, this.settings.serverIp);
+		this.props.setProperty(PROPERTY_NAME_MEINE_IP, this.settings.meineIp);
 		this.props.setProperty(PROPERTY_NAME_MEIN_NAME, this.settings.meinName);
 		this.props.setProperty(PROPERTY_NAME_INACTIVE, Boolean.toString(this.settings.inaktivBeiZugeingabe));
 		

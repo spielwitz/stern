@@ -53,7 +53,6 @@ import java.nio.file.StandardCopyOption;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -103,7 +102,6 @@ import commonUi.IUpdateCheckerCallback;
 import commonUi.LabelDark;
 import commonUi.PaintPanel;
 import commonUi.PanelDark;
-import commonUi.ServerFunctions;
 import commonUi.SpracheJDialog;
 import commonUi.SpringUtilities;
 import commonUi.SternAbout;
@@ -135,6 +133,8 @@ public class Stern extends Frame  // NO_UCD (use default)
 	transient private static final String PROPERTY_SERVER_COMMUNICATION_ENABLED = "serverCommunicationEnabled";
 	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
 	transient private static final String PROPERTY_MUTE_NOTIFICATION_SOUND = "muteNotificationSound";
+	transient private static final String PROPERTY_MEINE_IP = "ip";
+	
 	
 	static final int HIGHSCORE_NUM_ENTRIES = 20;
 	
@@ -206,19 +206,14 @@ public class Stern extends Frame  // NO_UCD (use default)
 	private Clip soundClipGlocke;
 	
 	private boolean muteNotificationSound;
+	private String meineIp;
 	
 	public static void main(String[] args)
 	{
-		Hashtable<String,String> argsTable = Utils.resolveProgramArgs(args);
-		
-		String meineIp = argsTable.containsKey("ip") ?
-								argsTable.get("ip") :
-								null;
-		
-		new Stern(meineIp);
+		new Stern();
 	}
 
-	private Stern(String meineIp)
+	private Stern()
 	{
 		super();
 		
@@ -722,8 +717,19 @@ public class Stern extends Frame  // NO_UCD (use default)
 			this.inputEnabled = false;
 			this.redrawScreen();
 			
-			ServerSettingsJDialog dlg = new ServerSettingsJDialog(this, SternResources.Terminalserver(false), true, this.serverFunctions);
+			ServerSettingsJDialog dlg = 
+					new ServerSettingsJDialog(
+							this, 
+							SternResources.Terminalserver(false),
+							this.meineIp,
+							true, 
+							this.serverFunctions);
+
 			dlg.setVisible(true);
+			
+			this.meineIp = dlg.meineIp;
+			this.setProperty(
+					Stern.PROPERTY_MEINE_IP, this.meineIp);
 			
 			this.updateTitle();
 			
@@ -1037,6 +1043,9 @@ public class Stern extends Frame  // NO_UCD (use default)
 		if (prop.containsKey(PROPERTY_MUTE_NOTIFICATION_SOUND))
 			this.muteNotificationSound = Boolean.parseBoolean(prop.getProperty(PROPERTY_MUTE_NOTIFICATION_SOUND));
 		
+		if (prop.containsKey(PROPERTY_MEINE_IP))
+			this.meineIp = prop.getProperty(PROPERTY_MEINE_IP);
+		
 		return prop;
 	}
 	
@@ -1277,8 +1286,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		if (this.serverFunctions != null && this.serverFunctions.isServerEnabled())
 			this.setTitle(
 					SternResources.SternTerminalServer(false)+
-					filename+
-					" (IP:"+this.serverFunctions.getMeineIp()+", "+SternResources.ThinClientCode(false)+" " + this.serverFunctions.getClientCode()+")");
+					filename);
 		else
 			this.setTitle(SternResources.SternTitel(false) + filename);
 	}

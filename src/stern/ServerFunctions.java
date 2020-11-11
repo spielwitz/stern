@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package commonUi;
+package stern;
 
 import java.awt.Frame;
 import java.rmi.Remote;
@@ -27,9 +27,12 @@ import java.util.concurrent.Executors;
 
 import javax.swing.JOptionPane;
 
+import common.Constants;
 import common.ScreenDisplayContent;
 import common.SternResources;
 import common.Utils;
+import commonUi.IClientMethods;
+import commonUi.IServerMethods;
 
 public class ServerFunctions
 {
@@ -39,8 +42,6 @@ public class ServerFunctions
 	
 	private Hashtable<String,ClientScreenDisplayContentUpdater> registeredClients;
 	private ExecutorService threadPool;
-	
-	private final static String	REG_NAME_SERVER = "Stern";
 	
 	public ServerFunctions(String meineIp)
 	{
@@ -55,13 +56,15 @@ public class ServerFunctions
 		this.registeredClients = new Hashtable<String,ClientScreenDisplayContentUpdater>();
 		this.threadPool = Executors.newCachedThreadPool();
 	}
+	
+	public void setIp(String meineIp)
+	{
+		this.meineIp = (meineIp == null) ? Utils.getMyIPAddress() : meineIp;
+		System.setProperty("java.rmi.server.hostname",this.meineIp);
+	}
 
 	public String getMeineIp() {
 		return meineIp;
-	}
-
-	public static String getServerId() {
-		return REG_NAME_SERVER;
 	}
 
 	public String getClientCode() {
@@ -238,7 +241,7 @@ public class ServerFunctions
 			stub = (IServerMethods) UnicastRemoteObject.exportObject(parent, 0 );
 			Registry registry;
 			registry = LocateRegistry.getRegistry();
-			registry.rebind( ServerFunctions.getServerId(), stub );
+			registry.rebind( Constants.REG_NAME_SERVER, stub );
 			
 			ok = true;
 			
@@ -300,7 +303,7 @@ public class ServerFunctions
 	{
 		try
 		{
-			registry.unbind(ServerFunctions.getServerId());
+			registry.unbind(Constants.REG_NAME_SERVER);
 		}
 		catch (Exception x) {}
 	}

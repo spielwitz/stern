@@ -119,4 +119,5 @@ public class Constants
 	public static final String 	RELEASE_FILE_NAME = "release.txt";
 	public static final String 	RELEASE_RECOMMENDED_FILE_NAME = "releaseRecommended.txt";
 	static final String 		GELOESCHTER_SPIELER = "_DELETED_";
+	public final static String	REG_NAME_SERVER = "Stern";
 }
