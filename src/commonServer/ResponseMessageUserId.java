@@ -16,9 +16,7 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class ResponseMessageUserId
+public class ResponseMessageUserId extends MessageBase
 {
 	public boolean sessionValid;
 	public String token;
@@ -27,19 +25,5 @@ public class ResponseMessageUserId
 	{
 		this.sessionValid = false;
 		this.token = CryptoLib.NULL_UUID;
-	}
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static ResponseMessageUserId fromJson(String json)
-	{
-		Gson gson = new Gson();
-		ResponseMessageUserId user = gson.fromJson(json, ResponseMessageUserId.class);
-		
-		return user;
 	}
 }

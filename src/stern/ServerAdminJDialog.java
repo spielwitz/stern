@@ -66,6 +66,7 @@ import commonServer.ResponseMessageChangeUser;
 import commonServer.ResponseMessageGetLog;
 import commonServer.ResponseMessageGetServerStatus;
 import commonServer.ServerUtils;
+import commonServer.ResponseMessageGetUsers.UserInfo;
 import commonUi.ButtonDark;
 import commonUi.CheckBoxDark;
 import commonUi.ComboBoxDark;
@@ -518,7 +519,17 @@ import commonUi.TextFieldDark;
 		
 		if (!resp.error)
 		{
-			ResponseMessageGetUsers respGetUser = ResponseMessageGetUsers.fromJson(resp.payloadSerialized);
+			ResponseMessageGetUsers respGetUser = null;
+			
+			try
+			{
+			respGetUser = (ResponseMessageGetUsers)
+					ResponseMessageGetUsers.fromJson(resp.payloadSerialized, ResponseMessageGetUsers.class);
+			}
+			catch (Exception x)
+			{
+				respGetUser = new ResponseMessageGetUsers();
+			}
 			
 			ArrayList<String> users = new ArrayList<String>();
 			this.usersOnServer.clear();
@@ -744,7 +755,13 @@ import commonUi.TextFieldDark;
 		
 		if (!respMsg.error)
 		{
-			ResponseMessageGetServerStatus respMsgPayload = ResponseMessageGetServerStatus.fromJson(respMsg.payloadSerialized);
+			ResponseMessageGetServerStatus respMsgPayload;
+			try {
+				respMsgPayload = (ResponseMessageGetServerStatus)
+						ResponseMessageGetServerStatus.fromJson(respMsg.payloadSerialized, ResponseMessageGetServerStatus.class);
+			} catch (Exception e) {
+				respMsgPayload = new ResponseMessageGetServerStatus();
+			}
 			
 			this.tfServerBuild.setText(ReleaseGetter.format(respMsgPayload.build));
 			this.tfServerStartDate.setText(ReleaseGetter.format(Utils.millisecondsToString(respMsgPayload.serverStartDate)));
@@ -761,7 +778,13 @@ import commonUi.TextFieldDark;
 		
 		if (!respMsg.error)
 		{
-			ResponseMessageGetLog respMsgPayload = ResponseMessageGetLog.fromJson(respMsg.payloadSerialized);
+			ResponseMessageGetLog respMsgPayload;
+			try {
+				respMsgPayload = (ResponseMessageGetLog)
+						ResponseMessageGetLog.fromJson(respMsg.payloadSerialized, ResponseMessageGetLog.class);
+			} catch (Exception e) {
+				respMsgPayload = new ResponseMessageGetLog();
+			}
 			
 			if (respMsgPayload.fileName != null && respMsgPayload.logCsv != null && respMsgPayload.logCsv.length() > 0)
 			{			

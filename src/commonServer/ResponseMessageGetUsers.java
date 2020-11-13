@@ -18,25 +18,14 @@ package commonServer;
 
 import java.util.ArrayList;
 
-import com.google.gson.Gson;
-
-public class ResponseMessageGetUsers 
+public class ResponseMessageGetUsers extends MessageBase
 {
 	public ArrayList<UserInfo> users;
 	
-	public String toJson()
+	public ResponseMessageGetUsers()
 	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
+		this.users = new ArrayList<UserInfo>();
 	}
-	
-	public static ResponseMessageGetUsers fromJson(String json)
-	{
-		Gson gson = new Gson();
-		ResponseMessageGetUsers obj = gson.fromJson(json, ResponseMessageGetUsers.class);
-		
-		return obj;
-	}	
 	
 	public void addUserInfo(String userId, String name, String email, boolean activated)
 	{

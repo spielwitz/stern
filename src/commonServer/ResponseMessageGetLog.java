@@ -16,24 +16,8 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class ResponseMessageGetLog
+public class ResponseMessageGetLog extends MessageBase
 {
 	public String fileName;
 	public String logCsv;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static ResponseMessageGetLog fromJson(String json)
-	{
-		Gson gson = new Gson();
-		ResponseMessageGetLog obj = gson.fromJson(json, ResponseMessageGetLog.class);
-		
-		return obj;
-	}	
 }

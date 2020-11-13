@@ -18,7 +18,7 @@ package commonServer;
 
 import common.SpielzuegeEmailTransport;
 
-public class RequestMessagePostMoves
+public class RequestMessagePostMoves extends MessageBase
 {
 	public String gameId;
 	public SpielzuegeEmailTransport zuege;

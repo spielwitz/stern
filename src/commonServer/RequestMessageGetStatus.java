@@ -16,24 +16,8 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class RequestMessageGetStatus
+public class RequestMessageGetStatus extends MessageBase
 {
 	public String currentGameId;
 	public int currentGameJahr;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessageGetStatus fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageGetStatus status = gson.fromJson(json, RequestMessageGetStatus.class);
-		
-		return status;
-	}
 }

@@ -16,7 +16,7 @@
 
 package commonServer;
 
-public class RequestMessageGameHostFinalizeGame
+public class RequestMessageGameHostFinalizeGame extends MessageBase
 {
 	public String gameHostUserId;
 	public String gameId;

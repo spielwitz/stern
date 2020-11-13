@@ -16,27 +16,11 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class RequestMessageChangeUser
+public class RequestMessageChangeUser extends MessageBase
 {
 	public String userId;
 	public String email;
 	public String name;
 	public boolean create;
 	public boolean renewCredentials;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessageChangeUser fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageChangeUser user = gson.fromJson(json, RequestMessageChangeUser.class);
-		
-		return user;
-	}
 }

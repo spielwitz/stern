@@ -40,6 +40,8 @@ import java.util.Hashtable;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+
 import common.Constants;
 import common.PostMovesResult;
 import common.ReleaseGetter;
@@ -530,10 +532,11 @@ public class SternServer // NO_UCD (unused code)
 			    out = this.socket.getOutputStream();
 			    
 			    // Empfange die User ID
-			    RequestMessageUserId msgRequest = 
+			    RequestMessageUserId msgRequest = (RequestMessageUserId)
 			    		RequestMessageUserId.fromJson(
 			    				CryptoLib.receiveStringRsaEncrypted(in, 
-			    				serverConfig.serverPrivateKeyObject));
+			    				serverConfig.serverPrivateKeyObject),
+			    				RequestMessageUserId.class);
 			    
 			    userId = msgRequest.userId;
 			    sessionId = msgRequest.sessionId;
@@ -667,8 +670,9 @@ public class SternServer // NO_UCD (unused code)
 			
 			try
 			{
-				msg = RequestMessage.fromJson(
-						CryptoLib.receiveStringAesEncrypted(in, ciphers.cipherDecrypt));
+				msg = (RequestMessage)RequestMessage.fromJson(
+						CryptoLib.receiveStringAesEncrypted(in, ciphers.cipherDecrypt),
+						RequestMessage.class);
 			    
 			    // Stimmt der Token?
 			    if (token!= null && !token.equals(msg.token))
@@ -736,7 +740,8 @@ public class SternServer // NO_UCD (unused code)
 									userId, 
 									this.getId(), 
 									sessionId,
-									RequestMessageChangeUser.fromJson(msg.payloadSerialized));
+									(RequestMessageChangeUser)RequestMessageChangeUser.fromJson(
+											msg.payloadSerialized, RequestMessageChangeUser.class));
 							break;
 						case ADMIN_DELETE_USER:
 							resp = processRequestAdminDeleteUser(msg.payloadSerialized);
@@ -760,7 +765,8 @@ public class SternServer // NO_UCD (unused code)
 							break;
 						case ADMIN_SET_LOG_LEVEL:
 							resp = processRequestAdminSetLogLevel(
-									RequestMessageSetLogLevel.fromJson(msg.payloadSerialized));
+									(RequestMessageSetLogLevel)RequestMessageSetLogLevel.fromJson(
+											msg.payloadSerialized, RequestMessageSetLogLevel.class));
 							break;
 							
 						default:
@@ -773,7 +779,8 @@ public class SternServer // NO_UCD (unused code)
 					    switch (msg.type)
 					    {
 						case ACTIVATE_USER:
-							RequestMessageActivateUser activateUser = RequestMessageActivateUser.fromJson(msg.payloadSerialized);
+							RequestMessageActivateUser activateUser = (RequestMessageActivateUser)
+								RequestMessageActivateUser.fromJson(msg.payloadSerialized, RequestMessageActivateUser.class);
 							
 							resp = processRequestActivateUser(
 									this.getId(), 
@@ -807,22 +814,24 @@ public class SternServer // NO_UCD (unused code)
 						case POST_MOVES:
 							resp = processRequestPostMoves(
 									user.userId, 
-									(RequestMessagePostMoves)Utils.base64ToObject(msg.payloadSerialized, RequestMessagePostMoves.class, null));
+									(RequestMessagePostMoves)RequestMessagePostMoves.fromJson(
+											msg.payloadSerialized, RequestMessagePostMoves.class));
 							break;
 						case GET_STATUS:
 							resp = processRequestGetStatus(
 									userId,
-									RequestMessageGetStatus.fromJson(msg.payloadSerialized));
+									(RequestMessageGetStatus)RequestMessageGetStatus.fromJson(
+											msg.payloadSerialized, RequestMessageGetStatus.class));
 					    	break;
 						case GAME_HOST_DELETE_GAME:
 							resp = processRequestGameHostDeleteGame(
-									(RequestMessageGameHostDeleteGame)Utils.base64ToObject(
-											msg.payloadSerialized, RequestMessageGameHostDeleteGame.class, null));
+									(RequestMessageGameHostDeleteGame)RequestMessageGameHostDeleteGame.fromJson(
+											msg.payloadSerialized, RequestMessageGameHostDeleteGame.class));
 							break;
 						case GAME_HOST_FINALIZE_GAME:
 							resp = processRequestGameHostFinalizeGame(
-									(RequestMessageGameHostFinalizeGame)Utils.base64ToObject(
-											msg.payloadSerialized, RequestMessageGameHostFinalizeGame.class, null));
+									(RequestMessageGameHostFinalizeGame)RequestMessageGameHostFinalizeGame.fromJson(
+											msg.payloadSerialized, RequestMessageGameHostFinalizeGame.class));
 							break;
 						default:
 							resp = this.notAuthorized(userId);
@@ -962,7 +971,8 @@ public class SternServer // NO_UCD (unused code)
 					// Nur Auswertung des letzten Jahres mitgeben.
 					// Fruehere Auswertungen werden bei Bedarf nachgeladen
 					Spiel spielKopie = spiel.copyWithReducedInfo(spIndex, true);
-					msgResponse.payloadSerialized = Utils.objectToBase64(spielKopie, null);
+					Gson gson = new Gson();
+					msgResponse.payloadSerialized = gson.toJson(spielKopie);
 				}
 				else
 				{
@@ -1541,7 +1551,8 @@ public class SternServer // NO_UCD (unused code)
 		
 		synchronized(this.users)
 		{
-			Spiel spiel = (Spiel)Utils.base64ToObject(msg.payloadSerialized, Spiel.class, null);
+			Gson gson = new Gson();
+			Spiel spiel = gson.fromJson(msg.payloadSerialized, Spiel.class); 
 			
 			for (Spieler spieler: spiel.getSpieler())
 			{

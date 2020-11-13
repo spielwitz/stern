@@ -16,16 +16,7 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class RequestMessageGamesAndUsers
+public class RequestMessageGamesAndUsers extends MessageBase
 {
-	public String userId; // NO_UCD (unused code)
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
+	public String userId; // NO_UCD (unused code)	
 }

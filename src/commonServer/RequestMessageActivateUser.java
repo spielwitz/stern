@@ -16,25 +16,9 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class RequestMessageActivateUser
+public class RequestMessageActivateUser extends MessageBase
 {
 	public String userId;
 	public String activationCode;
 	public String userPublicKey;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessageActivateUser fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageActivateUser user = gson.fromJson(json, RequestMessageActivateUser.class);
-		
-		return user;
-	}
 }

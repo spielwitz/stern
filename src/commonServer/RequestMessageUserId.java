@@ -16,24 +16,8 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class RequestMessageUserId
+public class RequestMessageUserId extends MessageBase
 {
 	public String userId;
 	public String sessionId;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessageUserId fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageUserId user = gson.fromJson(json, RequestMessageUserId.class);
-		
-		return user;
-	}
 }

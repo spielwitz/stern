@@ -16,7 +16,7 @@
 
 package commonServer;
 
-public class RequestMessageGameHostDeleteGame
+public class RequestMessageGameHostDeleteGame extends MessageBase
 {
 	public String gameHostUserId;
 	public String gameId;	

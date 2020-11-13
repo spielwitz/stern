@@ -16,37 +16,21 @@
 
 package commonServer;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+import com.google.gson.Gson;
 
-import common.SpielInfo;
-
-public class ResponseMessageGamesAndUsers extends MessageBase
+public abstract class MessageBase
 {
-	public String emailAdresseSpielleiter;
-	
-	public Hashtable<String, UserInfo> users;
-	
-	public ArrayList<SpielInfo> gamesZugeingabe;
-	public ArrayList<SpielInfo> gamesWarten;
-	public ArrayList<SpielInfo> gamesBeendet;
-	public ArrayList<SpielInfo> gamesSpielleiter;
-	
-	public ResponseMessageGamesAndUsers()
+	public String toJson()
 	{
-		this.gamesBeendet = new ArrayList<SpielInfo>();
-		this.gamesWarten = new ArrayList<SpielInfo>();
-		this.gamesSpielleiter = new ArrayList<SpielInfo>();
-		this.gamesZugeingabe = new ArrayList<SpielInfo>();
+		Gson gson = new Gson();
+		return gson.toJson(this);
 	}
-
-	public class UserInfo
+	
+	public static <T> Object fromJson(String json, Class<T> expectedClass) throws Exception
 	{
-		public String email;
+		Gson gson = new Gson();
+		Object msg = gson.fromJson(json, expectedClass);
 		
-		public UserInfo(String email)
-		{
-			this.email = email;
-		}
+		return msg;
 	}
 }

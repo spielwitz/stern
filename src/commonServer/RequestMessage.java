@@ -16,9 +16,7 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class RequestMessage
+public class RequestMessage extends MessageBase
 {
 	public RequestMessageType type;
 	public String token;
@@ -29,19 +27,5 @@ public class RequestMessage
 	public RequestMessage (RequestMessageType type)
 	{
 		this.type = type;
-	}
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessage fromJson(String json) throws Exception
-	{
-		Gson gson = new Gson();
-		RequestMessage msg = gson.fromJson(json, RequestMessage.class);
-		
-		return msg;
 	}
 }

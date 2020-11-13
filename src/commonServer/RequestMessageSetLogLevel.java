@@ -16,23 +16,7 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class RequestMessageSetLogLevel
+public class RequestMessageSetLogLevel extends MessageBase
 {
 	public LogEventType logLevel;
-	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static RequestMessageSetLogLevel fromJson(String json)
-	{
-		Gson gson = new Gson();
-		RequestMessageSetLogLevel user = gson.fromJson(json, RequestMessageSetLogLevel.class);
-		
-		return user;
-	}
 }

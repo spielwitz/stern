@@ -51,6 +51,8 @@ import javax.swing.SpringLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.google.gson.Gson;
+
 import common.Colors;
 import common.Constants;
 import common.ReleaseGetter;
@@ -323,7 +325,8 @@ import common.Utils;
 		if (!respMsg.error)
 		{
 			// Jetzt das Spiel wie ein E-Mail-Spiel laden.
-			this.spielGeladen = (Spiel)Utils.base64ToObject(respMsg.payloadSerialized, Spiel.class, null);
+			Gson gson = new Gson();
+			this.spielGeladen = gson.fromJson(respMsg.payloadSerialized, Spiel.class); 
 			this.close();
 		}
 	}
@@ -345,7 +348,7 @@ import common.Utils;
 		msgPayload.gameHostUserId = this.cuc.userId;
 		msgPayload.gameId = gameId;
 		
-		msg.payloadSerialized = Utils.objectToBase64(msgPayload, null);
+		msg.payloadSerialized = msgPayload.toJson();
 		
 		ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
 		
@@ -380,7 +383,7 @@ import common.Utils;
 		msgPayload.gameHostUserId = this.cuc.userId;
 		msgPayload.gameId = gameId;
 		
-		msg.payloadSerialized = Utils.objectToBase64(msgPayload, null);
+		msg.payloadSerialized = msgPayload.toJson();
 		
 		ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
 		
@@ -769,7 +772,8 @@ import common.Utils;
 		// Spiel an den Server schicken
 		RequestMessage msg = new RequestMessage(RequestMessageType.POST_NEW_GAME);
 		
-		msg.payloadSerialized = Utils.objectToBase64(this.spiel, null);
+		Gson gson = new Gson();
+		msg.payloadSerialized = gson.toJson(this.spiel); 
 		
 		ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
 		

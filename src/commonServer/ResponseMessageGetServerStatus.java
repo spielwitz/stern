@@ -16,26 +16,11 @@
 
 package commonServer;
 
-import com.google.gson.Gson;
-
-public class ResponseMessageGetServerStatus
+public class ResponseMessageGetServerStatus extends MessageBase
 {
 	public long serverStartDate;
 	public long logSizeBytes;
 	public LogEventType logLevel;
 	public String build;
 	
-	public String toJson()
-	{
-		Gson gson = new Gson();
-		return gson.toJson(this);
-	}
-	
-	public static ResponseMessageGetServerStatus fromJson(String json)
-	{
-		Gson gson = new Gson();
-		ResponseMessageGetServerStatus obj = gson.fromJson(json, ResponseMessageGetServerStatus.class);
-		
-		return obj;
-	}	
 }

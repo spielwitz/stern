@@ -116,9 +116,10 @@ class ClientSocketManager
 			}
 			else
 			{
-				ResponseMessageUserId respMsg = 
+				ResponseMessageUserId respMsg = (ResponseMessageUserId)
 						ResponseMessageUserId.fromJson(
-							CryptoLib.receiveStringRsaEncrypted(in, user.userPrivateKeyObject));
+							CryptoLib.receiveStringRsaEncrypted(in, user.userPrivateKeyObject),
+							ResponseMessageUserId.class);
 				
 				sessionId = respMsg.sessionValid ? sessionId : CryptoLib.NULL_UUID;
 				token = respMsg.token;

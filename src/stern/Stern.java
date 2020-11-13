@@ -1430,7 +1430,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			msgPayload.gameId = gameId;
 			msgPayload.zuege = set;
 			
-			msg.payloadSerialized = Utils.objectToBase64(msgPayload, null);
+			msg.payloadSerialized = msgPayload.toJson();
 			
 			ResponseMessage respMessage = this.sendAndReceive(this.cuc, msg);
 			
@@ -1472,8 +1472,13 @@ public class Stern extends Frame  // NO_UCD (use default)
 			{
 				connected = true;
 				
-				ResponseMessageGetStatus respMsgPayload = 
-						ResponseMessageGetStatus.fromJson(respMsg.payloadSerialized);
+				ResponseMessageGetStatus respMsgPayload;
+				try {
+					respMsgPayload = (ResponseMessageGetStatus)
+							ResponseMessageGetStatus.fromJson(respMsg.payloadSerialized, ResponseMessageGetStatus.class);
+				} catch (Exception e) {
+					respMsgPayload = new ResponseMessageGetStatus();
+				}
 				
 				currentGameNextYear = respMsgPayload.currentGameNextYear;
 				gamesWaitingForInput = respMsgPayload.gamesWaitingForInput;
@@ -1619,13 +1624,21 @@ public class Stern extends Frame  // NO_UCD (use default)
 			
 			if (!respMsg.error)
 			{
+				ResponseMessageGamesAndUsers gamesAndUser;
+				try {
+					gamesAndUser = (ResponseMessageGamesAndUsers)
+							ResponseMessageGamesAndUsers.fromJson(respMsg.payloadSerialized, ResponseMessageGamesAndUsers.class);
+				} catch (Exception e) {
+					gamesAndUser = new ResponseMessageGamesAndUsers();
+				}
+				
 				ServerGamesJDialog dlg = new ServerGamesJDialog(
 						this, 
 						SternResources.ServerbasierteSpiele(false, this.cuc.userId),
 						this.currentGameId,
 						this.cuc,
 						this.muteNotificationSound,
-						ResponseMessageGamesAndUsers.fromJson(respMsg.payloadSerialized));
+						gamesAndUser);
 				dlg.setVisible(true);
 				
 				this.muteNotificationSound = dlg.muteNotificationSound;
@@ -1664,7 +1677,8 @@ public class Stern extends Frame  // NO_UCD (use default)
 		if (!respMsg.error)
 		{
 			// Jetzt das Spiel wie ein E-Mail-Spiel laden.
-			Spiel spielGeladen = (Spiel)Utils.base64ToObject(respMsg.payloadSerialized, Spiel.class, null);
+			Gson gson = new Gson();
+			Spiel spielGeladen = gson.fromJson(respMsg.payloadSerialized, Spiel.class); 
 			
 			if (MinBuildChecker.doCheck(this, spielGeladen.getMinBuild()))
 			{
