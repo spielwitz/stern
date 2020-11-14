@@ -66,7 +66,6 @@ import commonServer.ResponseMessageChangeUser;
 import commonServer.ResponseMessageGetLog;
 import commonServer.ResponseMessageGetServerStatus;
 import commonServer.ServerUtils;
-import commonServer.ResponseMessageGetUsers.UserInfo;
 import commonUi.ButtonDark;
 import commonUi.CheckBoxDark;
 import commonUi.ComboBoxDark;

@@ -21,11 +21,11 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	MIN_BUILD = "202011120000";
+	public static final String 	MIN_BUILD = "202011140000";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	RECOMMENDED_BUILD = "202011200000";
+	public static final String 	RECOMMENDED_BUILD = "202011400000";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
 	static final String 		MIGRATION_BUILD_LIMIT = "202011090000";
@@ -45,7 +45,7 @@ public class Constants
 	static final int 		MAX_ANZ_FESTUNGEN = 2;
 	static final int 		KAUF_EPROD = 4;
 	static final int 		FESTUNG_STAERKE = 375;
-	static final int 		FESTUNG_REPARATUR_ANZ_RAUMER = 1;
+	static final int 		FESTUNG_REPARATUR_ANZ_RAUMER = 2;
 	static final int 		TRANSPORTER_MAX_ENEGER = 30;
 	static final int 		RAUMER_ZU_BEGINN_SPIELER = 375;
 	static final int 		RAUMER_ZU_BEGINN_NEUTRAL = 11;
