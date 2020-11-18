@@ -1051,64 +1051,12 @@ public class ScreenPainter
 		
 		for (SpielfeldPointDisplayContent point: points)
 		{
-			int sp = point.getCol() - Colors.SPIELER_FARBEN_OFFSET;
-			
 			Point2D.Double pt = point.getPos();
 			this.setColor(Colors.get(point.getCol()));
 			
-			switch (sp)
+			switch (point.getSymbol())
 			{
-			case 0:
-				// X
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
-						
-				break;
-			case 1:
-				// +
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y),
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y));
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) - size);
-				break;
-			case 2:
-				// Sanduhr
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				break;
-			case 3:
+			case 1: // Raumer
 				// Sanduhr (90 Grad)
 				this.dbGraphics.drawLine(
 						getPtSpielfeldX(pt.x) - size,
@@ -1131,32 +1079,20 @@ public class ScreenPainter
 						getPtSpielfeldX(pt.x) + size,
 						getPtSpielfeldY(pt.y) - size);
 				break;
-			case 4:
-				// Rechteck
+			case 2: // Aufklaerer
+				// +
 				this.dbGraphics.drawLine(
 						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldY(pt.y),
 						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
+						getPtSpielfeldY(pt.y));
 				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldX(pt.x),
 						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldX(pt.x),
 						getPtSpielfeldY(pt.y) - size);
-
-
 				break;
-			case 5:
+			case 3: // Patrouille
 				// Stern
 				this.dbGraphics.drawLine(
 						getPtSpielfeldX(pt.x) - size,
@@ -1178,6 +1114,71 @@ public class ScreenPainter
 						getPtSpielfeldY(pt.y) + size,
 						getPtSpielfeldX(pt.x),
 						getPtSpielfeldY(pt.y) - size);
+				break;
+			case 4: // Transporter
+				// Rechteck
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size);
+				break;
+						
+			case 5: // Minenleger
+				// Raute
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y));
+				
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y),
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) + size);
+				
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y));
+				
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y),
+						getPtSpielfeldX(pt.x),
+						getPtSpielfeldY(pt.y) - size);
+				
+				break;
+			case 6: // Minenraeumer
+				// X
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) - size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) + size);
+				this.dbGraphics.drawLine(
+						getPtSpielfeldX(pt.x) - size,
+						getPtSpielfeldY(pt.y) + size,
+						getPtSpielfeldX(pt.x) + size,
+						getPtSpielfeldY(pt.y) - size);
+
 				break;
 			default:
 				// Kreis

@@ -25,16 +25,19 @@ class SpielfeldPointDisplayContent implements Serializable
 	// Stellt einen Punkt dar, der im Spielfeld gezeichnet wird, z.B. um ein Objekt anzuzeigen
 	private PointLowRes p;
 	private byte c;
+	private byte s;
 	private int h;
 	
 	SpielfeldPointDisplayContent(
 			Point2D.Double pos, 
 			byte col,
+			byte symbol,
 			int hash)
 	{
 		super();
 		this.p = pos == null ? null : new PointLowRes(pos);
 		this.c = col;
+		this.s = symbol;
 		this.h = hash;
 	}
 
@@ -50,5 +53,9 @@ class SpielfeldPointDisplayContent implements Serializable
 	public int getHash()
 	{
 		return this.h;
+	}
+
+	public byte getSymbol() {
+		return s;
 	}
 }

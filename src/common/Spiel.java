@@ -1305,6 +1305,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
  					obj.getExactPos(tag), 
  					this.spieler[obj.getBes()].getColIndex(),
+ 					obj.getScreenDisplaySymbol(),
  					obj.hashCode());
 			
 			points.add(point);
@@ -6177,8 +6178,12 @@ public class Spiel extends EmailTransportBase implements Serializable
  					double x = ptPreviousDay.getPos().x + t * (ptCurrentDay.getPos().x - ptPreviousDay.getPos().x);
  					double y = ptPreviousDay.getPos().y + t * (ptCurrentDay.getPos().y - ptPreviousDay.getPos().y);
  					
- 					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
- 							new Point2D.Double(x, y), ptPreviousDay.getCol(), ptPreviousDay.getHash());
+ 					SpielfeldPointDisplayContent point = 
+ 							new SpielfeldPointDisplayContent(
+ 									new Point2D.Double(x, y), 
+ 									ptPreviousDay.getCol(), 
+ 									ptPreviousDay.getSymbol(),
+ 									ptPreviousDay.getHash());
  					
  					points.add(point);
  				}
@@ -6877,6 +6882,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
 		 	 					obj.getExactPos(), 
 		 	 					spiel.spieler[obj.getBes()].getColIndex(),
+		 	 					obj.getScreenDisplaySymbol(),
 		 	 					obj.hashCode());
 	 				
 	 				points.add(point);
@@ -7107,6 +7113,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
 		 	 					obj.getExactPos(), 
 		 	 					spiel.spieler[obj.getBes()].getColIndex(),
+		 	 					obj.getScreenDisplaySymbol(),
 		 	 					obj.hashCode());
 	 				
 	 				points.add(point);

@@ -656,4 +656,28 @@ class Flugobjekt implements Serializable
 		
 		return new Point(x, y);
 	}
+	
+	byte getScreenDisplaySymbol()
+	{
+		switch (this.typ)
+		{
+		case RAUMER:
+			return 1;
+		case AUFKLAERER:
+			return 2;
+		case PATROUILLE:
+			return 3;
+		case TRANSPORTER:
+			return 4;
+		case MINE50:
+		case MINE100:
+		case MINE250:
+		case MINE500:
+			return 5;
+		case MINENRAEUMER:
+			return 6;
+		default:
+			return 0;
+		}
+	}
 }
