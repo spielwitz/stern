@@ -514,17 +514,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 		}
 		
-		// Minen
-		spClone.minen = new Hashtable<String, Mine>();
-		
-		for (String pos: this.minen.keySet())
-		{
-			Mine mineClone = this.minen.get(pos).getSpielerInfo(spIndex);
-			
-			if (mineClone != null)
-				spClone.minen.put(pos, mineClone);
-		}
-		
 		// Planeten
 		for (int plIndex = 0; plIndex < this.anzPl; plIndex++)
 		{
@@ -1245,7 +1234,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 						this.planeten[plIndex].getPos(),
 						Colors.INDEX_WEISS,
 						null));
-				
 		}
 		
 		if (this.screenDisplayContent == null)
@@ -1310,6 +1298,15 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			points.add(point);
 		}
+		
+		// Minenfelder
+		ArrayList<MinenfeldDisplayContent> minen = new ArrayList<MinenfeldDisplayContent>();
+		
+		for (Mine mine: this.minen.values())
+		{
+			minen.add(
+					new MinenfeldDisplayContent(mine.getPos(), mine.getStaerke()));
+		}
 				
 		if (this.screenDisplayContent == null)
 			this.screenDisplayContent = new ScreenDisplayContent();
@@ -1319,7 +1316,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				markedField,
 				null, // lines, wenn Flugobjekte gezeichnet werden sollen, sonst null.
 				points,
-				null));
+				minen));
 		
 		this.screenDisplayContent.setEreignisTag(tag);
 		
@@ -1995,33 +1992,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 				// Zunaechst nur die Minen-Historie. Die aktuellen Staerken kommen spaeter
 				for (int t = 0; t < mcount; t++)
 				{
+					@SuppressWarnings("unused")
 					short mrec = this.inmki();
-					
-					int x = mrec % 20;
-					int y = (mrec % 380) / 20;
-					int sp = (mrec % 2280) / 380;
-					int staerke = mrec / 2280;
-					
-					ObjektTyp typ = ObjektTyp.MINE50; 
-					switch(staerke)
-					{
-					case 0: typ = ObjektTyp.MINE50; break;
-					case 1: typ = ObjektTyp.MINE100; break;
-					case 2: typ = ObjektTyp.MINE250; break;
-					case 3: typ = ObjektTyp.MINE500; break;
-					}
-										
-					MineHistorie mineHist = new MineHistorie(sp,typ);
-					
-					Point pos = new Point(x,y);
-					
-					Mine mine = spiel.minen.get(pos.getString()); // Ist auf dem Sektor schon eine Mine registriert?
-					if (mine == null)
-					{
-						mine = new Mine(pos, 0, null);
-						spiel.minen.put(pos.getString(), mine);
-					}
-					mine.addHistorie(mineHist);
 				}
 			}
 			
@@ -2041,7 +2013,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					Mine mine = spiel.minen.get(pt.getString());
 					if (mine == null)
 					{
-						mine = new Mine(pt, staerke, null);
+						mine = new Mine(pt, staerke);
 						spiel.minen.put(pt.getString(), mine);
 					}
 					else
@@ -5234,7 +5206,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleMarkedField(ereignis.markierungPos),
 							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
-					
+
 					this.spiel.console.appendText(
 							SternResources.AuswertungPatrouilleMeldetAusSektor(true,
 									this.spiel.spieler[objPatr.getBes()].getName(),
@@ -5282,12 +5254,15 @@ public class Spiel extends EmailTransportBase implements Serializable
 					
 					if (kapern)
 					{
-						this.taste();
-						
 						anderesObj.gekapert(
 								objPatr.getBes(),
 								ereignis.posObjAnderes);
-					}	
+						
+						this.spiel.updateSpielfeldDisplay(
+								this.spiel.getSimpleMarkedField(ereignis.markierungPos),
+								jahresende ? Constants.ANZ_TAGE_JAHR : 0);
+						this.taste();
+					}
   				}
   			}
   		}
@@ -5603,12 +5578,16 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				else
 				{
-					this.spiel.updateSpielfeldDisplay(ereignis.getTag());
+					this.mineLegen(obj);
+
+					this.spiel.updateSpielfeldDisplay(
+							this.spiel.getSimpleMarkedField(obj.getExactPos(ereignis.getTag())),
+							ereignis.getTag());
+							
 					this.spiel.console.appendText(
 							SternResources.AuswertungMineGelegt(
 									true, 
 									this.spiel.spieler[obj.getBes()].getName()));
-					this.mineLegen(obj);
 					this.taste();
 					obj.setZuLoeschen();
 					
@@ -5891,19 +5870,15 @@ public class Spiel extends EmailTransportBase implements Serializable
   			else
   				staerke = 500;
   			
-  			MineHistorie mh = new MineHistorie(obj.getBes(), obj.getTyp());
-  			
   			String key = obj.getZiel().getString();
   			Mine mine = this.spiel.minen.get(key);
   			
   			if (mine == null)
   			{
-  				ArrayList<MineHistorie> historie = new ArrayList<MineHistorie>();
-  				historie.add(mh);
-  				this.spiel.minen.put(key, new Mine(obj.getZiel(), staerke, historie));
+  				this.spiel.minen.put(key, new Mine(obj.getZiel(), staerke));
   			}
   			else
-  				mine.add(staerke, mh);
+  				mine.add(staerke);
   		}
   		
   		private void kommandozentraleErobert(int spVerlierer, int spGewinner, boolean kapituliert, int ereignisTag)
@@ -6240,14 +6215,12 @@ public class Spiel extends EmailTransportBase implements Serializable
  				if (!simpel && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
  					keys.add(new ConsoleKey("2", SternResources.SpielinformationenFestungen(true)));
  				if (!simpel)
- 					keys.add(new ConsoleKey("3",SternResources.SpielinformationenMinenfelder(true)));
- 				if (!simpel)
- 					keys.add(new ConsoleKey("4",SternResources.SpielinformationenPatrouillen(true)));
+ 					keys.add(new ConsoleKey("3",SternResources.SpielinformationenPatrouillen(true)));
  				if (!simpel && (this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN) ||
  						this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH)))
- 					keys.add(new ConsoleKey("5", SternResources.SpielinformationenKommandozentralen(true)));
+ 					keys.add(new ConsoleKey("4", SternResources.SpielinformationenKommandozentralen(true)));
  				if (!simpel)
- 					keys.add(new ConsoleKey("6",SternResources.SpielinformationenBuendnisse(true)));
+ 					keys.add(new ConsoleKey("5",SternResources.SpielinformationenBuendnisse(true)));
  				 				
  				ConsoleInput input = this.spiel.console.waitForKeyPressed(keys, false);
  				
@@ -6261,15 +6234,13 @@ public class Spiel extends EmailTransportBase implements Serializable
  				
  				if (inputString.equals("1"))
  					this.energieprod();
- 				else if (!simpel && inputString.equals("3"))
- 					this.minenfelder();
- 				else if (!simpel && inputString.equals("6"))
+ 				else if (!simpel && inputString.equals("5"))
  					this.buendnisse();
  				else if (!simpel && inputString.equals("2") && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
  					this.festungen();
- 				else if (!simpel && inputString.equals("4"))
+ 				else if (!simpel && inputString.equals("3"))
  					this.patrouillen();
- 				else if (!simpel && inputString.equals("5") && 
+ 				else if (!simpel && inputString.equals("4") && 
  						( this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN) ||
  								this.spiel.optionen.contains(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH)))
  					this.kommandozentralen();
@@ -6318,47 +6289,47 @@ public class Spiel extends EmailTransportBase implements Serializable
  			this.spiel.console.waitForTaste();
  		}
  		
- 		private void minenfelder()
- 		{
- 			this.spiel.console.setHeaderText(this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenMinenfelderTitel(true), Colors.INDEX_NEUTRAL);
- 			
- 			// Minenfelder
- 			ArrayList<MinenfeldDisplayContent> minen = new ArrayList<MinenfeldDisplayContent>();
- 			
- 			for (Mine mine: this.spiel.minen.values())
- 			{
- 				ArrayList<Byte> spielerMinen = new ArrayList<Byte>();
- 				BitSet spieler = new BitSet(Constants.ANZAHL_SPIELER_MAX);
- 				
- 				if (mine.getHistorie() != null)
- 				{
-	 				for (MineHistorie hist: mine.getHistorie())
-	 				{
-	 					if (hist.getSp() != Constants.BESITZER_NEUTRAL)
-	 						spieler.set(hist.getSp());
-	 				}
-	 				
-	 				for (int sp = 0; sp < this.spiel.anzSp; sp++)
-	 					if (spieler.get(sp))
-	 						spielerMinen.add(this.spiel.spieler[sp].getColIndex());
- 				}
- 				
- 				minen.add(new MinenfeldDisplayContent(mine.getPos(), mine.getStaerke(), spielerMinen));
- 			}
- 			
- 			ArrayList<SpielfeldPlanetDisplayContent> plData = this.standardSpielfeld(null, new HashSet<Integer>());
- 			
- 			this.spiel.screenDisplayContent.setSpielfeld(
- 					new SpielfeldDisplayContent(plData,
- 					null,
- 					null,
- 					null,
- 					minen));
- 			
- 			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
-
- 			this.spiel.console.waitForTaste();
- 		}
+// 		private void minenfelder()
+// 		{
+// 			this.spiel.console.setHeaderText(this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenMinenfelderTitel(true), Colors.INDEX_NEUTRAL);
+// 			
+// 			// Minenfelder
+// 			ArrayList<MinenfeldDisplayContent> minen = new ArrayList<MinenfeldDisplayContent>();
+// 			
+// 			for (Mine mine: this.spiel.minen.values())
+// 			{
+// 				ArrayList<Byte> spielerMinen = new ArrayList<Byte>();
+// 				BitSet spieler = new BitSet(Constants.ANZAHL_SPIELER_MAX);
+// 				
+// 				if (mine.getHistorie() != null)
+// 				{
+//	 				for (MineHistorie hist: mine.getHistorie())
+//	 				{
+//	 					if (hist.getSp() != Constants.BESITZER_NEUTRAL)
+//	 						spieler.set(hist.getSp());
+//	 				}
+//	 				
+//	 				for (int sp = 0; sp < this.spiel.anzSp; sp++)
+//	 					if (spieler.get(sp))
+//	 						spielerMinen.add(this.spiel.spieler[sp].getColIndex());
+// 				}
+// 				
+// 				minen.add(new MinenfeldDisplayContent(mine.getPos(), mine.getStaerke(), spielerMinen));
+// 			}
+// 			
+// 			ArrayList<SpielfeldPlanetDisplayContent> plData = this.standardSpielfeld(null, new HashSet<Integer>());
+// 			
+// 			this.spiel.screenDisplayContent.setSpielfeld(
+// 					new SpielfeldDisplayContent(plData,
+// 					null,
+// 					null,
+// 					null,
+// 					minen));
+// 			
+// 			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
+//
+// 			this.spiel.console.waitForTaste();
+// 		}
  		
  		private void buendnisse()
  		{
@@ -7395,15 +7366,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
   	  			for (Mine mine: spiel.minen.values())
   	  			{
-  	  				Mine mineClon = mine.getSpielerInfo(spieler);
-  	  				if (mineClon == null)
-  	  					continue;
-  	  				
-  	  				if (mineClon.getStaerke() > 0)
-  	  					minen.add(new MinenfeldDisplayContent(
-  	  							mine.getPos(), 
-  	  							mineClon.getStaerke(), 
-  	  							new ArrayList<Byte>()));
+  					minen.add(new MinenfeldDisplayContent(
+  							mine.getPos(), 
+  							mine.getStaerke()));
   				}
 			}
   	  		

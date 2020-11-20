@@ -17,14 +17,12 @@
 package common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 @SuppressWarnings("serial") 
 class MinenfeldDisplayContent implements Serializable
 {
 	private Point p;
 	private int s;
-	private ArrayList<Byte> c;
 	
 	public Point getPos() {
 		return p;
@@ -32,16 +30,9 @@ class MinenfeldDisplayContent implements Serializable
 	public int getStaerke() {
 		return s;
 	}
-	public ArrayList<Byte> getSpielerCol() {
-		return c;
-	}
-	MinenfeldDisplayContent(Point pos, int staerke,
-			ArrayList<Byte> spielerCol) {
+	MinenfeldDisplayContent(Point pos, int staerke) {
 		super();
 		this.p = pos;
 		this.s = staerke;
-		this.c = spielerCol;
 	}
-	
-	
 }

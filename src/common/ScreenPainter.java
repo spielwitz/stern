@@ -35,8 +35,6 @@ public class ScreenPainter
 	private static final int		SPIELFELD_YOFF = 10;
 	static final int				SPIELFELD_DX = 18;
 	
-	private static final double		MINENKNOEDEL_ABSTAND = (double)SPIELFELD_DX / (double)Constants.ANZAHL_SPIELER_MAX; 
-	
 	private static final double		LINIE_OBJEKT_RADIUS = 0.25;
 	private static final double		LINIE_OBJEKT_GROESSE = 0.5;
 	private static final double		OBJEKT_GROESSE = 0.75;
@@ -377,7 +375,6 @@ public class ScreenPainter
 						this.fmFelder);
 			}
 		}
-
 		
 		// Planeten
 		if (sdc.getPlanets() != null)
@@ -398,18 +395,17 @@ public class ScreenPainter
 			}
 		}
 		
-		// Markierte Felder
-		this.markiereFelder(sdc.getMarkedFields());		
-		
 		// Minen
 		this.zeichneMinenfelder(sdc.getMinen());
+		
+		// Markierte Felder
+		this.markiereFelder(sdc.getMarkedFields());		
 		
 		// Linien mit Objekten
 		this.zeichneLinienObjekte(sdc.getLines());		
 		
 		// Punkte
 		this.zeichnePunkte(sdc.getPoints());
-
 	}
 
 	private void drawPlanetenliste()
@@ -946,28 +942,13 @@ public class ScreenPainter
 		for (MinenfeldDisplayContent mine: minen)
 		{
 			// Raute zeichnen
-			this.fillRauteSpielfeld(mine.getPos(), Colors.get(Colors.INDEX_NEUTRAL));
+			this.fillRauteSpielfeld(mine.getPos(), Color.darkGray);
 		
 			// Text zeichnen
 			this.drawCTextSpielfeld(
 					mine.getPos(),
 					Integer.toString(mine.getStaerke()),
-					Color.white, this.fontMinen, this.fmMinen);
-			
-			// Spieler
-			for (int i = 0; i < mine.getSpielerCol().size(); i++)
-			{
-				this.setColor(Colors.get(mine.getSpielerCol().get(i))); 
-				
-				double x = (double)(SPIELFELD_XOFF + mine.getPos().getX() * SPIELFELD_DX) + (MINENKNOEDEL_ABSTAND * (double)i) + MINENKNOEDEL_ABSTAND/2.;
-				double y = (double)(SPIELFELD_YOFF + mine.getPos().getY() * SPIELFELD_DX) + MINENKNOEDEL_ABSTAND;
-				
-				this.dbGraphics.fillOval(
-						Utils.round(this.factor * x),
-						Utils.round(this.factor * y),
-						Utils.round(this.factor * MINENKNOEDEL_ABSTAND),
-						Utils.round(this.factor * MINENKNOEDEL_ABSTAND));
-			}
+					Colors.get(Colors.INDEX_NEUTRAL), this.fontMinen, this.fmMinen);
 		}
 	}
 	

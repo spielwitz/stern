@@ -24,8 +24,9 @@ import java.util.ArrayList;
 class ReplaySpielfeldDisplayContent implements Serializable
 {
 	private int p; // Planeten = ArrayList<SpielfeldPlanetDisplayContent> als einziges Json
-	private int m; // Markierte Felder = ArrayList<PointLowRes> als einziges Json
+	private int f; // Markierte Felder = ArrayList<PointLowRes> als einziges Json
 	private int o; // Objekte = ArrayList<SpielfeldPointDisplayContent> o als einziges Json
+	private int m; // Minen = 
 	
 	ReplaySpielfeldDisplayContent(
 			SpielfeldDisplayContent sdc,
@@ -51,10 +52,10 @@ class ReplaySpielfeldDisplayContent implements Serializable
 		
 		if (sdc.getMarkedFieldsRaw() != null)
 		{
-			this.m = replays.addObject(sdc.getMarkedFieldsRaw()); 
+			this.f = replays.addObject(sdc.getMarkedFieldsRaw()); 
 		}
 		else
-			this.m = -1;
+			this.f = -1;
 		
 		if (sdc.getPoints() != null)
 		{
@@ -69,6 +70,13 @@ class ReplaySpielfeldDisplayContent implements Serializable
 		}
 		else
 			this.o = -1;
+		
+		if (sdc.getMinen() != null)
+		{
+			this.m = replays.addObject(sdc.getMinen());
+		}
+		else
+			this.m = -1;
 	}
 
 	SpielfeldDisplayContent getSpielfeldDisplayContent(Replays replays)
@@ -93,7 +101,7 @@ class ReplaySpielfeldDisplayContent implements Serializable
 		}
 
 		PointLowRes[] markedFieldsArray = 
-				(PointLowRes[])replays.fromJson(replays.getString(this.m), PointLowRes[].class);
+				(PointLowRes[])replays.fromJson(replays.getString(this.f), PointLowRes[].class);
 
 		ArrayList<Point2D.Double> markedFields = PointLowRes.fromArray(markedFieldsArray);
 		
@@ -116,11 +124,26 @@ class ReplaySpielfeldDisplayContent implements Serializable
 			}
 		}
 		
+		ArrayList<MinenfeldDisplayContent> minen = null;
+		
+		if (this.m >= 0)
+		{
+			MinenfeldDisplayContent[] minenArray = 
+					(MinenfeldDisplayContent[])replays.fromJson(
+							replays.getString(this.m), 
+							MinenfeldDisplayContent[].class);
+			
+			minen = new ArrayList<MinenfeldDisplayContent>(minenArray.length);
+			
+			for (MinenfeldDisplayContent m: minenArray)
+				minen.add(m);
+		}
+		
 		return new SpielfeldDisplayContent(
 				planets,
 				markedFields,
 				null,
 				points,
-				null);
+				minen);
 	}
 }

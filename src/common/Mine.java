@@ -17,20 +17,16 @@
 package common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 @SuppressWarnings("serial") class Mine implements Serializable
 {
 	private Point pos; // Ort
 	private int staerke; // Momentane Staerke
 
-	private ArrayList<MineHistorie> historie;
-
-	Mine(Point pos, int staerke, ArrayList<MineHistorie> historie) {
+	Mine(Point pos, int staerke) {
 		super();
 		this.pos = pos;
 		this.staerke = staerke;
-		this.historie = historie;
 	}
 
 	public Point getPos() {
@@ -44,55 +40,9 @@ import java.util.ArrayList;
 	public void setStaerke(int staerke) {
 		this.staerke = staerke;
 	}
-
-	public ArrayList<MineHistorie> getHistorie() {
-		return historie;
-	}
 	
-	void addHistorie(MineHistorie historie)
-	{
-		if (this.historie == null)
-			this.historie = new ArrayList<MineHistorie>();
-		
-		this.historie.add(historie);
-	}
-	
-	void add(int staerke, MineHistorie historie)
+	void add(int staerke)
 	{
 		this.staerke += staerke;
-		this.addHistorie(historie);
-	}
-	
-	Mine getSpielerInfo(int spIndex)
-	{
-		if (this.historie == null)
-			return null;
-		
-		// Gibt waehrend eines Spieles die Information zurueck,
-		// wie stark das Minenfeld urspruenglich war. Wenn ein Spieler
-		// ueberhaupt nicht am Feld beteiligt war, kommt null zurueck
-		Mine mineClone = new Mine(this.pos, 0, new ArrayList<MineHistorie>());
-		
-		for (MineHistorie hist: this.historie)
-		{
-			if (hist.getSp() == spIndex)
-			{
-				if (hist.getTyp() == ObjektTyp.MINE50)
-					mineClone.staerke += 50;
-				else if (hist.getTyp() == ObjektTyp.MINE100)
-					mineClone.staerke += 100;
-				else if (hist.getTyp() == ObjektTyp.MINE250)
-					mineClone.staerke += 250;
-				else if (hist.getTyp() == ObjektTyp.MINE500)
-					mineClone.staerke += 500;
-				
-				mineClone.historie.add(hist);
-			}
-		}
-		
-		if (mineClone.historie.size() == 0)
-			return null;
-		else
-			return mineClone;
 	}
 }
