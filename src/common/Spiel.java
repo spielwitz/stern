@@ -1291,7 +1291,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			
 			SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
- 					obj.getExactPos(tag), 
+ 					obj.getPosOnDay(tag), 
  					this.spieler[obj.getBes()].getColIndex(),
  					obj.getScreenDisplaySymbol(),
  					obj.hashCode());
@@ -5269,7 +5269,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		
   		private ArrayList<AuswertungEreignisPatrouille> patrouilleBeobachtet(Flugobjekt objPatr)
   		{
-  			Point2D.Double momPos = objPatr.getExactPos();
+  			Point2D.Double momPos = objPatr.getCurrentPos();
   			
   			ArrayList<AuswertungEreignisPatrouille> ereignisse = new ArrayList<AuswertungEreignisPatrouille>();
   			
@@ -5281,7 +5281,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   					otherObj.istZuLoeschen())
   					continue;
   				
-  				Point2D.Double momPosOther = otherObj.getExactPos();
+  				Point2D.Double momPosOther = otherObj.getCurrentPos();
   					
   				double dist = Utils.dist(momPosOther, momPos);
   				
@@ -5386,7 +5386,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			// Spielfeld aktualisieren
 			this.spiel.updateSpielfeldDisplay(
-					this.spiel.getSimpleMarkedField(obj.getExactPos(ereignis.getTag())),
+					this.spiel.getSimpleMarkedField(obj.getPosOnDay(ereignis.getTag())),
 					ereignis.getTag());
 			
 			// Taste.
@@ -5581,7 +5581,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.mineLegen(obj);
 
 					this.spiel.updateSpielfeldDisplay(
-							this.spiel.getSimpleMarkedField(obj.getExactPos(ereignis.getTag())),
+							this.spiel.getSimpleMarkedField(obj.getPosOnDay(ereignis.getTag())),
 							ereignis.getTag());
 							
 					this.spiel.console.appendText(
@@ -6537,7 +6537,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				zentralen.add(obj);
  				
  				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
- 	 					obj.getStart(), obj.getZiel(), obj.getExactPos(), 
+ 	 					obj.getStart(), obj.getZiel(), obj.getCurrentPos(), 
  	 					this.spiel.spieler[obj.getKz().getSp()].getColIndex());
  				
  				lines.add(line);
@@ -6611,7 +6611,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					continue;
  				
  				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
- 	 					obj.getStart(), obj.getZiel(), obj.getExactPos(), this.spiel.spieler[obj.getBes()].getColIndex());
+ 	 					obj.getStart(), obj.getZiel(), obj.getCurrentPos(), this.spiel.spieler[obj.getBes()].getColIndex());
  				
  				lines.add(line);
  				
@@ -6851,7 +6851,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!obj.istBeteiligt(spieler))
   				{
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
-		 	 					obj.getExactPos(), 
+		 	 					obj.getCurrentPos(), 
 		 	 					spiel.spieler[obj.getBes()].getColIndex(),
 		 	 					obj.getScreenDisplaySymbol(),
 		 	 					obj.hashCode());
@@ -6930,7 +6930,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 				// Zur Grafik hinzufuegen
 				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
- 	 					obj.getStart(), obj.getZiel(), obj.getExactPos(), this.spiel.spieler[obj.getBes()].getColIndex());
+ 	 					obj.getStart(), obj.getZiel(), obj.getCurrentPos(), this.spiel.spieler[obj.getBes()].getColIndex());
  				
  				lines.add(line);
  				
@@ -7082,7 +7082,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!obj.istBeteiligt(this.spieler ))
   				{
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
-		 	 					obj.getExactPos(), 
+		 	 					obj.getCurrentPos(), 
 		 	 					spiel.spieler[obj.getBes()].getColIndex(),
 		 	 					obj.getScreenDisplaySymbol(),
 		 	 					obj.hashCode());
@@ -7109,7 +7109,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				brighterPlanets.add(obj.getZpl());
   				
 				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
- 	 					obj.getStart(), obj.getZiel(), obj.getExactPos(), this.spiel.spieler[obj.getBes()].getColIndex());
+ 	 					obj.getStart(), obj.getZiel(), obj.getCurrentPos(), this.spiel.spieler[obj.getBes()].getColIndex());
  				
  				lines.add(line);
  				
@@ -7339,7 +7339,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   					continue;
   				
   				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
-  	 					null, null, obj.getExactPos(), Colors.INDEX_WEISS);
+  	 					null, null, obj.getCurrentPos(), Colors.INDEX_WEISS);
   				
   				lines.add(line);
   			}

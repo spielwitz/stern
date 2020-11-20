@@ -210,11 +210,11 @@ class Flugobjekt implements Serializable
 
 	public Point getCurrentField()
 	{
-		Point2D.Double exactPos = this.getExactPos();
+		Point2D.Double exactPos = this.getCurrentPos();
 		return new Point(Utils.round(exactPos.x), Utils.round(exactPos.y));
 	}
 	
-	public Point2D.Double getExactPos()
+	public Point2D.Double getCurrentPos()
 	{
 		double dist = this.start.dist(this.ziel);
 		
@@ -228,28 +228,40 @@ class Flugobjekt implements Serializable
 			return new Point2D.Double(this.ziel.getX(), this.ziel.getY());
 	}
 	
-	public Point2D.Double getExactPos(int tag)
+	public Point2D.Double getPosOnDay(int tag)
 	{
 		if (this.bewegt)
 		{
-			double dist = this.start.dist(this.ziel);
 			int v = getGeschwindigkeit(this.getTyp(), this.transfer);
+			double distTotal = this.start.dist(this.ziel);
 			
-			double x0 = (double)this.start.getX() + (double)(this.pos-v) * (double)((double)this.ziel.getX()-(double)this.start.getX()) / dist;
-			double y0 = (double)this.start.getY() + (double)(this.pos-v) * (double)((double)this.ziel.getY()-(double)this.start.getY()) / dist;
+			// Position am Tag 0
+			double pos = (double)(this.pos - v);
 			
-			double x1 = (double)this.start.getX() + (double)this.pos * (double)((double)this.ziel.getX()-(double)this.start.getX()) / dist;
-			double y1 = (double)this.start.getY() + (double)this.pos * (double)((double)this.ziel.getY()-(double)this.start.getY()) / dist;
+			if (tag <= 0)
+			{
+				double x0 = (double)this.start.getX() + pos * (double)(this.ziel.getX()-this.start.getX()) / distTotal;
+				double y0 = (double)this.start.getY() + pos * (double)(this.ziel.getY()-this.start.getY()) / distTotal;
+				
+				return new Point2D.Double(x0, y0);
+			}
 			
 			double bruchteilJahr = AuswertungEreignis.getBruchteilTag(tag);
 			
-			double x = x0 + bruchteilJahr * (x1 - x0);
-			double y = y0 + bruchteilJahr * (y1 - y0);
+			double posTag = (double)pos +  bruchteilJahr * (double)v;
+			
+			if (posTag >= distTotal)
+			{
+				return this.ziel.toPoint2dDouble();
+			}
+			
+			double x = (double)this.start.getX() + posTag * (double)(this.ziel.getX()-this.start.getX()) / distTotal;
+			double y = (double)this.start.getY() + posTag * (double)(this.ziel.getY()-this.start.getY()) / distTotal;
 			
 			return new Point2D.Double(x, y);
 		}
 		else
-			return this.getExactPos();
+			return this.getCurrentPos();
 	}
 
 	public Kommandozentrale getKz() {
@@ -266,7 +278,7 @@ class Flugobjekt implements Serializable
 	
 	Flugzeit getRestflugzeit()
 	{
-		Point2D.Double posNow = this.getExactPos();
+		Point2D.Double posNow = this.getCurrentPos();
 		Point2D.Double posZiel = this.ziel.toPoint2dDouble();
 		
 		double dist = Utils.dist(posNow, posZiel);
@@ -336,7 +348,7 @@ class Flugobjekt implements Serializable
 		
 		// Startpunkt
 		Point feldStart = this.getCurrentField();
-		this.exactPosStart = this.getExactPos();
+		this.exactPosStart = this.getCurrentPos();
 		
 		// Bewegen
 		this.pos += geschwindigkeit;
@@ -346,7 +358,7 @@ class Flugobjekt implements Serializable
 		
 		// Zielpunkt
 		Point feldZiel = this.getCurrentField();
-		this.exactPosZiel = this.getExactPos();
+		this.exactPosZiel = this.getCurrentPos();
 		
 		double distJahr = this.angekommen ? 
 					Utils.dist(exactPosZiel, exactPosStart) :
@@ -540,6 +552,7 @@ class Flugobjekt implements Serializable
 		
 		this.angekommen = false;
 		this.zuLoeschen = false;
+		this.bewegt = false;
 	}
 
 	void subtractRaumer(int anz, int bevorzugterSpieler)
