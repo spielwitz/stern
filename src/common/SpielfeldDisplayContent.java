@@ -27,19 +27,22 @@ import java.util.ArrayList;
 	private ArrayList<SpielfeldLineDisplayContent> l; // Linien
 	private ArrayList<SpielfeldPointDisplayContent> o; // Objekte
 	private ArrayList<MinenfeldDisplayContent> n; // Minen
+	private SpielfeldPointRadarDisplayContent r; // Radarstrahl bei Patrouillenbeobachtung
 	
 	SpielfeldDisplayContent(
 			ArrayList<SpielfeldPlanetDisplayContent> planets,
 			ArrayList<Point2D.Double> markedFields,
 			ArrayList<SpielfeldLineDisplayContent> lines,
 			ArrayList<SpielfeldPointDisplayContent> points,
-			ArrayList<MinenfeldDisplayContent> minen) {
+			ArrayList<MinenfeldDisplayContent> minen,
+			SpielfeldPointRadarDisplayContent radar) {
 
 		this.p = planets;
 		this.m = markedFields == null ? null : PointLowRes.toArrayList(markedFields);
 		this.l = lines;
 		this.o = points;
 		this.n = minen;
+		this.r = radar;
 	}
 
 	public ArrayList<SpielfeldPlanetDisplayContent> getPlanets() {
@@ -58,6 +61,7 @@ import java.util.ArrayList;
 	public void clearMarkedFieldsAndPlanets()
 	{
 		this.m = null;
+		this.r = null;
 		
 		for (SpielfeldPlanetDisplayContent pl: this.p)
 		{
@@ -80,5 +84,9 @@ import java.util.ArrayList;
 	public void setPoints(ArrayList<SpielfeldPointDisplayContent> points)
 	{
 		this.o = points;
+	}
+
+	public SpielfeldPointRadarDisplayContent getRadar() {
+		return r;
 	}
 }

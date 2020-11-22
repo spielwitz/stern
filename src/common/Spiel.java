@@ -1244,6 +1244,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				null,
 				null,
 				null,
+				null,
 				null));
 		
 		this.spielThread.updateDisplay(this.screenDisplayContent);
@@ -1251,7 +1252,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private void updateSpielfeldDisplay (
 			Hashtable<Integer, ArrayList<Byte>> frames, 
-			ArrayList<Point2D.Double> markedField, int tag)
+			ArrayList<Point2D.Double> markedField, 
+			int tag)
+	{
+		this.updateSpielfeldDisplay(frames, markedField, null, tag);
+	}
+	
+	private void updateSpielfeldDisplay (
+			Hashtable<Integer, ArrayList<Byte>> frames, 
+			ArrayList<Point2D.Double> markedField, 
+			SpielfeldPointRadarDisplayContent radar,
+			int tag)
 	{
 		ArrayList<SpielfeldPlanetDisplayContent> plData = new ArrayList<SpielfeldPlanetDisplayContent>(this.anzPl);
 		
@@ -1316,7 +1327,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 				markedField,
 				null, // lines, wenn Flugobjekte gezeichnet werden sollen, sonst null.
 				points,
-				minen));
+				minen,
+				radar));
 		
 		this.screenDisplayContent.setEreignisTag(tag);
 		
@@ -4722,6 +4734,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				if (obj.istZuLoeschen())
 					this.spiel.objekte.remove(i);
 			}
+			
+			// Patrouillen wenden
+			this.patrouillenWenden();
 
 			// Ende der Auwertung
 			// Kennzeichen "Bewegt" bei allen Flugobjekten loeschen
@@ -5173,6 +5188,24 @@ public class Spiel extends EmailTransportBase implements Serializable
   					this.writeEreignisDatumJahresbeginn();
   				
 				this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
+				
+				// Radar
+				int winkelFlugrichtung = Utils.winkelVektoren(
+						objPatr.getStart().toPoint2dDouble(), 
+						new Point2D.Double(objPatr.getStart().getX() + 10, objPatr.getStart().getY()), 
+						objPatr.getZiel().toPoint2dDouble());
+				
+				int winkelRadar = 
+						objPatr.getAnz() == 1 ?
+								ereignis.winkel :
+								- ereignis.winkel;
+					
+				SpielfeldPointRadarDisplayContent radar = 
+						new SpielfeldPointRadarDisplayContent(
+								objPatr.getCurrentPos(),
+								this.spiel.spieler[objPatr.getBes()].getColIndex(),
+								winkelFlugrichtung,
+								winkelRadar);
   					
   				if (anderesObj.getTyp() == ObjektTyp.PATROUILLE &&
   					!anderesObj.isTransfer())
@@ -5187,8 +5220,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 					
 					// Sektor markieren
 					this.spiel.updateSpielfeldDisplay(
+							null,
 							this.spiel.getSimpleMarkedField(
 									ereignis.markierungPos),
+							radar,
 							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 					
 					this.spiel.console.appendText(
@@ -5204,7 +5239,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 					// Meldung machen. Kleinobjekte kapern
 					// Feld markieren
 					this.spiel.updateSpielfeldDisplay(
+							null,
 							this.spiel.getSimpleMarkedField(ereignis.markierungPos),
+							radar,
 							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 
 					this.spiel.console.appendText(
@@ -5259,7 +5296,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 								ereignis.posObjAnderes);
 						
 						this.spiel.updateSpielfeldDisplay(
+								null,
 								this.spiel.getSimpleMarkedField(ereignis.markierungPos),
+								radar,
 								jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 						this.taste();
 					}
@@ -5309,6 +5348,19 @@ public class Spiel extends EmailTransportBase implements Serializable
   			}
   			
   			return ereignisse;
+  		}
+  		
+  		private void patrouillenWenden()
+  		{
+  			for (Flugobjekt obj: this.spiel.objekte)
+  			{
+  				if (obj.getTyp() == ObjektTyp.PATROUILLE &&
+  					!obj.isTransfer() &&
+  					obj.istAngekommen())
+  				{
+  					obj.wenden();
+  				}
+  			}
   		}
   		  		
   		private void minenfeld(AuswertungEreignis ereignis)
@@ -5525,9 +5577,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 						this.taste();
 						obj.setZuLoeschen();
 					}
-					else
-						// Patrouille wenden
-						obj.wenden();
 				}
 				else
 				{
@@ -6282,54 +6331,13 @@ public class Spiel extends EmailTransportBase implements Serializable
  					null,
  					null,
  					null,
+ 					null,
  					null));
  			
  			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
 
  			this.spiel.console.waitForTaste();
  		}
- 		
-// 		private void minenfelder()
-// 		{
-// 			this.spiel.console.setHeaderText(this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenMinenfelderTitel(true), Colors.INDEX_NEUTRAL);
-// 			
-// 			// Minenfelder
-// 			ArrayList<MinenfeldDisplayContent> minen = new ArrayList<MinenfeldDisplayContent>();
-// 			
-// 			for (Mine mine: this.spiel.minen.values())
-// 			{
-// 				ArrayList<Byte> spielerMinen = new ArrayList<Byte>();
-// 				BitSet spieler = new BitSet(Constants.ANZAHL_SPIELER_MAX);
-// 				
-// 				if (mine.getHistorie() != null)
-// 				{
-//	 				for (MineHistorie hist: mine.getHistorie())
-//	 				{
-//	 					if (hist.getSp() != Constants.BESITZER_NEUTRAL)
-//	 						spieler.set(hist.getSp());
-//	 				}
-//	 				
-//	 				for (int sp = 0; sp < this.spiel.anzSp; sp++)
-//	 					if (spieler.get(sp))
-//	 						spielerMinen.add(this.spiel.spieler[sp].getColIndex());
-// 				}
-// 				
-// 				minen.add(new MinenfeldDisplayContent(mine.getPos(), mine.getStaerke(), spielerMinen));
-// 			}
-// 			
-// 			ArrayList<SpielfeldPlanetDisplayContent> plData = this.standardSpielfeld(null, new HashSet<Integer>());
-// 			
-// 			this.spiel.screenDisplayContent.setSpielfeld(
-// 					new SpielfeldDisplayContent(plData,
-// 					null,
-// 					null,
-// 					null,
-// 					minen));
-// 			
-// 			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
-//
-// 			this.spiel.console.waitForTaste();
-// 		}
  		
  		private void buendnisse()
  		{
@@ -6363,6 +6371,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
+ 					null,
  					null,
  					null,
  					null,
@@ -6447,6 +6456,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
+ 					null,
  					null,
  					null,
  					null,
@@ -6556,6 +6566,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					null,
  					lines,
  					null,
+ 					null,
  					null));
  			
  			
@@ -6625,6 +6636,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					new SpielfeldDisplayContent(plData,
  					null,
  					lines,
+ 					null,
  					null,
  					null));
  			
@@ -7053,6 +7065,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					markedFields,
  					lines,
  					points,
+ 					null,
  					null));
  			
  			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -7168,6 +7181,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	 					null,
 	 					lines,
 	 					points,
+	 					null,
 	 					null));
 	 			
 	 			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
@@ -7351,7 +7365,8 @@ public class Spiel extends EmailTransportBase implements Serializable
  					null,
  					null, // lines,
  					null,
- 					this.minen()));
+ 					this.minen(),
+ 					null));
  			
  			chapter.sdc = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
  			chapter.sdc.setPlaneten(this.sdcBefore.getPlaneten());
@@ -7524,6 +7539,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			
  			this.spiel.screenDisplayContent.setSpielfeld(
  					new SpielfeldDisplayContent(plData,
+ 					null,
  					null,
  					null,
  					null,

@@ -25,7 +25,7 @@ import com.google.gson.Gson;
 @SuppressWarnings("serial")
 class Replays implements Serializable 
 {
-	private static Gson serializer = new Gson();
+	static Gson serializer = new Gson();
 	
 	private ArrayList<String> serializedObjects = new ArrayList<String>();
 	

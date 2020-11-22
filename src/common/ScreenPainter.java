@@ -16,6 +16,7 @@
 
 package common;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -397,6 +398,9 @@ public class ScreenPainter
 		
 		// Minen
 		this.zeichneMinenfelder(sdc.getMinen());
+		
+		// Radarbeobachtungskreis
+		this.zeichneRadarkreis(sdc.getRadar());
 		
 		// Markierte Felder
 		this.markiereFelder(sdc.getMarkedFields());		
@@ -1167,6 +1171,66 @@ public class ScreenPainter
 				this.drawCircleSpielfeld(pt, LINIE_OBJEKT_RADIUS, Colors.get(point.getCol()));
 			}
 		}
+	}
+	
+	private void zeichneRadarkreis(SpielfeldPointRadarDisplayContent radar)
+	{
+		if (radar == null)
+			return;
+				
+		double rr = 2 * (double)Constants.PATROUILLE_BEOBACHTUNGSRADIUS * (double)SPIELFELD_DX;
+		
+		double x = (double)(SPIELFELD_XOFF + radar.getPos().getX() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
+		double y = (double)(SPIELFELD_XOFF + radar.getPos().getY() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
+		
+		this.setColor(Colors.get(radar.getCol()));
+		
+		AlphaComposite compositeBefore = (AlphaComposite) this.dbGraphics.getComposite();
+		float alpha = 0.3f;
+		int type = AlphaComposite.SRC_OVER; 
+		AlphaComposite composite = AlphaComposite.getInstance(type, alpha);
+		this.dbGraphics.setComposite(composite);
+		
+		this.dbGraphics.fillArc(
+				Utils.round(this.factor * x), 
+				Utils.round(this.factor * y), 
+				Utils.round(this.factor * rr), 
+				Utils.round(this.factor * rr), 
+				-radar.getWinkelFlugrichtung(), 
+				radar.getWinkelRadarstrahl());
+		
+		double x1Line = Utils.round(SPIELFELD_XOFF + (0.5 + (double)radar.getPos().getX()) * (double)SPIELFELD_DX);
+		double y1Line = Utils.round(SPIELFELD_XOFF + (0.5 + (double)radar.getPos().getY()) * (double)SPIELFELD_DX);
+		
+		double w = (double)(radar.getWinkelFlugrichtung()) * Math.PI / 180;
+		
+		double x2Line = x1Line + rr * Math.cos(w) / 2;
+		double y2Line = y1Line + rr * Math.sin(w) / 2;
+		
+		this.dbGraphics.drawLine(
+				Utils.round(this.factor * x1Line), 
+				Utils.round(this.factor * y1Line), 
+				Utils.round(this.factor * x2Line), 
+				Utils.round(this.factor * y2Line));
+		
+		this.dbGraphics.setComposite(compositeBefore);		
+
+		w = (double)(radar.getWinkelFlugrichtung() - radar.getWinkelRadarstrahl()) * Math.PI / 180;
+
+		x2Line = x1Line + rr * Math.cos(w) / 2;
+		y2Line = y1Line + rr * Math.sin(w) / 2;
+		
+		this.dbGraphics.drawLine(
+				Utils.round(this.factor * x1Line), 
+				Utils.round(this.factor * y1Line), 
+				Utils.round(this.factor * x2Line), 
+				Utils.round(this.factor * y2Line));
+		
+		this.dbGraphics.drawOval(
+				Utils.round(this.factor * x), 
+				Utils.round(this.factor * y), 
+				Utils.round(this.factor * rr), 
+				Utils.round(this.factor * rr));
 	}
 
 	private int getPtSpielfeldX(double ptX)

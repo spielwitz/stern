@@ -27,6 +27,7 @@ class ReplaySpielfeldDisplayContent implements Serializable
 	private int f; // Markierte Felder = ArrayList<PointLowRes> als einziges Json
 	private int o; // Objekte = ArrayList<SpielfeldPointDisplayContent> o als einziges Json
 	private int m; // Minen = 
+	private String r; // Radarstrahl bei Patrouillenbeobachtung
 	
 	ReplaySpielfeldDisplayContent(
 			SpielfeldDisplayContent sdc,
@@ -77,6 +78,12 @@ class ReplaySpielfeldDisplayContent implements Serializable
 		}
 		else
 			this.m = -1;
+		
+		if (sdc.getRadar() != null)
+		{
+			// Wird direkt serialisiert
+			this.r = Replays.serializer.toJson(sdc.getRadar());
+		}
 	}
 
 	SpielfeldDisplayContent getSpielfeldDisplayContent(Replays replays)
@@ -139,11 +146,19 @@ class ReplaySpielfeldDisplayContent implements Serializable
 				minen.add(m);
 		}
 		
+		SpielfeldPointRadarDisplayContent radar = 
+				this.r != null ?
+						Replays.serializer.fromJson(
+								this.r, 
+								SpielfeldPointRadarDisplayContent.class) :
+						null;
+		
 		return new SpielfeldDisplayContent(
 				planets,
 				markedFields,
 				null,
 				points,
-				minen);
+				minen,
+				radar);
 	}
 }
