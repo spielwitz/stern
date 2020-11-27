@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IE
+		// Hoechstes vergebenes Symbol: IG
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -579,18 +579,20 @@ public class SternResources
 		symbolDict.put("IC","ServerSettingsJDialogInaktiv_IC");
 		symbolDict.put("ID","ClientSettingsJDialogIpErmitteln_ID");
 		symbolDict.put("IE","ClientSettingsJDialogMeineIp_IE");
+		symbolDict.put("IF","SpielinformationenKampfschiffproduktionTitel_IF");
+		symbolDict.put("IG","SpielinformationenKampfschiffproduktion_IG");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
 		int pos = 0;
 
 		do {
-			int startPos = symbolString.indexOf("$", pos);
+			int startPos = symbolString.indexOf("£", pos);
 			if (startPos < 0){
 				sb.append(symbolString.substring(pos, symbolString.length()));
 				break;}
 			sb.append(symbolString.substring(pos, startPos));
-			int endPos = symbolString.indexOf("$", startPos + 1);
+			int endPos = symbolString.indexOf("£", startPos + 1);
 			String subString = symbolString.substring(startPos + 1, endPos);
 			Object[] parts = subString.split("§");
 			if (symbolDict.containsKey(parts[0])){
@@ -611,3793 +613,3807 @@ public class SternResources
 	   * Abbrechen [00]
 	   */
 	public static String Abbrechen(boolean symbol) {
-		return symbol ? "$00$":messages.getString("Abbrechen_00");
+		return symbol ? "£00£":messages.getString("Abbrechen_00");
 	}
 
 	/**
-	   * E-Prod. [01]
+	   * $ Prod. [01]
 	   */
 	public static String AbschlussEprod(boolean symbol) {
-		return symbol ? "$01$":messages.getString("AbschlussEprod_01");
+		return symbol ? "£01£":messages.getString("AbschlussEprod_01");
 	}
 
 	/**
 	   * Platz {0}: [02]
 	   */
 	public static String AbschlussPlatz(boolean symbol, String arg0) {
-		return symbol ? "$02§"+arg0+"$":MessageFormat.format(messages.getString("AbschlussPlatz_02"), arg0);
+		return symbol ? "£02§"+arg0+"£":MessageFormat.format(messages.getString("AbschlussPlatz_02"), arg0);
 	}
 
 	/**
 	   * --- Aktion wurde abgebrochen --- [03]
 	   */
 	public static String AktionAbgebrochen(boolean symbol) {
-		return symbol ? "$03$":messages.getString("AktionAbgebrochen_03");
+		return symbol ? "£03£":messages.getString("AktionAbgebrochen_03");
 	}
 
 	/**
 	   * Aktualisieren [04]
 	   */
 	public static String Aktualisieren(boolean symbol) {
-		return symbol ? "$04$":messages.getString("Aktualisieren_04");
+		return symbol ? "£04£":messages.getString("Aktualisieren_04");
 	}
 
 	/**
 	   * Aufkl\u00E4rer [05]
 	   */
 	public static String AufklaererPlural(boolean symbol) {
-		return symbol ? "$05$":messages.getString("AufklaererPlural_05");
+		return symbol ? "£05£":messages.getString("AufklaererPlural_05");
 	}
 
 	/**
 	   * Ausw\u00E4hlen [06]
 	   */
 	public static String Auswaehlen(boolean symbol) {
-		return symbol ? "$06$":messages.getString("Auswaehlen_06");
+		return symbol ? "£06£":messages.getString("Auswaehlen_06");
 	}
 
 	/**
 	   * Angreifer: {0}, Abwehrschild: {1} [07]
 	   */
 	public static String AuswertungAngriffAngreiferFestung(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$07§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferFestung_07"), arg0, arg1);
+		return symbol ? "£07§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferFestung_07"), arg0, arg1);
 	}
 
 	/**
 	   * {0} greift Planet {1} an [08]
 	   */
 	public static String AuswertungAngriffAngriffAufPlanet(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$08§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngriffAufPlanet_08"), arg0, arg1);
+		return symbol ? "£08§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungAngriffAngriffAufPlanet_08"), arg0, arg1);
 	}
 
 	/**
 	   * Angriff gescheitert. [09]
 	   */
 	public static String AuswertungAngriffAngriffGescheitert(boolean symbol) {
-		return symbol ? "$09$":messages.getString("AuswertungAngriffAngriffGescheitert_09");
+		return symbol ? "£09£":messages.getString("AuswertungAngriffAngriffGescheitert_09");
 	}
 
 	/**
 	   * Raumschiffe [0A]
 	   */
 	public static String InventurFlugobjekte(boolean symbol) {
-		return symbol ? "$0A$":messages.getString("InventurFlugobjekte_0A");
+		return symbol ? "£0A£":messages.getString("InventurFlugobjekte_0A");
 	}
 
 	/**
 	   * Fracht [0B]
 	   */
 	public static String InventurFracht(boolean symbol) {
-		return symbol ? "$0B$":messages.getString("InventurFracht_0B");
+		return symbol ? "£0B£":messages.getString("InventurFracht_0B");
 	}
 
 	/**
 	   * Jahr {0} [0C]
 	   */
 	public static String InventurJahr1(boolean symbol, String arg0) {
-		return symbol ? "$0C§"+arg0+"$":MessageFormat.format(messages.getString("InventurJahr1_0C"), arg0);
+		return symbol ? "£0C§"+arg0+"£":MessageFormat.format(messages.getString("InventurJahr1_0C"), arg0);
 	}
 
 	/**
 	   * Jahr {0} von {1} [0D]
 	   */
 	public static String InventurJahr2(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$0D§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("InventurJahr2_0D"), arg0, arg1);
+		return symbol ? "£0D§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("InventurJahr2_0D"), arg0, arg1);
 	}
 
 	/**
 	   * Es sind keine Raumschiffe unterwegs. [0E]
 	   */
 	public static String InventurKeineFlugobjekte(boolean symbol) {
-		return symbol ? "$0E$":messages.getString("InventurKeineFlugobjekte_0E");
+		return symbol ? "£0E£":messages.getString("InventurKeineFlugobjekte_0E");
 	}
 
 	/**
 	   * Es sind keine Patrouillen im Einsatz. [0F]
 	   */
 	public static String InventurKeinePatrouillen(boolean symbol) {
-		return symbol ? "$0F$":messages.getString("InventurKeinePatrouillen_0F");
+		return symbol ? "£0F£":messages.getString("InventurKeinePatrouillen_0F");
 	}
 
 	/**
 	   * Sie besitzen keine Planeten. [0G]
 	   */
 	public static String InventurKeinePlaneten(boolean symbol) {
-		return symbol ? "$0G$":messages.getString("InventurKeinePlaneten_0G");
+		return symbol ? "£0G£":messages.getString("InventurKeinePlaneten_0G");
 	}
 
 	/**
 	   * Es sind keine Kampfschiffe unterwegs. [0H]
 	   */
 	public static String InventurKeineRaumer(boolean symbol) {
-		return symbol ? "$0H$":messages.getString("InventurKeineRaumer_0H");
+		return symbol ? "£0H£":messages.getString("InventurKeineRaumer_0H");
 	}
 
 	/**
 	   * Kommandant [0I]
 	   */
 	public static String InventurKommandant(boolean symbol) {
-		return symbol ? "$0I$":messages.getString("InventurKommandant_0I");
+		return symbol ? "£0I£":messages.getString("InventurKommandant_0I");
 	}
 
 	/**
 	   * Kz [0J]
 	   */
 	public static String InventurKommandozentraleKurz(boolean symbol) {
-		return symbol ? "$0J$":messages.getString("InventurKommandozentraleKurz_0J");
+		return symbol ? "£0J£":messages.getString("InventurKommandozentraleKurz_0J");
 	}
 
 	/**
 	   * M100 [0K]
 	   */
 	public static String InventurMine100Kurz(boolean symbol) {
-		return symbol ? "$0K$":messages.getString("InventurMine100Kurz_0K");
+		return symbol ? "£0K£":messages.getString("InventurMine100Kurz_0K");
 	}
 
 	/**
 	   * M250 [0L]
 	   */
 	public static String InventurMine250Kurz(boolean symbol) {
-		return symbol ? "$0L$":messages.getString("InventurMine250Kurz_0L");
+		return symbol ? "£0L£":messages.getString("InventurMine250Kurz_0L");
 	}
 
 	/**
 	   * M500 [0M]
 	   */
 	public static String InventurMine500Kurz(boolean symbol) {
-		return symbol ? "$0M$":messages.getString("InventurMine500Kurz_0M");
+		return symbol ? "£0M£":messages.getString("InventurMine500Kurz_0M");
 	}
 
 	/**
 	   * M50 [0N]
 	   */
 	public static String InventurMine50Kurz(boolean symbol) {
-		return symbol ? "$0N$":messages.getString("InventurMine50Kurz_0N");
+		return symbol ? "£0N£":messages.getString("InventurMine50Kurz_0N");
 	}
 
 	/**
 	   * Minenleger (100) [0O]
 	   */
 	public static String InventurMinenleger100(boolean symbol) {
-		return symbol ? "$0O$":messages.getString("InventurMinenleger100_0O");
+		return symbol ? "£0O£":messages.getString("InventurMinenleger100_0O");
 	}
 
 	/**
 	   * Minenleger (250) [0P]
 	   */
 	public static String InventurMinenleger250(boolean symbol) {
-		return symbol ? "$0P$":messages.getString("InventurMinenleger250_0P");
+		return symbol ? "£0P£":messages.getString("InventurMinenleger250_0P");
 	}
 
 	/**
 	   * Minenleger (50) [0Q]
 	   */
 	public static String InventurMinenleger50(boolean symbol) {
-		return symbol ? "$0Q$":messages.getString("InventurMinenleger50_0Q");
+		return symbol ? "£0Q£":messages.getString("InventurMinenleger50_0Q");
 	}
 
 	/**
 	   * Minenleger (500) [0R]
 	   */
 	public static String InventurMinenleger500(boolean symbol) {
-		return symbol ? "$0R$":messages.getString("InventurMinenleger500_0R");
+		return symbol ? "£0R£":messages.getString("InventurMinenleger500_0R");
 	}
 
 	/**
 	   * Minenr\u00E4umer [0S]
 	   */
 	public static String InventurMinenraeumer(boolean symbol) {
-		return symbol ? "$0S$":messages.getString("InventurMinenraeumer_0S");
+		return symbol ? "£0S£":messages.getString("InventurMinenraeumer_0S");
 	}
 
 	/**
 	   * Pat [0T]
 	   */
 	public static String InventurPatrouilleKurz(boolean symbol) {
-		return symbol ? "$0T$":messages.getString("InventurPatrouilleKurz_0T");
+		return symbol ? "£0T£":messages.getString("InventurPatrouilleKurz_0T");
 	}
 
 	/**
 	   * Patrouille (Transfer) [0U]
 	   */
 	public static String InventurPatrouilleTransfer(boolean symbol) {
-		return symbol ? "$0U$":messages.getString("InventurPatrouilleTransfer_0U");
+		return symbol ? "£0U£":messages.getString("InventurPatrouilleTransfer_0U");
 	}
 
 	/**
 	   * Patrouillen [0V]
 	   */
 	public static String InventurPatrouillen(boolean symbol) {
-		return symbol ? "$0V$":messages.getString("InventurPatrouillen_0V");
+		return symbol ? "£0V£":messages.getString("InventurPatrouillen_0V");
 	}
 
 	/**
 	   * Patrouillen im Einsatz [0W]
 	   */
 	public static String InventurPatrrouillenTitel(boolean symbol) {
-		return symbol ? "$0W$":messages.getString("InventurPatrrouillenTitel_0W");
+		return symbol ? "£0W£":messages.getString("InventurPatrrouillenTitel_0W");
 	}
 
 	/**
 	   * Fehler: PDF-Anzeigeprogramm konnte nicht ge\u00F6ffnet werden. [0X]
 	   */
 	public static String InventurPdfFehler(boolean symbol) {
-		return symbol ? "$0X$":messages.getString("InventurPdfFehler_0X");
+		return symbol ? "£0X£":messages.getString("InventurPdfFehler_0X");
 	}
 
 	/**
 	   * PDF-Anzeigeprogramm wurde ge\u00F6ffnet. [0Y]
 	   */
 	public static String InventurPdfGeoeffnet(boolean symbol) {
-		return symbol ? "$0Y$":messages.getString("InventurPdfGeoeffnet_0Y");
+		return symbol ? "£0Y£":messages.getString("InventurPdfGeoeffnet_0Y");
 	}
 
 	/**
 	   * Planet [0Z]
 	   */
 	public static String InventurPlanet(boolean symbol) {
-		return symbol ? "$0Z$":messages.getString("InventurPlanet_0Z");
+		return symbol ? "£0Z£":messages.getString("InventurPlanet_0Z");
 	}
 
 	/**
 	   * Angreifer: {0}, Planet: {1} [13]
 	   */
 	public static String AuswertungAngriffAngreiferPlanet(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$13§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferPlanet_13"), arg0, arg1);
+		return symbol ? "£13§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferPlanet_13"), arg0, arg1);
 	}
 
 	/**
 	   * {0} hat den Planeten erobert! [15]
 	   */
 	public static String AuswertungAngriffSpielerErobert(boolean symbol, String arg0) {
-		return symbol ? "$15§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAngriffSpielerErobert_15"), arg0);
+		return symbol ? "£15§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungAngriffSpielerErobert_15"), arg0);
 	}
 
 	/**
 	   * {0}: 1 Aufkl\u00E4rer auf Planet {1} angekommen. [17]
 	   */
 	public static String AuswertungAufklaererAngekommen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$17§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungAufklaererAngekommen_17"), arg0, arg1);
+		return symbol ? "£17§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungAufklaererAngekommen_17"), arg0, arg1);
 	}
 
 	/**
-	   * Raumschiffe starten, die Planeten produzieren Kampfschiffe und Energie. [19]
+	   * Raumschiffe starten, Planeten produzieren. [19]
 	   */
 	public static String AuswertungBeginnt(boolean symbol) {
-		return symbol ? "$19$":messages.getString("AuswertungBeginnt_19");
+		return symbol ? "£19£":messages.getString("AuswertungBeginnt_19");
 	}
 
 	/**
 	   * Planet 1 [1A]
 	   */
 	public static String InventurPlanet1(boolean symbol) {
-		return symbol ? "$1A$":messages.getString("InventurPlanet1_1A");
+		return symbol ? "£1A£":messages.getString("InventurPlanet1_1A");
 	}
 
 	/**
 	   * Planet 2 [1B]
 	   */
 	public static String InventurPlanet2(boolean symbol) {
-		return symbol ? "$1B$":messages.getString("InventurPlanet2_1B");
+		return symbol ? "£1B£":messages.getString("InventurPlanet2_1B");
 	}
 
 	/**
 	   * Pl [1C]
 	   */
 	public static String InventurPlanetKurz(boolean symbol) {
-		return symbol ? "$1C$":messages.getString("InventurPlanetKurz_1C");
+		return symbol ? "£1C£":messages.getString("InventurPlanetKurz_1C");
 	}
 
 	/**
 	   * MRa [1D]
 	   */
 	public static String InventurMinenraeumerKurz(boolean symbol) {
-		return symbol ? "$1D$":messages.getString("InventurMinenraeumerKurz_1D");
+		return symbol ? "£1D£":messages.getString("InventurMinenraeumerKurz_1D");
 	}
 
 	/**
 	   * Planeten, B\u00FCndnisse und Minen [1E]
 	   */
 	public static String InventurPlanetenTitel(boolean symbol) {
-		return symbol ? "$1E$":messages.getString("InventurPlanetenTitel_1E");
+		return symbol ? "£1E£":messages.getString("InventurPlanetenTitel_1E");
 	}
 
 	/**
 	   * Planeten [1F]
 	   */
 	public static String InventurPlanetenTitelSimpel(boolean symbol) {
-		return symbol ? "$1F$":messages.getString("InventurPlanetenTitelSimpel_1F");
+		return symbol ? "£1F£":messages.getString("InventurPlanetenTitelSimpel_1F");
 	}
 
 	/**
 	   * {0} Punkte [1G]
 	   */
 	public static String InventurPunkte(boolean symbol, String arg0) {
-		return symbol ? "$1G§"+arg0+"$":MessageFormat.format(messages.getString("InventurPunkte_1G"), arg0);
+		return symbol ? "£1G§"+arg0+"£":MessageFormat.format(messages.getString("InventurPunkte_1G"), arg0);
 	}
 
 	/**
 	   * Kampfschiffe [1H]
 	   */
 	public static String InventurRaumer(boolean symbol) {
-		return symbol ? "$1H$":messages.getString("InventurRaumer_1H");
+		return symbol ? "£1H£":messages.getString("InventurRaumer_1H");
 	}
 
 	/**
 	   * Ks [1I]
 	   */
 	public static String InventurRaumerKurz(boolean symbol) {
-		return symbol ? "$1I$":messages.getString("InventurRaumerKurz_1I");
+		return symbol ? "£1I£":messages.getString("InventurRaumerKurz_1I");
 	}
 
 	/**
 	   * Kampfschiffproduktion/Jahr [1J]
 	   */
 	public static String InventurRaumerproduktionJahr(boolean symbol) {
-		return symbol ? "$1J$":messages.getString("InventurRaumerproduktionJahr_1J");
+		return symbol ? "£1J£":messages.getString("InventurRaumerproduktionJahr_1J");
 	}
 
 	/**
 	   * EKs [1K]
 	   */
 	public static String InventurRaumerproduktionKurz(boolean symbol) {
-		return symbol ? "$1K$":messages.getString("InventurRaumerproduktionKurz_1K");
+		return symbol ? "£1K£":messages.getString("InventurRaumerproduktionKurz_1K");
 	}
 
 	/**
 	   * Seite {0} [1L]
 	   */
 	public static String InventurSeite(boolean symbol, String arg0) {
-		return symbol ? "$1L§"+arg0+"$":MessageFormat.format(messages.getString("InventurSeite_1L"), arg0);
+		return symbol ? "£1L§"+arg0+"£":MessageFormat.format(messages.getString("InventurSeite_1L"), arg0);
 	}
 
 	/**
 	   * Start [1M]
 	   */
 	public static String InventurStart(boolean symbol) {
-		return symbol ? "$1M$":messages.getString("InventurStart_1M");
+		return symbol ? "£1M£":messages.getString("InventurStart_1M");
 	}
 
 	/**
 	   * Inventur [1N]
 	   */
 	public static String InventurTitel(boolean symbol) {
-		return symbol ? "$1N$":messages.getString("InventurTitel_1N");
+		return symbol ? "£1N£":messages.getString("InventurTitel_1N");
 	}
 
 	/**
 	   * Transporter [1O]
 	   */
 	public static String InventurTransporter(boolean symbol) {
-		return symbol ? "$1O$":messages.getString("InventurTransporter_1O");
+		return symbol ? "£1O£":messages.getString("InventurTransporter_1O");
 	}
 
 	/**
-	   * {0} EE [1P]
+	   * {0} $ [1P]
 	   */
 	public static String InventurTransporterEe(boolean symbol, String arg0) {
-		return symbol ? "$1P§"+arg0+"$":MessageFormat.format(messages.getString("InventurTransporterEe_1P"), arg0);
+		return symbol ? "£1P§"+arg0+"£":MessageFormat.format(messages.getString("InventurTransporterEe_1P"), arg0);
 	}
 
 	/**
 	   * Tra [1Q]
 	   */
 	public static String InventurTransporterKurz(boolean symbol) {
-		return symbol ? "$1Q$":messages.getString("InventurTransporterKurz_1Q");
+		return symbol ? "£1Q£":messages.getString("InventurTransporterKurz_1Q");
 	}
 
 	/**
 	   * Typ [1R]
 	   */
 	public static String InventurTyp(boolean symbol) {
-		return symbol ? "$1R$":messages.getString("InventurTyp_1R");
+		return symbol ? "£1R£":messages.getString("InventurTyp_1R");
 	}
 
 	/**
 	   * Ziel [1S]
 	   */
 	public static String InventurZiel(boolean symbol) {
-		return symbol ? "$1S$":messages.getString("InventurZiel_1S");
+		return symbol ? "£1S£":messages.getString("InventurZiel_1S");
 	}
 
 	/**
 	   * Ja [1T]
 	   */
 	public static String Ja(boolean symbol) {
-		return symbol ? "$1T$":messages.getString("Ja_1T");
+		return symbol ? "£1T£":messages.getString("Ja_1T");
 	}
 
 	/**
 	   * Kommandozentrale [1U]
 	   */
 	public static String Kommandozentrale(boolean symbol) {
-		return symbol ? "$1U$":messages.getString("Kommandozentrale_1U");
+		return symbol ? "£1U£":messages.getString("Kommandozentrale_1U");
 	}
 
 	/**
 	   * Links [1V]
 	   */
 	public static String Links(boolean symbol) {
-		return symbol ? "$1V$":messages.getString("Links_1V");
+		return symbol ? "£1V£":messages.getString("Links_1V");
 	}
 
 	/**
 	   * L\u00F6schen [1W]
 	   */
 	public static String Loeschen(boolean symbol) {
-		return symbol ? "$1W$":messages.getString("Loeschen_1W");
+		return symbol ? "£1W£":messages.getString("Loeschen_1W");
 	}
 
 	/**
 	   * Lokale Bestenliste [1X]
 	   */
 	public static String MenuBestenliste(boolean symbol) {
-		return symbol ? "$1X$":messages.getString("MenuBestenliste_1X");
+		return symbol ? "£1X£":messages.getString("MenuBestenliste_1X");
 	}
 
 	/**
 	   * Spiel [1Z]
 	   */
 	public static String MenuDatei(boolean symbol) {
-		return symbol ? "$1Z$":messages.getString("MenuDatei_1Z");
+		return symbol ? "£1Z£":messages.getString("MenuDatei_1Z");
 	}
 
 	/**
 	   * {0}: B\u00FCndnis auf Planet {1} kann nicht ge\u00E4ndert werden. [20]
 	   */
 	public static String AuswertungBuendnisNichtGeaendert(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$20§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungBuendnisNichtGeaendert_20"), arg0, arg1);
+		return symbol ? "£20§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungBuendnisNichtGeaendert_20"), arg0, arg1);
 	}
 
 	/**
 	   * Ende der Auswertung. [21]
 	   */
 	public static String AuswertungEnde(boolean symbol) {
-		return symbol ? "$21$":messages.getString("AuswertungEnde_21");
+		return symbol ? "£21£":messages.getString("AuswertungEnde_21");
 	}
 
 	/**
 	   * 'Die Neutralen' erobern die Kommandozentrale von {0}! [22]
 	   */
 	public static String AuswertungKommandozentraleErobertNeutral(boolean symbol, String arg0) {
-		return symbol ? "$22§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertNeutral_22"), arg0);
+		return symbol ? "£22§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertNeutral_22"), arg0);
 	}
 
 	/**
 	   * {0} erobert die Kommandozentrale von {1}! [23]
 	   */
 	public static String AuswertungKommandozentraleErobertSpieler(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$23§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertSpieler_23"), arg0, arg1);
+		return symbol ? "£23§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertSpieler_23"), arg0, arg1);
 	}
 
 	/**
 	   * {0}: Mine wurde gelegt. [24]
 	   */
 	public static String AuswertungMineGelegt(boolean symbol, String arg0) {
-		return symbol ? "$24§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMineGelegt_24"), arg0);
+		return symbol ? "£24§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungMineGelegt_24"), arg0);
 	}
 
 	/**
 	   * Minenfeld der St\u00E4rke {0} ger\u00E4umt. [25]
 	   */
 	public static String AuswertungMinenfeldGeraeumt(boolean symbol, String arg0) {
-		return symbol ? "$25§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungMinenfeldGeraeumt_25"), arg0);
+		return symbol ? "£25§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungMinenfeldGeraeumt_25"), arg0);
 	}
 
 	/**
 	   * {0}: 1 Minenleger auf Planet {1} angekommen. [27]
 	   */
 	public static String AuswertungMinenlegerAngekommen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$27§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerAngekommen_27"), arg0, arg1);
+		return symbol ? "£27§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungMinenlegerAngekommen_27"), arg0, arg1);
 	}
 
 	/**
 	   * {0}: 1 Minenleger auf Planet {1} zerschellt. [28]
 	   */
 	public static String AuswertungMinenlegerZerschellt(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$28§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenlegerZerschellt_28"), arg0, arg1);
+		return symbol ? "£28§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungMinenlegerZerschellt_28"), arg0, arg1);
 	}
 
 	/**
 	   * {0}: 1 Minenr\u00E4umer auf Planet {1} angekommen. [29]
 	   */
 	public static String AuswertungMinenraeumerAngekommen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$29§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerAngekommen_29"), arg0, arg1);
+		return symbol ? "£29§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungMinenraeumerAngekommen_29"), arg0, arg1);
 	}
 
 	/**
 	   * Serverfunktionen [2A]
 	   */
 	public static String MenuEinstellungen(boolean symbol) {
-		return symbol ? "$2A$":messages.getString("MenuEinstellungen_2A");
+		return symbol ? "£2A£":messages.getString("MenuEinstellungen_2A");
 	}
 
 	/**
 	   * STERN [2B]
 	   */
 	public static String MenuHilfe(boolean symbol) {
-		return symbol ? "$2B$":messages.getString("MenuHilfe_2B");
+		return symbol ? "£2B£":messages.getString("MenuHilfe_2B");
 	}
 
 	/**
 	   * Neues lokales Spiel [2C]
 	   */
 	public static String MenuNeuesSpiel(boolean symbol) {
-		return symbol ? "$2C$":messages.getString("MenuNeuesSpiel_2C");
+		return symbol ? "£2C£":messages.getString("MenuNeuesSpiel_2C");
 	}
 
 	/**
 	   * Bildschirm\u00FCbertragung [2D]
 	   */
 	public static String MenuScreesharing(boolean symbol) {
-		return symbol ? "$2D$":messages.getString("MenuScreesharing_2D");
+		return symbol ? "£2D£":messages.getString("MenuScreesharing_2D");
 	}
 
 	/**
 	   * STERN-Server verwalten [2E]
 	   */
 	public static String MenuServerAdmin(boolean symbol) {
-		return symbol ? "$2E$":messages.getString("MenuServerAdmin_2E");
+		return symbol ? "£2E£":messages.getString("MenuServerAdmin_2E");
 	}
 
 	/**
 	   * Server-Zugangsdaten [2F]
 	   */
 	public static String MenuServerCredentials(boolean symbol) {
-		return symbol ? "$2F$":messages.getString("MenuServerCredentials_2F");
+		return symbol ? "£2F£":messages.getString("MenuServerCredentials_2F");
 	}
 
 	/**
 	   * Meine serverbasierten Spiele [2G]
 	   */
 	public static String MenuServerbasierteSpiele(boolean symbol) {
-		return symbol ? "$2G$":messages.getString("MenuServerbasierteSpiele_2G");
+		return symbol ? "£2G£":messages.getString("MenuServerbasierteSpiele_2G");
 	}
 
 	/**
 	   * E-Mail-Spiel aus Zwischenablage laden [2H]
 	   */
 	public static String MenuSpielAusZwischenablageLaden(boolean symbol) {
-		return symbol ? "$2H$":messages.getString("MenuSpielAusZwischenablageLaden_2H");
+		return symbol ? "£2H£":messages.getString("MenuSpielAusZwischenablageLaden_2H");
 	}
 
 	/**
 	   * Lokales Spiel laden [2J]
 	   */
 	public static String MenuSpielLaden(boolean symbol) {
-		return symbol ? "$2J$":messages.getString("MenuSpielLaden_2J");
+		return symbol ? "£2J£":messages.getString("MenuSpielLaden_2J");
 	}
 
 	/**
 	   * Lokales Spiel speichern als [2K]
 	   */
 	public static String MenuSpielSpeichernAls(boolean symbol) {
-		return symbol ? "$2K$":messages.getString("MenuSpielSpeichernAls_2K");
+		return symbol ? "£2K£":messages.getString("MenuSpielSpeichernAls_2K");
 	}
 
 	/**
 	   * Spielanleitung [2L]
 	   */
 	public static String MenuSpielanleitung(boolean symbol) {
-		return symbol ? "$2L$":messages.getString("MenuSpielanleitung_2L");
+		return symbol ? "£2L£":messages.getString("MenuSpielanleitung_2L");
 	}
 
 	/**
 	   * STERN Client verlassen [2M]
 	   */
 	public static String MenuSternClientVerlassen(boolean symbol) {
-		return symbol ? "$2M$":messages.getString("MenuSternClientVerlassen_2M");
+		return symbol ? "£2M£":messages.getString("MenuSternClientVerlassen_2M");
 	}
 
 	/**
 	   * STERN verlassen [2N]
 	   */
 	public static String MenuSternVerlassen(boolean symbol) {
-		return symbol ? "$2N$":messages.getString("MenuSternVerlassen_2N");
+		return symbol ? "£2N£":messages.getString("MenuSternVerlassen_2N");
 	}
 
 	/**
 	   * \u00DCber STERN [2O]
 	   */
 	public static String MenuUeberStern(boolean symbol) {
-		return symbol ? "$2O$":messages.getString("MenuUeberStern_2O");
+		return symbol ? "£2O£":messages.getString("MenuUeberStern_2O");
 	}
 
 	/**
 	   * Verbindungseinstellungen [2P]
 	   */
 	public static String MenuVerbindungseinstellungen(boolean symbol) {
-		return symbol ? "$2P$":messages.getString("MenuVerbindungseinstellungen_2P");
+		return symbol ? "£2P£":messages.getString("MenuVerbindungseinstellungen_2P");
 	}
 
 	/**
 	   * Die geladenen Daten erfordern einen neueren<br>STERN-Build. Der mindestens vorausgesetzte<br>Build ist {0}, Ihr STERN-Build ist<br>{1}.<br><br>Bitte laden Sie sich den neusten Build unter<br>{2} herunter. [2Q]
 	   */
 	public static String MinBuild(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$2Q§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("MinBuild_2Q"), arg0, arg1, arg2);
+		return symbol ? "£2Q§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("MinBuild_2Q"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * 100er-Minen [2R]
 	   */
 	public static String Mine100Plural(boolean symbol) {
-		return symbol ? "$2R$":messages.getString("Mine100Plural_2R");
+		return symbol ? "£2R£":messages.getString("Mine100Plural_2R");
 	}
 
 	/**
 	   * 250er-Minen [2S]
 	   */
 	public static String Mine250Plural(boolean symbol) {
-		return symbol ? "$2S$":messages.getString("Mine250Plural_2S");
+		return symbol ? "£2S£":messages.getString("Mine250Plural_2S");
 	}
 
 	/**
 	   * 500er-Minen [2T]
 	   */
 	public static String Mine500Plural(boolean symbol) {
-		return symbol ? "$2T$":messages.getString("Mine500Plural_2T");
+		return symbol ? "£2T£":messages.getString("Mine500Plural_2T");
 	}
 
 	/**
 	   * 50er-Minen [2U]
 	   */
 	public static String Mine50Plural(boolean symbol) {
-		return symbol ? "$2U$":messages.getString("Mine50Plural_2U");
+		return symbol ? "£2U£":messages.getString("Mine50Plural_2U");
 	}
 
 	/**
 	   * Minenr\u00E4umer [2V]
 	   */
 	public static String MinenraeumerPlural(boolean symbol) {
-		return symbol ? "$2V$":messages.getString("MinenraeumerPlural_2V");
+		return symbol ? "£2V£":messages.getString("MinenraeumerPlural_2V");
 	}
 
 	/**
 	   * M\u00F6chten Sie STERN wirklich verlassen? [2W]
 	   */
 	public static String MoechtestDuSternVerlassen(boolean symbol) {
-		return symbol ? "$2W$":messages.getString("MoechtestDuSternVerlassen_2W");
+		return symbol ? "£2W£":messages.getString("MoechtestDuSternVerlassen_2W");
 	}
 
 	/**
 	   * Nein [2X]
 	   */
 	public static String Nein(boolean symbol) {
-		return symbol ? "$2X$":messages.getString("Nein_2X");
+		return symbol ? "£2X£":messages.getString("Nein_2X");
 	}
 
 	/**
 	   * Neutral [2Y]
 	   */
 	public static String Neutral(boolean symbol) {
-		return symbol ? "$2Y$":messages.getString("Neutral_2Y");
+		return symbol ? "£2Y£":messages.getString("Neutral_2Y");
 	}
 
 	/**
 	   * OK [2Z]
 	   */
 	public static String OK(boolean symbol) {
-		return symbol ? "$2Z$":messages.getString("OK_2Z");
+		return symbol ? "£2Z£":messages.getString("OK_2Z");
 	}
 
 	/**
 	   * {0}: 1 Minenr\u00E4umer auf Planet {1} zerschellt. [30]
 	   */
 	public static String AuswertungMinenraeumerZerschellt(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$30§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungMinenraeumerZerschellt_30"), arg0, arg1);
+		return symbol ? "£30§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungMinenraeumerZerschellt_30"), arg0, arg1);
 	}
 
 	/**
 	   * {0}: Nachricht aus Sektor {1}: [31]
 	   */
 	public static String AuswertungNachrichtAnAusSektor(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$31§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungNachrichtAnAusSektor_31"), arg0, arg1);
+		return symbol ? "£31§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungNachrichtAnAusSektor_31"), arg0, arg1);
 	}
 
 	/**
 	   * {0}: 1 Patrouille auf Planet {1} angekommen. [33]
 	   */
 	public static String AuswertungPatrouilleAngekommen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$33§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleAngekommen_33"), arg0, arg1);
+		return symbol ? "£33§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleAngekommen_33"), arg0, arg1);
 	}
 
 	/**
 	   * 1 Aufkl\u00E4rer von {0} angehalten und gekapert. [34]
 	   */
 	public static String AuswertungPatrouilleAufklaererGekapert(boolean symbol, String arg0) {
-		return symbol ? "$34§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleAufklaererGekapert_34"), arg0);
+		return symbol ? "£34§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleAufklaererGekapert_34"), arg0);
 	}
 
 	/**
 	   * {0}: Patrouille meldet aus Sektor {1}: [35]
 	   */
 	public static String AuswertungPatrouilleMeldetAusSektor(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$35§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleMeldetAusSektor_35"), arg0, arg1);
+		return symbol ? "£35§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMeldetAusSektor_35"), arg0, arg1);
 	}
 
 	/**
 	   * 1 Minenleger von {0} angehalten und gekapert. [36]
 	   */
 	public static String AuswertungPatrouilleMinenlegerGekapert(boolean symbol, String arg0) {
-		return symbol ? "$36§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenlegerGekapert_36"), arg0);
+		return symbol ? "£36§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenlegerGekapert_36"), arg0);
 	}
 
 	/**
 	   * 1 Minenr\u00E4umer von {0} angehalten und gekapert. [37]
 	   */
 	public static String AuswertungPatrouilleMinenraeumerGekapert(boolean symbol, String arg0) {
-		return symbol ? "$37§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenraeumerGekapert_37"), arg0);
+		return symbol ? "£37§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenraeumerGekapert_37"), arg0);
 	}
 
 	/**
 	   * 1 Patrouille von {0} angehalten und gekapert. [38]
 	   */
 	public static String AuswertungPatrouillePatrouilleGekapert(boolean symbol, String arg0) {
-		return symbol ? "$38§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleGekapert_38"), arg0);
+		return symbol ? "£38§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleGekapert_38"), arg0);
 	}
 
 	/**
 	   * 1 Patrouille von {0} zerst\u00F6rt. [39]
 	   */
 	public static String AuswertungPatrouillePatrouilleZerstoert(boolean symbol, String arg0) {
-		return symbol ? "$39§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleZerstoert_39"), arg0);
+		return symbol ? "£39§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleZerstoert_39"), arg0);
 	}
 
 	/**
 	   * Patrouillen [3A]
 	   */
 	public static String PatrouillePlural(boolean symbol) {
-		return symbol ? "$3A$":messages.getString("PatrouillePlural_3A");
+		return symbol ? "£3A£":messages.getString("PatrouillePlural_3A");
 	}
 
 	/**
 	   * PDF-Anzeigeprogramm \u00F6ffnen? [3B]
 	   */
 	public static String PdfOeffnenFrage(boolean symbol) {
-		return symbol ? "$3B$":messages.getString("PdfOeffnenFrage_3B");
+		return symbol ? "£3B£":messages.getString("PdfOeffnenFrage_3B");
 	}
 
 	/**
-	   * EE [3C]
+	   * $ [3C]
 	   */
 	public static String PlEditEe(boolean symbol) {
-		return symbol ? "$3C$":messages.getString("PlEditEe_3C");
+		return symbol ? "£3C£":messages.getString("PlEditEe_3C");
 	}
 
 	/**
-	   * EE Energievorrat [3D]
+	   * $ Vorrat [3D]
 	   */
 	public static String PlEditEeEnergievorrat(boolean symbol) {
-		return symbol ? "$3D$":messages.getString("PlEditEeEnergievorrat_3D");
+		return symbol ? "£3D£":messages.getString("PlEditEeEnergievorrat_3D");
 	}
 
 	/**
-	   * Energieproduktion/Jahr (Kauf +4) [3E]
+	   * $ Produktion/Jahr (Kauf +4) [3E]
 	   */
 	public static String PlEditEprodPlus4(boolean symbol) {
-		return symbol ? "$3E$":messages.getString("PlEditEprodPlus4_3E");
+		return symbol ? "£3E£":messages.getString("PlEditEprodPlus4_3E");
 	}
 
 	/**
 	   * Abwehrschild-Kampfschiffe (Kauf +{0}) [3F]
 	   */
 	public static String PlEditFestungRaumer(boolean symbol, String arg0) {
-		return symbol ? "$3F§"+arg0+"$":MessageFormat.format(messages.getString("PlEditFestungRaumer_3F"), arg0);
+		return symbol ? "£3F§"+arg0+"£":MessageFormat.format(messages.getString("PlEditFestungRaumer_3F"), arg0);
 	}
 
 	/**
 	   * Abwehrschilde [3G]
 	   */
 	public static String PlEditFestungen(boolean symbol) {
-		return symbol ? "$3G$":messages.getString("PlEditFestungen_3G");
+		return symbol ? "£3G£":messages.getString("PlEditFestungen_3G");
 	}
 
 	/**
 	   * Kaufpreis [3H]
 	   */
 	public static String PlEditKaufpreis(boolean symbol) {
-		return symbol ? "$3H$":messages.getString("PlEditKaufpreis_3H");
+		return symbol ? "£3H£":messages.getString("PlEditKaufpreis_3H");
 	}
 
 	/**
 	   * Kampfschiffproduktion/Jahr [3I]
 	   */
 	public static String PlEditRaumerProd(boolean symbol) {
-		return symbol ? "$3I$":messages.getString("PlEditRaumerProd_3I");
+		return symbol ? "£3I£":messages.getString("PlEditRaumerProd_3I");
 	}
 
 	/**
 	   * Verkaufspreis [3J]
 	   */
 	public static String PlEditVerkaufspreis(boolean symbol) {
-		return symbol ? "$3J$":messages.getString("PlEditVerkaufspreis_3J");
+		return symbol ? "£3J£":messages.getString("PlEditVerkaufspreis_3J");
 	}
 
 	/**
 	   * Planeten [3K]
 	   */
 	public static String Planeten(boolean symbol) {
-		return symbol ? "$3K$":messages.getString("Planeten_3K");
+		return symbol ? "£3K£":messages.getString("Planeten_3K");
 	}
 
 	/**
 	   * Ab [3L]
 	   */
 	public static String PlaneteneditorAb(boolean symbol) {
-		return symbol ? "$3L$":messages.getString("PlaneteneditorAb_3L");
+		return symbol ? "£3L£":messages.getString("PlaneteneditorAb_3L");
 	}
 
 	/**
 	   * Auf [3M]
 	   */
 	public static String PlaneteneditorAuf(boolean symbol) {
-		return symbol ? "$3M$":messages.getString("PlaneteneditorAuf_3M");
+		return symbol ? "£3M£":messages.getString("PlaneteneditorAuf_3M");
 	}
 
 	/**
 	   * Auswahl \u00E4ndern [3N]
 	   */
 	public static String PlaneteneditorAuswahlAendern(boolean symbol) {
-		return symbol ? "$3N$":messages.getString("PlaneteneditorAuswahlAendern_3N");
+		return symbol ? "£3N£":messages.getString("PlaneteneditorAuswahlAendern_3N");
 	}
 
 	/**
 	   * Kaufen\n [3O]
 	   */
 	public static String PlaneteneditorKaufen(boolean symbol) {
-		return symbol ? "$3O$":messages.getString("PlaneteneditorKaufen_3O");
+		return symbol ? "£3O£":messages.getString("PlaneteneditorKaufen_3O");
 	}
 
 	/**
 	   * \u00C4nderungen \u00FCbernehmen [3P]
 	   */
 	public static String PlaneteneditorUebernehmen(boolean symbol) {
-		return symbol ? "$3P$":messages.getString("PlaneteneditorUebernehmen_3P");
+		return symbol ? "£3P£":messages.getString("PlaneteneditorUebernehmen_3P");
 	}
 
 	/**
 	   * Verkaufen [3Q]
 	   */
 	public static String PlaneteneditorVerkaufen(boolean symbol) {
-		return symbol ? "$3Q$":messages.getString("PlaneteneditorVerkaufen_3Q");
+		return symbol ? "£3Q£":messages.getString("PlaneteneditorVerkaufen_3Q");
 	}
 
 	/**
 	   * Ung\u00FCltiges Programmargument [{0}] [3R]
 	   */
 	public static String ProgramArgument(boolean symbol, String arg0) {
-		return symbol ? "$3R§"+arg0+"$":MessageFormat.format(messages.getString("ProgramArgument_3R"), arg0);
+		return symbol ? "£3R§"+arg0+"£":MessageFormat.format(messages.getString("ProgramArgument_3R"), arg0);
 	}
 
 	/**
 	   * Punkte [3S]
 	   */
 	public static String Punkte(boolean symbol) {
-		return symbol ? "$3S$":messages.getString("Punkte_3S");
+		return symbol ? "£3S£":messages.getString("Punkte_3S");
 	}
 
 	/**
 	   * Kampfschiffe [3T]
 	   */
 	public static String Raumer(boolean symbol) {
-		return symbol ? "$3T$":messages.getString("Raumer_3T");
+		return symbol ? "£3T£":messages.getString("Raumer_3T");
 	}
 
 	/**
 	   * Rechts [3U]
 	   */
 	public static String Rechts(boolean symbol) {
-		return symbol ? "$3U$":messages.getString("Rechts_3U");
+		return symbol ? "£3U£":messages.getString("Rechts_3U");
 	}
 
 	/**
 	   * Auswertung wiedergeben [3V]
 	   */
 	public static String ReplayAuswertungWiedergeben(boolean symbol) {
-		return symbol ? "$3V$":messages.getString("ReplayAuswertungWiedergeben_3V");
+		return symbol ? "£3V£":messages.getString("ReplayAuswertungWiedergeben_3V");
 	}
 
 	/**
 	   * Jahr\n [3W]
 	   */
 	public static String ReplayErstesJahr(boolean symbol) {
-		return symbol ? "$3W$":messages.getString("ReplayErstesJahr_3W");
+		return symbol ? "£3W£":messages.getString("ReplayErstesJahr_3W");
 	}
 
 	/**
 	   * Zu diesem Spiel gibt es keine aufgezeichneten Auswertungen. [3X]
 	   */
 	public static String ReplayKeineAuswertungen(boolean symbol) {
-		return symbol ? "$3X$":messages.getString("ReplayKeineAuswertungen_3X");
+		return symbol ? "£3X£":messages.getString("ReplayKeineAuswertungen_3X");
 	}
 
 	/**
 	   * Letztes Jahr [3Y]
 	   */
 	public static String ReplayLetztesJahr(boolean symbol) {
-		return symbol ? "$3Y$":messages.getString("ReplayLetztesJahr_3Y");
+		return symbol ? "£3Y£":messages.getString("ReplayLetztesJahr_3Y");
 	}
 
 	/**
 	   * Wiedergabe ab welchem Jahr? [3Z]
 	   */
 	public static String ReplayWiedergabeAbWelchemJahr(boolean symbol) {
-		return symbol ? "$3Z$":messages.getString("ReplayWiedergabeAbWelchemJahr_3Z");
+		return symbol ? "£3Z£":messages.getString("ReplayWiedergabeAbWelchemJahr_3Z");
 	}
 
 	/**
 	   * {0} Kampfschiff(e) von {1} angehalten und gekapert. [40]
 	   */
 	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$40§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0, arg1);
+		return symbol ? "£40§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0, arg1);
 	}
 
 	/**
 	   * {0} Kampfschiff(e) von {1} gesichtet. [41]
 	   */
 	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$41§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1);
+		return symbol ? "£41§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1);
 	}
 
 	/**
 	   * 1 Transporter von {0} angehalten und gekapert. [42]
 	   */
 	public static String AuswertungPatrouilleTransporterGekapert(boolean symbol, String arg0) {
-		return symbol ? "$42§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleTransporterGekapert_42"), arg0);
+		return symbol ? "£42§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleTransporterGekapert_42"), arg0);
 	}
 
 	/**
 	   * {0}: 1 Patrouille auf Planet {1} zerschellt. [43]
 	   */
 	public static String AuswertungPatrouilleZerschellt(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$43§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungPatrouilleZerschellt_43"), arg0, arg1);
+		return symbol ? "£43§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleZerschellt_43"), arg0, arg1);
 	}
 
 	/**
 	   * {0}: {1} Kampfschiff(e) auf Planet {2} angekommen. [44]
 	   */
 	public static String AuswertungRaumerAngekommen(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$44§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAngekommen_44"), arg0, arg1, arg2);
+		return symbol ? "£44§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungRaumerAngekommen_44"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * {0}: {1} Kamfpschiff(e) in Sektor {2} auf eine Mine gelaufen. Die Mine wurde zerst\u00F6rt. [45]
 	   */
 	public static String AuswertungRaumerAufMineGelaufenZerstoert(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$45§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufenZerstoert_45"), arg0, arg1, arg2);
+		return symbol ? "£45§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufenZerstoert_45"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * {0}: {1} Kampfschiff(e) in Sektor {2} auf eine Mine gelaufen. [46]
 	   */
 	public static String AuswertungRaumerAufMineGelaufen(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$46§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufen_46"), arg0, arg1, arg2);
+		return symbol ? "£46§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungRaumerAufMineGelaufen_46"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * {0}: Kampfschiffe k\u00F6nnen nicht vom Planeten {1} gestartet werden. [47]
 	   */
 	public static String AuswertungRaumerNichtGestartet(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$47§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungRaumerNichtGestartet_47"), arg0, arg1);
+		return symbol ? "£47§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungRaumerNichtGestartet_47"), arg0, arg1);
 	}
 
 	/**
 	   * {1}: {0} Kampfschiffe wurden von Planet {2} vertrieben. [48]
 	   */
 	public static String AuswertungRaumerVertrieben(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$48§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("AuswertungRaumerVertrieben_48"), arg0, arg1, arg2);
+		return symbol ? "£48§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungRaumerVertrieben_48"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * Sie warten au\u00DFerhalb des Planeten auf ein neues Ziel. [49]
 	   */
 	public static String AuswertungRaumerVertrieben2(boolean symbol) {
-		return symbol ? "$49$":messages.getString("AuswertungRaumerVertrieben2_49");
+		return symbol ? "£49£":messages.getString("AuswertungRaumerVertrieben2_49");
 	}
 
 	/**
 	   * Wiedergabe der Auswertung des Jahres {0} [4A]
 	   */
 	public static String ReplayWiedergabeJahr(boolean symbol, String arg0) {
-		return symbol ? "$4A§"+arg0+"$":MessageFormat.format(messages.getString("ReplayWiedergabeJahr_4A"), arg0);
+		return symbol ? "£4A§"+arg0+"£":MessageFormat.format(messages.getString("ReplayWiedergabeJahr_4A"), arg0);
 	}
 
 	/**
 	   * Schlie\u00DFen [4B]
 	   */
 	public static String Schliessen(boolean symbol) {
-		return symbol ? "$4B$":messages.getString("Schliessen_4B");
+		return symbol ? "£4B£":messages.getString("Schliessen_4B");
 	}
 
 	/**
 	   * IP-Adresse des Servers [4C]
 	   */
 	public static String ServerSettingsJDialogIpServer(boolean symbol) {
-		return symbol ? "$4C$":messages.getString("ServerSettingsJDialogIpServer_4C");
+		return symbol ? "£4C£":messages.getString("ServerSettingsJDialogIpServer_4C");
 	}
 
 	/**
 	   * Aktivieren [4D]
 	   */
 	public static String ServerSettingsJDialogTerminalServerAktiv(boolean symbol) {
-		return symbol ? "$4D$":messages.getString("ServerSettingsJDialogTerminalServerAktiv_4D");
+		return symbol ? "£4D£":messages.getString("ServerSettingsJDialogTerminalServerAktiv_4D");
 	}
 
 	/**
 	   * [Unbekannt] [4E]
 	   */
 	public static String ServerSettingsJDialogUnbekannt(boolean symbol) {
-		return symbol ? "$4E$":messages.getString("ServerSettingsJDialogUnbekannt_4E");
+		return symbol ? "£4E£":messages.getString("ServerSettingsJDialogUnbekannt_4E");
 	}
 
 	/**
 	   * Verbundene Thin Clients [4F]
 	   */
 	public static String ServerSettingsJDialogVerbundeneClients(boolean symbol) {
-		return symbol ? "$4F$":messages.getString("ServerSettingsJDialogVerbundeneClients_4F");
+		return symbol ? "£4F£":messages.getString("ServerSettingsJDialogVerbundeneClients_4F");
 	}
 
 	/**
 	   * Spiel abschlie\u00DFen [4G]
 	   */
 	public static String SpielAbschliessen(boolean symbol) {
-		return symbol ? "$4G$":messages.getString("SpielAbschliessen_4G");
+		return symbol ? "£4G£":messages.getString("SpielAbschliessen_4G");
 	}
 
 	/**
 	   * Wollen Sie das Spiel wirklich abschlie\u00DFen? [4H]
 	   */
 	public static String SpielAbschliessenFrage(boolean symbol) {
-		return symbol ? "$4H$":messages.getString("SpielAbschliessenFrage_4H");
+		return symbol ? "£4H£":messages.getString("SpielAbschliessenFrage_4H");
 	}
 
 	/**
 	   * Spiel laden [4I]
 	   */
 	public static String SpielLaden(boolean symbol) {
-		return symbol ? "$4I$":messages.getString("SpielLaden_4I");
+		return symbol ? "£4I£":messages.getString("SpielLaden_4I");
 	}
 
 	/**
 	   * Spiel speichern [4J]
 	   */
 	public static String SpielSpeichern(boolean symbol) {
-		return symbol ? "$4J$":messages.getString("SpielSpeichern_4J");
+		return symbol ? "£4J£":messages.getString("SpielSpeichern_4J");
 	}
 
 	/**
 	   * Spieler [4K]
 	   */
 	public static String Spieler(boolean symbol) {
-		return symbol ? "$4K$":messages.getString("Spieler_4K");
+		return symbol ? "£4K£":messages.getString("Spieler_4K");
 	}
 
 	/**
 	   * Sind Sie mit diesem Spielfeld einverstanden? [4L]
 	   */
 	public static String SpielfeldOkFrage(boolean symbol) {
-		return symbol ? "$4L$":messages.getString("SpielfeldOkFrage_4L");
+		return symbol ? "£4L£":messages.getString("SpielfeldOkFrage_4L");
 	}
 
 	/**
 	   * Spielinformationen [4M]
 	   */
 	public static String Spielinformationen(boolean symbol) {
-		return symbol ? "$4M$":messages.getString("Spielinformationen_4M");
+		return symbol ? "£4M£":messages.getString("Spielinformationen_4M");
 	}
 
 	/**
 	   * Zeige B\u00FCndnisstruktur auf Planet [4Q]
 	   */
 	public static String SpielinformationenBuendnisPlanet(boolean symbol) {
-		return symbol ? "$4Q$":messages.getString("SpielinformationenBuendnisPlanet_4Q");
+		return symbol ? "£4Q£":messages.getString("SpielinformationenBuendnisPlanet_4Q");
 	}
 
 	/**
 	   * B\u00FCndnisse [4R]
 	   */
 	public static String SpielinformationenBuendnisse(boolean symbol) {
-		return symbol ? "$4R$":messages.getString("SpielinformationenBuendnisse_4R");
+		return symbol ? "£4R£":messages.getString("SpielinformationenBuendnisse_4R");
 	}
 
 	/**
 	   * B\u00FCndnisse [4T]
 	   */
 	public static String SpielinformationenBuendnisseTitel(boolean symbol) {
-		return symbol ? "$4T$":messages.getString("SpielinformationenBuendnisseTitel_4T");
+		return symbol ? "£4T£":messages.getString("SpielinformationenBuendnisseTitel_4T");
 	}
 
 	/**
 	   * B\u00FCndnisstruktur auf Planet {0} [4U]
 	   */
 	public static String SpielinformationenBuendnisstruktur(boolean symbol, String arg0) {
-		return symbol ? "$4U§"+arg0+"$":MessageFormat.format(messages.getString("SpielinformationenBuendnisstruktur_4U"), arg0);
+		return symbol ? "£4U§"+arg0+"£":MessageFormat.format(messages.getString("SpielinformationenBuendnisstruktur_4U"), arg0);
 	}
 
 	/**
-	   * Energieprod. [4V]
+	   * $ Produktion [4V]
 	   */
 	public static String SpielinformationenEnergieproduktion(boolean symbol) {
-		return symbol ? "$4V$":messages.getString("SpielinformationenEnergieproduktion_4V");
+		return symbol ? "£4V£":messages.getString("SpielinformationenEnergieproduktion_4V");
 	}
 
 	/**
-	   * Energieproduktion der Planeten [4W]
+	   * $ Produktion der Planeten [4W]
 	   */
 	public static String SpielinformationenEnergieproduktionTitel(boolean symbol) {
-		return symbol ? "$4W$":messages.getString("SpielinformationenEnergieproduktionTitel_4W");
+		return symbol ? "£4W£":messages.getString("SpielinformationenEnergieproduktionTitel_4W");
 	}
 
 	/**
 	   * Abwehrschilde [4X]
 	   */
 	public static String SpielinformationenFestungen(boolean symbol) {
-		return symbol ? "$4X$":messages.getString("SpielinformationenFestungen_4X");
+		return symbol ? "£4X£":messages.getString("SpielinformationenFestungen_4X");
 	}
 
 	/**
 	   * Abwehrschilde [4Y]
 	   */
 	public static String SpielinformationenFestungenTitel(boolean symbol) {
-		return symbol ? "$4Y$":messages.getString("SpielinformationenFestungenTitel_4Y");
+		return symbol ? "£4Y£":messages.getString("SpielinformationenFestungenTitel_4Y");
 	}
 
 	/**
 	   * Auf Planet {0} gibt es kein B\u00FCndnis. [4Z]
 	   */
 	public static String SpielinformationenKeinBuendnis(boolean symbol, String arg0) {
-		return symbol ? "$4Z§"+arg0+"$":MessageFormat.format(messages.getString("SpielinformationenKeinBuendnis_4Z"), arg0);
+		return symbol ? "£4Z§"+arg0+"£":MessageFormat.format(messages.getString("SpielinformationenKeinBuendnis_4Z"), arg0);
 	}
 
 	/**
 	   * Tja, {0}. Das Spiel ist aus! [57]
 	   */
 	public static String AuswertungSpielerTot(boolean symbol, String arg0) {
-		return symbol ? "$57§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungSpielerTot_57"), arg0);
+		return symbol ? "£57§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungSpielerTot_57"), arg0);
 	}
 
 	/**
 	   * {0}: 1 Transporter auf Planet {1} angekommen. [58]
 	   */
 	public static String AuswertungTransporterAngekommen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$58§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungTransporterAngekommen_58"), arg0, arg1);
+		return symbol ? "£58§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungTransporterAngekommen_58"), arg0, arg1);
 	}
 
 	/**
 	   * {0}: 1 Transporter auf Planet {1} zerschellt. [59]
 	   */
 	public static String AuswertungTransporterZerschellt(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$59§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungTransporterZerschellt_59"), arg0, arg1);
+		return symbol ? "£59§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungTransporterZerschellt_59"), arg0, arg1);
 	}
 
 	/**
 	   * Es gibt keine Planeten mit B\u00FCndnissen. [5B]
 	   */
 	public static String SpielinformationenKeinePlanetenMitBuendnissen(boolean symbol) {
-		return symbol ? "$5B$":messages.getString("SpielinformationenKeinePlanetenMitBuendnissen_5B");
+		return symbol ? "£5B£":messages.getString("SpielinformationenKeinePlanetenMitBuendnissen_5B");
 	}
 
 	/**
 	   * Kommandozentr. [5C]
 	   */
 	public static String SpielinformationenKommandozentralen(boolean symbol) {
-		return symbol ? "$5C$":messages.getString("SpielinformationenKommandozentralen_5C");
+		return symbol ? "£5C£":messages.getString("SpielinformationenKommandozentralen_5C");
 	}
 
 	/**
 	   * Kommandozentralen [5D]
 	   */
 	public static String SpielinformationenKommandozentralenTitel(boolean symbol) {
-		return symbol ? "$5D$":messages.getString("SpielinformationenKommandozentralenTitel_5D");
+		return symbol ? "£5D£":messages.getString("SpielinformationenKommandozentralenTitel_5D");
 	}
 
 	/**
 	   * Die K.-Zentrale von {0} ist unterwegs zu Planet {1}. [5E]
 	   */
 	public static String SpielinformationenKommandozentralenUnterwegs(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$5E§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs_5E"), arg0, arg1);
+		return symbol ? "£5E§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs_5E"), arg0, arg1);
 	}
 
 	/**
 	   * Minenfelder [5F]
 	   */
 	public static String SpielinformationenMinenfelder(boolean symbol) {
-		return symbol ? "$5F$":messages.getString("SpielinformationenMinenfelder_5F");
+		return symbol ? "£5F£":messages.getString("SpielinformationenMinenfelder_5F");
 	}
 
 	/**
 	   * Minenfelder [5G]
 	   */
 	public static String SpielinformationenMinenfelderTitel(boolean symbol) {
-		return symbol ? "$5G$":messages.getString("SpielinformationenMinenfelderTitel_5G");
+		return symbol ? "£5G£":messages.getString("SpielinformationenMinenfelderTitel_5G");
 	}
 
 	/**
 	   * Patrouillen [5H]
 	   */
 	public static String SpielinformationenPatrouillen(boolean symbol) {
-		return symbol ? "$5H$":messages.getString("SpielinformationenPatrouillen_5H");
+		return symbol ? "£5H£":messages.getString("SpielinformationenPatrouillen_5H");
 	}
 
 	/**
 	   * Patrouillen [5I]
 	   */
 	public static String SpielinformationenPatrouillenTitel(boolean symbol) {
-		return symbol ? "$5I$":messages.getString("SpielinformationenPatrouillenTitel_5I");
+		return symbol ? "£5I£":messages.getString("SpielinformationenPatrouillenTitel_5I");
 	}
 
 	/**
 	   * Planet [5J]
 	   */
 	public static String SpielinformationenPlanet(boolean symbol) {
-		return symbol ? "$5J$":messages.getString("SpielinformationenPlanet_5J");
+		return symbol ? "£5J£":messages.getString("SpielinformationenPlanet_5J");
 	}
 
 	/**
 	   * Planet [5K]
 	   */
 	public static String SpielinformationenPlanetTitel(boolean symbol) {
-		return symbol ? "$5K$":messages.getString("SpielinformationenPlanetTitel_5K");
+		return symbol ? "£5K£":messages.getString("SpielinformationenPlanetTitel_5K");
 	}
 
 	/**
 	   * Spielleiter [5L]
 	   */
 	public static String Spielleiter(boolean symbol) {
-		return symbol ? "$5L$":messages.getString("Spielleiter_5L");
+		return symbol ? "£5L£":messages.getString("Spielleiter_5L");
 	}
 
 	/**
 	   * Spielparameter [5M]
 	   */
 	public static String Spielparameter(boolean symbol) {
-		return symbol ? "$5M$":messages.getString("Spielparameter_5M");
+		return symbol ? "£5M£":messages.getString("Spielparameter_5M");
 	}
 
 	/**
 	   * Auto-Save [5O]
 	   */
 	public static String SpielparameterJDialogAutoSave(boolean symbol) {
-		return symbol ? "$5O$":messages.getString("SpielparameterJDialogAutoSave_5O");
+		return symbol ? "£5O£":messages.getString("SpielparameterJDialogAutoSave_5O");
 	}
 
 	/**
 	   * Bot [5P]
 	   */
 	public static String SpielparameterJDialogBot(boolean symbol) {
-		return symbol ? "$5P$":messages.getString("SpielparameterJDialogBot_5P");
+		return symbol ? "£5P£":messages.getString("SpielparameterJDialogBot_5P");
 	}
 
 	/**
 	   * E-Mail-Einstellungen [5Q]
 	   */
 	public static String SpielparameterJDialogEMailEinstellungen(boolean symbol) {
-		return symbol ? "$5Q$":messages.getString("SpielparameterJDialogEMailEinstellungen_5Q");
+		return symbol ? "£5Q£":messages.getString("SpielparameterJDialogEMailEinstellungen_5Q");
 	}
 
 	/**
 	   * E-Mail-Modus [5R]
 	   */
 	public static String SpielparameterJDialogEmailModus(boolean symbol) {
-		return symbol ? "$5R$":messages.getString("SpielparameterJDialogEmailModus_5R");
+		return symbol ? "£5R£":messages.getString("SpielparameterJDialogEmailModus_5R");
 	}
 
 	/**
 	   * Farbe [5S]
 	   */
 	public static String SpielparameterJDialogFarbe(boolean symbol) {
-		return symbol ? "$5S$":messages.getString("SpielparameterJDialogFarbe_5S");
+		return symbol ? "£5S£":messages.getString("SpielparameterJDialogFarbe_5S");
 	}
 
 	/**
 	   * Der Spielername [{0}] ist unzul\u00E4ssig.\nEin Spielername muss zwischen {1} und {2} Zeichen lang sein\nund darf nur die Zeichen a-z, A-Z und 0-9 enthalten. [5T]
 	   */
 	public static String SpielparameterJDialogNameZuLang(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$5T§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("SpielparameterJDialogNameZuLang_5T"), arg0, arg1, arg2);
+		return symbol ? "£5T§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("SpielparameterJDialogNameZuLang_5T"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * STERN LIGHT [5U]
 	   */
 	public static String SpielparameterJDialogSimpelStern(boolean symbol) {
-		return symbol ? "$5U$":messages.getString("SpielparameterJDialogSimpelStern_5U");
+		return symbol ? "£5U£":messages.getString("SpielparameterJDialogSimpelStern_5U");
 	}
 
 	/**
 	   * Spiele bis Jahr [5V]
 	   */
 	public static String SpielparameterJDialogSpieleBisJahr(boolean symbol) {
-		return symbol ? "$5V$":messages.getString("SpielparameterJDialogSpieleBisJahr_5V");
+		return symbol ? "£5V£":messages.getString("SpielparameterJDialogSpieleBisJahr_5V");
 	}
 
 	/**
 	   * Die E-Mail-Adresse des Spielers [{0}] ist ung\u00FCltig. [5W]
 	   */
 	public static String SpielparameterJDialogSpielerEMail(boolean symbol, String arg0) {
-		return symbol ? "$5W§"+arg0+"$":MessageFormat.format(messages.getString("SpielparameterJDialogSpielerEMail_5W"), arg0);
+		return symbol ? "£5W§"+arg0+"£":MessageFormat.format(messages.getString("SpielparameterJDialogSpielerEMail_5W"), arg0);
 	}
 
 	/**
 	   * Die E-Mail-Adresse des Spielleiters ist ung\u00FCltig. [5X]
 	   */
 	public static String SpielparameterJDialogSpielleiterEMail(boolean symbol) {
-		return symbol ? "$5X$":messages.getString("SpielparameterJDialogSpielleiterEMail_5X");
+		return symbol ? "£5X£":messages.getString("SpielparameterJDialogSpielleiterEMail_5X");
 	}
 
 	/**
 	   * Unendlich [5Y]
 	   */
 	public static String SpielparameterJDialogUnendlich(boolean symbol) {
-		return symbol ? "$5Y$":messages.getString("SpielparameterJDialogUnendlich_5Y");
+		return symbol ? "£5Y£":messages.getString("SpielparameterJDialogUnendlich_5Y");
 	}
 
 	/**
 	   * Auswertungen [60]
 	   */
 	public static String AuswertungWiederholen(boolean symbol) {
-		return symbol ? "$60$":messages.getString("AuswertungWiederholen_60");
+		return symbol ? "£60£":messages.getString("AuswertungWiederholen_60");
 	}
 
 	/**
 	   * Bestenliste [61]
 	   */
 	public static String Bestenliste(boolean symbol) {
-		return symbol ? "$61$":messages.getString("Bestenliste_61");
+		return symbol ? "£61£":messages.getString("Bestenliste_61");
 	}
 
 	/**
 	   * Client ist nicht am Server {0} registriert [62]
 	   */
 	public static String ClientSettingsJDialogClientNichtRegistriert(boolean symbol, String arg0) {
-		return symbol ? "$62§"+arg0+"$":MessageFormat.format(messages.getString("ClientSettingsJDialogClientNichtRegistriert_62"), arg0);
+		return symbol ? "£62§"+arg0+"£":MessageFormat.format(messages.getString("ClientSettingsJDialogClientNichtRegistriert_62"), arg0);
 	}
 
 	/**
 	   * Es konnte keine Verbindung zum Server aufgebaut werden. Fehlermeldung:\n\n{0} [63]
 	   */
 	public static String ClientSettingsJDialogKeineVerbindung(boolean symbol, String arg0) {
-		return symbol ? "$63§"+arg0+"$":MessageFormat.format(messages.getString("ClientSettingsJDialogKeineVerbindung_63"), arg0);
+		return symbol ? "£63§"+arg0+"£":MessageFormat.format(messages.getString("ClientSettingsJDialogKeineVerbindung_63"), arg0);
 	}
 
 	/**
 	   * Mein Name [64]
 	   */
 	public static String ClientSettingsJDialogMeinName(boolean symbol) {
-		return symbol ? "$64$":messages.getString("ClientSettingsJDialogMeinName_64");
+		return symbol ? "£64£":messages.getString("ClientSettingsJDialogMeinName_64");
 	}
 
 	/**
 	   * Nicht verbunden [65]
 	   */
 	public static String ClientSettingsJDialogNichtVerbunden(boolean symbol) {
-		return symbol ? "$65$":messages.getString("ClientSettingsJDialogNichtVerbunden_65");
+		return symbol ? "£65£":messages.getString("ClientSettingsJDialogNichtVerbunden_65");
 	}
 
 	/**
 	   * Server {0} ist nicht erreichbar [66]
 	   */
 	public static String ClientSettingsJDialogServerNichtErreichbar(boolean symbol, String arg0) {
-		return symbol ? "$66§"+arg0+"$":MessageFormat.format(messages.getString("ClientSettingsJDialogServerNichtErreichbar_66"), arg0);
+		return symbol ? "£66§"+arg0+"£":MessageFormat.format(messages.getString("ClientSettingsJDialogServerNichtErreichbar_66"), arg0);
 	}
 
 	/**
 	   * Verbindungseinstellungen [67]
 	   */
 	public static String ClientSettingsJDialogTitel(boolean symbol) {
-		return symbol ? "$67$":messages.getString("ClientSettingsJDialogTitel_67");
+		return symbol ? "£67£":messages.getString("ClientSettingsJDialogTitel_67");
 	}
 
 	/**
 	   * Verbinden [68]
 	   */
 	public static String ClientSettingsJDialogVerbinden(boolean symbol) {
-		return symbol ? "$68$":messages.getString("ClientSettingsJDialogVerbinden_68");
+		return symbol ? "£68£":messages.getString("ClientSettingsJDialogVerbinden_68");
 	}
 
 	/**
 	   * Verbindungsstatus [69]
 	   */
 	public static String ClientSettingsJDialogVerbindungsstatus(boolean symbol) {
-		return symbol ? "$69$":messages.getString("ClientSettingsJDialogVerbindungsstatus_69");
+		return symbol ? "£69£":messages.getString("ClientSettingsJDialogVerbindungsstatus_69");
 	}
 
 	/**
 	   * Statistik [6A]
 	   */
 	public static String Statistik(boolean symbol) {
-		return symbol ? "$6A$":messages.getString("Statistik_6A");
+		return symbol ? "£6A£":messages.getString("Statistik_6A");
 	}
 
 	/**
 	   * Jahr -\n [6C]
 	   */
 	public static String StatistikJahrMinus(boolean symbol) {
-		return symbol ? "$6C$":messages.getString("StatistikJahrMinus_6C");
+		return symbol ? "£6C£":messages.getString("StatistikJahrMinus_6C");
 	}
 
 	/**
 	   * Jahr +\n [6D]
 	   */
 	public static String StatistikJahrPlus(boolean symbol) {
-		return symbol ? "$6D$":messages.getString("StatistikJahrPlus_6D");
+		return symbol ? "£6D£":messages.getString("StatistikJahrPlus_6D");
 	}
 
 	/**
 	   * Max: {0} (Jahr {1}) [6E]
 	   */
 	public static String StatistikMax(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$6E§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("StatistikMax_6E"), arg0, arg1);
+		return symbol ? "£6E§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("StatistikMax_6E"), arg0, arg1);
 	}
 
 	/**
 	   * Min: {0} (Jahr {1}) [6F]
 	   */
 	public static String StatistikMin(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$6F§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("StatistikMin_6F"), arg0, arg1);
+		return symbol ? "£6F§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("StatistikMin_6F"), arg0, arg1);
 	}
 
 	/**
 	   * Statistik schlie\u00DFen [6G]
 	   */
 	public static String StatistikSchliessen(boolean symbol) {
-		return symbol ? "$6G$":messages.getString("StatistikSchliessen_6G");
+		return symbol ? "£6G£":messages.getString("StatistikSchliessen_6G");
 	}
 
 	/**
 	   * Spiel begonnen am [6H]
 	   */
 	public static String StatistikSpielBegonnen(boolean symbol) {
-		return symbol ? "$6H$":messages.getString("StatistikSpielBegonnen_6H");
+		return symbol ? "£6H£":messages.getString("StatistikSpielBegonnen_6H");
 	}
 
 	/**
 	   * Std. [6I]
 	   */
 	public static String StatistikStunden(boolean symbol) {
-		return symbol ? "$6I$":messages.getString("StatistikStunden_6I");
+		return symbol ? "£6I£":messages.getString("StatistikStunden_6I");
 	}
 
 	/**
-	   * Energieprod. im Jahr {0} [6J]
+	   * $ Prod. im Jahr {0} [6J]
 	   */
 	public static String StatistikTitelEnergieproduktion(boolean symbol, String arg0) {
-		return symbol ? "$6J§"+arg0+"$":MessageFormat.format(messages.getString("StatistikTitelEnergieproduktion_6J"), arg0);
+		return symbol ? "£6J§"+arg0+"£":MessageFormat.format(messages.getString("StatistikTitelEnergieproduktion_6J"), arg0);
 	}
 
 	/**
 	   * Planeten im Jahr {0} [6K]
 	   */
 	public static String StatistikTitelPlaneten(boolean symbol, String arg0) {
-		return symbol ? "$6K§"+arg0+"$":MessageFormat.format(messages.getString("StatistikTitelPlaneten_6K"), arg0);
+		return symbol ? "£6K§"+arg0+"£":MessageFormat.format(messages.getString("StatistikTitelPlaneten_6K"), arg0);
 	}
 
 	/**
 	   * Punkte im Jahr {0} [6L]
 	   */
 	public static String StatistikTitelPunkte(boolean symbol, String arg0) {
-		return symbol ? "$6L§"+arg0+"$":MessageFormat.format(messages.getString("StatistikTitelPunkte_6L"), arg0);
+		return symbol ? "£6L§"+arg0+"£":MessageFormat.format(messages.getString("StatistikTitelPunkte_6L"), arg0);
 	}
 
 	/**
 	   * Kampfschiffe im Jahr {0} [6M]
 	   */
 	public static String StatistikTitelRaumer(boolean symbol, String arg0) {
-		return symbol ? "$6M§"+arg0+"$":MessageFormat.format(messages.getString("StatistikTitelRaumer_6M"), arg0);
+		return symbol ? "£6M§"+arg0+"£":MessageFormat.format(messages.getString("StatistikTitelRaumer_6M"), arg0);
 	}
 
 	/**
 	   * STERN Client [6N]
 	   */
 	public static String SternClientTitel(boolean symbol) {
-		return symbol ? "$6N$":messages.getString("SternClientTitel_6N");
+		return symbol ? "£6N£":messages.getString("SternClientTitel_6N");
 	}
 
 	/**
 	   * M\u00F6chten Sie den STERN Client wirklich verlassen? [6P]
 	   */
 	public static String SternClientVerlassenFrage(boolean symbol) {
-		return symbol ? "$6P$":messages.getString("SternClientVerlassenFrage_6P");
+		return symbol ? "£6P£":messages.getString("SternClientVerlassenFrage_6P");
 	}
 
 	/**
 	   * STERN - Bildschirm\u00FCbertragung aktiv [6Q]
 	   */
 	public static String SternTerminalServer(boolean symbol) {
-		return symbol ? "$6Q$":messages.getString("SternTerminalServer_6Q");
+		return symbol ? "£6Q£":messages.getString("SternTerminalServer_6Q");
 	}
 
 	/**
 	   * STERN Client verlassen [6R]
 	   */
 	public static String SternThinClientVerlassen(boolean symbol) {
-		return symbol ? "$6R$":messages.getString("SternThinClientVerlassen_6R");
+		return symbol ? "£6R£":messages.getString("SternThinClientVerlassen_6R");
 	}
 
 	/**
 	   * STERN [6S]
 	   */
 	public static String SternTitel(boolean symbol) {
-		return symbol ? "$6S$":messages.getString("SternTitel_6S");
+		return symbol ? "£6S£":messages.getString("SternTitel_6S");
 	}
 
 	/**
 	   * STERN verlassen [6T]
 	   */
 	public static String SternVerlassen(boolean symbol) {
-		return symbol ? "$6T$":messages.getString("SternVerlassen_6T");
+		return symbol ? "£6T£":messages.getString("SternVerlassen_6T");
 	}
 
 	/**
 	   * Bildschirm\u00FCbertragung [6U]
 	   */
 	public static String Terminalserver(boolean symbol) {
-		return symbol ? "$6U$":messages.getString("Terminalserver_6U");
+		return symbol ? "£6U£":messages.getString("Terminalserver_6U");
 	}
 
 	/**
 	   * Sicherheitscode [6V]
 	   */
 	public static String ThinClientCode(boolean symbol) {
-		return symbol ? "$6V$":messages.getString("ThinClientCode_6V");
+		return symbol ? "£6V£":messages.getString("ThinClientCode_6V");
 	}
 
 	/**
 	   * Transporter [6W]
 	   */
 	public static String TransporterPlural(boolean symbol) {
-		return symbol ? "$6W$":messages.getString("TransporterPlural_6W");
+		return symbol ? "£6W£":messages.getString("TransporterPlural_6W");
 	}
 
 	/**
 	   * Ung\u00FCltige Eingabe. [6X]
 	   */
 	public static String UngueltigeEingabe(boolean symbol) {
-		return symbol ? "$6X$":messages.getString("UngueltigeEingabe_6X");
+		return symbol ? "£6X£":messages.getString("UngueltigeEingabe_6X");
 	}
 
 	/**
 	   * Client und Server verwenden unterschiedliche STERN-Builds [6Y]
 	   */
 	public static String UnterschiedlicheBuilds(boolean symbol) {
-		return symbol ? "$6Y$":messages.getString("UnterschiedlicheBuilds_6Y");
+		return symbol ? "£6Y£":messages.getString("UnterschiedlicheBuilds_6Y");
 	}
 
 	/**
 	   * Weiter [6Z]
 	   */
 	public static String Weiter(boolean symbol) {
-		return symbol ? "$6Z$":messages.getString("Weiter_6Z");
+		return symbol ? "£6Z£":messages.getString("Weiter_6Z");
 	}
 
 	/**
 	   * Vebunden mit Server {0} [70]
 	   */
 	public static String ClientSettingsJDialogVerbunden(boolean symbol, String arg0) {
-		return symbol ? "$70§"+arg0+"$":MessageFormat.format(messages.getString("ClientSettingsJDialogVerbunden_70"), arg0);
+		return symbol ? "£70§"+arg0+"£":MessageFormat.format(messages.getString("ClientSettingsJDialogVerbunden_70"), arg0);
 	}
 
 	/**
 	   * Daten k\u00F6nnen nicht interpretiert werden. Pr\u00FCfen Sie folgendes:\n\n1. Stammen die Daten aus einer STERN-Email?\n2. Haben Sie eine E-Mail aus einem falschen Kontext verwendet?\n3. Ihr STERN-Build ({0}) und der Build des Absenders (siehe E-Mail) sind zu unterschiedlich.\n\u0009\u0009\u0009\u0009\u0009\u0009 [71]
 	   */
 	public static String ClipboardImportJDIalogImportFehler(boolean symbol, String arg0) {
-		return symbol ? "$71§"+arg0+"$":MessageFormat.format(messages.getString("ClipboardImportJDIalogImportFehler_71"), arg0);
+		return symbol ? "£71§"+arg0+"£":MessageFormat.format(messages.getString("ClipboardImportJDIalogImportFehler_71"), arg0);
 	}
 
 	/**
 	   * Inhalt der Zwischenablage hier einf\u00FCgen [72]
 	   */
 	public static String ClipboardImportJDIalogInhaltHierEinfuegen(boolean symbol) {
-		return symbol ? "$72$":messages.getString("ClipboardImportJDIalogInhaltHierEinfuegen_72");
+		return symbol ? "£72£":messages.getString("ClipboardImportJDIalogInhaltHierEinfuegen_72");
 	}
 
 	/**
 	   * Daten aus Zwischenablage importieren [73]
 	   */
 	public static String ClipboardImportJDIalogTitle(boolean symbol) {
-		return symbol ? "$73$":messages.getString("ClipboardImportJDIalogTitle_73");
+		return symbol ? "£73£":messages.getString("ClipboardImportJDIalogTitle_73");
 	}
 
 	/**
 	   * Die Datei existiert nicht. [74]
 	   */
 	public static String DateiExistiertNicht(boolean symbol) {
-		return symbol ? "$74$":messages.getString("DateiExistiertNicht_74");
+		return symbol ? "£74£":messages.getString("DateiExistiertNicht_74");
 	}
 
 	/**
 	   * Die Datei ist keine g\u00FCltige STERN-Spieldatei. [76]
 	   */
 	public static String DateiNichtGueltig(boolean symbol) {
-		return symbol ? "$76$":messages.getString("DateiNichtGueltig_76");
+		return symbol ? "£76£":messages.getString("DateiNichtGueltig_76");
 	}
 
 	/**
 	   * E-Mail-Adresse [77]
 	   */
 	public static String EMailAdresse(boolean symbol) {
-		return symbol ? "$77$":messages.getString("EMailAdresse_77");
+		return symbol ? "£77£":messages.getString("EMailAdresse_77");
 	}
 
 	/**
 	   * Einf\u00FCgen [78]
 	   */
 	public static String Einfuegen(boolean symbol) {
-		return symbol ? "$78$":messages.getString("Einfuegen_78");
+		return symbol ? "£78£":messages.getString("Einfuegen_78");
 	}
 
 	/**
 	   * Eingabe gesperrt [79]
 	   */
 	public static String EingabeGesperrt(boolean symbol) {
-		return symbol ? "$79$":messages.getString("EingabeGesperrt_79");
+		return symbol ? "£79£":messages.getString("EingabeGesperrt_79");
 	}
 
 	/**
 	   * Zugeingabe [7A]
 	   */
 	public static String Zugeingabe(boolean symbol) {
-		return symbol ? "$7A$":messages.getString("Zugeingabe_7A");
+		return symbol ? "£7A£":messages.getString("Zugeingabe_7A");
 	}
 
 	/**
 	   * Aktion nicht m\u00F6glich. [7B]
 	   */
 	public static String ZugeingabeAktionNichtMoeglich(boolean symbol) {
-		return symbol ? "$7B$":messages.getString("ZugeingabeAktionNichtMoeglich_7B");
+		return symbol ? "£7B£":messages.getString("ZugeingabeAktionNichtMoeglich_7B");
 	}
 
 	/**
 	   * Maximale Beladung [7C]
 	   */
 	public static String ZugeingabeAlleEe(boolean symbol) {
-		return symbol ? "$7C$":messages.getString("ZugeingabeAlleEe_7C");
+		return symbol ? "£7C£":messages.getString("ZugeingabeAlleEe_7C");
 	}
 
 	/**
 	   * Alle Kampfschiffe [7D]
 	   */
 	public static String ZugeingabeAlleRaumer(boolean symbol) {
-		return symbol ? "$7D$":messages.getString("ZugeingabeAlleRaumer_7D");
+		return symbol ? "£7D£":messages.getString("ZugeingabeAlleRaumer_7D");
 	}
 
 	/**
 	   * Ankunft: [7E]
 	   */
 	public static String ZugeingabeAnkunft(boolean symbol) {
-		return symbol ? "$7E$":messages.getString("ZugeingabeAnkunft_7E");
+		return symbol ? "£7E£":messages.getString("ZugeingabeAnkunft_7E");
 	}
 
 	/**
 	   * Anzahl [7F]
 	   */
 	public static String ZugeingabeAnzahl(boolean symbol) {
-		return symbol ? "$7F$":messages.getString("ZugeingabeAnzahl_7F");
+		return symbol ? "£7F£":messages.getString("ZugeingabeAnzahl_7F");
 	}
 
 	/**
 	   * Auf fremden Planeten d\u00FCrfen Sie nur Ihr eigene Teilnahme aufk\u00FCndigen. [7G]
 	   */
 	public static String ZugeingabeAufFremdenPlanetenNurKuendigen(boolean symbol) {
-		return symbol ? "$7G$":messages.getString("ZugeingabeAufFremdenPlanetenNurKuendigen_7G");
+		return symbol ? "£7G£":messages.getString("ZugeingabeAufFremdenPlanetenNurKuendigen_7G");
 	}
 
 	/**
 	   * Aufkl\u00E4rer [7H]
 	   */
 	public static String ZugeingabeAufklaerer(boolean symbol) {
-		return symbol ? "$7H$":messages.getString("ZugeingabeAufklaerer_7H");
+		return symbol ? "£7H£":messages.getString("ZugeingabeAufklaerer_7H");
 	}
 
 	/**
 	   * Zugeingabe beenden [7I]
 	   */
 	public static String ZugeingabeBeenden(boolean symbol) {
-		return symbol ? "$7I$":messages.getString("ZugeingabeBeenden_7I");
+		return symbol ? "£7I£":messages.getString("ZugeingabeBeenden_7I");
 	}
 
 	/**
 	   * Wollen Sie die Zugeingabe wirklich beenden? [7J]
 	   */
 	public static String ZugeingabeBeendenFrage(boolean symbol) {
-		return symbol ? "$7J$":messages.getString("ZugeingabeBeendenFrage_7J");
+		return symbol ? "£7J£":messages.getString("ZugeingabeBeendenFrage_7J");
 	}
 
 	/**
 	   * B\u00FCndnisflotte [7K]
 	   */
 	public static String ZugeingabeBuendRaumer(boolean symbol) {
-		return symbol ? "$7K$":messages.getString("ZugeingabeBuendRaumer_7K");
+		return symbol ? "£7K£":messages.getString("ZugeingabeBuendRaumer_7K");
 	}
 
 	/**
 	   * B\u00FCndnis [7L]
 	   */
 	public static String ZugeingabeBuendnis(boolean symbol) {
-		return symbol ? "$7L$":messages.getString("ZugeingabeBuendnis_7L");
+		return symbol ? "£7L£":messages.getString("ZugeingabeBuendnis_7L");
 	}
 
 	/**
 	   * E-Mail-Aktionen [7M]
 	   */
 	public static String ZugeingabeEMailAktionen(boolean symbol) {
-		return symbol ? "$7M$":messages.getString("ZugeingabeEMailAktionen_7M");
+		return symbol ? "£7M£":messages.getString("ZugeingabeEMailAktionen_7M");
 	}
 
 	/**
 	   * Spiel: {0}\nJahr: {1}\nSpielz\u00FCge von: {2}\nBuild: {3}\n\nHallo Spielleiter,\n\nhier sind die Spielz\u00FCge von {4}. Bitte f\u00FChren Sie folgende Schritte aus:\n\n1. Markieren Sie diesen gesamten E-Mail-Text (z.B. mit Strg + A) und kopieren Sie ihn in die Zwischenablage Ihres Rechners (z.B. mit Strg + C).\n\n2. Starten Sie Stern. Laden Sie das Spiel {5}.stn\n\n3. Gehen Sie zur Zugeingabe. W\u00E4hlen Sie "E-Mail-Aktionen -> Spielz\u00FCge eines Spielers importieren".\n\n4. Dr\u00FCcken Sie den Knopf "Einf\u00FCgen", um den Inhalt der Zwischenablage in das Textfeld einzuf\u00FCgen.\n\n5. Dr\u00FCcken Sie den Knopf 'OK'. [7N]
 	   */
 	public static String ZugeingabeEMailBody(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4, String arg5) {
-		return symbol ? "$7N§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"§"+arg5+"$":MessageFormat.format(messages.getString("ZugeingabeEMailBody_7N"), arg0, arg1, arg2, arg3, arg4, arg5);
+		return symbol ? "£7N§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"§"+arg5+"£":MessageFormat.format(messages.getString("ZugeingabeEMailBody_7N"), arg0, arg1, arg2, arg3, arg4, arg5);
 	}
 
 	/**
 	   * Bitte warten Sie auf die n\u00E4chste E-Mail vom Spielleiter. [7O]
 	   */
 	public static String ZugeingabeEMailEndlosschleife(boolean symbol) {
-		return symbol ? "$7O$":messages.getString("ZugeingabeEMailEndlosschleife_7O");
+		return symbol ? "£7O£":messages.getString("ZugeingabeEMailEndlosschleife_7O");
 	}
 
 	/**
 	   * Spiel: {0}\nJahr: {1}\nBuild: {2}\n\nHallo {3},\n\nhier sind die aktuellen Spieldaten f\u00FCr Ihr Stern-E-Mail-Spiel. Bitte f\u00FChren Sie folgende Schritte aus:\n\n1. Markieren Sie diesen gesamten E-Mail-Text (z.B. mit Strg + A) und kopieren Sie ihn in die Zwischenablage Ihres Rechners (z.B. mit Strg + C).\n\n2. Starten Sie Stern und w\u00E4hlen Sie "Spiel -> E-Mail-Spiel aus Zwischenablage laden".\n\n3. Dr\u00FCcken Sie den Knopf "Einf\u00FCgen", um den Inhalt der Zwischenablage in das Textfeld einzuf\u00FCgen.\n\n4. Dr\u00FCcken Sie den Knopf "OK".\n\nDann geben Sie Ihre Spielz\u00FCge ein. Wenn Sie damit fertig sind, \u00F6ffnet sich eine weitere E-Mail in Ihrem E-Mail-Client. Diese weitere E-Mail, die Ihre Spielz\u00FCge enth\u00E4lt und an mich adressiert ist, schicken Sie bitte unver\u00E4ndert ab.\n\nDanke und viel Spa\u00DF!\nIhr Spielleiter [7P]
 	   */
 	public static String ZugeingabeEMailBody2(boolean symbol, String arg0, String arg1, String arg2, String arg3) {
-		return symbol ? "$7P§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"$":MessageFormat.format(messages.getString("ZugeingabeEMailBody2_7P"), arg0, arg1, arg2, arg3);
+		return symbol ? "£7P§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"£":MessageFormat.format(messages.getString("ZugeingabeEMailBody2_7P"), arg0, arg1, arg2, arg3);
 	}
 
 	/**
 	   * Es wurde eine E-Mail in Ihrem Standard-E-Mail-Client erzeugt. [7Q]
 	   */
 	public static String ZugeingabeEMailErzeugt(boolean symbol) {
-		return symbol ? "$7Q$":messages.getString("ZugeingabeEMailErzeugt_7Q");
+		return symbol ? "£7Q£":messages.getString("ZugeingabeEMailErzeugt_7Q");
 	}
 
 	/**
 	   * Bitte schicken Sie die Mail unver\u00E4ndert an den Spielleiter. [7R]
 	   */
 	public static String ZugeingabeEMailErzeugt2(boolean symbol) {
-		return symbol ? "$7R$":messages.getString("ZugeingabeEMailErzeugt2_7R");
+		return symbol ? "£7R£":messages.getString("ZugeingabeEMailErzeugt2_7R");
 	}
 
 	/**
 	   * Es wurden {0} E-Mail(s) in Ihrem Standard-E-Mail-Client erzeugt. [7S]
 	   */
 	public static String ZugeingabeEMailErzeugt3(boolean symbol, String arg0) {
-		return symbol ? "$7S§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeEMailErzeugt3_7S"), arg0);
+		return symbol ? "£7S§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeEMailErzeugt3_7S"), arg0);
 	}
 
 	/**
 	   * Bitte schicken Sie die Mail(s) unver\u00E4ndert an die Spieler. [7T]
 	   */
 	public static String ZugeingabeEMailErzeugt4(boolean symbol) {
-		return symbol ? "$7T$":messages.getString("ZugeingabeEMailErzeugt4_7T");
+		return symbol ? "£7T£":messages.getString("ZugeingabeEMailErzeugt4_7T");
 	}
 
 	/**
 	   * Fertig [7U]
 	   */
 	public static String ZugeingabeFertig(boolean symbol) {
-		return symbol ? "$7U$":messages.getString("ZugeingabeFertig_7U");
+		return symbol ? "£7U£":messages.getString("ZugeingabeFertig_7U");
 	}
 
 	/**
 	   * Info [7V]
 	   */
 	public static String ZugeingabeInfo(boolean symbol) {
-		return symbol ? "$7V$":messages.getString("ZugeingabeInfo_7V");
+		return symbol ? "£7V£":messages.getString("ZugeingabeInfo_7V");
 	}
 
 	/**
 	   * Inventur [7W]
 	   */
 	public static String ZugeingabeInventur(boolean symbol) {
-		return symbol ? "$7W$":messages.getString("ZugeingabeInventur_7W");
+		return symbol ? "£7W£":messages.getString("ZugeingabeInventur_7W");
 	}
 
 	/**
 	   * Kein B\u00FCndnis. [7X]
 	   */
 	public static String ZugeingabeKeinBuendnis(boolean symbol) {
-		return symbol ? "$7X$":messages.getString("ZugeingabeKeinBuendnis_7X");
+		return symbol ? "£7X£":messages.getString("ZugeingabeKeinBuendnis_7X");
 	}
 
 	/**
 	   * Sie sind kein B\u00FCndnismitglied auf diesem Planeten. [7Y]
 	   */
 	public static String ZugeingabeKeinBuendnismitglied(boolean symbol) {
-		return symbol ? "$7Y$":messages.getString("ZugeingabeKeinBuendnismitglied_7Y");
+		return symbol ? "£7Y£":messages.getString("ZugeingabeKeinBuendnismitglied_7Y");
 	}
 
 	/**
 	   * Auf dem Startplaneten befindet sich keine Kommandozentrale. [7Z]
 	   */
 	public static String ZugeingabeKeineKommandozentrale(boolean symbol) {
-		return symbol ? "$7Z$":messages.getString("ZugeingabeKeineKommandozentrale_7Z");
+		return symbol ? "£7Z£":messages.getString("ZugeingabeKeineKommandozentrale_7Z");
 	}
 
 	/**
 	   * Bisher verwendete E-Mail-Adressen [80]
 	   */
 	public static String EmailAdressenJDialogTitel(boolean symbol) {
-		return symbol ? "$80$":messages.getString("EmailAdressenJDialogTitel_80");
+		return symbol ? "£80£":messages.getString("EmailAdressenJDialogTitel_80");
 	}
 
 	/**
 	   * E-Mail-Modus-Einstellungen [81]
 	   */
 	public static String EmailSettingsJDialogTitel(boolean symbol) {
-		return symbol ? "$81$":messages.getString("EmailSettingsJDialogTitel_81");
+		return symbol ? "£81£":messages.getString("EmailSettingsJDialogTitel_81");
 	}
 
 	/**
-	   * Energieproduktion [82]
+	   * $ Produktion [82]
 	   */
 	public static String Energieproduktion(boolean symbol) {
-		return symbol ? "$82$":messages.getString("Energieproduktion_82");
+		return symbol ? "£82£":messages.getString("Energieproduktion_82");
 	}
 
 	/**
 	   * Distanzmatrix [83]
 	   */
 	public static String Entfernungstabelle(boolean symbol) {
-		return symbol ? "$83$":messages.getString("Entfernungstabelle_83");
+		return symbol ? "£83£":messages.getString("Entfernungstabelle_83");
 	}
 
 	/**
 	   * Fehler [84]
 	   */
 	public static String Fehler(boolean symbol) {
-		return symbol ? "$84$":messages.getString("Fehler_84");
+		return symbol ? "£84£":messages.getString("Fehler_84");
 	}
 
 	/**
 	   * Fehler beim Laden [85]
 	   */
 	public static String FehlerBeimLaden(boolean symbol) {
-		return symbol ? "$85$":messages.getString("FehlerBeimLaden_85");
+		return symbol ? "£85£":messages.getString("FehlerBeimLaden_85");
 	}
 
 	/**
 	   * Hauptmen\u00FC [86]
 	   */
 	public static String Hauptmenue(boolean symbol) {
-		return symbol ? "$86$":messages.getString("Hauptmenue_86");
+		return symbol ? "£86£":messages.getString("Hauptmenue_86");
 	}
 
 	/**
 	   * M\u00F6chten Sie die Ergebnisse in die Bestenliste eintragen? [87]
 	   */
 	public static String HighscoreFrage(boolean symbol) {
-		return symbol ? "$87$":messages.getString("HighscoreFrage_87");
+		return symbol ? "£87£":messages.getString("HighscoreFrage_87");
 	}
 
 	/**
 	   * Ankunft [88]
 	   */
 	public static String InventurAnkunft(boolean symbol) {
-		return symbol ? "$88$":messages.getString("InventurAnkunft_88");
+		return symbol ? "£88£":messages.getString("InventurAnkunft_88");
 	}
 
 	/**
 	   * J{0}T{1} [89]
 	   */
 	public static String InventurAnkunftJahr(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$89§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("InventurAnkunftJahr_89"), arg0, arg1);
+		return symbol ? "£89§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("InventurAnkunftJahr_89"), arg0, arg1);
 	}
 
 	/**
 	   * Es sind keine Spielz\u00FCge vorhanen. [8A]
 	   */
 	public static String ZugeingabeKeineSpielzuege(boolean symbol) {
-		return symbol ? "$8A$":messages.getString("ZugeingabeKeineSpielzuege_8A");
+		return symbol ? "£8A£":messages.getString("ZugeingabeKeineSpielzuege_8A");
 	}
 
 	/**
 	   * Kommandozentrale verlegen [8B]
 	   */
 	public static String ZugeingabeKommandozentraleVerlegen(boolean symbol) {
-		return symbol ? "$8B$":messages.getString("ZugeingabeKommandozentraleVerlegen_8B");
+		return symbol ? "£8B£":messages.getString("ZugeingabeKommandozentraleVerlegen_8B");
 	}
 
 	/**
 	   * K\u00FCndigen [8C]
 	   */
 	public static String ZugeingabeKuendigen(boolean symbol) {
-		return symbol ? "$8C$":messages.getString("ZugeingabeKuendigen_8C");
+		return symbol ? "£8C£":messages.getString("ZugeingabeKuendigen_8C");
 	}
 
 	/**
 	   * Sie k\u00F6nnen maximal {0} Kampfschiffe starten. [8D]
 	   */
 	public static String ZugeingabeMaxAnzahlRaumer(boolean symbol, String arg0) {
-		return symbol ? "$8D§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeMaxAnzahlRaumer_8D"), arg0);
+		return symbol ? "£8D§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeMaxAnzahlRaumer_8D"), arg0);
 	}
 
 	/**
 	   * Mine [8E]
 	   */
 	public static String ZugeingabeMine(boolean symbol) {
-		return symbol ? "$8E$":messages.getString("ZugeingabeMine_8E");
+		return symbol ? "£8E£":messages.getString("ZugeingabeMine_8E");
 	}
 
 	/**
 	   * 250er-Mine [8F]
 	   */
 	public static String ZugeingabeMine250(boolean symbol) {
-		return symbol ? "$8F$":messages.getString("ZugeingabeMine250_8F");
+		return symbol ? "£8F£":messages.getString("ZugeingabeMine250_8F");
 	}
 
 	/**
 	   * 50er-Mine [8G]
 	   */
 	public static String ZugeingabeMine50(boolean symbol) {
-		return symbol ? "$8G$":messages.getString("ZugeingabeMine50_8G");
+		return symbol ? "£8G£":messages.getString("ZugeingabeMine50_8G");
 	}
 
 	/**
 	   * 500er-Mine [8H]
 	   */
 	public static String ZugeingabeMine500(boolean symbol) {
-		return symbol ? "$8H$":messages.getString("ZugeingabeMine500_8H");
+		return symbol ? "£8H£":messages.getString("ZugeingabeMine500_8H");
 	}
 
 	/**
 	   * Welcher Typ? [8I]
 	   */
 	public static String ZugeingabeMineTypFrage(boolean symbol) {
-		return symbol ? "$8I$":messages.getString("ZugeingabeMineTypFrage_8I");
+		return symbol ? "£8I£":messages.getString("ZugeingabeMineTypFrage_8I");
 	}
 
 	/**
 	   * Zielsektor/-planet [8J]
 	   */
 	public static String ZugeingabeMineZielsektor(boolean symbol) {
-		return symbol ? "$8J$":messages.getString("ZugeingabeMineZielsektor_8J");
+		return symbol ? "£8J£":messages.getString("ZugeingabeMineZielsektor_8J");
 	}
 
 	/**
 	   * Minenr\u00E4umer [8K]
 	   */
 	public static String ZugeingabeMinenraeumer(boolean symbol) {
-		return symbol ? "$8K$":messages.getString("ZugeingabeMinenraeumer_8K");
+		return symbol ? "£8K£":messages.getString("ZugeingabeMinenraeumer_8K");
 	}
 
 	/**
 	   * Einsatz oder Transfer? [8L]
 	   */
 	public static String ZugeingabeMissionTransferFrage(boolean symbol) {
-		return symbol ? "$8L$":messages.getString("ZugeingabeMissionTransferFrage_8L");
+		return symbol ? "£8L£":messages.getString("ZugeingabeMissionTransferFrage_8L");
 	}
 
 	/**
 	   * Momentane B\u00FCndnisstruktur [8M]
 	   */
 	public static String ZugeingabeMomentaneBuendnisstruktur(boolean symbol) {
-		return symbol ? "$8M$":messages.getString("ZugeingabeMomentaneBuendnisstruktur_8M");
+		return symbol ? "£8M£":messages.getString("ZugeingabeMomentaneBuendnisstruktur_8M");
 	}
 
 	/**
 	   * Neue B\u00FCndnisstruktur [8N]
 	   */
 	public static String ZugeingabeNeueBuendnisstruktur(boolean symbol) {
-		return symbol ? "$8N$":messages.getString("ZugeingabeNeueBuendnisstruktur_8N");
+		return symbol ? "£8N£":messages.getString("ZugeingabeNeueBuendnisstruktur_8N");
 	}
 
 	/**
 	   * So viele Kampfschiffe sind nicht verf\u00FCgbar. [8O]
 	   */
 	public static String ZugeingabeNichtGenugRaumer(boolean symbol) {
-		return symbol ? "$8O$":messages.getString("ZugeingabeNichtGenugRaumer_8O");
+		return symbol ? "£8O£":messages.getString("ZugeingabeNichtGenugRaumer_8O");
 	}
 
 	/**
 	   * Patrouille [8P]
 	   */
 	public static String ZugeingabePatrouille(boolean symbol) {
-		return symbol ? "$8P$":messages.getString("ZugeingabePatrouille_8P");
+		return symbol ? "£8P£":messages.getString("ZugeingabePatrouille_8P");
 	}
 
 	/**
 	   * Einsatz (linksdrehend) [8Q]
 	   */
 	public static String ZugeingabePatrouilleMissionLinks(boolean symbol) {
-		return symbol ? "$8Q$":messages.getString("ZugeingabePatrouilleMissionLinks_8Q");
+		return symbol ? "£8Q£":messages.getString("ZugeingabePatrouilleMissionLinks_8Q");
 	}
 
 	/**
 	   * Transfer [8R]
 	   */
 	public static String ZugeingabePatrouilleTransfer(boolean symbol) {
-		return symbol ? "$8R$":messages.getString("ZugeingabePatrouilleTransfer_8R");
+		return symbol ? "£8R£":messages.getString("ZugeingabePatrouilleTransfer_8R");
 	}
 
 	/**
 	   * Planet [8S]
 	   */
 	public static String ZugeingabePlanet(boolean symbol) {
-		return symbol ? "$8S$":messages.getString("ZugeingabePlanet_8S");
+		return symbol ? "£8S£":messages.getString("ZugeingabePlanet_8S");
 	}
 
 	/**
 	   * Dieser Planet geh\u00F6rt Ihnen nicht. [8T]
 	   */
 	public static String ZugeingabePlanetGehoertNicht(boolean symbol) {
-		return symbol ? "$8T$":messages.getString("ZugeingabePlanetGehoertNicht_8T");
+		return symbol ? "£8T£":messages.getString("ZugeingabePlanetGehoertNicht_8T");
 	}
 
 	/**
 	   * Planeteninfo [8U]
 	   */
 	public static String ZugeingabePlaneteninfo(boolean symbol) {
-		return symbol ? "$8U$":messages.getString("ZugeingabePlaneteninfo_8U");
+		return symbol ? "£8U£":messages.getString("ZugeingabePlaneteninfo_8U");
 	}
 
 	/**
 	   * Kampfschiffe [8V]
 	   */
 	public static String ZugeingabeRaumer(boolean symbol) {
-		return symbol ? "$8V$":messages.getString("ZugeingabeRaumer_8V");
+		return symbol ? "£8V£":messages.getString("ZugeingabeRaumer_8V");
 	}
 
 	/**
 	   * Spielstand an alle Spieler schicken [8W]
 	   */
 	public static String ZugeingabeSpielstandVerschicken(boolean symbol) {
-		return symbol ? "$8W$":messages.getString("ZugeingabeSpielstandVerschicken_8W");
+		return symbol ? "£8W£":messages.getString("ZugeingabeSpielstandVerschicken_8W");
 	}
 
 	/**
 	   * Die Spielz\u00FCge geh\u00F6ren nicht zu dieser Spielrunde. [8X]
 	   */
 	public static String ZugeingabeSpielzuegeFalscheRunde(boolean symbol) {
-		return symbol ? "$8X$":messages.getString("ZugeingabeSpielzuegeFalscheRunde_8X");
+		return symbol ? "£8X£":messages.getString("ZugeingabeSpielzuegeFalscheRunde_8X");
 	}
 
 	/**
 	   * Spielz\u00FCge eines Spielers importieren [8Y]
 	   */
 	public static String ZugeingabeSpielzuegeImportieren(boolean symbol) {
-		return symbol ? "$8Y$":messages.getString("ZugeingabeSpielzuegeImportieren_8Y");
+		return symbol ? "£8Y£":messages.getString("ZugeingabeSpielzuegeImportieren_8Y");
 	}
 
 	/**
 	   * Spielz\u00FCge von {0} erfolgreich importiert. [8Z]
 	   */
 	public static String ZugeingabeSpielzuegeImportiert(boolean symbol, String arg0) {
-		return symbol ? "$8Z§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeSpielzuegeImportiert_8Z"), arg0);
+		return symbol ? "£8Z§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeSpielzuegeImportiert_8Z"), arg0);
 	}
 
 	/**
 	   * Anzahl [90]
 	   */
 	public static String InventurAnzahl(boolean symbol) {
-		return symbol ? "$90$":messages.getString("InventurAnzahl_90");
+		return symbol ? "£90£":messages.getString("InventurAnzahl_90");
 	}
 
 	/**
 	   * Aufkl\u00E4rer [91]
 	   */
 	public static String InventurAufklaerer(boolean symbol) {
-		return symbol ? "$91$":messages.getString("InventurAufklaerer_91");
+		return symbol ? "£91£":messages.getString("InventurAufklaerer_91");
 	}
 
 	/**
 	   * Auf [92]
 	   */
 	public static String InventurAufklaererKurz(boolean symbol) {
-		return symbol ? "$92$":messages.getString("InventurAufklaererKurz_92");
+		return symbol ? "£92£":messages.getString("InventurAufklaererKurz_92");
 	}
 
 	/**
 	   * Besitzer [93]
 	   */
 	public static String InventurBesitzerKurz(boolean symbol) {
-		return symbol ? "$93$":messages.getString("InventurBesitzerKurz_93");
+		return symbol ? "£93£":messages.getString("InventurBesitzerKurz_93");
 	}
 
 	/**
 	   * B\u00FCndnis [94]
 	   */
 	public static String InventurBuendnis(boolean symbol) {
-		return symbol ? "$94$":messages.getString("InventurBuendnis_94");
+		return symbol ? "£94£":messages.getString("InventurBuendnis_94");
 	}
 
 	/**
 	   * B\u00FCndnis [95]
 	   */
 	public static String InventurBuendnisKurz(boolean symbol) {
-		return symbol ? "$95$":messages.getString("InventurBuendnisKurz_95");
+		return symbol ? "£95£":messages.getString("InventurBuendnisKurz_95");
 	}
 
 	/**
-	   * EPr [96]
+	   * $Pr [96]
 	   */
 	public static String InventurEnergieproduktionKurz(boolean symbol) {
-		return symbol ? "$96$":messages.getString("InventurEnergieproduktionKurz_96");
+		return symbol ? "£96£":messages.getString("InventurEnergieproduktionKurz_96");
 	}
 
 	/**
-	   * EVor [97]
+	   * $Vor [97]
 	   */
 	public static String InventurEnergievorratKurz(boolean symbol) {
-		return symbol ? "$97$":messages.getString("InventurEnergievorratKurz_97");
+		return symbol ? "£97£":messages.getString("InventurEnergievorratKurz_97");
 	}
 
 	/**
 	   * As [98]
 	   */
 	public static String InventurFestungKurz(boolean symbol) {
-		return symbol ? "$98$":messages.getString("InventurFestungKurz_98");
+		return symbol ? "£98£":messages.getString("InventurFestungKurz_98");
 	}
 
 	/**
 	   * AsKs [99]
 	   */
 	public static String InventurFestungRaumerKurz(boolean symbol) {
-		return symbol ? "$99$":messages.getString("InventurFestungRaumerKurz_99");
+		return symbol ? "£99£":messages.getString("InventurFestungRaumerKurz_99");
 	}
 
 	/**
 	   * Spielz\u00FCge wurden nicht importiert. [9A]
 	   */
 	public static String ZugeingabeSpielzuegeNichtImportiert(boolean symbol) {
-		return symbol ? "$9A$":messages.getString("ZugeingabeSpielzuegeNichtImportiert_9A");
+		return symbol ? "£9A£":messages.getString("ZugeingabeSpielzuegeNichtImportiert_9A");
 	}
 
 	/**
 	   * +++ Spielzug wurde registriert +++ [9B]
 	   */
 	public static String ZugeingabeStartErfolgreich(boolean symbol) {
-		return symbol ? "$9B$":messages.getString("ZugeingabeStartErfolgreich_9B");
+		return symbol ? "£9B£":messages.getString("ZugeingabeStartErfolgreich_9B");
 	}
 
 	/**
 	   * Startplanet [9C]
 	   */
 	public static String ZugeingabeStartplanet(boolean symbol) {
-		return symbol ? "$9C$":messages.getString("ZugeingabeStartplanet_9C");
+		return symbol ? "£9C£":messages.getString("ZugeingabeStartplanet_9C");
 	}
 
 	/**
 	   * Spielz\u00FCge eingeben [9D]
 	   */
 	public static String ZugeingabeTitel(boolean symbol) {
-		return symbol ? "$9D$":messages.getString("ZugeingabeTitel_9D");
+		return symbol ? "£9D£":messages.getString("ZugeingabeTitel_9D");
 	}
 
 	/**
 	   * Transporter [9E]
 	   */
 	public static String ZugeingabeTransporter(boolean symbol) {
-		return symbol ? "$9E$":messages.getString("ZugeingabeTransporter_9E");
+		return symbol ? "£9E£":messages.getString("ZugeingabeTransporter_9E");
 	}
 
 	/**
 	   * Undo [9F]
 	   */
 	public static String ZugeingabeUndo(boolean symbol) {
-		return symbol ? "$9F$":messages.getString("ZugeingabeUndo_9F");
+		return symbol ? "£9F£":messages.getString("ZugeingabeUndo_9F");
 	}
 
 	/**
 	   * Letzter Spielzug wurde r\u00FCckg\u00E4ngig gemacht. [9G]
 	   */
 	public static String ZugeingabeUndoErfolg(boolean symbol) {
-		return symbol ? "$9G$":messages.getString("ZugeingabeUndoErfolg_9G");
+		return symbol ? "£9G£":messages.getString("ZugeingabeUndoErfolg_9G");
 	}
 
 	/**
 	   * Letzten Spielzug r\u00FCckg\u00E4ngig machen? [9H]
 	   */
 	public static String ZugeingabeUndoFrage(boolean symbol) {
-		return symbol ? "$9H$":messages.getString("ZugeingabeUndoFrage_9H");
+		return symbol ? "£9H£":messages.getString("ZugeingabeUndoFrage_9H");
 	}
 
 	/**
 	   * Folgende Spieler m\u00FCssen noch ihre Spielz\u00FCge eingeben: [9I]
 	   */
 	public static String ZugeingabeWartenAufSpielzuege(boolean symbol) {
-		return symbol ? "$9I$":messages.getString("ZugeingabeWartenAufSpielzuege_9I");
+		return symbol ? "£9I£":messages.getString("ZugeingabeWartenAufSpielzuege_9I");
 	}
 
 	/**
-	   * Wieviele Energieeinheiten (max. {0})? [9J]
+	   * Wieviele $ (max. {0})? [9J]
 	   */
 	public static String ZugeingabeWievieleEe(boolean symbol, String arg0) {
-		return symbol ? "$9J§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeWievieleEe_9J"), arg0);
+		return symbol ? "£9J§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeWievieleEe_9J"), arg0);
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie einen 100er-Minenleger schicken? [9K]
 	   */
 	public static String ZugeingabeWohin100erMine(boolean symbol) {
-		return symbol ? "$9K$":messages.getString("ZugeingabeWohin100erMine_9K");
+		return symbol ? "£9K£":messages.getString("ZugeingabeWohin100erMine_9K");
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie einen 250er-Minenleger schicken? [9L]
 	   */
 	public static String ZugeingabeWohin250erMine(boolean symbol) {
-		return symbol ? "$9L$":messages.getString("ZugeingabeWohin250erMine_9L");
+		return symbol ? "£9L£":messages.getString("ZugeingabeWohin250erMine_9L");
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie einen 500er-Minenleger schicken? [9M]
 	   */
 	public static String ZugeingabeWohin500erMine(boolean symbol) {
-		return symbol ? "$9M$":messages.getString("ZugeingabeWohin500erMine_9M");
+		return symbol ? "£9M£":messages.getString("ZugeingabeWohin500erMine_9M");
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie einen 50er-Minenleger schicken? [9N]
 	   */
 	public static String ZugeingabeWohin50erMine(boolean symbol) {
-		return symbol ? "$9N$":messages.getString("ZugeingabeWohin50erMine_9N");
+		return symbol ? "£9N£":messages.getString("ZugeingabeWohin50erMine_9N");
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie einen Aufkl\u00E4rer schicken? [9O]
 	   */
 	public static String ZugeingabeWohinAufklaerer(boolean symbol) {
-		return symbol ? "$9O$":messages.getString("ZugeingabeWohinAufklaerer_9O");
+		return symbol ? "£9O£":messages.getString("ZugeingabeWohinAufklaerer_9O");
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie einen Minenr\u00E4umer schicken? [9P]
 	   */
 	public static String ZugeingabeWohinMinenraumer(boolean symbol) {
-		return symbol ? "$9P$":messages.getString("ZugeingabeWohinMinenraumer_9P");
+		return symbol ? "£9P£":messages.getString("ZugeingabeWohinMinenraumer_9P");
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie eine Patrouille schicken? [9Q]
 	   */
 	public static String ZugeingabeWohinPatrouille(boolean symbol) {
-		return symbol ? "$9Q$":messages.getString("ZugeingabeWohinPatrouille_9Q");
+		return symbol ? "£9Q£":messages.getString("ZugeingabeWohinPatrouille_9Q");
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie {0} Kampfschiffe schicken? [9R]
 	   */
 	public static String ZugeingabeWohinRaumer(boolean symbol, String arg0) {
-		return symbol ? "$9R§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeWohinRaumer_9R"), arg0);
+		return symbol ? "£9R§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeWohinRaumer_9R"), arg0);
 	}
 
 	/**
 	   * Auf welchen Planeten m\u00F6chten Sie einen Transporter schicken? [9S]
 	   */
 	public static String ZugeingabeWohinTransporter(boolean symbol) {
-		return symbol ? "$9S$":messages.getString("ZugeingabeWohinTransporter_9S");
+		return symbol ? "£9S£":messages.getString("ZugeingabeWohinTransporter_9S");
 	}
 
 	/**
 	   * Zielplanet [9T]
 	   */
 	public static String ZugeingabeZielplanet(boolean symbol) {
-		return symbol ? "$9T$":messages.getString("ZugeingabeZielplanet_9T");
+		return symbol ? "£9T£":messages.getString("ZugeingabeZielplanet_9T");
 	}
 
 	/**
 	   * Das ist der Startplanet. W\u00E4hlen Sie einen anderen Planeten. [9U]
 	   */
 	public static String ZugeingabeZielplanetIstStartplanet(boolean symbol) {
-		return symbol ? "$9U$":messages.getString("ZugeingabeZielplanetIstStartplanet_9U");
+		return symbol ? "£9U£":messages.getString("ZugeingabeZielplanetIstStartplanet_9U");
 	}
 
 	/**
-	   * So viel Energie k\u00F6nnen Sie nicht transportieren. [9V]
+	   * So viele $ k\u00F6nnen Sie nicht transportieren. [9V]
 	   */
 	public static String ZugeingabeZuVielEe(boolean symbol) {
-		return symbol ? "$9V$":messages.getString("ZugeingabeZuVielEe_9V");
+		return symbol ? "£9V£":messages.getString("ZugeingabeZuVielEe_9V");
 	}
 
 	/**
 	   * Sie m\u00FCssen erst alle Ihre Kampfschiffe abziehen, bevor Sie k\u00FCndigen k\u00F6nnen. [9W]
 	   */
 	public static String ZugeingabeZuerstKuendigen(boolean symbol) {
-		return symbol ? "$9W$":messages.getString("ZugeingabeZuerstKuendigen_9W");
+		return symbol ? "£9W£":messages.getString("ZugeingabeZuerstKuendigen_9W");
 	}
 
 	/**
 	   * Zuf\u00E4lliger Spieler [9X]
 	   */
 	public static String ZugeingabeZufaelligerSpieler(boolean symbol) {
-		return symbol ? "$9X$":messages.getString("ZugeingabeZufaelligerSpieler_9X");
+		return symbol ? "£9X£":messages.getString("ZugeingabeZufaelligerSpieler_9X");
 	}
 
 	/**
 	   * Zur\u00FCck [9Y]
 	   */
 	public static String Zurueck(boolean symbol) {
-		return symbol ? "$9Y$":messages.getString("Zurueck_9Y");
+		return symbol ? "£9Y£":messages.getString("Zurueck_9Y");
 	}
 
 	/**
 	   * Auswertung [9Z]
 	   */
 	public static String Auswertung(boolean symbol) {
-		return symbol ? "$9Z$":messages.getString("Auswertung_9Z");
+		return symbol ? "£9Z£":messages.getString("Auswertung_9Z");
 	}
 
 	/**
 	   * Keine Verbindung mit Server {0} [AA]
 	   */
 	public static String ClientSettingsJDialogKeineVerbindung2(boolean symbol, String arg0) {
-		return symbol ? "$AA§"+arg0+"$":MessageFormat.format(messages.getString("ClientSettingsJDialogKeineVerbindung2_AA"), arg0);
+		return symbol ? "£AA§"+arg0+"£":MessageFormat.format(messages.getString("ClientSettingsJDialogKeineVerbindung2_AA"), arg0);
 	}
 
 	/**
 	   * Min. [AB]
 	   */
 	public static String StatistikMinuten(boolean symbol) {
-		return symbol ? "$AB$":messages.getString("StatistikMinuten_AB");
+		return symbol ? "£AB£":messages.getString("StatistikMinuten_AB");
 	}
 
 	/**
 	   * Sie d\u00FCrfen '0' nicht mit anderen Eingaben kombinieren. [AC]
 	   */
 	public static String ZugeingabeBuendnis0NichtKombinieren(boolean symbol) {
-		return symbol ? "$AC$":messages.getString("ZugeingabeBuendnis0NichtKombinieren_AC");
+		return symbol ? "£AC£":messages.getString("ZugeingabeBuendnis0NichtKombinieren_AC");
 	}
 
 	/**
 	   * Keine Spielz\u00FCge vorhanden. M\u00F6chten Sie die Zugeingabe ganz abbrechen? [AD]
 	   */
 	public static String ZugeingabeKeineSpielzuegeAbbrechen(boolean symbol) {
-		return symbol ? "$AD$":messages.getString("ZugeingabeKeineSpielzuegeAbbrechen_AD");
+		return symbol ? "£AD£":messages.getString("ZugeingabeKeineSpielzuegeAbbrechen_AD");
 	}
 
 	/**
 	   * 100er-Mine [AE]
 	   */
 	public static String ZugeingabeMine100(boolean symbol) {
-		return symbol ? "$AE$":messages.getString("ZugeingabeMine100_AE");
+		return symbol ? "£AE£":messages.getString("ZugeingabeMine100_AE");
 	}
 
 	/**
 	   * \u00C4nderungen an den Server schicken [AF]
 	   */
 	public static String ServerAdminAnDenSeverSchicken(boolean symbol) {
-		return symbol ? "$AF$":messages.getString("ServerAdminAnDenSeverSchicken_AF");
+		return symbol ? "£AF£":messages.getString("ServerAdminAnDenSeverSchicken_AF");
 	}
 
 	/**
 	   * User-ID [AG]
 	   */
 	public static String UserId(boolean symbol) {
-		return symbol ? "$AG$":messages.getString("UserId_AG");
+		return symbol ? "£AG£":messages.getString("UserId_AG");
 	}
 
 	/**
 	   * Name [AH]
 	   */
 	public static String Name(boolean symbol) {
-		return symbol ? "$AH$":messages.getString("Name_AH");
+		return symbol ? "£AH£":messages.getString("Name_AH");
 	}
 
 	/**
 	   * User [AI]
 	   */
 	public static String ServerAdminSpieler(boolean symbol) {
-		return symbol ? "$AI$":messages.getString("ServerAdminSpieler_AI");
+		return symbol ? "£AI£":messages.getString("ServerAdminSpieler_AI");
 	}
 
 	/**
 	   * Server herunterfahren [AJ]
 	   */
 	public static String ServerAdminShutdown(boolean symbol) {
-		return symbol ? "$AJ$":messages.getString("ServerAdminShutdown_AJ");
+		return symbol ? "£AJ£":messages.getString("ServerAdminShutdown_AJ");
 	}
 
 	/**
 	   * Datei [AK]
 	   */
 	public static String ServerAdminDatei(boolean symbol) {
-		return symbol ? "$AK$":messages.getString("ServerAdminDatei_AK");
+		return symbol ? "£AK£":messages.getString("ServerAdminDatei_AK");
 	}
 
 	/**
 	   * Server-URL [AL]
 	   */
 	public static String ServerAdminUrl(boolean symbol) {
-		return symbol ? "$AL$":messages.getString("ServerAdminUrl_AL");
+		return symbol ? "£AL£":messages.getString("ServerAdminUrl_AL");
 	}
 
 	/**
 	   * Server-Port [AM]
 	   */
 	public static String ServerAdminPort(boolean symbol) {
-		return symbol ? "$AM$":messages.getString("ServerAdminPort_AM");
+		return symbol ? "£AM£":messages.getString("ServerAdminPort_AM");
 	}
 
 	/**
 	   * Verbindungstest [AN]
 	   */
 	public static String ServerAdminVerbindungstest(boolean symbol) {
-		return symbol ? "$AN$":messages.getString("ServerAdminVerbindungstest_AN");
+		return symbol ? "£AN£":messages.getString("ServerAdminVerbindungstest_AN");
 	}
 
 	/**
 	   * Admin-Authentifizierung [AO]
 	   */
 	public static String ServerAdminAdminAuth(boolean symbol) {
-		return symbol ? "$AO$":messages.getString("ServerAdminAdminAuth_AO");
+		return symbol ? "£AO£":messages.getString("ServerAdminAdminAuth_AO");
 	}
 
 	/**
 	   * Die Datei {0}\nenth\u00E4lt keine g\u00FCltigen Anmeldedaten. [AP]
 	   */
 	public static String UngueltigeAnmeldedaten(boolean symbol, String arg0) {
-		return symbol ? "$AP§"+arg0+"$":MessageFormat.format(messages.getString("UngueltigeAnmeldedaten_AP"), arg0);
+		return symbol ? "£AP§"+arg0+"£":MessageFormat.format(messages.getString("UngueltigeAnmeldedaten_AP"), arg0);
 	}
 
 	/**
 	   * Verbindung erfolgreich [AQ]
 	   */
 	public static String VerbindungErfolgreich(boolean symbol) {
-		return symbol ? "$AQ$":messages.getString("VerbindungErfolgreich_AQ");
+		return symbol ? "£AQ£":messages.getString("VerbindungErfolgreich_AQ");
 	}
 
 	/**
 	   * Verbindung nicht erfolgreich [AR]
 	   */
 	public static String VerbindungNichtErfolgreich(boolean symbol) {
-		return symbol ? "$AR$":messages.getString("VerbindungNichtErfolgreich_AR");
+		return symbol ? "£AR£":messages.getString("VerbindungNichtErfolgreich_AR");
 	}
 
 	/**
 	   * M\u00F6chten Sie den User [{0}] wirklich anlegen? [AS]
 	   */
 	public static String ServerAdminBenutzerAnlegenFrage(boolean symbol, String arg0) {
-		return symbol ? "$AS§"+arg0+"$":MessageFormat.format(messages.getString("ServerAdminBenutzerAnlegenFrage_AS"), arg0);
+		return symbol ? "£AS§"+arg0+"£":MessageFormat.format(messages.getString("ServerAdminBenutzerAnlegenFrage_AS"), arg0);
 	}
 
 	/**
 	   * M\u00F6chten Sie den STERN-Server herunterfahren? [AT]
 	   */
 	public static String ServerAdminShutdownFrage(boolean symbol) {
-		return symbol ? "$AT$":messages.getString("ServerAdminShutdownFrage_AT");
+		return symbol ? "£AT£":messages.getString("ServerAdminShutdownFrage_AT");
 	}
 
 	/**
 	   * Sind Sie wirklich sicher? [AU]
 	   */
 	public static String AreYouSure(boolean symbol) {
-		return symbol ? "$AU$":messages.getString("AreYouSure_AU");
+		return symbol ? "£AU£":messages.getString("AreYouSure_AU");
 	}
 
 	/**
 	   * Der STERN-Server wird jetzt heruntergefahren... [AV]
 	   */
 	public static String ServerAdminShutdownDone(boolean symbol) {
-		return symbol ? "$AV$":messages.getString("ServerAdminShutdownDone_AV");
+		return symbol ? "£AV£":messages.getString("ServerAdminShutdownDone_AV");
 	}
 
 	/**
 	   * Verbindungsfehler [AW]
 	   */
 	public static String Verbindungsfehler(boolean symbol) {
-		return symbol ? "$AW$":messages.getString("Verbindungsfehler_AW");
+		return symbol ? "£AW£":messages.getString("Verbindungsfehler_AW");
 	}
 
 	/**
 	   * (Keine Datei ausgew\u00E4hlt) [AX]
 	   */
 	public static String KeineDateiAusgewaehlt(boolean symbol) {
-		return symbol ? "$AX$":messages.getString("KeineDateiAusgewaehlt_AX");
+		return symbol ? "£AX£":messages.getString("KeineDateiAusgewaehlt_AX");
 	}
 
 	/**
 	   * Server-Zugangsdaten [AY]
 	   */
 	public static String ServerZugangsdaten(boolean symbol) {
-		return symbol ? "$AY$":messages.getString("ServerZugangsdaten_AY");
+		return symbol ? "£AY£":messages.getString("ServerZugangsdaten_AY");
 	}
 
 	/**
 	   * Sie haben noch keine Server-Zugangsdaten hinterlegt. [AZ]
 	   */
 	public static String ServerZugangsdatenNichtHinterlegt(boolean symbol) {
-		return symbol ? "$AZ$":messages.getString("ServerZugangsdatenNichtHinterlegt_AZ");
+		return symbol ? "£AZ£":messages.getString("ServerZugangsdatenNichtHinterlegt_AZ");
 	}
 
 	/**
 	   * Serverbasierte Spiele (Spieler {0}) [BA]
 	   */
 	public static String ServerbasierteSpiele(boolean symbol, String arg0) {
-		return symbol ? "$BA§"+arg0+"$":MessageFormat.format(messages.getString("ServerbasierteSpiele_BA"), arg0);
+		return symbol ? "£BA§"+arg0+"£":MessageFormat.format(messages.getString("ServerbasierteSpiele_BA"), arg0);
 	}
 
 	/**
 	   * STERN-Server verwalten [BB]
 	   */
 	public static String SternServerVerwalten(boolean symbol) {
-		return symbol ? "$BB$":messages.getString("SternServerVerwalten_BB");
+		return symbol ? "£BB£":messages.getString("SternServerVerwalten_BB");
 	}
 
 	/**
 	   * Verbunden mit dem STERN-Server {0}:{1} als Benutzer {2} [BC]
 	   */
 	public static String VerbundenMitServer(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$BC§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("VerbundenMitServer_BC"), arg0, arg1, arg2);
+		return symbol ? "£BC§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("VerbundenMitServer_BC"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * Mitspieler warten auf Ihre Zugeingaben [BD]
 	   */
 	public static String MitspielerWarten(boolean symbol) {
-		return symbol ? "$BD$":messages.getString("MitspielerWarten_BD");
+		return symbol ? "£BD£":messages.getString("MitspielerWarten_BD");
 	}
 
 	/**
 	   * [STERN] Ihr neuer User [{0}] [BE]
 	   */
 	public static String EmailSubjectNeuerUser(boolean symbol, String arg0) {
-		return symbol ? "$BE§"+arg0+"$":MessageFormat.format(messages.getString("EmailSubjectNeuerUser_BE"), arg0);
+		return symbol ? "£BE§"+arg0+"£":MessageFormat.format(messages.getString("EmailSubjectNeuerUser_BE"), arg0);
 	}
 
 	/**
 	   * Hallo {0},\n\nwillkommen bei STERN! Ihr neuer User [{1}] auf dem Server {2}:{3} ist angelegt und muss nur noch aktiviert werden.\n\nBitte f\u00FChren Sie dazu folgende Schritte aus:\n\n1. Markieren Sie diesen gesamten E-Mail-Text (z.B. mit Strg + A) und kopieren Sie ihn in die Zwischenablage Ihres Rechners (z.B. mit Strg + C).\n\n2. Starten Sie STERN und w\u00E4hlen Sie "Spiel -> Server-Zugangsdaten...".\n\n3. Setzen Sie das H\u00E4kchen bei "Serververbindung -> Aktivieren"\n\n4. Dr\u00FCcken Sie den Knopf "Benutzer aktivieren" und f\u00FCgen Sie den Inhalt der Zwischenablage in das gro\u00DFe Textfeld ein.\n\n5. Geben Sie das Passwort ein, dass Ihnen vom Spielleiter mitgeteilt wurde.\n\n6. Dr\u00FCcken Sie den Knopf "OK". W\u00E4hlen Sie einen Speicherort f\u00FCr die Datei mir den Zugangsdaten aus.\n\nIhr Benutzer ist nun aktiviert, und Ihre Benutzerdaten sind  in STERN hinterlegt.\n\nViel Spa\u00DF beim Spielen!\nIhr Spielleiter [BF]
 	   */
 	public static String NeuerUserEMailBody(boolean symbol, String arg0, String arg1, String arg2, String arg3) {
-		return symbol ? "$BF§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"$":MessageFormat.format(messages.getString("NeuerUserEMailBody_BF"), arg0, arg1, arg2, arg3);
+		return symbol ? "£BF§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"£":MessageFormat.format(messages.getString("NeuerUserEMailBody_BF"), arg0, arg1, arg2, arg3);
 	}
 
 	/**
 	   * Serververbindung [BG]
 	   */
 	public static String Serververbindung(boolean symbol) {
-		return symbol ? "$BG$":messages.getString("Serververbindung_BG");
+		return symbol ? "£BG£":messages.getString("Serververbindung_BG");
 	}
 
 	/**
 	   * Aktivieren [BH]
 	   */
 	public static String Aktivieren(boolean symbol) {
-		return symbol ? "$BH$":messages.getString("Aktivieren_BH");
+		return symbol ? "£BH£":messages.getString("Aktivieren_BH");
 	}
 
 	/**
 	   * Benutzer aktivieren [BI]
 	   */
 	public static String BenutzerAktivieren(boolean symbol) {
-		return symbol ? "$BI$":messages.getString("BenutzerAktivieren_BI");
+		return symbol ? "£BI£":messages.getString("BenutzerAktivieren_BI");
 	}
 
 	/**
 	   * M\u00F6chten Sie Ihren Benutzer [{0}] auf dem Server\n{1}:{2} aktivieren?\nW\u00E4hlen Sie im folgenden Dialog den Ablageort\nf\u00FCr die Authentifizierungsdatei. [BJ]
 	   */
 	public static String BenutzerAktivierenFrage(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$BJ§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("BenutzerAktivierenFrage_BJ"), arg0, arg1, arg2);
+		return symbol ? "£BJ§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("BenutzerAktivierenFrage_BJ"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * Authentifizierungsdatei abspeichern [BK]
 	   */
 	public static String BenutzerAktivierenAbspeichern(boolean symbol) {
-		return symbol ? "$BK$":messages.getString("BenutzerAktivierenAbspeichern_BK");
+		return symbol ? "£BK£":messages.getString("BenutzerAktivierenAbspeichern_BK");
 	}
 
 	/**
 	   * Der Benutzer wurde erfolgreich aktiviert. [BL]
 	   */
 	public static String BenutzerAktivierenErfolg(boolean symbol) {
-		return symbol ? "$BL$":messages.getString("BenutzerAktivierenErfolg_BL");
+		return symbol ? "£BL£":messages.getString("BenutzerAktivierenErfolg_BL");
 	}
 
 	/**
 	   * Spieler warten auf mich [BM]
 	   */
 	public static String ServerGamesSpielerWarten(boolean symbol) {
-		return symbol ? "$BM$":messages.getString("ServerGamesSpielerWarten_BM");
+		return symbol ? "£BM£":messages.getString("ServerGamesSpielerWarten_BM");
 	}
 
 	/**
 	   * Ich warte auf andere Spieler [BN]
 	   */
 	public static String ServerGamesIchWarte(boolean symbol) {
-		return symbol ? "$BN$":messages.getString("ServerGamesIchWarte_BN");
+		return symbol ? "£BN£":messages.getString("ServerGamesIchWarte_BN");
 	}
 
 	/**
 	   * Beendete Spiele [BO]
 	   */
 	public static String ServerGamesBeendeteSpiele(boolean symbol) {
-		return symbol ? "$BO$":messages.getString("ServerGamesBeendeteSpiele_BO");
+		return symbol ? "£BO£":messages.getString("ServerGamesBeendeteSpiele_BO");
 	}
 
 	/**
 	   * Neues Spiel [BP]
 	   */
 	public static String ServerGamesNeuesSpiel(boolean symbol) {
-		return symbol ? "$BP$":messages.getString("ServerGamesNeuesSpiel_BP");
+		return symbol ? "£BP£":messages.getString("ServerGamesNeuesSpiel_BP");
 	}
 
 	/**
 	   * Neues Spielfeld [BQ]
 	   */
 	public static String ServerGamesNeuesSpielfeld(boolean symbol) {
-		return symbol ? "$BQ$":messages.getString("ServerGamesNeuesSpielfeld_BQ");
+		return symbol ? "£BQ£":messages.getString("ServerGamesNeuesSpielfeld_BQ");
 	}
 
 	/**
 	   * Spiel ver\u00F6ffentlichen [BR]
 	   */
 	public static String ServerGamesSubmit(boolean symbol) {
-		return symbol ? "$BR$":messages.getString("ServerGamesSubmit_BR");
+		return symbol ? "£BR£":messages.getString("ServerGamesSubmit_BR");
 	}
 
 	/**
 	   * Sie m\u00FCssen allen Spielern Namen zuweisen. [BS]
 	   */
 	public static String ServerGamesSubmitNamenZuweisen(boolean symbol) {
-		return symbol ? "$BS$":messages.getString("ServerGamesSubmitNamenZuweisen_BS");
+		return symbol ? "£BS£":messages.getString("ServerGamesSubmitNamenZuweisen_BS");
 	}
 
 	/**
 	   * M\u00F6chten Sie das neue Spiel [{0}] wirklich auf dem Server ver\u00F6ffentlichen? [BT]
 	   */
 	public static String ServerGamesSubmitFrage(boolean symbol, String arg0) {
-		return symbol ? "$BT§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesSubmitFrage_BT"), arg0);
+		return symbol ? "£BT§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesSubmitFrage_BT"), arg0);
 	}
 
 	/**
 	   * Das neue Spiel [{0}] wurde auf dem Server angelegt. [BU]
 	   */
 	public static String ServerGamesSubmitAngelegt(boolean symbol, String arg0) {
-		return symbol ? "$BU§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesSubmitAngelegt_BU"), arg0);
+		return symbol ? "£BU§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesSubmitAngelegt_BU"), arg0);
 	}
 
 	/**
 	   * Spiel laden [BV]
 	   */
 	public static String ServerGamesLaden(boolean symbol) {
-		return symbol ? "$BV$":messages.getString("ServerGamesLaden_BV");
+		return symbol ? "£BV£":messages.getString("ServerGamesLaden_BV");
 	}
 
 	/**
 	   * {0} Spieler, {1} Planeten [BW]
 	   */
 	public static String ServerGamesSpielerPlaneten(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$BW§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerGamesSpielerPlaneten_BW"), arg0, arg1);
+		return symbol ? "£BW§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("ServerGamesSpielerPlaneten_BW"), arg0, arg1);
 	}
 
 	/**
 	   * Beginn: {0} [BY]
 	   */
 	public static String ServerGamesBegonnen(boolean symbol, String arg0) {
-		return symbol ? "$BY§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesBegonnen_BY"), arg0);
+		return symbol ? "£BY§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesBegonnen_BY"), arg0);
 	}
 
 	/**
 	   * Spielname [BZ]
 	   */
 	public static String ServerGamesSpielname(boolean symbol) {
-		return symbol ? "$BZ$":messages.getString("ServerGamesSpielname_BZ");
+		return symbol ? "£BZ£":messages.getString("ServerGamesSpielname_BZ");
 	}
 
 	/**
 	   * Willkommen beim Einrichten des STERN-Servers! [CA]
 	   */
 	public static String ServerWillkommen(boolean symbol) {
-		return symbol ? "$CA$":messages.getString("ServerWillkommen_CA");
+		return symbol ? "£CA£":messages.getString("ServerWillkommen_CA");
 	}
 
 	/**
 	   * voreingestellt [CB]
 	   */
 	public static String ServerVoreingestellt(boolean symbol) {
-		return symbol ? "$CB$":messages.getString("ServerVoreingestellt_CB");
+		return symbol ? "£CB£":messages.getString("ServerVoreingestellt_CB");
 	}
 
 	/**
 	   * E-Mail-Adresse des Admins [CC]
 	   */
 	public static String ServerEmailAdmin(boolean symbol) {
-		return symbol ? "$CC$":messages.getString("ServerEmailAdmin_CC");
+		return symbol ? "£CC£":messages.getString("ServerEmailAdmin_CC");
 	}
 
 	/**
 	   * Sind alle Angaben richtig? Ja = [1]/ Nein = [andere Taste] [CD]
 	   */
 	public static String ServerInitConfirm(boolean symbol) {
-		return symbol ? "$CD$":messages.getString("ServerInitConfirm_CD");
+		return symbol ? "£CD£":messages.getString("ServerInitConfirm_CD");
 	}
 
 	/**
 	   * Einrichten des Servers abgebrochen. Programmende. [CE]
 	   */
 	public static String ServerInitAbort(boolean symbol) {
-		return symbol ? "$CE$":messages.getString("ServerInitAbort_CE");
+		return symbol ? "£CE£":messages.getString("ServerInitAbort_CE");
 	}
 
 	/**
 	   * Starte Server... [CF]
 	   */
 	public static String ServerStarting(boolean symbol) {
-		return symbol ? "$CF$":messages.getString("ServerStarting_CF");
+		return symbol ? "£CF£":messages.getString("ServerStarting_CF");
 	}
 
 	/**
 	   * STERN-Server auf Port {0} gestartet [CG]
 	   */
 	public static String ServerStarted(boolean symbol, String arg0) {
-		return symbol ? "$CG§"+arg0+"$":MessageFormat.format(messages.getString("ServerStarted_CG"), arg0);
+		return symbol ? "£CG§"+arg0+"£":MessageFormat.format(messages.getString("ServerStarted_CG"), arg0);
 	}
 
 	/**
 	   * STERN-Server auf Port {0} kann nicht gestartet werden. Wahrscheinlich ist der Port belegt. Programmende. [CH]
 	   */
 	public static String ServerNotStarted(boolean symbol, String arg0) {
-		return symbol ? "$CH§"+arg0+"$":MessageFormat.format(messages.getString("ServerNotStarted_CH"), arg0);
+		return symbol ? "£CH§"+arg0+"£":MessageFormat.format(messages.getString("ServerNotStarted_CH"), arg0);
 	}
 
 	/**
 	   * Warte auf eingehende Verbindung... [CI]
 	   */
 	public static String ServerWaiting(boolean symbol) {
-		return symbol ? "$CI$":messages.getString("ServerWaiting_CI");
+		return symbol ? "£CI£":messages.getString("ServerWaiting_CI");
 	}
 
 	/**
 	   * Eingehende Verbindung von Client IP {0}. Thread {1} wird gestartet. [CJ]
 	   */
 	public static String ServerIncomingConnection(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$CJ§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerIncomingConnection_CJ"), arg0, arg1);
+		return symbol ? "£CJ§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("ServerIncomingConnection_CJ"), arg0, arg1);
 	}
 
 	/**
 	   * Schlie\u00DFe Server-Socket. [CK]
 	   */
 	public static String ServerISocketClose(boolean symbol) {
-		return symbol ? "$CK$":messages.getString("ServerISocketClose_CK");
+		return symbol ? "£CK£":messages.getString("ServerISocketClose_CK");
 	}
 
 	/**
 	   * Datei {0} angelegt. [CL]
 	   */
 	public static String ServerIDateiAngelegt(boolean symbol, String arg0) {
-		return symbol ? "$CL§"+arg0+"$":MessageFormat.format(messages.getString("ServerIDateiAngelegt_CL"), arg0);
+		return symbol ? "£CL§"+arg0+"£":MessageFormat.format(messages.getString("ServerIDateiAngelegt_CL"), arg0);
 	}
 
 	/**
 	   * Datum [CM]
 	   */
 	public static String ServerILogDatum(boolean symbol) {
-		return symbol ? "$CM$":messages.getString("ServerILogDatum_CM");
+		return symbol ? "£CM£":messages.getString("ServerILogDatum_CM");
 	}
 
 	/**
 	   * Event ID [CN]
 	   */
 	public static String ServerILogEventId(boolean symbol) {
-		return symbol ? "$CN$":messages.getString("ServerILogEventId_CN");
+		return symbol ? "£CN£":messages.getString("ServerILogEventId_CN");
 	}
 
 	/**
 	   * Thread ID [CO]
 	   */
 	public static String ServerILogThreadId(boolean symbol) {
-		return symbol ? "$CO$":messages.getString("ServerILogThreadId_CO");
+		return symbol ? "£CO£":messages.getString("ServerILogThreadId_CO");
 	}
 
 	/**
 	   * Level [CP]
 	   */
 	public static String ServerILogLevel(boolean symbol) {
-		return symbol ? "$CP$":messages.getString("ServerILogLevel_CP");
+		return symbol ? "£CP£":messages.getString("ServerILogLevel_CP");
 	}
 
 	/**
 	   * Meldung [CQ]
 	   */
 	public static String ServerILogMeldung(boolean symbol) {
-		return symbol ? "$CQ$":messages.getString("ServerILogMeldung_CQ");
+		return symbol ? "£CQ£":messages.getString("ServerILogMeldung_CQ");
 	}
 
 	/**
 	   * Anmeldungsversuch mit ung\u00FCltiger Benutzernamenl\u00E4nge {0} [CR]
 	   */
 	public static String ServerErrorUngueltigeLaengeBenutzer(boolean symbol, String arg0) {
-		return symbol ? "$CR§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorUngueltigeLaengeBenutzer_CR"), arg0);
+		return symbol ? "£CR§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorUngueltigeLaengeBenutzer_CR"), arg0);
 	}
 
 	/**
 	   * Eingehender Request von User {0} [CS]
 	   */
 	public static String ServerBenutzer(boolean symbol, String arg0) {
-		return symbol ? "$CS§"+arg0+"$":MessageFormat.format(messages.getString("ServerBenutzer_CS"), arg0);
+		return symbol ? "£CS§"+arg0+"£":MessageFormat.format(messages.getString("ServerBenutzer_CS"), arg0);
 	}
 
 	/**
 	   * Anmeldungsversuch mit ung\u00FCltigem Benutzer [{0}] [CT]
 	   */
 	public static String ServerErrorUngueltigerBenutzer(boolean symbol, String arg0) {
-		return symbol ? "$CT§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorUngueltigerBenutzer_CT"), arg0);
+		return symbol ? "£CT§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorUngueltigerBenutzer_CT"), arg0);
 	}
 
 	/**
 	   * Fehler beim Empfangen des Requests: {0} [CU]
 	   */
 	public static String ServerErrorRequestReceive(boolean symbol, String arg0) {
-		return symbol ? "$CU§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorRequestReceive_CU"), arg0);
+		return symbol ? "£CU§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorRequestReceive_CU"), arg0);
 	}
 
 	/**
 	   * Fehler beim Senden der Responsenachricht: {0} [CV]
 	   */
 	public static String ServerErrorSendResponse(boolean symbol, String arg0) {
-		return symbol ? "$CV§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorSendResponse_CV"), arg0);
+		return symbol ? "£CV§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorSendResponse_CV"), arg0);
 	}
 
 	/**
 	   * Falscher Token. Authorisierung fehlgeschlagen. [CW]
 	   */
 	public static String ServerErrorNichtAuthorisiert(boolean symbol) {
-		return symbol ? "$CW$":messages.getString("ServerErrorNichtAuthorisiert_CW");
+		return symbol ? "£CW£":messages.getString("ServerErrorNichtAuthorisiert_CW");
 	}
 
 	/**
 	   * Fehler beim Entschl\u00FCsseln der Requestnachricht: {0} [CX]
 	   */
 	public static String ServerErrorDecode(boolean symbol, String arg0) {
-		return symbol ? "$CX§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorDecode_CX"), arg0);
+		return symbol ? "£CX§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorDecode_CX"), arg0);
 	}
 
 	/**
 	   * Request-Nachricht vom Typ {0} von User {1} [CY]
 	   */
 	public static String ServerInfoMessageType(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$CY§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerInfoMessageType_CY"), arg0, arg1);
+		return symbol ? "£CY§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("ServerInfoMessageType_CY"), arg0, arg1);
 	}
 
 	/**
 	   * Client-Verbindung IP {0} wird geschlossen. [CZ]
 	   */
 	public static String ServerInfoClientClosing(boolean symbol, String arg0) {
-		return symbol ? "$CZ§"+arg0+"$":MessageFormat.format(messages.getString("ServerInfoClientClosing_CZ"), arg0);
+		return symbol ? "£CZ§"+arg0+"£":MessageFormat.format(messages.getString("ServerInfoClientClosing_CZ"), arg0);
 	}
 
 	/**
 	   * Fehler beim Schliessen der Socketverbindung: {0} [DA]
 	   */
 	public static String ServerErrorClientClosing(boolean symbol, String arg0) {
-		return symbol ? "$DA§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorClientClosing_DA"), arg0);
+		return symbol ? "£DA§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorClientClosing_DA"), arg0);
 	}
 
 	/**
 	   * Thread wird beendet. [DB]
 	   */
 	public static String ServerThreadClosing(boolean symbol) {
-		return symbol ? "$DB$":messages.getString("ServerThreadClosing_DB");
+		return symbol ? "£DB£":messages.getString("ServerThreadClosing_DB");
 	}
 
 	/**
 	   * Sie sind als Benutzer [{0}] nicht authorisiert, diese Aktion auszuf\u00FChren. [DC]
 	   */
 	public static String ServerErrorNotAuthorized(boolean symbol, String arg0) {
-		return symbol ? "$DC§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorNotAuthorized_DC"), arg0);
+		return symbol ? "£DC§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorNotAuthorized_DC"), arg0);
 	}
 
 	/**
 	   * Der User [{0}] nimmt nicht an diesem Spiel teil. [DD]
 	   */
 	public static String ServerErrorSpielerNimmNichtTeil(boolean symbol, String arg0) {
-		return symbol ? "$DD§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorSpielerNimmNichtTeil_DD"), arg0);
+		return symbol ? "£DD§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorSpielerNimmNichtTeil_DD"), arg0);
 	}
 
 	/**
 	   * Das Spiel [{0}] existiert nicht! [DE]
 	   */
 	public static String ServerErrorSpielExistiertNicht(boolean symbol, String arg0) {
-		return symbol ? "$DE§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorSpielExistiertNicht_DE"), arg0);
+		return symbol ? "£DE§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorSpielExistiertNicht_DE"), arg0);
 	}
 
 	/**
 	   * Userdaten sind unvollst\u00E4ndig. [DF]
 	   */
 	public static String ServerErrorAdminNeuerUser(boolean symbol) {
-		return symbol ? "$DF$":messages.getString("ServerErrorAdminNeuerUser_DF");
+		return symbol ? "£DF£":messages.getString("ServerErrorAdminNeuerUser_DF");
 	}
 
 	/**
 	   * Die User-ID [{0}] ist bereits vergeben oder unzul\u00E4ssig.\nEine User-ID muss zwischen {1} und {2} Zeichen lang sein\nund darf nur die Zeichen a-z, A-Z und 0-9 enthalten. [DG]
 	   */
 	public static String ServerErrorAdminUserUnzulaessig(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "$DG§"+arg0+"§"+arg1+"§"+arg2+"$":MessageFormat.format(messages.getString("ServerErrorAdminUserUnzulaessig_DG"), arg0, arg1, arg2);
+		return symbol ? "£DG§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("ServerErrorAdminUserUnzulaessig_DG"), arg0, arg1, arg2);
 	}
 
 	/**
 	   * Neuer inaktiver User [{0}] angelegt. [DH]
 	   */
 	public static String ServerInfoInaktiverBenutzerAngelegt(boolean symbol, String arg0) {
-		return symbol ? "$DH§"+arg0+"$":MessageFormat.format(messages.getString("ServerInfoInaktiverBenutzerAngelegt_DH"), arg0);
+		return symbol ? "£DH§"+arg0+"£":MessageFormat.format(messages.getString("ServerInfoInaktiverBenutzerAngelegt_DH"), arg0);
 	}
 
 	/**
 	   * Der Benutzer [{0}] wurde bereits aktiviert. [DI]
 	   */
 	public static String ServerErrorBenutzerBereitsAktiviert(boolean symbol, String arg0) {
-		return symbol ? "$DI§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorBenutzerBereitsAktiviert_DI"), arg0);
+		return symbol ? "£DI§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorBenutzerBereitsAktiviert_DI"), arg0);
 	}
 
 	/**
 	   * Das Jahr wurde bereits ausgewertet. [DK]
 	   */
 	public static String ServerErrorJahrVorbei(boolean symbol) {
-		return symbol ? "$DK$":messages.getString("ServerErrorJahrVorbei_DK");
+		return symbol ? "£DK£":messages.getString("ServerErrorJahrVorbei_DK");
 	}
 
 	/**
 	   * Die Spielz\u00FCge wurden erfolgreich an den Server \u00FCbermittelt. [DM]
 	   */
 	public static String ZugeingabePostMovesSuccess(boolean symbol) {
-		return symbol ? "$DM$":messages.getString("ZugeingabePostMovesSuccess_DM");
+		return symbol ? "£DM£":messages.getString("ZugeingabePostMovesSuccess_DM");
 	}
 
 	/**
 	   * Die Spielz\u00FCge konnten nicht an den Server \u00FCbermittelt werden. [DN]
 	   */
 	public static String ZugeingabePostMovesError(boolean symbol) {
-		return symbol ? "$DN$":messages.getString("ZugeingabePostMovesError_DN");
+		return symbol ? "£DN£":messages.getString("ZugeingabePostMovesError_DN");
 	}
 
 	/**
 	   * Taste [DO]
 	   */
 	public static String Taste(boolean symbol) {
-		return symbol ? "$DO$":messages.getString("Taste_DO");
+		return symbol ? "£DO£":messages.getString("Taste_DO");
 	}
 
 	/**
 	   * Nochmal versuchen [DP]
 	   */
 	public static String NochmalVersuchen(boolean symbol) {
-		return symbol ? "$DP$":messages.getString("NochmalVersuchen_DP");
+		return symbol ? "£DP£":messages.getString("NochmalVersuchen_DP");
 	}
 
 	/**
 	   * Bitte warten Sie, bis das Neuladen-Symbol erscheint. [DQ]
 	   */
 	public static String WartenBisNaechsteZugeingabe(boolean symbol) {
-		return symbol ? "$DQ$":messages.getString("WartenBisNaechsteZugeingabe_DQ");
+		return symbol ? "£DQ£":messages.getString("WartenBisNaechsteZugeingabe_DQ");
 	}
 
 	/**
 	   * Die Auswertung des Jahres ist verf\u00FCgbar. [DR]
 	   */
 	public static String AuswertungVerfuegbar(boolean symbol) {
-		return symbol ? "$DR$":messages.getString("AuswertungVerfuegbar_DR");
+		return symbol ? "£DR£":messages.getString("AuswertungVerfuegbar_DR");
 	}
 
 	/**
 	   * Spracheinstellungen [DS]
 	   */
 	public static String SpracheDialogTitle(boolean symbol) {
-		return symbol ? "$DS$":messages.getString("SpracheDialogTitle_DS");
+		return symbol ? "£DS£":messages.getString("SpracheDialogTitle_DS");
 	}
 
 	/**
 	   * Sprache [DT]
 	   */
 	public static String Sprache(boolean symbol) {
-		return symbol ? "$DT$":messages.getString("Sprache_DT");
+		return symbol ? "£DT£":messages.getString("Sprache_DT");
 	}
 
 	/**
 	   * Die neuen Spracheinstellungen werden erst nach einem Neustart der Anwendung wirksam. Die Anwendung wird nun geschlossen. [DU]
 	   */
 	public static String SpracheDialogFrage(boolean symbol) {
-		return symbol ? "$DU$":messages.getString("SpracheDialogFrage_DU");
+		return symbol ? "£DU£":messages.getString("SpracheDialogFrage_DU");
 	}
 
 	/**
 	   * Sprache / Language [DV]
 	   */
 	public static String MenuSpracheinstellungen(boolean symbol) {
-		return symbol ? "$DV$":messages.getString("MenuSpracheinstellungen_DV");
+		return symbol ? "£DV£":messages.getString("MenuSpracheinstellungen_DV");
 	}
 
 	/**
 	   * Andere Taste [DW]
 	   */
 	public static String AndereTaste(boolean symbol) {
-		return symbol ? "$DW$":messages.getString("AndereTaste_DW");
+		return symbol ? "£DW£":messages.getString("AndereTaste_DW");
 	}
 
 	/**
 	   * Serverkommunikation ist deaktiviert. [DX]
 	   */
 	public static String ServerKommunikationInaktiv(boolean symbol) {
-		return symbol ? "$DX$":messages.getString("ServerKommunikationInaktiv_DX");
+		return symbol ? "£DX£":messages.getString("ServerKommunikationInaktiv_DX");
 	}
 
 	/**
 	   * Minenr\u00E4umer (Transfer) [E0]
 	   */
 	public static String InventurMinenraeumerTransfer(boolean symbol) {
-		return symbol ? "$E0$":messages.getString("InventurMinenraeumerTransfer_E0");
+		return symbol ? "£E0£":messages.getString("InventurMinenraeumerTransfer_E0");
 	}
 
 	/**
 	   * Ziel eines Transfers muss ein Planet sein. [E1]
 	   */
 	public static String ZugeingabeZielTransfer(boolean symbol) {
-		return symbol ? "$E1$":messages.getString("ZugeingabeZielTransfer_E1");
+		return symbol ? "£E1£":messages.getString("ZugeingabeZielTransfer_E1");
 	}
 
 	/**
 	   * Daten k\u00F6nnen nicht interpretiert werden. Pr\u00FCfen Sie folgendes:\n\n1. Stammen die Daten aus einer STERN-Email?\n2. Ist das Passwort korrekt?\n3. Haben Sie eine E-Mail aus einem falschen Kontext verwendet?\n4. Ihr STERN-Build ({0}) und der Build des Absenders (siehe E-Mail) sind zu unterschiedlich.\n\u0009\u0009\u0009\u0009\u0009\u0009 [E2]
 	   */
 	public static String ClipboardImportJDIalogImportFehlerPassword(boolean symbol, String arg0) {
-		return symbol ? "$E2§"+arg0+"$":MessageFormat.format(messages.getString("ClipboardImportJDIalogImportFehlerPassword_E2"), arg0);
+		return symbol ? "£E2§"+arg0+"£":MessageFormat.format(messages.getString("ClipboardImportJDIalogImportFehlerPassword_E2"), arg0);
 	}
 
 	/**
 	   * Aktivierungspasswort [E3]
 	   */
 	public static String Aktivierungspasswort(boolean symbol) {
-		return symbol ? "$E3$":messages.getString("Aktivierungspasswort_E3");
+		return symbol ? "£E3£":messages.getString("Aktivierungspasswort_E3");
 	}
 
 	/**
 	   * (Passwort wiederholen) [E5]
 	   */
 	public static String PasswortWiederholen(boolean symbol) {
-		return symbol ? "$E5$":messages.getString("PasswortWiederholen_E5");
+		return symbol ? "£E5£":messages.getString("PasswortWiederholen_E5");
 	}
 
 	/**
 	   * Die Passw\u00F6rter sind unterschiedlich. [E6]
 	   */
 	public static String PasswoerterUnterschiedlich(boolean symbol) {
-		return symbol ? "$E6$":messages.getString("PasswoerterUnterschiedlich_E6");
+		return symbol ? "£E6£":messages.getString("PasswoerterUnterschiedlich_E6");
 	}
 
 	/**
 	   * Das Aktivierungspasswort muss mindestens 3 Zeichen lang sein. [E7]
 	   */
 	public static String PasswortZuKurz(boolean symbol) {
-		return symbol ? "$E7$":messages.getString("PasswortZuKurz_E7");
+		return symbol ? "£E7£":messages.getString("PasswortZuKurz_E7");
 	}
 
 	/**
 	   * Passwort [E8]
 	   */
 	public static String Passwort(boolean symbol) {
-		return symbol ? "$E8$":messages.getString("Passwort_E8");
+		return symbol ? "£E8£":messages.getString("Passwort_E8");
 	}
 
 	/**
 	   * Neutrale Pl. [EC]
 	   */
 	public static String SpielinformationenNeutralePlaneten(boolean symbol) {
-		return symbol ? "$EC$":messages.getString("SpielinformationenNeutralePlaneten_EC");
+		return symbol ? "£EC£":messages.getString("SpielinformationenNeutralePlaneten_EC");
 	}
 
 	/**
 	   * Neutrale Planeten [ED]
 	   */
 	public static String SpielinformationenNeutralePlanetenTitel(boolean symbol) {
-		return symbol ? "$ED$":messages.getString("SpielinformationenNeutralePlanetenTitel_ED");
+		return symbol ? "£ED£":messages.getString("SpielinformationenNeutralePlanetenTitel_ED");
 	}
 
 	/**
 	   * Der Server setzt mindestens Build {0} voraus. Sie verwenden Build {1}. [EE]
 	   */
 	public static String ServerBuildFalsch(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$EE§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerBuildFalsch_EE"), arg0, arg1);
+		return symbol ? "£EE§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("ServerBuildFalsch_EE"), arg0, arg1);
 	}
 
 	/**
 	   * STERN-Bildschirm\u00FCbertragungsserver [EF]
 	   */
 	public static String SternScreenSharingServer(boolean symbol) {
-		return symbol ? "$EF$":messages.getString("SternScreenSharingServer_EF");
+		return symbol ? "£EF£":messages.getString("SternScreenSharingServer_EF");
 	}
 
 	/**
 	   * [STERN] {0} hat Sie zum neuen Spiel {1} eingeladen [EG]
 	   */
 	public static String EmailSubjectEingeladen(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$EG§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("EmailSubjectEingeladen_EG"), arg0, arg1);
+		return symbol ? "£EG§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("EmailSubjectEingeladen_EG"), arg0, arg1);
 	}
 
 	/**
 	   * Hallo,\n\nwillkommen bei STERN! {0} hat Sie zum Spiel {1} auf dem Server {2}:{3} eingeladen.\n\nViel Spa\u00DF beim Spielen!\nIhr Spielleiter [EH]
 	   */
 	public static String EmailBodyEingeladen(boolean symbol, String arg0, String arg1, String arg2, String arg3) {
-		return symbol ? "$EH§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"$":MessageFormat.format(messages.getString("EmailBodyEingeladen_EH"), arg0, arg1, arg2, arg3);
+		return symbol ? "£EH§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"£":MessageFormat.format(messages.getString("EmailBodyEingeladen_EH"), arg0, arg1, arg2, arg3);
 	}
 
 	/**
 	   * Sie sind nicht als Spieler {0} am STERN-Server angemeldet. [EI]
 	   */
 	public static String SpielerNichtAngemeldet(boolean symbol, String arg0) {
-		return symbol ? "$EI§"+arg0+"$":MessageFormat.format(messages.getString("SpielerNichtAngemeldet_EI"), arg0);
+		return symbol ? "£EI§"+arg0+"£":MessageFormat.format(messages.getString("SpielerNichtAngemeldet_EI"), arg0);
 	}
 
 	/**
 	   * {0}: Spionagesender installiert. [EJ]
 	   */
 	public static String AuswertungAufklaererSender(boolean symbol, String arg0) {
-		return symbol ? "$EJ§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0);
+		return symbol ? "£EJ§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0);
 	}
 
 	/**
 	   * Mehr... [EK]
 	   */
 	public static String ZugeingabeMehr(boolean symbol) {
-		return symbol ? "$EK$":messages.getString("ZugeingabeMehr_EK");
+		return symbol ? "£EK£":messages.getString("ZugeingabeMehr_EK");
 	}
 
 	/**
 	   * Kampfschiffe auf Planet anzeigen [EL]
 	   */
 	public static String ZugeingabeRaumerAufPlanet(boolean symbol) {
-		return symbol ? "$EL$":messages.getString("ZugeingabeRaumerAufPlanet_EL");
+		return symbol ? "£EL£":messages.getString("ZugeingabeRaumerAufPlanet_EL");
 	}
 
 	/**
 	   * Auf dem Planeten befinden sich {0} Kampfschiffe. [EM]
 	   */
 	public static String ZugeingabeRaumerAnzeigen(boolean symbol, String arg0) {
-		return symbol ? "$EM§"+arg0+"$":MessageFormat.format(messages.getString("ZugeingabeRaumerAnzeigen_EM"), arg0);
+		return symbol ? "£EM§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeRaumerAnzeigen_EM"), arg0);
 	}
 
 	/**
 	   * Klicken Sie auf das blinkende Neuladen-Symbol. [EN]
 	   */
 	public static String AuswertungVerfuegbar2(boolean symbol) {
-		return symbol ? "$EN$":messages.getString("AuswertungVerfuegbar2_EN");
+		return symbol ? "£EN£":messages.getString("AuswertungVerfuegbar2_EN");
 	}
 
 	/**
 	   * Das neue Spiel [{0}] wurde auf dem Server angelegt. Sie k\u00F6nnen nachfolgend eine Einladungsmail an Ihre Mitspieler schicken. [EO]
 	   */
 	public static String ServerGamesSubmitAngelegt2(boolean symbol, String arg0) {
-		return symbol ? "$EO§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesSubmitAngelegt2_EO"), arg0);
+		return symbol ? "£EO§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesSubmitAngelegt2_EO"), arg0);
 	}
 
 	/**
 	   * Dies war die letzte Zugeingabe dieses Spiels. [EP]
 	   */
 	public static String LetztesJahr(boolean symbol) {
-		return symbol ? "$EP$":messages.getString("LetztesJahr_EP");
+		return symbol ? "£EP£":messages.getString("LetztesJahr_EP");
 	}
 
 	/**
 	   * Sie finden das beendete Spiel demn\u00E4chst unter "Meine serverbasierten Spiele". [EQ]
 	   */
 	public static String LetztesJahr2(boolean symbol) {
-		return symbol ? "$EQ$":messages.getString("LetztesJahr2_EQ");
+		return symbol ? "£EQ£":messages.getString("LetztesJahr2_EQ");
 	}
 
 	/**
 	   * Beendetes Spiel im Jahr {0} [ER]
 	   */
 	public static String AbgeschlossenesSpiel(boolean symbol, String arg0) {
-		return symbol ? "$ER§"+arg0+"$":MessageFormat.format(messages.getString("AbgeschlossenesSpiel_ER"), arg0);
+		return symbol ? "£ER§"+arg0+"£":MessageFormat.format(messages.getString("AbgeschlossenesSpiel_ER"), arg0);
 	}
 
 	/**
 	   * Kapitulieren [ET]
 	   */
 	public static String ZugeingabeKapitulieren(boolean symbol) {
-		return symbol ? "$ET$":messages.getString("ZugeingabeKapitulieren_ET");
+		return symbol ? "£ET£":messages.getString("ZugeingabeKapitulieren_ET");
 	}
 
 	/**
 	   * Spieler {0} hat kapituliert. [EU]
 	   */
 	public static String AuswertungKapitulation(boolean symbol, String arg0) {
-		return symbol ? "$EU§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungKapitulation_EU"), arg0);
+		return symbol ? "£EU§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungKapitulation_EU"), arg0);
 	}
 
 	/**
 	   * Ein Update ist verf\u00FCgbar [EV]
 	   */
 	public static String UpdateVerfuegbar(boolean symbol) {
-		return symbol ? "$EV$":messages.getString("UpdateVerfuegbar_EV");
+		return symbol ? "£EV£":messages.getString("UpdateVerfuegbar_EV");
 	}
 
 	/**
 	   * Update [EX]
 	   */
 	public static String Update(boolean symbol) {
-		return symbol ? "$EX$":messages.getString("Update_EX");
+		return symbol ? "£EX£":messages.getString("Update_EX");
 	}
 
 	/**
 	   * Sie haben Ihre Spielz\u00FCge bereits eingegeben. Bitte warten Sie auf die Auswertung. [EY]
 	   */
 	public static String ZugeingabeSpielzuegeSchonEingegeben(boolean symbol) {
-		return symbol ? "$EY$":messages.getString("ZugeingabeSpielzuegeSchonEingegeben_EY");
+		return symbol ? "£EY£":messages.getString("ZugeingabeSpielzuegeSchonEingegeben_EY");
 	}
 
 	/**
 	   * Anwendungsfehler auf dem Server:\n{0} [EZ]
 	   */
 	public static String ServerAnwendungsfehler(boolean symbol, String arg0) {
-		return symbol ? "$EZ§"+arg0+"$":MessageFormat.format(messages.getString("ServerAnwendungsfehler_EZ"), arg0);
+		return symbol ? "£EZ§"+arg0+"£":MessageFormat.format(messages.getString("ServerAnwendungsfehler_EZ"), arg0);
 	}
 
 	/**
 	   * Jahr [FA]
 	   */
 	public static String ReplayErstesJahrServer(boolean symbol) {
-		return symbol ? "$FA$":messages.getString("ReplayErstesJahrServer_FA");
+		return symbol ? "£FA£":messages.getString("ReplayErstesJahrServer_FA");
 	}
 
 	/**
 	   * {0}.{1}.{2} {3}:{4} [FB]
 	   */
 	public static String ReleaseFormatted(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4) {
-		return symbol ? "$FB§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"$":MessageFormat.format(messages.getString("ReleaseFormatted_FB"), arg0, arg1, arg2, arg3, arg4);
+		return symbol ? "£FB§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"£":MessageFormat.format(messages.getString("ReleaseFormatted_FB"), arg0, arg1, arg2, arg3, arg4);
 	}
 
 	/**
 	   * Ein wichtiges Update ist verf\u00FCgbar [FC]
 	   */
 	public static String UpdateVerfuegbarWichtig(boolean symbol) {
-		return symbol ? "$FC$":messages.getString("UpdateVerfuegbarWichtig_FC");
+		return symbol ? "£FC£":messages.getString("UpdateVerfuegbarWichtig_FC");
 	}
 
 	/**
 	   * Nach Updates suchen [FD]
 	   */
 	public static String MenuSearchForUpdates(boolean symbol) {
-		return symbol ? "$FD$":messages.getString("MenuSearchForUpdates_FD");
+		return symbol ? "£FD£":messages.getString("MenuSearchForUpdates_FD");
 	}
 
 	/**
 	   * Ihr STERN-Build ist auf dem neusten Stand. [FE]
 	   */
 	public static String UpdateAktuell(boolean symbol) {
-		return symbol ? "$FE$":messages.getString("UpdateAktuell_FE");
+		return symbol ? "£FE£":messages.getString("UpdateAktuell_FE");
 	}
 
 	/**
 	   * Der Update-Server ist nicht erreichbar. [FF]
 	   */
 	public static String UpdateServerNichtErreichbar(boolean symbol) {
-		return symbol ? "$FF$":messages.getString("UpdateServerNichtErreichbar_FF");
+		return symbol ? "£FF£":messages.getString("UpdateServerNichtErreichbar_FF");
 	}
 
 	/**
 	   * User l\u00F6schen [FG]
 	   */
 	public static String ServerAdminSpielerLoeschen(boolean symbol) {
-		return symbol ? "$FG$":messages.getString("ServerAdminSpielerLoeschen_FG");
+		return symbol ? "£FG£":messages.getString("ServerAdminSpielerLoeschen_FG");
 	}
 
 	/**
 	   * Neuen User anlegen [FH]
 	   */
 	public static String ServerAdminSpielerAnlegen(boolean symbol) {
-		return symbol ? "$FH$":messages.getString("ServerAdminSpielerAnlegen_FH");
+		return symbol ? "£FH£":messages.getString("ServerAdminSpielerAnlegen_FH");
 	}
 
 	/**
 	   * Anmeldedaten erneuern [FI]
 	   */
 	public static String ServerAdminAnmeldedatenErneuern(boolean symbol) {
-		return symbol ? "$FI$":messages.getString("ServerAdminAnmeldedatenErneuern_FI");
+		return symbol ? "£FI£":messages.getString("ServerAdminAnmeldedatenErneuern_FI");
 	}
 
 	/**
 	   * User-ID [{0}] existiert nicht auf dem Server. [FJ]
 	   */
 	public static String ServerErrorAdminUserExistiertNicht(boolean symbol, String arg0) {
-		return symbol ? "$FJ§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorAdminUserExistiertNicht_FJ"), arg0);
+		return symbol ? "£FJ§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorAdminUserExistiertNicht_FJ"), arg0);
 	}
 
 	/**
 	   * User-Liste neu laden [FK]
 	   */
 	public static String ServerAdminUserNeuLaden(boolean symbol) {
-		return symbol ? "$FK$":messages.getString("ServerAdminUserNeuLaden_FK");
+		return symbol ? "£FK£":messages.getString("ServerAdminUserNeuLaden_FK");
 	}
 
 	/**
 	   * Der User [{0}] wurde erfolgreich auf dem Server aktualisiert. [FL]
 	   */
 	public static String ServerAdminUserErfolg(boolean symbol, String arg0) {
-		return symbol ? "$FL§"+arg0+"$":MessageFormat.format(messages.getString("ServerAdminUserErfolg_FL"), arg0);
+		return symbol ? "£FL§"+arg0+"£":MessageFormat.format(messages.getString("ServerAdminUserErfolg_FL"), arg0);
 	}
 
 	/**
 	   * M\u00F6chten Sie den User [{0}] wirklich aktualisieren? ACHTUNG: Sie \u00E4ndern auch die Anmeldedaten des Users, so dass der User neu aktiviert werden muss! [FM]
 	   */
 	public static String ServerAdminUserRenewCredentials(boolean symbol, String arg0) {
-		return symbol ? "$FM§"+arg0+"$":MessageFormat.format(messages.getString("ServerAdminUserRenewCredentials_FM"), arg0);
+		return symbol ? "£FM§"+arg0+"£":MessageFormat.format(messages.getString("ServerAdminUserRenewCredentials_FM"), arg0);
 	}
 
 	/**
 	   * M\u00F6chten Sie den User [{0}] wirklich aktualisieren? [FN]
 	   */
 	public static String ServerAdminUserUpdate(boolean symbol, String arg0) {
-		return symbol ? "$FN§"+arg0+"$":MessageFormat.format(messages.getString("ServerAdminUserUpdate_FN"), arg0);
+		return symbol ? "£FN§"+arg0+"£":MessageFormat.format(messages.getString("ServerAdminUserUpdate_FN"), arg0);
 	}
 
 	/**
 	   * Logon-Versuch mit inaktivem User [{0}]. [FO]
 	   */
 	public static String ServerErrorLogonWithInactiveUser(boolean symbol, String arg0) {
-		return symbol ? "$FO§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorLogonWithInactiveUser_FO"), arg0);
+		return symbol ? "£FO§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorLogonWithInactiveUser_FO"), arg0);
 	}
 
 	/**
 	   * M\u00F6chten Sie den User [{0}] tats\u00E4chlich vom Server l\u00F6schen? Diese Aktion kann nicht widerrufen werden! [FP]
 	   */
 	public static String ServerAdminUserDelete(boolean symbol, String arg0) {
-		return symbol ? "$FP§"+arg0+"$":MessageFormat.format(messages.getString("ServerAdminUserDelete_FP"), arg0);
+		return symbol ? "£FP§"+arg0+"£":MessageFormat.format(messages.getString("ServerAdminUserDelete_FP"), arg0);
 	}
 
 	/**
 	   * Der User [{0}] wurde erfolgreich vom Server gel\u00F6scht. [FQ]
 	   */
 	public static String ServerAdminUserDeleted(boolean symbol, String arg0) {
-		return symbol ? "$FQ§"+arg0+"$":MessageFormat.format(messages.getString("ServerAdminUserDeleted_FQ"), arg0);
+		return symbol ? "£FQ§"+arg0+"£":MessageFormat.format(messages.getString("ServerAdminUserDeleted_FQ"), arg0);
 	}
 
 	/**
 	   * Der User [{0}] wurde erfolgreich auf dem Server angelegt. Bitte schicken Sie die nachfolgend erzeugte E-Mail unver\u00E4ndert ab. [FR]
 	   */
 	public static String ServerAdminUserCreated(boolean symbol, String arg0) {
-		return symbol ? "$FR§"+arg0+"$":MessageFormat.format(messages.getString("ServerAdminUserCreated_FR"), arg0);
+		return symbol ? "£FR§"+arg0+"£":MessageFormat.format(messages.getString("ServerAdminUserCreated_FR"), arg0);
 	}
 
 	/**
 	   * E-Mail schreiben [FS]
 	   */
 	public static String MenuEmail(boolean symbol) {
-		return symbol ? "$FS$":messages.getString("MenuEmail_FS");
+		return symbol ? "£FS£":messages.getString("MenuEmail_FS");
 	}
 
 	/**
 	   * E-Mail erzeugen [FT]
 	   */
 	public static String EmailErzeugen(boolean symbol) {
-		return symbol ? "$FT$":messages.getString("EmailErzeugen_FT");
+		return symbol ? "£FT£":messages.getString("EmailErzeugen_FT");
 	}
 
 	/**
 	   * (E-Mail-Adresse unbekannt) [FU]
 	   */
 	public static String EmailUnbekannt(boolean symbol) {
-		return symbol ? "$FU$":messages.getString("EmailUnbekannt_FU");
+		return symbol ? "£FU£":messages.getString("EmailUnbekannt_FU");
 	}
 
 	/**
 	   * Server-Status [FV]
 	   */
 	public static String ServerStatus(boolean symbol) {
-		return symbol ? "$FV$":messages.getString("ServerStatus_FV");
+		return symbol ? "£FV£":messages.getString("ServerStatus_FV");
 	}
 
 	/**
 	   * Server-Build [FW]
 	   */
 	public static String ServerBuild(boolean symbol) {
-		return symbol ? "$FW$":messages.getString("ServerBuild_FW");
+		return symbol ? "£FW£":messages.getString("ServerBuild_FW");
 	}
 
 	/**
 	   * L\u00E4uft seit [FX]
 	   */
 	public static String ServerLaeuftSeit(boolean symbol) {
-		return symbol ? "$FX$":messages.getString("ServerLaeuftSeit_FX");
+		return symbol ? "£FX£":messages.getString("ServerLaeuftSeit_FX");
 	}
 
 	/**
 	   * Gr\u00F6\u00DFe des Logs [FY]
 	   */
 	public static String ServerLogGroesse(boolean symbol) {
-		return symbol ? "$FY$":messages.getString("ServerLogGroesse_FY");
+		return symbol ? "£FY£":messages.getString("ServerLogGroesse_FY");
 	}
 
 	/**
 	   * Log herunterladen [FZ]
 	   */
 	public static String ServerLogDownload(boolean symbol) {
-		return symbol ? "$FZ$":messages.getString("ServerLogDownload_FZ");
+		return symbol ? "£FZ£":messages.getString("ServerLogDownload_FZ");
 	}
 
 	/**
 	   * Log-Level [GA]
 	   */
 	public static String ServerLogLevel(boolean symbol) {
-		return symbol ? "$GA$":messages.getString("ServerLogLevel_GA");
+		return symbol ? "£GA£":messages.getString("ServerLogLevel_GA");
 	}
 
 	/**
 	   * Log-Level \u00E4ndern [GB]
 	   */
 	public static String ServerLogLevelAendern(boolean symbol) {
-		return symbol ? "$GB$":messages.getString("ServerLogLevelAendern_GB");
+		return symbol ? "£GB£":messages.getString("ServerLogLevelAendern_GB");
 	}
 
 	/**
 	   * Status aktualisieren [GC]
 	   */
 	public static String ServerStatusAktualisieren(boolean symbol) {
-		return symbol ? "$GC$":messages.getString("ServerStatusAktualisieren_GC");
+		return symbol ? "£GC£":messages.getString("ServerStatusAktualisieren_GC");
 	}
 
 	/**
 	   * M\u00F6chten Sie das Log-Level des Servers wirklich auf "{0}" \u00E4ndern? [GD]
 	   */
 	public static String ServerLogLevelAendernAYS(boolean symbol, String arg0) {
-		return symbol ? "$GD§"+arg0+"$":MessageFormat.format(messages.getString("ServerLogLevelAendernAYS_GD"), arg0);
+		return symbol ? "£GD§"+arg0+"£":MessageFormat.format(messages.getString("ServerLogLevelAendernAYS_GD"), arg0);
 	}
 
 	/**
 	   * Das Log-Level des Servers wurde erfolgreich ge\u00E4ndert. [GE]
 	   */
 	public static String ServerLogLevelAendernErfolg(boolean symbol) {
-		return symbol ? "$GE$":messages.getString("ServerLogLevelAendernErfolg_GE");
+		return symbol ? "£GE£":messages.getString("ServerLogLevelAendernErfolg_GE");
 	}
 
 	/**
 	   * Das Server-Log enth\u00E4lt keine Daten. [GF]
 	   */
 	public static String ServerLogLeer(boolean symbol) {
-		return symbol ? "$GF$":messages.getString("ServerLogLeer_GF");
+		return symbol ? "£GF£":messages.getString("ServerLogLeer_GF");
 	}
 
 	/**
 	   * {0}.{1}.{2} {3}:{4}:{5} [GG]
 	   */
 	public static String ReleaseFormatted2(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4, String arg5) {
-		return symbol ? "$GG§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"§"+arg5+"$":MessageFormat.format(messages.getString("ReleaseFormatted2_GG"), arg0, arg1, arg2, arg3, arg4, arg5);
+		return symbol ? "£GG§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"§"+arg5+"£":MessageFormat.format(messages.getString("ReleaseFormatted2_GG"), arg0, arg1, arg2, arg3, arg4, arg5);
 	}
 
 	/**
 	   * ++ Jahr {0}, Tag {1} ++ [GH]
 	   */
 	public static String AuswertungEreignisTag(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$GH§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungEreignisTag_GH"), arg0, arg1);
+		return symbol ? "£GH§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungEreignisTag_GH"), arg0, arg1);
 	}
 
 	/**
 	   * ++ Jahr {0}, Jahresbeginn ++ [GI]
 	   */
 	public static String AuswertungEreignisJahresbeginn(boolean symbol, String arg0) {
-		return symbol ? "$GI§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungEreignisJahresbeginn_GI"), arg0);
+		return symbol ? "£GI§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungEreignisJahresbeginn_GI"), arg0);
 	}
 
 	/**
 	   * ++ Jahr {0}, Jahresende ++ [GJ]
 	   */
 	public static String AuswertungEreignisJahresende(boolean symbol, String arg0) {
-		return symbol ? "$GJ§"+arg0+"$":MessageFormat.format(messages.getString("AuswertungEreignisJahresende_GJ"), arg0);
+		return symbol ? "£GJ§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungEreignisJahresende_GJ"), arg0);
 	}
 
 	/**
 	   * Jahr {0}, Tag {1} [GK]
 	   */
 	public static String FlugzeitOutput(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$GK§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("FlugzeitOutput_GK"), arg0, arg1);
+		return symbol ? "£GK§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("FlugzeitOutput_GK"), arg0, arg1);
 	}
 
 	/**
 	   * Jahr {0}, Jahresende [GL]
 	   */
 	public static String FlugzeitOutputJahresende(boolean symbol, String arg0) {
-		return symbol ? "$GL§"+arg0+"$":MessageFormat.format(messages.getString("FlugzeitOutputJahresende_GL"), arg0);
+		return symbol ? "£GL§"+arg0+"£":MessageFormat.format(messages.getString("FlugzeitOutputJahresende_GL"), arg0);
 	}
 
 	/**
 	   * J{0}\nT{1} [GM]
 	   */
 	public static String FlugzeitOutputShort(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$GM§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("FlugzeitOutputShort_GM"), arg0, arg1);
+		return symbol ? "£GM§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("FlugzeitOutputShort_GM"), arg0, arg1);
 	}
 
 	/**
 	   * J{0}\nEnde [GN]
 	   */
 	public static String FlugzeitOutputJahresendeShort(boolean symbol, String arg0) {
-		return symbol ? "$GN§"+arg0+"$":MessageFormat.format(messages.getString("FlugzeitOutputJahresendeShort_GN"), arg0);
+		return symbol ? "£GN§"+arg0+"£":MessageFormat.format(messages.getString("FlugzeitOutputJahresendeShort_GN"), arg0);
 	}
 
 	/**
 	   * Einsatz (rechtsdrehend) [GO]
 	   */
 	public static String ZugeingabePatrouilleMissionRechts(boolean symbol) {
-		return symbol ? "$GO$":messages.getString("ZugeingabePatrouilleMissionRechts_GO");
+		return symbol ? "£GO£":messages.getString("ZugeingabePatrouilleMissionRechts_GO");
 	}
 
 	/**
 	   * Einsatz [GP]
 	   */
 	public static String ZugeingabeMinenraeumerMission(boolean symbol) {
-		return symbol ? "$GP$":messages.getString("ZugeingabeMinenraeumerMission_GP");
+		return symbol ? "£GP£":messages.getString("ZugeingabeMinenraeumerMission_GP");
 	}
 
 	/**
 	   * Linksdrehend [GQ]
 	   */
 	public static String InventurPatrouillenOrientierungLinks(boolean symbol) {
-		return symbol ? "$GQ$":messages.getString("InventurPatrouillenOrientierungLinks_GQ");
+		return symbol ? "£GQ£":messages.getString("InventurPatrouillenOrientierungLinks_GQ");
 	}
 
 	/**
 	   * Rechtsdrehend [GR]
 	   */
 	public static String InventurPatrouillenOrientierungRechts(boolean symbol) {
-		return symbol ? "$GR$":messages.getString("InventurPatrouillenOrientierungRechts_GR");
+		return symbol ? "£GR£":messages.getString("InventurPatrouillenOrientierungRechts_GR");
 	}
 
 	/**
 	   * Orientierung [GS]
 	   */
 	public static String InventurPatrouillenOrientierung(boolean symbol) {
-		return symbol ? "$GS$":messages.getString("InventurPatrouillenOrientierung_GS");
+		return symbol ? "£GS£":messages.getString("InventurPatrouillenOrientierung_GS");
 	}
 
 	/**
 	   * Ankunft: {0}. [GT]
 	   */
 	public static String SpielinformationenKommandozentralenUnterwegs2(boolean symbol, String arg0) {
-		return symbol ? "$GT§"+arg0+"$":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs2_GT"), arg0);
+		return symbol ? "£GT§"+arg0+"£":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs2_GT"), arg0);
 	}
 
 	/**
 	   * Der Server benutzt Build {0}. Ihr STERN-Build erwartet einen Server-Build von mindestens {1}. [GV]
 	   */
 	public static String ServerBuildVeraltet(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$GV§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerBuildVeraltet_GV"), arg0, arg1);
+		return symbol ? "£GV§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("ServerBuildVeraltet_GV"), arg0, arg1);
 	}
 
 	/**
 	   * Letzte Aktivit\u00E4t: {0} [GW]
 	   */
 	public static String ServerGamesLetzteAktivitaet(boolean symbol, String arg0) {
-		return symbol ? "$GW§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesLetzteAktivitaet_GW"), arg0);
+		return symbol ? "£GW§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesLetzteAktivitaet_GW"), arg0);
 	}
 
 	/**
 	   * Spielleiteraktionen [GY]
 	   */
 	public static String ServerGamesSpielleiteraktionen(boolean symbol) {
-		return symbol ? "$GY$":messages.getString("ServerGamesSpielleiteraktionen_GY");
+		return symbol ? "£GY£":messages.getString("ServerGamesSpielleiteraktionen_GY");
 	}
 
 	/**
 	   * Spiel l\u00F6schen [GZ]
 	   */
 	public static String ServerGamesLoeschen(boolean symbol) {
-		return symbol ? "$GZ$":messages.getString("ServerGamesLoeschen_GZ");
+		return symbol ? "£GZ£":messages.getString("ServerGamesLoeschen_GZ");
 	}
 
 	/**
 	   * Spiel beenden [HA]
 	   */
 	public static String ServerGamesBeenden(boolean symbol) {
-		return symbol ? "$HA$":messages.getString("ServerGamesBeenden_HA");
+		return symbol ? "£HA£":messages.getString("ServerGamesBeenden_HA");
 	}
 
 	/**
 	   * Sie sind nicht der Spielleiter des Spiels {0}. [HC]
 	   */
 	public static String ServerErrorKeinSpielleiter(boolean symbol, String arg0) {
-		return symbol ? "$HC§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorKeinSpielleiter_HC"), arg0);
+		return symbol ? "£HC§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorKeinSpielleiter_HC"), arg0);
 	}
 
 	/**
 	   * Spiel {0} wurde erfolgreich gel\u00F6scht. [HD]
 	   */
 	public static String ServerGamesGameDeleted(boolean symbol, String arg0) {
-		return symbol ? "$HD§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesGameDeleted_HD"), arg0);
+		return symbol ? "£HD§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesGameDeleted_HD"), arg0);
 	}
 
 	/**
 	   * M\u00F6chten Sie das Spiel {0} wirklich vom Server l\u00F6schen? [HE]
 	   */
 	public static String ServerGamesLoeschenAys(boolean symbol, String arg0) {
-		return symbol ? "$HE§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesLoeschenAys_HE"), arg0);
+		return symbol ? "£HE§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesLoeschenAys_HE"), arg0);
 	}
 
 	/**
 	   * Das Spiel ist bereits abgeschlossen. [HF]
 	   */
 	public static String ServerGamesAbgeschlossen(boolean symbol) {
-		return symbol ? "$HF$":messages.getString("ServerGamesAbgeschlossen_HF");
+		return symbol ? "£HF£":messages.getString("ServerGamesAbgeschlossen_HF");
 	}
 
 	/**
 	   * M\u00F6chten Sie das Spiel {0} wirklich sofort beenden? Alle Spielz\u00FCge der Spieler gehen verloren. [HG]
 	   */
 	public static String ServerGamesBeendenAys(boolean symbol, String arg0) {
-		return symbol ? "$HG§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesBeendenAys_HG"), arg0);
+		return symbol ? "£HG§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesBeendenAys_HG"), arg0);
 	}
 
 	/**
 	   * Spiel {0} wurde erfolgreich beendet. [HH]
 	   */
 	public static String ServerGamesGameFinalized(boolean symbol, String arg0) {
-		return symbol ? "$HH§"+arg0+"$":MessageFormat.format(messages.getString("ServerGamesGameFinalized_HH"), arg0);
+		return symbol ? "£HH§"+arg0+"£":MessageFormat.format(messages.getString("ServerGamesGameFinalized_HH"), arg0);
 	}
 
 	/**
 	   * Jahresbeginn [HI]
 	   */
 	public static String AuswertungEreignisJahresbeginn2(boolean symbol) {
-		return symbol ? "$HI$":messages.getString("AuswertungEreignisJahresbeginn2_HI");
+		return symbol ? "£HI£":messages.getString("AuswertungEreignisJahresbeginn2_HI");
 	}
 
 	/**
 	   * Jahresende [HJ]
 	   */
 	public static String AuswertungEreignisJahresende2(boolean symbol) {
-		return symbol ? "$HJ$":messages.getString("AuswertungEreignisJahresende2_HJ");
+		return symbol ? "£HJ£":messages.getString("AuswertungEreignisJahresende2_HJ");
 	}
 
 	/**
 	   * Tag {0} von {1} [HK]
 	   */
 	public static String AuswertungEreignisTag2(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$HK§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("AuswertungEreignisTag2_HK"), arg0, arg1);
+		return symbol ? "£HK§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungEreignisTag2_HK"), arg0, arg1);
 	}
 
 	/**
 	   * Raumschiffe aus-/einblenden [HL]
 	   */
 	public static String ZugeingabeObjekteAusblenden(boolean symbol) {
-		return symbol ? "$HL$":messages.getString("ZugeingabeObjekteAusblenden_HL");
+		return symbol ? "£HL£":messages.getString("ZugeingabeObjekteAusblenden_HL");
 	}
 
 	/**
 	   * an [HM]
 	   */
 	public static String ZugeingabeObjekteAusblendenAn(boolean symbol) {
-		return symbol ? "$HM$":messages.getString("ZugeingabeObjekteAusblendenAn_HM");
+		return symbol ? "£HM£":messages.getString("ZugeingabeObjekteAusblendenAn_HM");
 	}
 
 	/**
 	   * aus [HN]
 	   */
 	public static String ZugeingabeObjekteAusblendenAus(boolean symbol) {
-		return symbol ? "$HN$":messages.getString("ZugeingabeObjekteAusblendenAus_HN");
+		return symbol ? "£HN£":messages.getString("ZugeingabeObjekteAusblendenAus_HN");
 	}
 
 	/**
 	   * Alle aus [HO]
 	   */
 	public static String ZugeingabeObjekteAusblendenAlleAus(boolean symbol) {
-		return symbol ? "$HO$":messages.getString("ZugeingabeObjekteAusblendenAlleAus_HO");
+		return symbol ? "£HO£":messages.getString("ZugeingabeObjekteAusblendenAlleAus_HO");
 	}
 
 	/**
 	   * Alle an [HP]
 	   */
 	public static String ZugeingabeObjekteAusblendenAlleAn(boolean symbol) {
-		return symbol ? "$HP$":messages.getString("ZugeingabeObjekteAusblendenAlleAn_HP");
+		return symbol ? "£HP£":messages.getString("ZugeingabeObjekteAusblendenAlleAn_HP");
 	}
 
 	/**
 	   * Das Jahr ist ausgewertet. Klicken Sie hier, um das Spiel neu zu laden. [HQ]
 	   */
 	public static String AuswertungVerfuegbarSymbol(boolean symbol) {
-		return symbol ? "$HQ$":messages.getString("AuswertungVerfuegbarSymbol_HQ");
+		return symbol ? "£HQ£":messages.getString("AuswertungVerfuegbarSymbol_HQ");
 	}
 
 	/**
 	   * Diffie\u2013Hellman-Schl\u00FCsselaustausch gescheitert: {0} [HR]
 	   */
 	public static String ServerErrorDh(boolean symbol, String arg0) {
-		return symbol ? "$HR§"+arg0+"$":MessageFormat.format(messages.getString("ServerErrorDh_HR"), arg0);
+		return symbol ? "£HR§"+arg0+"£":MessageFormat.format(messages.getString("ServerErrorDh_HR"), arg0);
 	}
 
 	/**
 	   * Neue Session {0} f\u00FCr User {1} erzeugt. [HS]
 	   */
 	public static String ServerNeueSession(boolean symbol, String arg0, String arg1) {
-		return symbol ? "$HS§"+arg0+"§"+arg1+"$":MessageFormat.format(messages.getString("ServerNeueSession_HS"), arg0, arg1);
+		return symbol ? "£HS§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("ServerNeueSession_HS"), arg0, arg1);
 	}
 
 	/**
 	   * Session ID [HT]
 	   */
 	public static String ServerILogSessionId(boolean symbol) {
-		return symbol ? "$HT$":messages.getString("ServerILogSessionId_HT");
+		return symbol ? "£HT£":messages.getString("ServerILogSessionId_HT");
 	}
 
 	/**
 	   * Benachrichtigungsklang stummschalten [HU]
 	   */
 	public static String BenachrichtigungStumm(boolean symbol) {
-		return symbol ? "$HU$":messages.getString("BenachrichtigungStumm_HU");
+		return symbol ? "£HU£":messages.getString("BenachrichtigungStumm_HU");
 	}
 
 	/**
 	   * User {0} einlesen... [HV]
 	   */
 	public static String ServerUserLesen(boolean symbol, String arg0) {
-		return symbol ? "$HV§"+arg0+"$":MessageFormat.format(messages.getString("ServerUserLesen_HV"), arg0);
+		return symbol ? "£HV§"+arg0+"£":MessageFormat.format(messages.getString("ServerUserLesen_HV"), arg0);
 	}
 
 	/**
 	   * Konfiguration lesen... [HW]
 	   */
 	public static String ServerConfigLaden(boolean symbol) {
-		return symbol ? "$HW$":messages.getString("ServerConfigLaden_HW");
+		return symbol ? "£HW£":messages.getString("ServerConfigLaden_HW");
 	}
 
 	/**
 	   * Konfiguration neu anlegen... [HX]
 	   */
 	public static String ServerConfigErzeugen(boolean symbol) {
-		return symbol ? "$HX$":messages.getString("ServerConfigErzeugen_HX");
+		return symbol ? "£HX£":messages.getString("ServerConfigErzeugen_HX");
 	}
 
 	/**
 	   * Spiel {0} einlesen... [HY]
 	   */
 	public static String ServerSpielLesen(boolean symbol, String arg0) {
-		return symbol ? "$HY§"+arg0+"$":MessageFormat.format(messages.getString("ServerSpielLesen_HY"), arg0);
+		return symbol ? "£HY§"+arg0+"£":MessageFormat.format(messages.getString("ServerSpielLesen_HY"), arg0);
 	}
 
 	/**
 	   * Order {0} erzeugen... [HZ]
 	   */
 	public static String ServerOrdnerErzeugen(boolean symbol, String arg0) {
-		return symbol ? "$HZ§"+arg0+"$":MessageFormat.format(messages.getString("ServerOrdnerErzeugen_HZ"), arg0);
+		return symbol ? "£HZ§"+arg0+"£":MessageFormat.format(messages.getString("ServerOrdnerErzeugen_HZ"), arg0);
 	}
 
 	/**
 	   * Admin-User erzeugen... [IA]
 	   */
 	public static String ServerAdminErzeugen(boolean symbol) {
-		return symbol ? "$IA$":messages.getString("ServerAdminErzeugen_IA");
+		return symbol ? "£IA£":messages.getString("ServerAdminErzeugen_IA");
 	}
 
 	/**
 	   * >>> Spieler geben Ihre Spielz\u00FCge ein. Die Eingabe ist gesperrt. <<< [IB]
 	   */
 	public static String ZugeingabeClientEingabeGesperrt(boolean symbol) {
-		return symbol ? "$IB$":messages.getString("ZugeingabeClientEingabeGesperrt_IB");
+		return symbol ? "£IB£":messages.getString("ZugeingabeClientEingabeGesperrt_IB");
 	}
 
 	/**
 	   * Inaktiv w\u00E4hrend der Zugeingabe [IC]
 	   */
 	public static String ServerSettingsJDialogInaktiv(boolean symbol) {
-		return symbol ? "$IC$":messages.getString("ServerSettingsJDialogInaktiv_IC");
+		return symbol ? "£IC£":messages.getString("ServerSettingsJDialogInaktiv_IC");
 	}
 
 	/**
 	   * Ermitteln [ID]
 	   */
 	public static String ClientSettingsJDialogIpErmitteln(boolean symbol) {
-		return symbol ? "$ID$":messages.getString("ClientSettingsJDialogIpErmitteln_ID");
+		return symbol ? "£ID£":messages.getString("ClientSettingsJDialogIpErmitteln_ID");
 	}
 
 	/**
 	   * Meine IP-Adresse [IE]
 	   */
 	public static String ClientSettingsJDialogMeineIp(boolean symbol) {
-		return symbol ? "$IE$":messages.getString("ClientSettingsJDialogMeineIp_IE");
+		return symbol ? "£IE£":messages.getString("ClientSettingsJDialogMeineIp_IE");
+	}
+
+	/**
+	   * Kampfschiffproduktion der Planeten [IF]
+	   */
+	public static String SpielinformationenKampfschiffproduktionTitel(boolean symbol) {
+		return symbol ? "£IF£":messages.getString("SpielinformationenKampfschiffproduktionTitel_IF");
+	}
+
+	/**
+	   * Kampfschiffproduktion [IG]
+	   */
+	public static String SpielinformationenKampfschiffproduktion(boolean symbol) {
+		return symbol ? "£IG£":messages.getString("SpielinformationenKampfschiffproduktion_IG");
 	}
 }

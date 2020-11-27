@@ -80,7 +80,7 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 	transient private static final String PROPERTY_NAME_OUTPUT_PATH = "outputClassPath";
 	
 	private static final String SYMBOL_SEPARATOR = "_";
-	private static final String SYMBOL_PREFIX = "$";
+	private static final String SYMBOL_PREFIX = "£";
 	private static final String SYMBOL_PARAMETER_SEPARATOR = "§";
 	
 	public static void main(String[] args) 

@@ -6259,7 +6259,10 @@ public class Spiel extends EmailTransportBase implements Serializable
  				keys.add(new ConsoleKey("ESC", SternResources.Hauptmenue(true)));
  				keys.add(new ConsoleKey("0",SternResources.SpielinformationenPlanet(true)));
  				
- 				keys.add(new ConsoleKey("1",SternResources.SpielinformationenEnergieproduktion(true)));
+ 				keys.add(new ConsoleKey("1",
+ 						simpel ?
+ 								SternResources.SpielinformationenKampfschiffproduktion(true) :
+ 								SternResources.SpielinformationenEnergieproduktion(true)));
  				
  				if (!simpel && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
  					keys.add(new ConsoleKey("2", SternResources.SpielinformationenFestungen(true)));
@@ -6282,7 +6285,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				String inputString = input.getInputText().toUpperCase();
  				
  				if (inputString.equals("1"))
- 					this.energieprod();
+ 					this.energieprod(simpel);
  				else if (!simpel && inputString.equals("5"))
  					this.buendnisse();
  				else if (!simpel && inputString.equals("2") && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
@@ -6301,9 +6304,22 @@ public class Spiel extends EmailTransportBase implements Serializable
  			} while (true);
  		}
  		
- 		private void energieprod()
+ 		private void energieprod(boolean simpel)
  		{
- 			this.spiel.console.setHeaderText(this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenEnergieproduktionTitel(true), Colors.INDEX_NEUTRAL);
+ 			if (simpel)
+ 			{
+ 				this.spiel.console.setHeaderText(
+							this.spiel.hauptmenueHeaderGetJahrText() + 
+							" -> "+SternResources.Spielinformationen(true)+
+							" -> "+SternResources.SpielinformationenKampfschiffproduktionTitel(true), Colors.INDEX_NEUTRAL);
+ 			}
+	 		else
+	 		{
+	 			this.spiel.console.setHeaderText(
+	 							this.spiel.hauptmenueHeaderGetJahrText() + 
+	 							" -> "+SternResources.Spielinformationen(true)+
+	 							" -> "+SternResources.SpielinformationenEnergieproduktionTitel(true), Colors.INDEX_NEUTRAL);
+	 		}
  			
  			ArrayList<SpielfeldPlanetDisplayContent> plData = new ArrayList<SpielfeldPlanetDisplayContent>(this.spiel.anzPl);
  			
