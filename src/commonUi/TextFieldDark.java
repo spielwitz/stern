@@ -19,10 +19,10 @@ package commonUi;
 import java.awt.Color;
 import java.awt.Font;
 
-import javax.swing.JFormattedTextField;
+import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
-public class TextFieldDark extends JFormattedTextField 
+public class TextFieldDark extends JTextField 
 {
 	public TextFieldDark(String text, Font f)
 	{
