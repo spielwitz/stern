@@ -17,8 +17,11 @@
 package commonServer;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class ServerUtils
 {
@@ -55,5 +58,19 @@ public class ServerUtils
 		return aca;
 	}
 	
-
+	public static boolean writeClientUserCredentials(ClientUserCredentials cuc, String fileName)
+	{
+		boolean success = true;
+		
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName)))
+		{
+			String text = cuc.toJson();
+			bw.write(text);			
+		} catch (IOException e)
+		{
+			success = false;
+		}
+		
+		return success;
+	}
 }

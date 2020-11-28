@@ -27,17 +27,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.security.KeyPair;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import common.SternResources;
 import commonServer.ClientUserCredentials;
@@ -56,7 +56,8 @@ import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial") class ServerCredentialsJDialog extends JDialog implements ActionListener
+@SuppressWarnings("serial") 
+class ServerCredentialsJDialog extends JDialog implements ActionListener
 {
 	private ButtonDark butOk;
 	private ButtonDark butClose;
@@ -65,7 +66,7 @@ import commonUi.TextFieldDark;
 	private ButtonDark butAuthActivate;
 	private LabelDark labPing;
 	private TextFieldDark tfAuthUrl;
-	private TextFieldDark tfAuthPort;
+	private IntegerTextFieldDark tfAuthPort;
 	private TextFieldDark tfAuthUserId;
 	private TextFieldDark tfAdminEmail;
 	private TextFieldDark tfAuthFile;
@@ -75,6 +76,8 @@ import commonUi.TextFieldDark;
 	String serverUserCredentialsFile;
 	boolean serverCommunicationEnabled;
 	private ClientUserCredentials cuc;
+	private String authUrlBefore;
+	private int authPortBefore;
 	boolean ok = false;
 	
 	private static Font font;
@@ -90,6 +93,12 @@ import commonUi.TextFieldDark;
 		this.serverCommunicationEnabled = serverCommunicationEnabled;
 		this.serverUserCredentialsFile = serverUserCredentialsFile;
 		this.cuc = ServerUtils.readClientUserCredentials(this.serverUserCredentialsFile);
+		
+		if (this.cuc != null)
+		{
+			this.authUrlBefore = this.cuc.url;
+			this.authPortBefore = this.cuc.port;
+		}
 		
 		// Font laden
 		font = DialogFontHelper.getFont();
@@ -134,11 +143,11 @@ import commonUi.TextFieldDark;
 		PanelDark panAuthInfo = new PanelDark(new SpringLayout());
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminUrl(false)+":", font));
-		this.tfAuthUrl = new TextFieldDark("", font, false); 
+		this.tfAuthUrl = new TextFieldDark("", font, true); 
 		panAuthInfo.add(this.tfAuthUrl);
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminPort(false)+":", font));
-		this.tfAuthPort = new TextFieldDark("", font, false);
+		this.tfAuthPort = new IntegerTextFieldDark(font); // Erlaube nur bis zu 5 Ziffern
 		panAuthInfo.add(this.tfAuthPort);
 		
 		panAuthInfo.add(new LabelDark(SternResources.UserId(false)+":", font));
@@ -212,7 +221,7 @@ import commonUi.TextFieldDark;
 		this.getRootPane().registerKeyboardAction(this, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 		getRootPane().setDefaultButton(this.butClose);
 		
-		this.setControlsEnabled();
+		this.tfAuthPort.enableCheckInput(); // macht auch setControlsEnabled() mit
 		
 		this.pack();
 		this.setLocationRelativeTo(parent);	
@@ -233,6 +242,27 @@ import commonUi.TextFieldDark;
 		}
 		if (source == this.butOk)
 		{
+			if (this.cuc != null && this.authUrlBefore != null &&
+				(!this.authUrlBefore.equals(this.tfAuthUrl.getText()) ||
+				 this.authPortBefore != Integer.parseInt(this.tfAuthPort.getText())))
+			{
+				int dialogResult = JOptionPane.showConfirmDialog(this,
+						SternResources.ServerUrlUebernehmen(false),
+					    SternResources.ServerZugangsdatenAendern(false),
+					    JOptionPane.YES_NO_CANCEL_OPTION);
+
+				if (dialogResult == JOptionPane.YES_OPTION)
+				{
+					this.cuc.url = this.tfAuthUrl.getText();
+					this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+					ServerUtils.writeClientUserCredentials(cuc, this.serverUserCredentialsFile);
+				}
+				else if (dialogResult == JOptionPane.CANCEL_OPTION)
+				{
+					return;
+				}
+			}
+			
 			this.ok = true;
 			this.close();
 		}
@@ -266,6 +296,8 @@ import commonUi.TextFieldDark;
 				{
 					this.serverUserCredentialsFile = file.getAbsolutePath();
 					this.fillAuthCredentials(this.cuc);
+					this.authUrlBefore = this.cuc.url;
+					this.authPortBefore = this.cuc.port;
 				}
 				else
 					JOptionPane.showMessageDialog(this,
@@ -277,6 +309,12 @@ import commonUi.TextFieldDark;
 		}
 		else if (source == this.butPing)
 		{
+			if (this.cuc != null)
+			{
+				this.cuc.url = this.tfAuthUrl.getText();
+				this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+			}
+			
 			RequestMessage msg = new RequestMessage(RequestMessageType.PING);
 			
 			ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
@@ -366,25 +404,21 @@ import commonUi.TextFieldDark;
 						
 						File fileClientInfo = new File(directory, filename);
 						
-						try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileClientInfo.getAbsoluteFile())))
+						boolean success = ServerUtils.writeClientUserCredentials(cucTemp, fileClientInfo.getAbsolutePath());
+						
+						if (success)
 						{
-							String text = cucTemp.toJson();
-							bw.write(text);
-							
 							JOptionPane.showMessageDialog(this,
 									SternResources.BenutzerAktivierenErfolg(false),
 								    SternResources.BenutzerAktivieren(false),
 								    JOptionPane.INFORMATION_MESSAGE);
 							
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						
-						this.serverUserCredentialsFile = fileClientInfo.getAbsolutePath();
-						this.cuc = cucTemp;
-						
-						// UI aktuaslisieren
-						this.fillAuthCredentials(this.cuc);
+							this.serverUserCredentialsFile = fileClientInfo.getAbsolutePath();
+							this.cuc = cucTemp;
+							
+							// UI aktuaslisieren
+							this.fillAuthCredentials(this.cuc);
+						}						
 					}
 				}
 			}
@@ -442,8 +476,73 @@ import commonUi.TextFieldDark;
 	
 	private void setControlsEnabled()
 	{
-		this.butAuthActivate.setEnabled(this.serverCommunicationEnabled);
+		this.butAuthActivate.setEnabled(this.serverCommunicationEnabled && !this.tfAuthPort.error);
 		this.butAuthBrowse.setEnabled(this.serverCommunicationEnabled);
-		this.butPing.setEnabled(this.serverCommunicationEnabled);
+		this.butPing.setEnabled(this.serverCommunicationEnabled && !this.tfAuthPort.error);
+		this.butOk.setEnabled(!this.tfAuthPort.error);
+	}
+	
+	private class IntegerTextFieldDark extends JTextField  implements DocumentListener
+	{
+		public boolean error = false;
+		private boolean checkInput = false;
+		
+		public IntegerTextFieldDark(Font f)
+		{
+			super();
+			this.init(f);
+			this.getDocument().addDocumentListener(this);
+			this.checkInput();
+		}
+		
+		private void init(Font f)
+		{
+			this.setFont(f);
+			this.setBackground(Color.black);
+			this.setForeground(Color.white);
+			this.setCaretColor(Color.white);
+		}
+		
+		@Override
+		public void insertUpdate(DocumentEvent e)
+		{
+			this.checkInput();
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) 
+		{
+			this.checkInput();
+		}
+
+		@Override
+		public void changedUpdate(DocumentEvent e) 
+		{
+			this.checkInput();
+		}
+		
+		private void checkInput()
+		{
+			if (checkInput)
+			{
+				try
+				{
+					Integer.parseInt(this.getText());
+					this.error = false;
+				}
+				catch (Exception x)
+				{
+					this.error = true;
+				}
+				
+				setControlsEnabled();
+			}
+		}
+		
+		public void enableCheckInput()
+		{
+			this.checkInput = true;
+			this.checkInput();
+		}
 	}
 }

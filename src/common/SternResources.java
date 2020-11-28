@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IG
+		// Hoechstes vergebenes Symbol: II
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -581,6 +581,8 @@ public class SternResources
 		symbolDict.put("IE","ClientSettingsJDialogMeineIp_IE");
 		symbolDict.put("IF","SpielinformationenKampfschiffproduktionTitel_IF");
 		symbolDict.put("IG","SpielinformationenKampfschiffproduktion_IG");
+		symbolDict.put("IH","ServerUrlUebernehmen_IH");
+		symbolDict.put("II","ServerZugangsdatenAendern_II");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4415,5 +4417,19 @@ public class SternResources
 	   */
 	public static String SpielinformationenKampfschiffproduktion(boolean symbol) {
 		return symbol ? "£IG£":messages.getString("SpielinformationenKampfschiffproduktion_IG");
+	}
+
+	/**
+	   * Wollen Sie die ge\u00E4nderte Server-URL abspeichern? [IH]
+	   */
+	public static String ServerUrlUebernehmen(boolean symbol) {
+		return symbol ? "£IH£":messages.getString("ServerUrlUebernehmen_IH");
+	}
+
+	/**
+	   * Zugangsdaten speichern? [II]
+	   */
+	public static String ServerZugangsdatenAendern(boolean symbol) {
+		return symbol ? "£II£":messages.getString("ServerZugangsdatenAendern_II");
 	}
 }
