@@ -99,7 +99,6 @@ public class SternClient extends Frame // NO_UCD (use default)
 	transient private static final String PROPERTY_NAME_MEIN_NAME = "meinName";
 	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
 	transient private static final String PROPERTY_LAST_UPDATE_FOUND = "lastUpdateFound";
-	transient private static final String PROPERTY_NAME_INACTIVE = "inaktivBeiZugeingabe";
 	
 	public static void main(String[] args)
 	{
@@ -466,11 +465,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 		}
 		if (prop.containsKey(PROPERTY_LAST_UPDATE_FOUND))
 			this.lastUpdateCheck = prop.getProperty(PROPERTY_LAST_UPDATE_FOUND);
-		
-		if (prop.containsKey(PROPERTY_NAME_INACTIVE))
-			this.settings.inaktivBeiZugeingabe = 
-				Boolean.parseBoolean(prop.getProperty(PROPERTY_NAME_INACTIVE));
-		
+
 		return prop;
 	}
 	
@@ -479,7 +474,6 @@ public class SternClient extends Frame // NO_UCD (use default)
 		this.props.setProperty(PROPERTY_NAME_SERVER_IP, this.settings.serverIp);
 		this.props.setProperty(PROPERTY_NAME_MEINE_IP, this.settings.meineIp);
 		this.props.setProperty(PROPERTY_NAME_MEIN_NAME, this.settings.meinName);
-		this.props.setProperty(PROPERTY_NAME_INACTIVE, Boolean.toString(this.settings.inaktivBeiZugeingabe));
 		
 		writeProperties(this.props);
 	}

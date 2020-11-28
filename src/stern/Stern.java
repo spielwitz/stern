@@ -134,6 +134,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
 	transient private static final String PROPERTY_MUTE_NOTIFICATION_SOUND = "muteNotificationSound";
 	transient private static final String PROPERTY_MEINE_IP = "ip";
+    transient private static final String PROPERTY_CLIENTS_INACTIVE = "clientsInaktivBeiZugeingabe";
 	
 	
 	static final int HIGHSCORE_NUM_ENTRIES = 20;
@@ -206,6 +207,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 	private Clip soundClipGlocke;
 	
 	private boolean muteNotificationSound;
+	private boolean clientsInaktivBeiZugeingabe;
 	private String meineIp;
 	
 	public static void main(String[] args)
@@ -1046,6 +1048,11 @@ public class Stern extends Frame  // NO_UCD (use default)
 		if (prop.containsKey(PROPERTY_MEINE_IP))
 			this.meineIp = prop.getProperty(PROPERTY_MEINE_IP);
 		
+		if (prop.containsKey(PROPERTY_CLIENTS_INACTIVE))
+			this.clientsInaktivBeiZugeingabe = 
+				Boolean.parseBoolean(prop.getProperty(PROPERTY_CLIENTS_INACTIVE));
+
+		
 		return prop;
 	}
 	
@@ -1128,8 +1135,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			String release, 
 			String ip,
 			String clientCode, 
-			String clientName,
-			boolean inaktivBeiZugeingabe) 
+			String clientName) 
 					throws RemoteException
 	{
 		if (release.equals(ReleaseGetter.getRelease()))
@@ -1138,7 +1144,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 					ip, 
 					clientCode, 
 					clientName, 
-					inaktivBeiZugeingabe);
+					this.clientsInaktivBeiZugeingabe);
 		else
 			return SternResources.UnterschiedlicheBuilds(false);
 	}
@@ -1703,5 +1709,17 @@ public class Stern extends Frame  // NO_UCD (use default)
 	public void lastUpdateFound(String updateBuild) 
 	{
 		this.setProperty(PROPERTY_LAST_UPDATE_FOUND, updateBuild);
+	}
+	
+	public boolean getClientsInaktivBeiZugeingabe()
+	{
+		return this.clientsInaktivBeiZugeingabe;
+	}
+	
+	public void setClientsInaktivBeiZugeingabe(boolean enabled)
+	{
+		this.clientsInaktivBeiZugeingabe = enabled;
+		
+		this.setProperty(PROPERTY_CLIENTS_INACTIVE, Boolean.toString(this.clientsInaktivBeiZugeingabe));
 	}
 }

@@ -43,7 +43,6 @@ import javax.swing.event.ChangeListener;
 import common.SternResources;
 import common.Utils;
 import commonUi.ButtonDark;
-import commonUi.CheckBoxDark;
 import commonUi.DialogFontHelper;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
@@ -59,6 +58,7 @@ import commonUi.TextFieldDark;
 	private TextFieldDark tfIp;
 	
 	private CheckBoxDark cbServerEnabled;
+    private CheckBoxDark cbInaktivBeiZugeingabe;
 	private JList<String> listClients;
 	
 	private DefaultListModel<String> listClientsModel;
@@ -70,6 +70,7 @@ import commonUi.TextFieldDark;
 	private static Font font;
 	
 	public String meineIp;
+	private boolean inaktivBeiZugeingabe;
 	
 	ServerSettingsJDialog(
 			Stern parent,
@@ -88,6 +89,7 @@ import commonUi.TextFieldDark;
 		
 		this.serverFunctions = serverFunctions;
 		this.parent = parent;
+		this.inaktivBeiZugeingabe = parent.getClientsInaktivBeiZugeingabe();
 		
 		this.setLayout(new BorderLayout());
 		this.setBackground(new Color(30, 30, 30));
@@ -104,9 +106,20 @@ import commonUi.TextFieldDark;
 		PanelDark panServer = new GroupBoxDark(SternResources.Terminalserver(false), font);
 		panServer.setLayout(new GridLayout(2,1));
 		
+		PanelDark panServerSub = new PanelDark(new GridLayout(2,1));
+		
+		this.cbInaktivBeiZugeingabe = new CheckBoxDark(
+				SternResources.ServerSettingsJDialogInaktiv(false), 
+				this.inaktivBeiZugeingabe, 
+				font);
+		this.cbInaktivBeiZugeingabe.addActionListener(this);
+		panServerSub.add(this.cbInaktivBeiZugeingabe);
+		
 		this.cbServerEnabled = new CheckBoxDark(SternResources.ServerSettingsJDialogTerminalServerAktiv(false), serverFunctions.isServerEnabled(), font);
 		this.cbServerEnabled.addActionListener(this);
-		panServer.add(this.cbServerEnabled);
+		panServerSub.add(this.cbServerEnabled);
+		
+		panServer.add(panServerSub);
 		
 		PanelDark panServerCodes = new PanelDark();
 		panServerCodes.setLayout(new SpringLayout());
@@ -209,6 +222,7 @@ import commonUi.TextFieldDark;
 		this.pack();
 		this.setLocationRelativeTo(parent);	
 		this.setResizable(false);
+		this.setControlsEnabled();
 	}
 	
 	@Override
@@ -236,6 +250,12 @@ import commonUi.TextFieldDark;
 			}
 			
 			this.setCursor(Cursor.getDefaultCursor());
+			this.setControlsEnabled();
+		}
+		else if (source == this.cbInaktivBeiZugeingabe)
+		{
+			this.inaktivBeiZugeingabe = this.cbInaktivBeiZugeingabe.isSelected();
+			this.parent.setClientsInaktivBeiZugeingabe(this.inaktivBeiZugeingabe);
 		}
 		else if (source == this.butRefreshClients)
 			this.updateClientList();
@@ -273,5 +293,10 @@ import commonUi.TextFieldDark;
 							client.getClientName();
 			this.listClientsModel.addElement(name + " (" + client.getClientIp() + ")");
 		}
+	}
+	
+	private void setControlsEnabled()
+	{
+		this.cbInaktivBeiZugeingabe.setEnabled(!this.cbServerEnabled.isSelected());
 	}
 }

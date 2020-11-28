@@ -4383,7 +4383,7 @@ public class SternResources
 	}
 
 	/**
-	   * Inaktiv w\u00E4hrend der Zugeingabe [IC]
+	   * Clients inaktiv w\u00E4hrend der Zugeingabe [IC]
 	   */
 	public static String ServerSettingsJDialogInaktiv(boolean symbol) {
 		return symbol ? "£IC£":messages.getString("ServerSettingsJDialogInaktiv_IC");

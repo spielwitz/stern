@@ -45,7 +45,6 @@ import common.ReleaseGetter;
 import common.SternResources;
 import common.Utils;
 import commonUi.ButtonDark;
-import commonUi.CheckBoxDark;
 import commonUi.DialogFontHelper;
 import commonUi.IServerMethods;
 import commonUi.LabelDark;
@@ -64,7 +63,6 @@ import commonUi.TextFieldDark;
 	private PasswordFieldDark tfClientCode;
 	private TextFieldDark tfMeinName;
 	private LabelDark labStatus;
-	private CheckBoxDark cbInaktivBeiZugeingabe;
 
 	private ClientSettings settings;
 	
@@ -95,14 +93,6 @@ import commonUi.TextFieldDark;
 		// ---------------
 		PanelDark panMain = new PanelDark();
 		panMain.setLayout(new BorderLayout(20,10));
-		
-		// ---------------
-		this.cbInaktivBeiZugeingabe = new CheckBoxDark(
-				SternResources.ServerSettingsJDialogInaktiv(false), 
-				this.settings.inaktivBeiZugeingabe, 
-				font);
-		
-		panMain.add(this.cbInaktivBeiZugeingabe, BorderLayout.NORTH);
 		
 		// ---------------
 		PanelDark panServer = this.getGroupBox(SternResources.SternScreenSharingServer(false));
@@ -241,8 +231,7 @@ import commonUi.TextFieldDark;
 						ReleaseGetter.getRelease(),
 						this.settings.meineIp,
 						this.settings.clientCode,
-						this.settings.meinName,
-						this.cbInaktivBeiZugeingabe.isSelected());
+						this.settings.meinName);
 				
 				if (errorMsg.length() > 0)
 					JOptionPane.showMessageDialog(this,
@@ -311,7 +300,6 @@ import commonUi.TextFieldDark;
 		this.settings.meinName = this.tfMeinName.getText();
 		this.settings.meineIp = this.tfMeineIp.getText();
 		this.settings.serverIp = this.tfServerIp.getText();
-		this.settings.inaktivBeiZugeingabe = this.cbInaktivBeiZugeingabe.isSelected();
 	}
 
 	@Override
