@@ -28,7 +28,7 @@ public class SternAbout
 		DialogWindow.showInformation(
 				parent, 
 				new MessageWithLink(
-						"Stern - (c) 1989-2020 Michael Schweitzer - <a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>"),
+						"STERN - (c) 1989-2020 Michael Schweitzer - <a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>"),
 				"Build " + ReleaseGetter.format(ReleaseGetter.getRelease()));
 	}
 }
