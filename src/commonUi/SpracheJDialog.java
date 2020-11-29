@@ -30,7 +30,6 @@ import java.util.Hashtable;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
@@ -156,12 +155,11 @@ public class SpracheJDialog extends JDialog implements ActionListener
 		}
 		else if (source == this.butOk)
 		{
-			int dialogResult = JOptionPane.showConfirmDialog(this,
+			DialogWindowResult dialogResult =  DialogWindow.showOkCancel(this,
 					SternResources.SpracheDialogFrage(false),
-					SternResources.SpracheDialogTitle(false),
-				    JOptionPane.OK_CANCEL_OPTION);
+					SternResources.SpracheDialogTitle(false));
 			
-			if (dialogResult == JOptionPane.OK_OPTION)
+			if (dialogResult == DialogWindowResult.OK)
 			{
 				String selectedKey = (String)this.comboSprachen.getSelectedItem();
 				this.languageCode = this.sprachen.get(selectedKey);

@@ -61,7 +61,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.SpringLayout;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -96,6 +95,8 @@ import commonServer.ResponseMessage;
 import commonServer.ResponseMessageGamesAndUsers;
 import commonServer.ResponseMessageGetStatus;
 import commonServer.ServerUtils;
+import commonUi.DialogWindow;
+import commonUi.DialogWindowResult;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
 import commonUi.IUpdateCheckerCallback;
@@ -556,10 +557,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 			String errorText = Utils.writeSpielToFile(spiel, file);
 			
 			if (errorText != null)
-				JOptionPane.showMessageDialog(this,
+				DialogWindow.showError(
+						this,
 					    errorText,
-					    "",
-					    JOptionPane.ERROR_MESSAGE);
+					    "");
 			else
 			{
 				this.letztesVerzeichnis = directory;
@@ -607,7 +608,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			
 			dlg.setVisible(true);
 			
-			if (dlg.dlgResult == JOptionPane.OK_OPTION)
+			if (dlg.dlgResult == DialogWindowResult.OK)
 			{
 				Spiel spiel = (Spiel)dlg.obj;
 				
@@ -888,10 +889,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 				
 				if (error == true)
 				{
-					JOptionPane.showMessageDialog(this,
+					DialogWindow.showError(
+							this,
 						    errorText,
-						    SternResources.FehlerBeimLaden(false),
-						    JOptionPane.ERROR_MESSAGE);
+						    SternResources.FehlerBeimLaden(false));
 					
 					spiel = null;
 				}
@@ -913,11 +914,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 				}
 			}
 			else
-				JOptionPane.showMessageDialog(
+				DialogWindow.showError(
 						this, 
 						SternResources.DateiExistiertNicht(false), 
-						SternResources.FehlerBeimLaden(false),
-						JOptionPane.OK_OPTION);
+						SternResources.FehlerBeimLaden(false));
 		}
 		
 		return spiel;
@@ -973,13 +973,12 @@ public class Stern extends Frame  // NO_UCD (use default)
 		this.inputEnabled = false;
 		this.redrawScreen();
 		
-		int result = JOptionPane.showConfirmDialog(
+		DialogWindowResult result = DialogWindow.showYesNo(
 				this,
 				SternResources.MoechtestDuSternVerlassen(false),
-				SternResources.SternVerlassen(false),
-				JOptionPane.YES_NO_OPTION);
+				SternResources.SternVerlassen(false));
 		
-		if (result == JOptionPane.YES_OPTION)
+		if (result == DialogWindowResult.YES)
 			System.exit(0);
 		
 		this.inputEnabled = true;
@@ -1414,10 +1413,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 		}
 		
 		if (respMsg.error)
-			JOptionPane.showMessageDialog(this,
+			DialogWindow.showError(
+					this,
 				    respMsg.errorMsg,
-				    SternResources.Verbindungsfehler(false),
-				    JOptionPane.ERROR_MESSAGE);
+				    SternResources.Verbindungsfehler(false));
 		
 		return respMsg;
 
@@ -1610,10 +1609,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 		
 		if (this.cuc == null)
 		{
-			JOptionPane.showMessageDialog(this,
+			DialogWindow.showError(
+					this,
 				    SternResources.ServerZugangsdatenNichtHinterlegt(false),
-				    SternResources.Fehler(false),
-				    JOptionPane.ERROR_MESSAGE);
+				    SternResources.Fehler(false));
 		}
 		else
 		{

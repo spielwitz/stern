@@ -46,13 +46,14 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import common.Constants;
 import common.PdfLauncher;
 import common.ScreenDisplayContent;
 import common.ScreenDisplayContentClient;
+import commonUi.DialogWindow;
+import commonUi.DialogWindowResult;
 import commonUi.IClientMethods;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
@@ -374,13 +375,12 @@ public class SternClient extends Frame // NO_UCD (use default)
 	
 	private void closeSternClient()
 	{
-		int result = JOptionPane.showConfirmDialog(
+		DialogWindowResult result = DialogWindow.showYesNo(
 				this,
 				SternResources.SternClientVerlassenFrage(false),
-				SternResources.SternThinClientVerlassen(false),
-				JOptionPane.YES_NO_OPTION);
+				SternResources.SternThinClientVerlassen(false));
 		
-		if (result == JOptionPane.YES_OPTION)
+		if (result == DialogWindowResult.YES)
 		{
 			// Abmelden vom Server
 			this.logoff();

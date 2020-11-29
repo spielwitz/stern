@@ -16,19 +16,10 @@
 
 package commonUi;
 
-import java.awt.Frame;
-
-import common.Constants;
-import common.ReleaseGetter;
-
-public class SternAbout
+public enum DialogWindowResult 
 {
-	public static void show(Frame parent)
-	{
-		DialogWindow.showInformation(
-				parent, 
-				new MessageWithLink(
-						"Stern - (c) 1989-2020 Michael Schweitzer - <a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>"),
-				"Build " + ReleaseGetter.format(ReleaseGetter.getRelease()));
-	}
+	OK,
+	CANCEL,
+	YES,
+	NO
 }

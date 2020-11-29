@@ -29,7 +29,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
@@ -39,6 +38,8 @@ import common.ReleaseGetter;
 import common.SternResources;
 import commonUi.ButtonDark;
 import commonUi.DialogFontHelper;
+import commonUi.DialogWindow;
+import commonUi.DialogWindowResult;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.PasswordFieldDark;
@@ -61,7 +62,7 @@ import commonUi.SpringUtilities;
 	
 	private boolean passwordProtected;
 	
-	int dlgResult = JOptionPane.CANCEL_OPTION;
+	DialogWindowResult dlgResult = DialogWindowResult.CANCEL;
 	Object obj;
 	
 	ClipboardImportJDialog(
@@ -213,29 +214,26 @@ import commonUi.SpringUtilities;
 			
 			if (ok)
 			{
-				this.dlgResult = JOptionPane.OK_OPTION;
+				this.dlgResult = DialogWindowResult.OK;
 				this.close();
 			}
 			else
 			{
 				this.obj = null;
 				if (password == null)
-					JOptionPane.showMessageDialog(
+					DialogWindow.showError(
 							this,
 							SternResources.ClipboardImportJDIalogImportFehler(false,
 									ReleaseGetter.format(ReleaseGetter.getRelease())),
-							SternResources.FehlerBeimLaden(false),
-							JOptionPane.OK_OPTION);
+							SternResources.FehlerBeimLaden(false));
 				else
-					JOptionPane.showMessageDialog(
+					DialogWindow.showError(
 							this,
 							SternResources.ClipboardImportJDIalogImportFehlerPassword(false,
 									ReleaseGetter.format(ReleaseGetter.getRelease())),
-							SternResources.FehlerBeimLaden(false),
-							JOptionPane.OK_OPTION);
+							SternResources.FehlerBeimLaden(false));
 			}
 		}
-		
 	}
 	
 	private void close()

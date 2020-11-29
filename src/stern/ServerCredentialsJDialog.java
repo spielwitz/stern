@@ -32,7 +32,6 @@ import java.security.KeyPair;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
@@ -51,6 +50,8 @@ import commonServer.ServerConstants;
 import commonServer.ServerUtils;
 import commonUi.ButtonDark;
 import commonUi.DialogFontHelper;
+import commonUi.DialogWindow;
+import commonUi.DialogWindowResult;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
@@ -246,18 +247,18 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 				(!this.authUrlBefore.equals(this.tfAuthUrl.getText()) ||
 				 this.authPortBefore != Integer.parseInt(this.tfAuthPort.getText())))
 			{
-				int dialogResult = JOptionPane.showConfirmDialog(this,
+				DialogWindowResult dialogResult = DialogWindow.showYesNoCancel(
+						this,
 						SternResources.ServerUrlUebernehmen(false),
-					    SternResources.ServerZugangsdatenAendern(false),
-					    JOptionPane.YES_NO_CANCEL_OPTION);
+					    SternResources.ServerZugangsdatenAendern(false));
 
-				if (dialogResult == JOptionPane.YES_OPTION)
+				if (dialogResult == DialogWindowResult.YES)
 				{
 					this.cuc.url = this.tfAuthUrl.getText();
 					this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
 					ServerUtils.writeClientUserCredentials(cuc, this.serverUserCredentialsFile);
 				}
-				else if (dialogResult == JOptionPane.CANCEL_OPTION)
+				else if (dialogResult == DialogWindowResult.CANCEL)
 				{
 					return;
 				}
@@ -300,10 +301,10 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 					this.authPortBefore = this.cuc.port;
 				}
 				else
-					JOptionPane.showMessageDialog(this,
+					DialogWindow.showError(
+						this,
 						SternResources.UngueltigeAnmeldedaten(false, file.getAbsolutePath().toString()),
-					    SternResources.Fehler(false),
-					    JOptionPane.ERROR_MESSAGE);
+					    SternResources.Fehler(false));
 
 			}
 		}
@@ -332,22 +333,22 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 			
 			dlg.setVisible(true);
 			
-			if (dlg.dlgResult == JOptionPane.OK_OPTION)
+			if (dlg.dlgResult == DialogWindowResult.OK)
 			{
 				ResponseMessageChangeUser newUser = (ResponseMessageChangeUser)dlg.obj;
 				
 				if (newUser != null)
 				{
-					int dialogResult = JOptionPane.showConfirmDialog(this,
+					DialogWindowResult dialogResult = DialogWindow.showOkCancel(
+							this,
 							SternResources.BenutzerAktivierenFrage(
 									false, 
 									newUser.userId, 
 									newUser.serverUrl, 
 									Integer.toString(newUser.serverPort)),
-						    SternResources.BenutzerAktivieren(false),
-						    JOptionPane.OK_CANCEL_OPTION);
+						    SternResources.BenutzerAktivieren(false));
 					
-					if (dialogResult != JOptionPane.OK_OPTION)
+					if (dialogResult != DialogWindowResult.OK)
 						return;
 					
 					// Wohin soll das Credential-File gespeichert werden?
@@ -408,10 +409,10 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 						
 						if (success)
 						{
-							JOptionPane.showMessageDialog(this,
+							DialogWindow.showInformation(
+									this,
 									SternResources.BenutzerAktivierenErfolg(false),
-								    SternResources.BenutzerAktivieren(false),
-								    JOptionPane.INFORMATION_MESSAGE);
+								    SternResources.BenutzerAktivieren(false));
 							
 							this.serverUserCredentialsFile = fileClientInfo.getAbsolutePath();
 							this.cuc = cucTemp;
@@ -423,7 +424,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 				}
 			}
 		}
-		
 	}
 	
 	private ResponseMessage sendAndReceive(ClientUserCredentials cuc, RequestMessage msg)
@@ -433,10 +433,10 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 		this.setCursor(Cursor.getDefaultCursor());
 		
 		if (respMsg.error)
-			JOptionPane.showMessageDialog(this,
+			DialogWindow.showError(
+					this,
 				    respMsg.errorMsg,
-				    SternResources.Verbindungsfehler(false),
-				    JOptionPane.ERROR_MESSAGE);
+				    SternResources.Verbindungsfehler(false));
 		
 		return respMsg;
 	}

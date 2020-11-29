@@ -40,7 +40,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
@@ -69,6 +68,8 @@ import commonServer.ServerUtils;
 import commonUi.ButtonDark;
 import commonUi.ComboBoxDark;
 import commonUi.DialogFontHelper;
+import commonUi.DialogWindow;
+import commonUi.DialogWindowResult;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.PasswordFieldDark;
@@ -414,10 +415,10 @@ import commonUi.TextFieldDark;
 					this.fillAuthCredentials(this.cuc);
 				}
 				else
-					JOptionPane.showMessageDialog(this,
+					DialogWindow.showError(
+							this,
 							SternResources.UngueltigeAnmeldedaten(false, file.getAbsoluteFile().toString()),
-						    SternResources.Fehler(false),
-						    JOptionPane.ERROR_MESSAGE);
+						    SternResources.Fehler(false));
 
 			}
 		}
@@ -438,29 +439,29 @@ import commonUi.TextFieldDark;
 		}
 		else if (source == this.butShutdown)
 		{
-			int dialogResult = JOptionPane.showConfirmDialog(this,
+			DialogWindowResult dialogResult = DialogWindow.showOkCancel(
+					this,
 					SternResources.ServerAdminShutdownFrage(false),
-					SternResources.ServerAdminShutdown(false),
-				    JOptionPane.OK_CANCEL_OPTION);
+					SternResources.ServerAdminShutdown(false));
 			
-			if (dialogResult == JOptionPane.OK_OPTION)
+			if (dialogResult == DialogWindowResult.OK)
 			{
-				dialogResult = JOptionPane.showConfirmDialog(this,
+				dialogResult = DialogWindow.showYesNo(
+						this,
 					    SternResources.AreYouSure(false),
-					    SternResources.ServerAdminShutdown(false),
-					    JOptionPane.YES_NO_OPTION);
+					    SternResources.ServerAdminShutdown(false));
 				
-				if (dialogResult == JOptionPane.YES_OPTION)
+				if (dialogResult == DialogWindowResult.YES)
 				{
 					RequestMessage msgRequest = new RequestMessage(RequestMessageType.ADMIN_SERVER_SHUTDOWN);
 					
 					ResponseMessage msgResponse = this.sendAndReceive(msgRequest, true);
 					
 					if (!msgResponse.error)
-						JOptionPane.showMessageDialog(this,
+						DialogWindow.showInformation(
+								this,
 							    SternResources.ServerAdminShutdownDone(false),
-							    SternResources.ServerAdminShutdown(false),
-							    JOptionPane.INFORMATION_MESSAGE);
+							    SternResources.ServerAdminShutdown(false));
 				}
 			}
 		}
@@ -500,10 +501,10 @@ import commonUi.TextFieldDark;
 		this.setCursor(Cursor.getDefaultCursor());
 		
 		if (respMsg.error && message)
-			JOptionPane.showMessageDialog(this,
+			DialogWindow.showError(
+					this,
 				    respMsg.errorMsg,
-				    SternResources.Verbindungsfehler(false),
-				    JOptionPane.ERROR_MESSAGE);
+				    SternResources.Verbindungsfehler(false));
 		
 		return respMsg;
 	}
@@ -521,7 +522,7 @@ import commonUi.TextFieldDark;
 			
 			try
 			{
-			respGetUser = (ResponseMessageGetUsers)
+				respGetUser = (ResponseMessageGetUsers)
 					ResponseMessageGetUsers.fromJson(resp.payloadSerialized, ResponseMessageGetUsers.class);
 			}
 			catch (Exception x)
@@ -601,19 +602,19 @@ import commonUi.TextFieldDark;
 			
 			if (!password1.equals(password2))
 			{
-				JOptionPane.showMessageDialog(this,
+				DialogWindow.showError(
+						this,
 						SternResources.PasswoerterUnterschiedlich(false),
-					    SternResources.ServerAdminSpieler(false),
-					    JOptionPane.ERROR_MESSAGE);
+					    SternResources.ServerAdminSpieler(false));
 				return;
 			}
 			
 			if (password1.length() < 3)
 			{
-				JOptionPane.showMessageDialog(this,
+				DialogWindow.showError(
+						this,
 						SternResources.PasswortZuKurz(false),
-					    SternResources.ServerAdminSpieler(false),
-					    JOptionPane.ERROR_MESSAGE);
+					    SternResources.ServerAdminSpieler(false));
 				return;
 			}
 		}
@@ -626,34 +627,34 @@ import commonUi.TextFieldDark;
 		reqMsgChangeUser.create = (mode == Mode.NewUser);
 		reqMsgChangeUser.renewCredentials = (mode == Mode.NewUser || mode == Mode.RenewCredentials);
 		
-		int dialogResult = 0;
+		DialogWindowResult dialogResult = DialogWindowResult.OK;
 		
 		if (mode == Mode.NewUser)
 		{
-			dialogResult = JOptionPane.showConfirmDialog(this,
+			dialogResult = DialogWindow.showOkCancel(
+					this,
 					SternResources.ServerAdminBenutzerAnlegenFrage(false, reqMsgChangeUser.userId),
-				    SternResources.ServerAdminSpieler(false),
-				    JOptionPane.OK_CANCEL_OPTION);
+				    SternResources.ServerAdminSpieler(false));
 		}
 		else if (mode == Mode.RenewCredentials)
 		{
-			dialogResult = JOptionPane.showConfirmDialog(this,
+			dialogResult = DialogWindow.showOkCancel(
+					this,
 					SternResources.ServerAdminUserRenewCredentials(false, reqMsgChangeUser.userId),
-				    SternResources.ServerAdminSpieler(false),
-				    JOptionPane.OK_CANCEL_OPTION);
+				    SternResources.ServerAdminSpieler(false));
 		}
 		else if (mode == Mode.ChangeUser)
 		{
-			dialogResult = JOptionPane.showConfirmDialog(this,
+			dialogResult = DialogWindow.showOkCancel(
+					this,
 					SternResources.ServerAdminUserUpdate(false, reqMsgChangeUser.userId),
-				    SternResources.ServerAdminSpieler(false),
-				    JOptionPane.OK_CANCEL_OPTION);
+				    SternResources.ServerAdminSpieler(false));
 		}
 		else
 			return; // Da ist was falsch implementiert 
 			
 		
-		if (dialogResult != JOptionPane.OK_OPTION)
+		if (dialogResult != DialogWindowResult.OK)
 			return;
 		
 		RequestMessage msg = new RequestMessage(RequestMessageType.ADMIN_CHANGE_USER);
@@ -673,11 +674,10 @@ import commonUi.TextFieldDark;
 			if (reqMsgChangeUser.renewCredentials)
 			{
 				// Einfach nur eine Erfolgsnachricht bringen
-				JOptionPane.showMessageDialog(
+				DialogWindow.showInformation(
 						this, 
 						SternResources.ServerAdminUserCreated(false, reqMsgChangeUser.userId), 
-						SternResources.ServerAdminSpieler(false),
-						JOptionPane.INFORMATION_MESSAGE);
+						SternResources.ServerAdminSpieler(false));
 				
 				EmailToolkit.launchEmailClient(
 						reqMsgChangeUser.email, 
@@ -694,11 +694,10 @@ import commonUi.TextFieldDark;
 			else
 			{
 				// Einfach nur eine Erfolgsnachricht bringen
-				JOptionPane.showMessageDialog(
+				DialogWindow.showInformation(
 						this, 
 						SternResources.ServerAdminUserErfolg(false, reqMsgChangeUser.userId), 
-						SternResources.ServerAdminSpieler(false),
-						JOptionPane.INFORMATION_MESSAGE);
+						SternResources.ServerAdminSpieler(false));
 			}
 		}		
 	}
@@ -714,20 +713,20 @@ import commonUi.TextFieldDark;
 		
 		requestMessage.payloadSerialized = userId;
 		
-		int dialogResult = JOptionPane.showConfirmDialog(this,
+		DialogWindowResult dialogResult = DialogWindow.showOkCancel(
+				this,
 				SternResources.ServerAdminUserDelete(false, userId),
-			    SternResources.ServerAdminSpieler(false),
-			    JOptionPane.OK_CANCEL_OPTION);
+			    SternResources.ServerAdminSpieler(false));
 		
-		if (dialogResult != JOptionPane.OK_OPTION)
+		if (dialogResult != DialogWindowResult.OK)
 			return;
 		
-		dialogResult = JOptionPane.showConfirmDialog(this,
+		dialogResult = DialogWindow.showYesNo(
+				this,
 				SternResources.AreYouSure(false),
-			    SternResources.ServerAdminSpieler(false),
-			    JOptionPane.YES_NO_OPTION);
+			    SternResources.ServerAdminSpieler(false));
 		
-		if (dialogResult != JOptionPane.YES_OPTION)
+		if (dialogResult != DialogWindowResult.YES)
 			return;
 		
 		ResponseMessage respMsg = this.sendAndReceive(requestMessage, true);
@@ -737,11 +736,10 @@ import commonUi.TextFieldDark;
 			// Userliste aktualisieren
 			this.butRefreshUserList.doClick();
 			
-			JOptionPane.showMessageDialog(
+			DialogWindow.showInformation(
 					this, 
 					SternResources.ServerAdminUserDeleted(false, userId), 
-					SternResources.ServerAdminSpieler(false),
-					JOptionPane.INFORMATION_MESSAGE);
+					SternResources.ServerAdminSpieler(false));
 		}
 	}
 	
@@ -809,13 +807,10 @@ import commonUi.TextFieldDark;
 				}
 			}
 			else
-				JOptionPane.showMessageDialog(
+				DialogWindow.showInformation(
 						this, 
 						SternResources.ServerLogLeer(false), 
-						SternResources.ServerLogDownload(false),
-						JOptionPane.INFORMATION_MESSAGE);
-			
-			//respMsgPayload.fileName
+						SternResources.ServerLogDownload(false));
 		}
 	}
 	
@@ -823,12 +818,12 @@ import commonUi.TextFieldDark;
 	{
 		String newLogLevel = (String) this.comboServerLogLevel.getSelectedItem();
 		
-		int dialogResult = JOptionPane.showConfirmDialog(this,
+		DialogWindowResult dialogResult = DialogWindow.showYesNo(
+				this,
 				SternResources.ServerLogLevelAendernAYS(false, newLogLevel),
-			    SternResources.ServerLogLevelAendern(false),
-			    JOptionPane.YES_NO_OPTION);
+			    SternResources.ServerLogLevelAendern(false));
 		
-		if (dialogResult != JOptionPane.YES_OPTION)
+		if (dialogResult != DialogWindowResult.YES)
 			return;
 		
 		RequestMessage requestMessage = new RequestMessage(RequestMessageType.ADMIN_SET_LOG_LEVEL);
@@ -842,11 +837,10 @@ import commonUi.TextFieldDark;
 		
 		if (!respMsg.error)
 		{
-			JOptionPane.showMessageDialog(
+			DialogWindow.showInformation(
 					this, 
 					SternResources.ServerLogLevelAendernErfolg(false), 
-					SternResources.ServerLogLevelAendern(false),
-					JOptionPane.INFORMATION_MESSAGE);
+					SternResources.ServerLogLevelAendern(false));
 		}
 	}
 	

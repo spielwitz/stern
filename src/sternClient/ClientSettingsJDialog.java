@@ -33,7 +33,6 @@ import java.rmi.registry.Registry;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
@@ -46,6 +45,7 @@ import common.SternResources;
 import common.Utils;
 import commonUi.ButtonDark;
 import commonUi.DialogFontHelper;
+import commonUi.DialogWindow;
 import commonUi.IServerMethods;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
@@ -234,20 +234,20 @@ import commonUi.TextFieldDark;
 						this.settings.meinName);
 				
 				if (errorMsg.length() > 0)
-					JOptionPane.showMessageDialog(this,
+					DialogWindow.showError(
+							this,
 							errorMsg,
-							SternResources.Fehler(false),
-							JOptionPane.ERROR_MESSAGE);
+							SternResources.Fehler(false));
 				else
 					this.parent.connected = true;
 			}
 			catch (Exception e) {
 				this.setCursor(Cursor.getDefaultCursor());
 				
-				JOptionPane.showMessageDialog(this,
+				DialogWindow.showError(
+						this,
 						SternResources.ClientSettingsJDialogKeineVerbindung(false, e.getMessage()),
-						SternResources.Fehler(false),
-						JOptionPane.ERROR_MESSAGE);
+						SternResources.Fehler(false));
 				
 				this.parent.connected = false;
 			}

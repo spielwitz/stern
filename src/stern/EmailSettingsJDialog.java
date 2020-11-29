@@ -32,7 +32,6 @@ import java.util.Collections;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
@@ -42,6 +41,7 @@ import common.SternResources;
 import common.Utils;
 import commonUi.ButtonDark;
 import commonUi.DialogFontHelper;
+import commonUi.DialogWindowResult;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
@@ -69,7 +69,7 @@ import commonUi.TextFieldDark;
 	
 	private static Font font;
 	
-	public int dlgResult = JOptionPane.CANCEL_OPTION; // NO_UCD (unused code)
+	public DialogWindowResult dlgResult = DialogWindowResult.CANCEL; // NO_UCD (unused code)
 	
 	@SuppressWarnings("unchecked") EmailSettingsJDialog(
 			JDialog parent,
@@ -228,7 +228,7 @@ import commonUi.TextFieldDark;
 			
 			if (ok)
 			{
-				this.dlgResult = JOptionPane.OK_OPTION;
+				this.dlgResult = DialogWindowResult.OK;
 				this.close();
 			}
 		}

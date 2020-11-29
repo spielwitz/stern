@@ -40,7 +40,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -68,6 +67,8 @@ import commonServer.ResponseMessageGamesAndUsers;
 import commonUi.ButtonDark;
 import commonUi.ComboBoxDark;
 import commonUi.DialogFontHelper;
+import commonUi.DialogWindow;
+import commonUi.DialogWindowResult;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
@@ -304,10 +305,10 @@ import common.Utils;
 		this.setCursor(Cursor.getDefaultCursor());
 		
 		if (respMsg.error)
-			JOptionPane.showMessageDialog(this,
+			DialogWindow.showError(
+					this,
 				    respMsg.errorMsg,
-				    SternResources.Verbindungsfehler(false),
-				    JOptionPane.ERROR_MESSAGE);
+				    SternResources.Verbindungsfehler(false));
 		
 		return respMsg;
 	}
@@ -332,12 +333,12 @@ import common.Utils;
 	
 	private void deleteGame(String gameId)
 	{
-		int dialogResult = JOptionPane.showConfirmDialog(this,
+		DialogWindowResult dialogResult = DialogWindow.showYesNo(
+				this,
 			    SternResources.ServerGamesLoeschenAys(false, gameId),
-			    SternResources.ServerGamesLoeschen(false),
-			    JOptionPane.YES_NO_OPTION);
+			    SternResources.ServerGamesLoeschen(false));
 		
-		if (dialogResult != JOptionPane.YES_OPTION)
+		if (dialogResult != DialogWindowResult.YES)
 			return;
 		
 		RequestMessage msg = new RequestMessage(RequestMessageType.GAME_HOST_DELETE_GAME);
@@ -354,11 +355,10 @@ import common.Utils;
 		if (!respMsg.error)
 		{
 			// Erfolgmeldung
-			JOptionPane.showMessageDialog(
+			DialogWindow.showInformation(
 					this, 
 					SternResources.ServerGamesGameDeleted(false, gameId), 
-					SternResources.ServerGamesLoeschen(false), 
-					JOptionPane.INFORMATION_MESSAGE);
+					SternResources.ServerGamesLoeschen(false));
 			
 			// Dialog schließen
 			this.close();
@@ -367,12 +367,12 @@ import common.Utils;
 	
 	private void finalizeGame(String gameId)
 	{
-		int dialogResult = JOptionPane.showConfirmDialog(this,
+		DialogWindowResult dialogResult = DialogWindow.showYesNo(
+				this,
 			    SternResources.ServerGamesBeendenAys(false, gameId),
-			    SternResources.ServerGamesBeenden(false),
-			    JOptionPane.YES_NO_OPTION);
+			    SternResources.ServerGamesBeenden(false));
 		
-		if (dialogResult != JOptionPane.YES_OPTION)
+		if (dialogResult != DialogWindowResult.YES)
 			return;
 		
 		RequestMessage msg = new RequestMessage(RequestMessageType.GAME_HOST_FINALIZE_GAME);
@@ -389,11 +389,10 @@ import common.Utils;
 		if (!respMsg.error)
 		{
 			// Erfolgmeldung
-			JOptionPane.showMessageDialog(
+			DialogWindow.showInformation(
 					this, 
 					SternResources.ServerGamesGameFinalized(false, gameId), 
-					SternResources.ServerGamesBeenden(false), 
-					JOptionPane.INFORMATION_MESSAGE);
+					SternResources.ServerGamesBeenden(false));
 			
 			// Dialog schließen
 			this.close();
@@ -705,10 +704,10 @@ import common.Utils;
 			Spieler spieler = alleSpieler[i];
 			if (spieler.getName().equals("") && !spieler.istComputer())
 			{
-				JOptionPane.showMessageDialog(this,
+				DialogWindow.showError(
+						this,
 						SternResources.ServerGamesSubmitNamenZuweisen(false),
-					    SternResources.Fehler(false),
-					    JOptionPane.ERROR_MESSAGE);
+					    SternResources.Fehler(false));
 				return;
 			}
 			
@@ -722,12 +721,12 @@ import common.Utils;
 			}
 		}
 		
-		int dialogResult = JOptionPane.showConfirmDialog(this,
+		DialogWindowResult dialogResult = DialogWindow.showOkCancel(
+				this,
 				SternResources.ServerGamesSubmitFrage(false, spiel.getName()),
-				SternResources.ServerGamesSubmit(false),
-			    JOptionPane.OK_CANCEL_OPTION);
+				SternResources.ServerGamesSubmit(false));
 		
-		if (dialogResult != JOptionPane.OK_OPTION)
+		if (dialogResult != DialogWindowResult.OK)
 			return;
 		
 		this.spiel.setSpieler(alleSpieler);
@@ -791,11 +790,10 @@ import common.Utils;
 			
 			if (spielerEmail.size() > 0)
 			{
-				JOptionPane.showMessageDialog(
+				DialogWindow.showInformation(
 						this, 
 						SternResources.ServerGamesSubmitAngelegt2(false, respMsg.payloadSerialized), 
-						SternResources.ServerGamesSubmit(false), 
-						JOptionPane.INFORMATION_MESSAGE);
+						SternResources.ServerGamesSubmit(false));
 				
 				EmailCreatorJDialog dlg = new EmailCreatorJDialog(
 						this, 
@@ -822,11 +820,10 @@ import common.Utils;
 				}	
 			}
 			else
-				JOptionPane.showMessageDialog(
+				DialogWindow.showInformation(
 						this, 
 						SternResources.ServerGamesSubmitAngelegt(false, respMsg.payloadSerialized), 
-						SternResources.ServerGamesSubmit(false), 
-						JOptionPane.INFORMATION_MESSAGE);
+						SternResources.ServerGamesSubmit(false));
 			
 			// Spiel laden
 			this.selectGame(this.spiel.getName());

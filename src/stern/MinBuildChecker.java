@@ -18,11 +18,10 @@ package stern;
 
 import java.awt.Frame;
 
-import javax.swing.JOptionPane;
-
 import common.Constants;
 import common.ReleaseGetter;
 import common.SternResources;
+import commonUi.DialogWindow;
 import commonUi.MessageWithLink;
 
 class MinBuildChecker
@@ -41,15 +40,14 @@ class MinBuildChecker
 		
 		if (thisBuild.compareTo(minBuild) < 0)
 		{
-			JOptionPane.showMessageDialog(
+			DialogWindow.showError(
 					parent, 
 					new MessageWithLink(
 						SternResources.MinBuild(false,
 									ReleaseGetter.format(minBuild),
 									ReleaseGetter.format(thisBuild),
 							"<a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>")),
-					SternResources.Fehler(false),
-					JOptionPane.ERROR_MESSAGE);
+					SternResources.Fehler(false));
 			
 			success = false;
 		}

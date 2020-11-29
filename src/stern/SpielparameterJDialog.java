@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
@@ -53,6 +52,7 @@ import commonServer.ServerConstants;
 import commonUi.ButtonDark;
 import commonUi.ComboBoxDark;
 import commonUi.DialogFontHelper;
+import commonUi.DialogWindow;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
@@ -592,15 +592,14 @@ class SpielparameterJDialog extends JDialog implements ActionListener, IColorCho
 			
 			if (!userAllowed)
 			{
-				JOptionPane.showMessageDialog(
+				DialogWindow.showError(
 						this,
 						SternResources.SpielparameterJDialogNameZuLang(
 								false, 
 								sp.getName(), 
 								Integer.toString(Constants.SPIELER_NAME_MIN_LAENGE), 
 								Integer.toString(Constants.SPIELER_NAME_MAX_LAENGE)),
-						SternResources.Fehler(false),
-						JOptionPane.OK_OPTION);
+						SternResources.Fehler(false));
 				ok = false;
 				break;
 			}
@@ -634,11 +633,10 @@ class SpielparameterJDialog extends JDialog implements ActionListener, IColorCho
 		
 		if (emailAdresseSpielleiter == null || !emailAdresseSpielleiter.contains("@"))
 		{
-			JOptionPane.showMessageDialog(
+			DialogWindow.showError(
 					c,
 					SternResources.SpielparameterJDialogSpielleiterEMail(false), 
-					SternResources.Fehler(false),
-					JOptionPane.OK_OPTION);
+					SternResources.Fehler(false));
 			return false;
 		}
 		
@@ -654,11 +652,10 @@ class SpielparameterJDialog extends JDialog implements ActionListener, IColorCho
 				if (sp.istEmail() && !sp.getEmailAdresse().contains("@"))
 				{
 					ok = false;
-					JOptionPane.showMessageDialog(
+					DialogWindow.showError(
 							c,
 							SternResources.SpielparameterJDialogSpielerEMail(false, sp.getName()),
-							SternResources.Fehler(false),
-							JOptionPane.OK_OPTION);
+							SternResources.Fehler(false));
 					break;
 				}
 			}

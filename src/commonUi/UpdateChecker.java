@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.swing.JOptionPane;
 
 import common.Constants;
 import common.ReleaseGetter;
@@ -53,11 +52,10 @@ public class UpdateChecker implements Runnable
 		{
 			if (!this.background)
 			{
-				JOptionPane.showMessageDialog(
+				DialogWindow.showError(
 						(Frame)parent, 
 						SternResources.UpdateServerNichtErreichbar(false),
-						SternResources.Update(false),
-						JOptionPane.ERROR_MESSAGE);
+						SternResources.Update(false));
 			}
 			
 			return;
@@ -87,33 +85,30 @@ public class UpdateChecker implements Runnable
 				if (this.lastReleaseFoundLong < availableReleaseLong)
 				{
 					aktuell = false;
-					JOptionPane.showMessageDialog(
+					DialogWindow.showInformation(
 							(Frame)parent, 
 							new MessageWithLink(
 									SternResources.UpdateVerfuegbar(false) + " - <a href=\""+urlString+"\">"+urlString+"</a>"),
-							SternResources.Update(false),
-							JOptionPane.INFORMATION_MESSAGE);
+							SternResources.Update(false));
 				}
 			}
 			else
 			{
 				aktuell = false;
-				JOptionPane.showMessageDialog(
+				DialogWindow.showInformation(
 						(Frame)parent, 
 						new MessageWithLink(
 								SternResources.UpdateVerfuegbarWichtig(false) + " - <a href=\""+urlString+"\">"+urlString+"</a>"),
-						SternResources.Update(false),
-						JOptionPane.INFORMATION_MESSAGE);
+						SternResources.Update(false));
 			}
 		}	
 		
 		if (!this.background && aktuell)
 		{
-			JOptionPane.showMessageDialog(
+			DialogWindow.showInformation(
 					(Frame)parent, 
 					SternResources.UpdateAktuell(false),
-					SternResources.Update(false),
-					JOptionPane.INFORMATION_MESSAGE);
+					SternResources.Update(false));
 		}
 	}
 	

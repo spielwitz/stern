@@ -25,12 +25,11 @@ import java.util.Hashtable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.JOptionPane;
-
 import common.Constants;
 import common.ScreenDisplayContent;
 import common.SternResources;
 import common.Utils;
+import commonUi.DialogWindow;
 import commonUi.IClientMethods;
 import commonUi.IServerMethods;
 
@@ -250,11 +249,10 @@ public class ServerFunctions
 			
 			Frame parentFrame = (Frame)parent;
 			
-			JOptionPane.showMessageDialog(
+			DialogWindow.showError(
 					parentFrame, 
 					e.toString(),
-					SternResources.Fehler(false),
-					JOptionPane.ERROR_MESSAGE);
+					SternResources.Fehler(false));
 		}
 		
 		if (ok)
@@ -283,11 +281,10 @@ public class ServerFunctions
 			
 			Frame parentFrame = (Frame)parent;
 			
-			JOptionPane.showMessageDialog(
+			DialogWindow.showError(
 					parentFrame, 
 					e.toString(),
-					SternResources.Fehler(false),
-					JOptionPane.ERROR_MESSAGE);
+					SternResources.Fehler(false));
 		}
 		
 		if (ok)
