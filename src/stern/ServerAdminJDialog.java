@@ -77,7 +77,7 @@ import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
 @SuppressWarnings("serial") class ServerAdminJDialog extends JDialog 
-			implements ChangeListener, ActionListener, ListSelectionListener
+			implements ChangeListener, ActionListener, ListSelectionListener, IIntegerTextFieldDarkCallback
 {
 	private ButtonDark butClose;
 	private ButtonDark butNewUserOk;
@@ -96,9 +96,9 @@ import commonUi.TextFieldDark;
 	private TextFieldDark tfServerBuild;
 	private ComboBoxDark<String> comboServerLogLevel;
 	private LabelDark labPing;
-	private LabelDark labAuthUrl;
-	private LabelDark labAuthPort;
-	private LabelDark labAuthUserId;
+	private TextFieldDark tfAuthUrl;
+	private IntegerTextFieldDark tfAuthPort;
+	private TextFieldDark tfAuthUserId;
 	private TextFieldDark tfAuthFile;
 	
 	private PanelUserData panUsersDetailsInner;
@@ -111,6 +111,9 @@ import commonUi.TextFieldDark;
 
 	private static Font font;
 	
+	private String authUrlBefore;
+	private int authPortBefore;
+	
 	ServerAdminJDialog(
 			Stern parent,
 			String title,
@@ -122,6 +125,12 @@ import commonUi.TextFieldDark;
 		this.usersOnServer = new Hashtable<String, ResponseMessageGetUsers.UserInfo>();
 		
 		this.cuc = ServerUtils.readClientUserCredentials(this.serverAdminCredentialsFile);
+		
+		if (this.cuc != null)
+		{
+			this.authUrlBefore = this.cuc.url;
+			this.authPortBefore = this.cuc.port;
+		}
 		
 		// Font laden
 		font = DialogFontHelper.getFont();
@@ -282,19 +291,21 @@ import commonUi.TextFieldDark;
 		
 		panAuth.add(panAuthFile, BorderLayout.NORTH);
 		
+		PanelDark panAuthInfoShell = new PanelDark(new BorderLayout());
+		
 		PanelDark panAuthInfo = new PanelDark(new SpringLayout());
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminUrl(false)+":", font));
-		this.labAuthUrl = new LabelDark("", font); 
-		panAuthInfo.add(this.labAuthUrl);
+		this.tfAuthUrl = new TextFieldDark("", font, true);
+		panAuthInfo.add(this.tfAuthUrl);
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminPort(false)+ ":", font));
-		this.labAuthPort = new LabelDark("", font);
-		panAuthInfo.add(this.labAuthPort);
+		this.tfAuthPort = new IntegerTextFieldDark(this, font);
+		panAuthInfo.add(this.tfAuthPort);
 		
 		panAuthInfo.add(new LabelDark(SternResources.UserId(false) + ":", font));
-		this.labAuthUserId = new LabelDark("", font);
-		panAuthInfo.add(this.labAuthUserId);
+		this.tfAuthUserId = new TextFieldDark("", font, false);
+		panAuthInfo.add(this.tfAuthUserId);
 		
 		this.fillAuthCredentials(this.cuc);
 		
@@ -303,7 +314,9 @@ import commonUi.TextFieldDark;
 			      5, 5, //initialX, initialY
 			      20, 5);//xPad, yPad
 		
-		panAuth.add(panAuthInfo, BorderLayout.CENTER);
+		panAuthInfoShell.add(panAuthInfo, BorderLayout.NORTH);
+		
+		panAuth.add(panAuthInfoShell, BorderLayout.CENTER);
 		
 		PanelDark panPing = new PanelDark(new FlowLayout(FlowLayout.LEFT));
 		
@@ -330,7 +343,7 @@ import commonUi.TextFieldDark;
 		
 		PanelDark panButtons = new PanelDark();
 		panButtons.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		
+
 		this.butClose = new ButtonDark(this, SternResources.Schliessen(false), font);
 		panButtons.add(this.butClose);
 		
@@ -362,6 +375,8 @@ import commonUi.TextFieldDark;
 		if (this.cuc == null)
 			tabpane.setSelectedComponent(panAuthOuter);
 		
+		this.tfAuthPort.enableCheckInput(); // macht auch setControlsEnabled() mit
+		
 		this.pack();
 		this.setLocationRelativeTo(parent);	
 		this.setResizable(false);
@@ -382,7 +397,32 @@ import commonUi.TextFieldDark;
 		Object source = event.getSource();
 		
 		if (source == this.butClose || source == this.getRootPane())
+		{
+			if (this.cuc != null &&
+					!this.tfAuthPort.error &&
+					this.authUrlBefore != null &&
+					(!this.authUrlBefore.equals(this.tfAuthUrl.getText()) ||
+					 this.authPortBefore != Integer.parseInt(this.tfAuthPort.getText())))
+			{
+				DialogWindowResult dialogResult = DialogWindow.showYesNoCancel(
+						this,
+						SternResources.ServerUrlUebernehmen(false),
+					    SternResources.ServerZugangsdatenAendern(false));
+
+				if (dialogResult == DialogWindowResult.YES)
+				{
+					this.cuc.url = this.tfAuthUrl.getText();
+					this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+					ServerUtils.writeClientUserCredentials(cuc, this.serverAdminCredentialsFile);
+				}
+				else if (dialogResult == DialogWindowResult.CANCEL)
+				{
+					return;
+				}
+			}
+			
 			this.close();
+		}
 		else if (source == this.butAuthBrowse)
 		{
 			FileDialog fd = new FileDialog(this, SternResources.SpielLaden(false), FileDialog.LOAD);
@@ -424,6 +464,12 @@ import commonUi.TextFieldDark;
 		}
 		else if (source == this.butPing)
 		{
+			if (this.cuc != null)
+			{
+				this.cuc.url = this.tfAuthUrl.getText();
+				this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+			}
+			
 			RequestMessage msg = new RequestMessage(RequestMessageType.ADMIN_PING);
 			
 			ResponseMessage respMsg = this.sendAndReceive(msg, true);
@@ -577,14 +623,13 @@ import commonUi.TextFieldDark;
 			this.tfAuthFile.setText("");
 		}
 		
-		
-		this.labAuthUrl.setText(
+		this.tfAuthUrl.setText(
 				cuc == null || cuc.url == null ? SternResources.KeineDateiAusgewaehlt(false) : cuc.url);
 		
-		this.labAuthPort.setText(
+		this.tfAuthPort.setText(
 				cuc == null || cuc.port == 0 ? "" : Integer.toString(cuc.port));
 		
-		this.labAuthUserId.setText(
+		this.tfAuthUserId.setText(
 				cuc == null || cuc.userId == null ? "" : cuc.userId);
 	}	
 	
@@ -1098,5 +1143,11 @@ import commonUi.TextFieldDark;
 		this.listUsers.removeListSelectionListener(this);
 		this.listUsers.clearSelection();
 		this.listUsers.addListSelectionListener(this);
+	}
+
+	@Override
+	public void setControlsEnabled() 
+	{
+		this.butPing.setEnabled(!this.tfAuthPort.error);
 	}
 }

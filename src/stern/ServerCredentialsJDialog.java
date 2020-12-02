@@ -32,11 +32,8 @@ import java.security.KeyPair;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import common.SternResources;
 import commonServer.ClientUserCredentials;
@@ -58,7 +55,7 @@ import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
 @SuppressWarnings("serial") 
-class ServerCredentialsJDialog extends JDialog implements ActionListener
+class ServerCredentialsJDialog extends JDialog implements ActionListener, IIntegerTextFieldDarkCallback
 {
 	private ButtonDark butOk;
 	private ButtonDark butClose;
@@ -148,7 +145,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 		panAuthInfo.add(this.tfAuthUrl);
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminPort(false)+":", font));
-		this.tfAuthPort = new IntegerTextFieldDark(font); // Erlaube nur bis zu 5 Ziffern
+		this.tfAuthPort = new IntegerTextFieldDark(this, font); // Erlaube nur bis zu 5 Ziffern
 		panAuthInfo.add(this.tfAuthPort);
 		
 		panAuthInfo.add(new LabelDark(SternResources.UserId(false)+":", font));
@@ -474,75 +471,12 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener
 				cuc == null || cuc.adminEmail == null ? "" : cuc.adminEmail);
 	}
 	
-	private void setControlsEnabled()
+	@Override
+	public void setControlsEnabled()
 	{
 		this.butAuthActivate.setEnabled(this.serverCommunicationEnabled && !this.tfAuthPort.error);
 		this.butAuthBrowse.setEnabled(this.serverCommunicationEnabled);
 		this.butPing.setEnabled(this.serverCommunicationEnabled && !this.tfAuthPort.error);
 		this.butOk.setEnabled(!this.tfAuthPort.error);
-	}
-	
-	private class IntegerTextFieldDark extends JTextField  implements DocumentListener
-	{
-		public boolean error = false;
-		private boolean checkInput = false;
-		
-		public IntegerTextFieldDark(Font f)
-		{
-			super();
-			this.init(f);
-			this.getDocument().addDocumentListener(this);
-			this.checkInput();
-		}
-		
-		private void init(Font f)
-		{
-			this.setFont(f);
-			this.setBackground(Color.black);
-			this.setForeground(Color.white);
-			this.setCaretColor(Color.white);
-		}
-		
-		@Override
-		public void insertUpdate(DocumentEvent e)
-		{
-			this.checkInput();
-		}
-
-		@Override
-		public void removeUpdate(DocumentEvent e) 
-		{
-			this.checkInput();
-		}
-
-		@Override
-		public void changedUpdate(DocumentEvent e) 
-		{
-			this.checkInput();
-		}
-		
-		private void checkInput()
-		{
-			if (checkInput)
-			{
-				try
-				{
-					Integer.parseInt(this.getText());
-					this.error = false;
-				}
-				catch (Exception x)
-				{
-					this.error = true;
-				}
-				
-				setControlsEnabled();
-			}
-		}
-		
-		public void enableCheckInput()
-		{
-			this.checkInput = true;
-			this.checkInput();
-		}
 	}
 }
