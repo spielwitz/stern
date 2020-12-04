@@ -20,17 +20,15 @@ import java.io.Serializable;
 
 @SuppressWarnings("serial") class Mine implements Serializable
 {
-	private Point pos; // Ort
+	private int x;
+	private int y;
 	private int staerke; // Momentane Staerke
 
-	Mine(Point pos, int staerke) {
+	Mine(int x, int y, int staerke) {
 		super();
-		this.pos = pos;
+		this.x = x;
+		this.y = y;
 		this.staerke = staerke;
-	}
-
-	public Point getPos() {
-		return pos;
 	}
 
 	public int getStaerke() {
@@ -45,4 +43,14 @@ import java.io.Serializable;
 	{
 		this.staerke += staerke;
 	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+	
+	
 }

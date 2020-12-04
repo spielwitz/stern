@@ -16,7 +16,6 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 @SuppressWarnings("serial") 
@@ -29,7 +28,7 @@ class SpielfeldPointDisplayContent implements Serializable
 	private int h;
 	
 	SpielfeldPointDisplayContent(
-			Point2D.Double pos, 
+			Point pos, 
 			byte col,
 			byte symbol,
 			int hash)
@@ -45,9 +44,9 @@ class SpielfeldPointDisplayContent implements Serializable
 		return c;
 	}
 	
-	public Point2D.Double getPos()
+	public Point getPos()
 	{
-		return this.p== null ? null : this.p.toPoint2D();
+		return this.p== null ? null : this.p.toPoint();
 	}
 	
 	public int getHash()

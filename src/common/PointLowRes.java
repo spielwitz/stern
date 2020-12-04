@@ -16,33 +16,32 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-// Diese Klasse speichert einen Punkt, der ursprünglich ein Point2D.Double war,
-// als Integer um Faktor 10 erhöht ab. Also aus (3.1234564,-223.44663456) wird
-// (31, -2234). Damit wird beim Abspeichern der Auswertung nicht so viel Speicher
+// Diese Klasse speichert einen Punkt, der ursprünglich ein PointHighRes war,
+// als Integer um Faktor 100 erhöht ab. Also aus (3.1234564,-223.44663456) wird
+// (312, -22345). Damit wird beim Abspeichern der Auswertungen nicht so viel Speicher
 // verwendet
 @SuppressWarnings("serial") class PointLowRes implements Serializable
 {
 	private int x;
 	private int y;
 	
-	PointLowRes(Point2D.Double pt)
+	PointLowRes(Point pt)
 	{
 		this.x = Utils.round(pt.x * 100.);
 		this.y = Utils.round(pt.y * 100.);
 	}
 	
-	Point2D.Double toPoint2D()
+	Point toPoint()
 	{
-		return new Point2D.Double(
+		return new Point(
 				(double)this.x / (double)100, 
 				(double)this.y / (double)100);
 	}
 	
-	static ArrayList<PointLowRes> toArrayList(ArrayList<Point2D.Double> list)
+	static ArrayList<PointLowRes> toArrayList(ArrayList<Point> list)
 	{
 		if (list == null)
 			return null;
@@ -55,28 +54,28 @@ import java.util.ArrayList;
 		return resultList;
 	}
 	
-	static ArrayList<Point2D.Double> fromArrayList(ArrayList<PointLowRes> list)
+	static ArrayList<Point> fromArrayList(ArrayList<PointLowRes> list)
 	{
 		if (list == null)
 			return null;
 		
-		ArrayList<Point2D.Double> resultList = new ArrayList<Point2D.Double>(list.size());
+		ArrayList<Point> resultList = new ArrayList<Point>(list.size());
 		
 		for (int i = 0; i < list.size(); i++)
-			resultList.add(i, list.get(i).toPoint2D());
+			resultList.add(i, list.get(i).toPoint());
 		
 		return resultList;
 	}
 	
-	static ArrayList<Point2D.Double> fromArray(PointLowRes[] list)
+	static ArrayList<Point> fromArray(PointLowRes[] list)
 	{
 		if (list == null)
 			return null;
 		
-		ArrayList<Point2D.Double> resultList = new ArrayList<Point2D.Double>(list.length);
+		ArrayList<Point> resultList = new ArrayList<Point>(list.length);
 		
 		for (int i = 0; i < list.length; i++)
-			resultList.add(i, list[i].toPoint2D());
+			resultList.add(i, list[i].toPoint());
 		
 		return resultList;
 	}

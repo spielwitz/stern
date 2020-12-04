@@ -29,7 +29,6 @@ class PlanetenEditorDisplayContent implements Serializable
 	private HashSet<ObjektTyp> verkaufNichtMoeglich;
 	
 	private boolean readOnly;
-	private boolean reduzierteAnzeige;
 	private byte farbeSpieler;
 	private int evorrat;
 	private boolean kommandozentrale;
@@ -42,8 +41,7 @@ class PlanetenEditorDisplayContent implements Serializable
 			byte farbeSpieler,
 			int evorrat,
 			boolean kommandozentrale,
-			boolean readOnly,
-			boolean reduzierteAnzeige) {
+			boolean readOnly) {
 		super();
 		this.typMarkiert = typMarkiert;
 		this.anzahl = anzahl;
@@ -53,9 +51,7 @@ class PlanetenEditorDisplayContent implements Serializable
 		this.evorrat = evorrat;
 		this.kommandozentrale = kommandozentrale;
 		this.readOnly = readOnly;
-		this.reduzierteAnzeige = reduzierteAnzeige;
 	}
-
 
 	public ObjektTyp getTypMarkiert() {
 		return typMarkiert;
@@ -67,11 +63,6 @@ class PlanetenEditorDisplayContent implements Serializable
 		return this.readOnly;
 	}
 	
-	public boolean isReduzierteAnzeige()
-	{
-		return this.reduzierteAnzeige;
-	}
-
 	public Hashtable<ObjektTyp, String> getAnzahl() {
 		return anzahl;
 	}

@@ -16,7 +16,6 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -110,7 +109,7 @@ class ReplaySpielfeldDisplayContent implements Serializable
 		PointLowRes[] markedFieldsArray = 
 				(PointLowRes[])replays.fromJson(replays.getString(this.f), PointLowRes[].class);
 
-		ArrayList<Point2D.Double> markedFields = PointLowRes.fromArray(markedFieldsArray);
+		ArrayList<Point> markedFields = PointLowRes.fromArray(markedFieldsArray);
 		
 		Integer[] oIndicesArray = (Integer[])replays.fromJson(
 				replays.getString(this.o), 

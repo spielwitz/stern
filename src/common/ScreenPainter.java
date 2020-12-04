@@ -24,7 +24,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 public class ScreenPainter
@@ -488,11 +487,8 @@ public class ScreenPainter
 		if (pedc.isKommandozentrale())
 			this.drawLTextEditor(SternResources.Kommandozentrale(false), sp2+8, 1, Colors.get(pedc.getFarbeSpieler()));
 		
-		if (!pedc.isReduzierteAnzeige())
-		{
-			this.drawLTextEditor(SternResources.PlEditKaufpreis(false), sp2+2, 2, Colors.get(Colors.INDEX_NEUTRAL));
-			this.drawLTextEditor(SternResources.PlEditVerkaufspreis(false), sp3, 2, Colors.get(Colors.INDEX_NEUTRAL));
-		}
+		this.drawLTextEditor(SternResources.PlEditKaufpreis(false), sp2+2, 2, Colors.get(Colors.INDEX_NEUTRAL));
+		this.drawLTextEditor(SternResources.PlEditVerkaufspreis(false), sp3, 2, Colors.get(Colors.INDEX_NEUTRAL));
 		
 		this.editorZeile(ObjektTyp.EPROD, pedc, SternResources.PlEditEprodPlus4(false), 3);
 		this.editorZeile(ObjektTyp.ERAUM, pedc, SternResources.PlEditRaumerProd(false), 4);
@@ -515,15 +511,15 @@ public class ScreenPainter
 	{
 		this.drawLTextEditor(Utils.padString(pedc.getAnzahl().get(typ),4), sp1, zeile, Colors.get(pedc.getFarbeSpieler()));
 		this.drawLTextEditor(name, sp1+5, zeile, 
-				!pedc.isReduzierteAnzeige() && pedc.getTypMarkiert() == typ ?
+				!pedc.isReadOnly() && pedc.getTypMarkiert() == typ ?
 						Color.white :
 						Colors.get(Colors.INDEX_NEUTRAL));
 		
 		// Zeilen-Marker
-		if (!pedc.isReduzierteAnzeige() && pedc.getTypMarkiert() == typ)
+		if (!pedc.isReadOnly() && pedc.getTypMarkiert() == typ)
 			this.drawLTextEditor(">>>>", 0, zeile, Color.white);
 
-		if (typ == ObjektTyp.ERAUM || pedc.isReduzierteAnzeige())
+		if (typ == ObjektTyp.ERAUM)
 			return;
 		
 		// Kaufpreis
@@ -818,39 +814,6 @@ public class ScreenPainter
 		
 	}
 	
-	private void drawCircleSpielfeld(Point2D.Double pos, double r, Color col)
-	{
-		this.setColor(col);
-		
-		double rr = r * (double)SPIELFELD_DX;
-		
-		double x = ((double)SPIELFELD_XOFF + pos.getX() * (double)SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
-		double y = ((double)SPIELFELD_XOFF + pos.getY() * (double)SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
-		
-		this.dbGraphics.drawOval(
-				Utils.round(this.factor * x),
-				Utils.round(this.factor * y),
-				Utils.round(this.factor * rr),
-				Utils.round(this.factor * rr));
-		
-	}
-	
-	private void fillCircleSpielfeld(Point2D.Double pos, double r, Color fillCol)
-	{
-		this.setColor(fillCol);
-		
-		double rr = r * (double)SPIELFELD_DX;
-		
-		double x = ((double)SPIELFELD_XOFF + pos.getX() * (double)SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
-		double y = ((double)SPIELFELD_XOFF + pos.getY() * (double)SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
-		
-		this.dbGraphics.fillOval(
-				Utils.round(this.factor * x),
-				Utils.round(this.factor * y),
-				Utils.round(this.factor * rr),
-				Utils.round(this.factor * rr));
-		
-	}
 	
 	private void fillRauteSpielfeld(Point pos, Color col)
 	{
@@ -859,14 +822,14 @@ public class ScreenPainter
 		int[] x = new int[4];
 		int[] y = new int[4];
 		
-		x[0] = Utils.round((double)((double)SPIELFELD_XOFF + (double)pos.getX() * (double)SPIELFELD_DX) * this.factor);
-		y[0] = Utils.round((double)((double)SPIELFELD_YOFF + ((double)pos.getY() + 0.5) * (double)SPIELFELD_DX) * this.factor);
+		x[0] = Utils.round((double)((double)SPIELFELD_XOFF + pos.getX() * (double)SPIELFELD_DX) * this.factor);
+		y[0] = Utils.round((double)((double)SPIELFELD_YOFF + (pos.getY() + 0.5) * (double)SPIELFELD_DX) * this.factor);
 		
-		x[1] = Utils.round((double)((double)SPIELFELD_XOFF + ((double)pos.getX() + 0.5) * (double)SPIELFELD_DX) * this.factor);
-		y[1] = Utils.round((double)((double)SPIELFELD_YOFF + (double)pos.getY() * (double)SPIELFELD_DX) * this.factor);
+		x[1] = Utils.round((double)((double)SPIELFELD_XOFF + (pos.getX() + 0.5) * (double)SPIELFELD_DX) * this.factor);
+		y[1] = Utils.round((double)((double)SPIELFELD_YOFF + pos.getY() * (double)SPIELFELD_DX) * this.factor);
 		
-		x[2] = Utils.round((double)((double)SPIELFELD_XOFF + ((double)pos.getX()+1.) * (double)SPIELFELD_DX) * this.factor);
-		y[2] = Utils.round((double)((double)SPIELFELD_YOFF + ((double)pos.getY() + 0.5) * (double)SPIELFELD_DX) * this.factor);
+		x[2] = Utils.round((double)((double)SPIELFELD_XOFF + (pos.getX()+1.) * (double)SPIELFELD_DX) * this.factor);
+		y[2] = Utils.round((double)((double)SPIELFELD_YOFF + (pos.getY() + 0.5) * (double)SPIELFELD_DX) * this.factor);
 		
 		x[3] = Utils.round((double)((double)SPIELFELD_XOFF + ((double)pos.getX() + 0.5) * (double)SPIELFELD_DX) * this.factor);
 		y[3] = Utils.round((double)((double)SPIELFELD_YOFF + ((double)pos.getY()+1.) * (double)SPIELFELD_DX) * this.factor);
@@ -883,8 +846,8 @@ public class ScreenPainter
 		
 		this.setColor(col);
 		
-		int x = Utils.round(this.factor * ((double)SPIELFELD_XOFF + ((double)pos.getX()+0.5) * (double)SPIELFELD_DX) - (double)width/2.);
-		int y = Utils.round(this.factor * ((double)SPIELFELD_YOFF + ((double)pos.getY()+0.5) * (double)SPIELFELD_DX) + (double)height/2.);
+		int x = Utils.round(this.factor * ((double)SPIELFELD_XOFF + (pos.getX()+0.5) * (double)SPIELFELD_DX) - (double)width/2.);
+		int y = Utils.round(this.factor * ((double)SPIELFELD_YOFF + (pos.getY()+0.5) * (double)SPIELFELD_DX) + (double)height/2.);
 		
 		this.dbGraphics.drawString(text, x, y);
 	}
@@ -901,8 +864,8 @@ public class ScreenPainter
 
 		for (int i = 0; i < pl.getFrameCols().size(); i++)
 		{
-			int x = (SPIELFELD_XOFF + pl.getPos().getX() * SPIELFELD_DX) - (i+1)*2;
-			int y = (SPIELFELD_YOFF + pl.getPos().getY() * SPIELFELD_DX) - (i+1)*2;
+			int x = (int)((SPIELFELD_XOFF + pl.getPos().getX() * SPIELFELD_DX) - (i+1)*2);
+			int y = (int)((SPIELFELD_YOFF + pl.getPos().getY() * SPIELFELD_DX) - (i+1)*2);
 			
 			this.setColor(Colors.get(pl.getFrameCols().get(i)));
 			this.drawRect(
@@ -913,12 +876,12 @@ public class ScreenPainter
 		}
 	}
 	
-	private void markiereFelder (ArrayList<Point2D.Double> points)
+	private void markiereFelder (ArrayList<Point> points)
 	{
 		if (points == null)
 			return;
 		
-		for (Point2D.Double point: points)
+		for (Point point: points)
 		{
 			this.drawCircleSpielfeld(point, 0.8, Color.white);
 			
@@ -946,11 +909,15 @@ public class ScreenPainter
 		for (MinenfeldDisplayContent mine: minen)
 		{
 			// Raute zeichnen
-			this.fillRauteSpielfeld(mine.getPos(), Color.darkGray);
+			Point pos = new Point(mine.getX(), mine.getY()); 
+			
+			this.fillRauteSpielfeld(
+					pos,
+					Color.darkGray);
 		
 			// Text zeichnen
 			this.drawCTextSpielfeld(
-					mine.getPos(),
+					pos,
 					Integer.toString(mine.getStaerke()),
 					Colors.get(Colors.INDEX_NEUTRAL), this.fontMinen, this.fmMinen);
 		}
@@ -1036,7 +1003,7 @@ public class ScreenPainter
 		
 		for (SpielfeldPointDisplayContent point: points)
 		{
-			Point2D.Double pt = point.getPos();
+			Point pt = point.getPos();
 			this.setColor(Colors.get(point.getCol()));
 			
 			switch (point.getSymbol())
@@ -1302,8 +1269,8 @@ public class ScreenPainter
 	private Point convertSpielfeld2Zeichenkoord(Point pt)
 	{
 		// Konvertiere eine Spielfeldkoordinate (Mittelpunkt) in Zeichenkoordinaten
-		int x = Utils.round(SPIELFELD_XOFF + (0.5 + (double)pt.getX()) * (double)SPIELFELD_DX); 
-		int y = Utils.round(SPIELFELD_YOFF + (0.5 + (double)pt.getY()) * (double)SPIELFELD_DX);
+		int x = Utils.round(SPIELFELD_XOFF + (0.5 + pt.getX()) * (double)SPIELFELD_DX); 
+		int y = Utils.round(SPIELFELD_YOFF + (0.5 + pt.getY()) * (double)SPIELFELD_DX);
 		
 		return new Point(x,y);
 	}

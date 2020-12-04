@@ -18,7 +18,6 @@ package common;
 
 import java.awt.Panel;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -385,8 +384,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 		
 		for (Planet pl: this.planeten)
 			retval.add(new PlanetenInfo(
-					pl.getPos().getX(), 
-					pl.getPos().getY(), 
+					(int)pl.getPos().getX(), 
+					(int)pl.getPos().getY(), 
 					pl.getBes() == Constants.BESITZER_NEUTRAL ?
 							Colors.INDEX_NEUTRAL :
 							this.spieler[pl.getBes()].getColIndex()));
@@ -857,8 +856,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 		
 		for (int i = 0; i < heimatPlanetUmkreis.size(); i++)
 		{
-			int x = ptHeimatplanet.getX() + heimatPlanetUmkreis.get(i).getX();
-			int y = ptHeimatplanet.getY() + heimatPlanetUmkreis.get(i).getY();
+			int x = (int)(ptHeimatplanet.getX() + heimatPlanetUmkreis.get(i).getX());
+			int y = (int)(ptHeimatplanet.getY() + heimatPlanetUmkreis.get(i).getY());
 			
 			// Liegt der Punkt ausserhalb des Spielfelds?
 			if (x < 0 || x >= this.breite || y < 0 || y >= this.hoehe)
@@ -1209,7 +1208,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.updateSpielfeldDisplay(frames, null, tag);
 	}
 	
-	private void updateSpielfeldDisplay (ArrayList<Point2D.Double> markedField, int tag)
+	private void updateSpielfeldDisplay (ArrayList<Point> markedField, int tag)
 	{
 		this.updateSpielfeldDisplay(null, markedField, tag);
 	}
@@ -1252,7 +1251,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private void updateSpielfeldDisplay (
 			Hashtable<Integer, ArrayList<Byte>> frames, 
-			ArrayList<Point2D.Double> markedField, 
+			ArrayList<Point> markedField, 
 			int tag)
 	{
 		this.updateSpielfeldDisplay(frames, markedField, null, tag);
@@ -1260,7 +1259,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private void updateSpielfeldDisplay (
 			Hashtable<Integer, ArrayList<Byte>> frames, 
-			ArrayList<Point2D.Double> markedField, 
+			ArrayList<Point> markedField, 
 			SpielfeldPointRadarDisplayContent radar,
 			int tag)
 	{
@@ -1316,7 +1315,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 		for (Mine mine: this.minen.values())
 		{
 			minen.add(
-					new MinenfeldDisplayContent(mine.getPos(), mine.getStaerke()));
+					new MinenfeldDisplayContent(
+							mine.getX(), 
+							mine.getY(), 
+							mine.getStaerke()));
 		}
 				
 		if (this.screenDisplayContent == null)
@@ -1448,7 +1450,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 		for (int index = 0; index < this.anzPl; index++)
 		{
 			Planet pl = this.planeten[index];
-			String pos = Integer.toString(pl.getPos().getX()) + ";" + Integer.toString(pl.getPos().getY());
+			String pos = Integer.toString(
+					(int)(pl.getPos().getX())) + ";" + Integer.toString((int)(pl.getPos().getY()));
 
 			String name = this.getFeldNameFromPoint(pl.getPos());
 			
@@ -1468,7 +1471,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		if (this.planetenByPoint == null)
 			this.buildPlanetenNameMap();
 		
-		String pos = Integer.toString(pt.getX()) + ";" + Integer.toString(pt.getY()); 
+		String pos = Integer.toString((int)(pt.getX())) + ";" + Integer.toString((int)(pt.getY())); 
 		
 		Integer plIndex = this.planetenByPoint.get(pos);
 		
@@ -1518,8 +1521,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	static String getSectorNameFromPoint(Point pt)
 	{
-		return Character.toString((char)(65+(pt.getY()))) +
-			   Character.toString((char)(65+(pt.getX())));
+		return Character.toString((char)(65+(Utils.round(pt.getY())))) +
+			   Character.toString((char)(65+(Utils.round(pt.getX()))));
 		
 	}
 	
@@ -1585,17 +1588,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return frames;
 	}
 	
-//	private ArrayList<Point2D.Double> getSimpleMarkedField(Point pt)
+//	private ArrayList<PointHighRes> getSimpleMarkedField(Point pt)
 //	{
-//		ArrayList<Point2D.Double> markedFields = new ArrayList<Point2D.Double>();
+//		ArrayList<PointHighRes> markedFields = new ArrayList<PointHighRes>();
 //		markedFields.add(Utils.toPoint2D(pt));
 //		
 //		return markedFields;
 //	}
 	
-	private ArrayList<Point2D.Double> getSimpleMarkedField(Point2D.Double pt)
+	private ArrayList<Point> getSimpleMarkedField(Point pt)
 	{
-		ArrayList<Point2D.Double> markedFields = new ArrayList<Point2D.Double>();
+		ArrayList<Point> markedFields = new ArrayList<Point>();
 		markedFields.add(pt);
 		
 		return markedFields;
@@ -2025,7 +2028,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					Mine mine = spiel.minen.get(pt.getString());
 					if (mine == null)
 					{
-						mine = new Mine(pt, staerke);
+						mine = new Mine((int)pt.x, (int)pt.y, staerke);
 						spiel.minen.put(pt.getString(), mine);
 					}
 					else
@@ -3846,8 +3849,8 @@ public class Spiel extends EmailTransportBase implements Serializable
  					break;
  				
  				// Position markieren
- 				ArrayList<Point2D.Double> markedFields = new ArrayList<Point2D.Double>();
- 				markedFields.add(Utils.toPoint2D(obj.getStart()));
+ 				ArrayList<Point> markedFields = new ArrayList<Point>();
+ 				markedFields.add(obj.getStart());
  				this.spiel.updateSpielfeldDisplay(markedFields, 0);
  				
  				// Console-Keys
@@ -4061,8 +4064,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel,
 					startPl,
 					this.spiel.spielzuege.get(this.spielerJetzt),
-					this.spiel.planeten[startPl].getBes() != this.spielerJetzt,
-					false);
+					this.spiel.planeten[startPl].getBes() != this.spielerJetzt);
  		}
  		 		
  		private void planeteninfo()
@@ -4146,17 +4148,14 @@ public class Spiel extends EmailTransportBase implements Serializable
  		private ArrayList<ObjektTyp> editorReihenfolge;
  		private Spiel spiel;
  		private boolean readOnly;
- 		private boolean reduzierteAnzeige;
  		
  		private Planeteneditor(
  				Spiel spiel,
  				int plIndex,
  				ArrayList<Spielzug> spielzuege,
- 		 		boolean readOnly,
- 		 		boolean reduzierteAnzeige)
+ 		 		boolean readOnly)
  		{
  			this.readOnly = readOnly;
- 			this.reduzierteAnzeige = reduzierteAnzeige;
  			
  			this.spiel = spiel;
  			
@@ -4188,7 +4187,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
 			
-			if (this.reduzierteAnzeige)
+			if (this.readOnly)
 				keys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 			else
 			{
@@ -4212,7 +4211,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					break;
 				}
 				
-				if (this.reduzierteAnzeige)
+				if (this.readOnly)
 					continue;
 				
 				if (input.getLastKeyCode() == KeyEvent.VK_ENTER)
@@ -4375,9 +4374,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			if (this.spiel.screenDisplayContent == null)
  				this.spiel.screenDisplayContent = new ScreenDisplayContent();
  			
- 			byte col = // pl.isNeutral() ?
- 						Colors.INDEX_WEISS; // :
- 						//this.spiel.spieler[pl.getBes()].getColIndex();
+ 			byte col = Colors.INDEX_WEISS;
  			
  			this.spiel.screenDisplayContent.setPlEdit(new
  				PlanetenEditorDisplayContent(
@@ -4388,8 +4385,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  						col,
  						pl.getEvorrat(),
  						pl.istKommandozentrale(),
- 						this.readOnly,
- 						this.reduzierteAnzeige));
+ 						this.readOnly));
  			
  			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
  		}
@@ -5191,9 +5187,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 				// Radar
 				int winkelFlugrichtung = Utils.winkelVektoren(
-						objPatr.getStart().toPoint2dDouble(), 
-						new Point2D.Double(objPatr.getStart().getX() + 10, objPatr.getStart().getY()), 
-						objPatr.getZiel().toPoint2dDouble());
+						objPatr.getStart(), 
+						new Point(objPatr.getStart().getX() + 10, objPatr.getStart().getY()), 
+						objPatr.getZiel());
 				
 				int winkelRadar = 
 						objPatr.getAnz() == 1 ?
@@ -5226,6 +5222,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 							radar,
 							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
 					
+					this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
 					this.spiel.console.appendText(
 							SternResources.AuswertungPatrouillePatrouilleZerstoert(
 									true, this.spiel.spieler[anderesObj.getBes()].getName()));
@@ -5252,6 +5249,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					
 					boolean kapern = true;
 					String name = this.spiel.spieler[anderesObj.getBes()].getName();
+					this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
 					
 					if (anderesObj.getTyp() == ObjektTyp.AUFKLAERER)
 						this.spiel.console.appendText(
@@ -5308,7 +5306,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   		
   		private ArrayList<AuswertungEreignisPatrouille> patrouilleBeobachtet(Flugobjekt objPatr)
   		{
-  			Point2D.Double momPos = objPatr.getCurrentPos();
+  			Point momPos = objPatr.getCurrentPos();
   			
   			ArrayList<AuswertungEreignisPatrouille> ereignisse = new ArrayList<AuswertungEreignisPatrouille>();
   			
@@ -5320,7 +5318,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   					otherObj.istZuLoeschen())
   					continue;
   				
-  				Point2D.Double momPosOther = otherObj.getCurrentPos();
+  				Point momPosOther = otherObj.getCurrentPos();
   					
   				double dist = Utils.dist(momPosOther, momPos);
   				
@@ -5330,9 +5328,9 @@ public class Spiel extends EmailTransportBase implements Serializable
   				AuswertungEreignisPatrouille ereignis = 
   						new AuswertungEreignisPatrouille(objPatr, otherObj);
   				
-  				Point2D.Double zielPosPatr = objPatr.getZiel().toPoint2dDouble();
+  				Point zielPosPatr = objPatr.getZiel();
   				
-  				if (Utils.dist(momPos, momPosOther) <= Flugobjekt.PRECISION)
+  				if (Utils.dist(momPos, momPosOther) <= Constants.PRECISION)
   					ereignis.winkel = 0;
   				else
 	  				ereignis.winkel = objPatr.getAnz() == 1 ?
@@ -5342,7 +5340,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	  						Utils.winkelVektoren(momPos, zielPosPatr, momPosOther);
   				
   				ereignis.markierungPos = momPosOther;
-  				ereignis.posObjAnderes = otherObj.getCurrentField();
+  				ereignis.posObjAnderes = otherObj.getCurrentPos();
   				
   				ereignisse.add(ereignis);
   			}
@@ -5392,7 +5390,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 								true,
 								name,
 								Integer.toString(Math.min(obj.getAnz(),mine.getStaerke())),
-								Spiel.getSectorNameFromPoint(mine.getPos())));
+								Spiel.getSectorNameFromPoint(
+										new Point(mine.getX(), mine.getY())
+										)));
 					
 					// Anzahl der Raumerflotte reduzieren
 					obj.subtractRaumer(mine.getStaerke(), obj.getBes());
@@ -5409,7 +5409,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 									true, 
 									name,
 									Integer.toString(Math.min(obj.getAnz(),mine.getStaerke())),
-									Spiel.getSectorNameFromPoint(mine.getPos())));
+									Spiel.getSectorNameFromPoint(
+											new Point(mine.getX(), mine.getY())
+											)));
 					
 					// Flotte wurde zerstoert
 					objLoeschen = true;
@@ -5424,7 +5426,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				this.spiel.console.appendText (
 						SternResources.AuswertungNachrichtAnAusSektor(true,
 								this.spiel.spieler[obj.getBes()].getName(),
-								Spiel.getSectorNameFromPoint(mine.getPos())));
+								Spiel.getSectorNameFromPoint(
+										new Point(mine.getX(), mine.getY())
+										)));
 				this.spiel.console.lineBreak();
 				this.spiel.console.appendText (
 						SternResources.AuswertungMinenfeldGeraeumt(true,
@@ -5924,7 +5928,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
   			if (mine == null)
   			{
-  				this.spiel.minen.put(key, new Mine(obj.getZiel(), staerke));
+  				this.spiel.minen.put(key, new Mine((int)obj.getZiel().x, (int)obj.getZiel().y, staerke));
   			}
   			else
   				mine.add(staerke);
@@ -5970,11 +5974,6 @@ public class Spiel extends EmailTransportBase implements Serializable
   				pl.spielerwechsel(spVerlierer, spGewinner);
   			}
   				
-  			this.spiel.updatePlanetenlisteDisplay(false);
-  			this.spiel.updateSpielfeldDisplay(ereignisTag);
-  			
-  			this.taste();
-  			
   			// Besitzer aller Flugobjekte und Teilnahme an Buendnissenflotten wechseln
   			for (Flugobjekt obj: this.spiel.objekte)
   			{
@@ -5991,6 +5990,11 @@ public class Spiel extends EmailTransportBase implements Serializable
   							ereignisTag);
   				}
   			}
+  			
+  			this.spiel.updatePlanetenlisteDisplay(false);
+  			this.spiel.updateSpielfeldDisplay(ereignisTag);
+  			
+  			this.taste();
   		}  		
   	}
   	
@@ -6204,7 +6208,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					
  					SpielfeldPointDisplayContent point = 
  							new SpielfeldPointDisplayContent(
- 									new Point2D.Double(x, y), 
+ 									new Point(x, y), 
  									ptPreviousDay.getCol(), 
  									ptPreviousDay.getSymbol(),
  									ptPreviousDay.getHash());
@@ -6708,7 +6712,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 	 						this.spiel,
 	 						plIndex,
 	 						null,
-	 						true,
 	 						true);
  				}
  				
@@ -6905,7 +6908,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			this.spiel.screenDisplayContent = new ScreenDisplayContent();
 			chapter.table = new InventurPdfTable(this.simple? 4 : 8);
 			HashSet<Integer> brighterPlanets = new HashSet<Integer>();
- 			ArrayList<Point2D.Double> markedFields = new ArrayList<Point2D.Double>();
+ 			ArrayList<Point> markedFields = new ArrayList<Point>();
 			
 			// Spaltenueberschriften
  			if (this.simple)
@@ -6965,14 +6968,14 @@ public class Spiel extends EmailTransportBase implements Serializable
  				if (this.spiel.getPlanetIndexFromPoint(obj.getStart()) != Constants.KEIN_PLANET)
  					brighterPlanets.add(obj.getSpl());
  				else
- 					markedFields.add(Utils.toPoint2D(obj.getStart()));
+ 					markedFields.add(obj.getStart());
  				
  				if (!obj.isStop())
  				{
   	 				if (this.spiel.getPlanetIndexFromPoint(obj.getZiel()) != Constants.KEIN_PLANET)
   	 					brighterPlanets.add(obj.getZpl());
   	 				else
-  	 					markedFields.add(Utils.toPoint2D(obj.getZiel()));
+  	 					markedFields.add(obj.getZiel());
  				}
  				
  				// Zur Tabelle hinzufuegen
@@ -7398,7 +7401,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   	  			for (Mine mine: spiel.minen.values())
   	  			{
   					minen.add(new MinenfeldDisplayContent(
-  							mine.getPos(), 
+  							mine.getX(),
+  							mine.getY(),
   							mine.getStaerke()));
   				}
 			}

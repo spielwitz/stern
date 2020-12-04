@@ -21,14 +21,14 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	MIN_BUILD = "202011270000";
+	public static final String 	MIN_BUILD = "202012040000";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	RECOMMENDED_BUILD = "202012700000";
+	public static final String 	RECOMMENDED_BUILD = "202012040000";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
-	static final String 		MIGRATION_BUILD_LIMIT = "202011270000";
+	static final String 		MIGRATION_BUILD_LIMIT = "202012040000";
 	
 	public static final String 	STERN_URL = "https://stern.dyndns1.de";
 	public static final String 	NO_BUILD_INFO = "000000000000";
@@ -120,4 +120,7 @@ public class Constants
 	public static final String 	RELEASE_RECOMMENDED_FILE_NAME = "releaseRecommended.txt";
 	static final String 		GELOESCHTER_SPIELER = "_DELETED_";
 	public final static String	REG_NAME_SERVER = "Stern";
+	static final double 		PRECISION = 0.000001;
+	
+
 }

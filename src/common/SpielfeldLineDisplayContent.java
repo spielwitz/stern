@@ -16,7 +16,6 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 @SuppressWarnings("serial") class SpielfeldLineDisplayContent implements Serializable
@@ -28,7 +27,7 @@ import java.io.Serializable;
 	private PointLowRes p;
 	private byte c;
 	
-	SpielfeldLineDisplayContent(Point start, Point end, Point2D.Double pos, byte col) {
+	SpielfeldLineDisplayContent(Point start, Point end, Point pos, byte col) {
 		super();
 		this.s = start;
 		this.e = end;
@@ -48,9 +47,9 @@ import java.io.Serializable;
 		return c;
 	}
 	
-	public Point2D.Double getPos()
+	public Point getPos()
 	{
-		return this.p== null ? null : this.p.toPoint2D();
+		return this.p== null ? null : this.p.toPoint();
 	}
 	
 }

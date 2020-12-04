@@ -21,18 +21,24 @@ import java.io.Serializable;
 @SuppressWarnings("serial") 
 class MinenfeldDisplayContent implements Serializable
 {
-	private Point p;
+	private int x;
+	private int y;
 	private int s;
+
 	
-	public Point getPos() {
-		return p;
+	public int getX() {
+		return x;
+	}
+	public int getY() {
+		return y;
 	}
 	public int getStaerke() {
 		return s;
 	}
-	MinenfeldDisplayContent(Point pos, int staerke) {
+	MinenfeldDisplayContent(int x, int y, int staerke) {
 		super();
-		this.p = pos;
+		this.x = x;
+		this.y = y;
 		this.s = staerke;
 	}
 }

@@ -310,11 +310,6 @@ public class Utils
 		return meineIP;
 	}
 	
-	static Point2D.Double toPoint2D(Point p)
-	{
-		return new Point2D.Double(p.getX(), p.getY());
-	}
-	
 	public static String objectToBase64(Object obj, String password)
 	{
 		String outString = "";

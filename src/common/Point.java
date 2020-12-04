@@ -19,28 +19,19 @@ package common;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-@SuppressWarnings("serial") class Point implements Serializable
+@SuppressWarnings("serial") 
+class Point extends Point2D.Double implements Serializable
 {
-	private int x;
-	private int y;
-	
-	Point(int x, int y)
+	Point(double x, double y)
 	{
-		this.x = x;
-		this.y = y;
+		super(x, y);
 	}
 
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-	
 	double dist(Point p)
 	{
-		return Math.sqrt(Math.pow((double)(this.x - p.x), 2) + Math.pow((double)(this.y - p.y), 2));
+		return Math.sqrt(
+				Math.pow(this.x - p.x, 2) + 
+				Math.pow(this.y - p.y, 2));
 	}
 	
 	public String getString()
@@ -62,7 +53,8 @@ import java.io.Serializable;
 	  }
 	  Point other = (Point) obj;
 	  
-	  if (other.x == this.x && other.y == this.y)
+	  if (Math.abs(other.x - this.x) < Constants.PRECISION && 
+		  Math.abs(other.y - this.y) < Constants.PRECISION)
 		  return true;
 	  else
 		  return false;
@@ -71,10 +63,5 @@ import java.io.Serializable;
 	Point klon()
 	{
 		return new Point(this.x, this.y);
-	}
-	
-	Point2D.Double toPoint2dDouble()
-	{
-		return new Point2D.Double(this.x, this.y);
-	}
+	}	
 }

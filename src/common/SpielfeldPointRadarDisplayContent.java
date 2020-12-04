@@ -16,7 +16,6 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 @SuppressWarnings("serial") 
@@ -28,7 +27,7 @@ class SpielfeldPointRadarDisplayContent implements Serializable
 	private int r; // Winkel Radarstrahl (in ganzzahligen Grad)
 	
 	SpielfeldPointRadarDisplayContent(
-			Point2D.Double pos, 
+			Point pos, 
 			byte col,
 			int winkelFlugrichtung,
 			int winkelRadarstrahl)
@@ -52,8 +51,8 @@ class SpielfeldPointRadarDisplayContent implements Serializable
 		return c;
 	}
 	
-	public Point2D.Double getPos()
+	public Point getPos()
 	{
-		return this.p.toPoint2D();
+		return this.p.toPoint();
 	}
 }

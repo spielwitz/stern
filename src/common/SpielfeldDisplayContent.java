@@ -16,7 +16,6 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -31,7 +30,7 @@ import java.util.ArrayList;
 	
 	SpielfeldDisplayContent(
 			ArrayList<SpielfeldPlanetDisplayContent> planets,
-			ArrayList<Point2D.Double> markedFields,
+			ArrayList<Point> markedFields,
 			ArrayList<SpielfeldLineDisplayContent> lines,
 			ArrayList<SpielfeldPointDisplayContent> points,
 			ArrayList<MinenfeldDisplayContent> minen,
@@ -49,7 +48,7 @@ import java.util.ArrayList;
 		return p;
 	}
 
-	public ArrayList<Point2D.Double> getMarkedFields() {
+	public ArrayList<Point> getMarkedFields() {
 		return this.m == null ? null : PointLowRes.fromArrayList(m);
 	}
 	

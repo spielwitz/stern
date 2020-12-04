@@ -16,14 +16,13 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.util.Comparator;
 
 class AuswertungEreignisPatrouille implements Comparator<AuswertungEreignisPatrouille>
 {
 	int winkel; // Ein Wert zwischen 0 und 364. Stellt den Erfasungswinkel dar
 	
-	Point2D.Double markierungPos;
+	Point markierungPos;
 	Point posObjAnderes;
 	Flugobjekt objPatrouille; 
 	Flugobjekt objAnderes;

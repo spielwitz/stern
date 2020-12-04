@@ -16,7 +16,6 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -27,8 +26,8 @@ class Flugobjekt implements Serializable
 	// Felder, die abgespeichert werden
 	private int spl; // Startplanet. Ist Constants.KEIN_PLANET, wenn Objekt von einem Feld abfliegt
 	private int zpl; // Zielplanet. Ist Constants.KEIN_PLANET, wenn Objekt zu einem Feld fliegt
-	private Point start; // Startpunkt. Immer gesetzt
-	private Point ziel; // Zielpunkt. Immer gesetzt
+	private Point s; // Startpunkt. Immer gesetzt
+	private Point z; // Zielpunkt. Immer gesetzt
 	
 	private int pos; // Positionszaehler
 	private ObjektTyp typ; // Typ des Flugobjekts
@@ -45,10 +44,8 @@ class Flugobjekt implements Serializable
 	transient private boolean angekommen;
 	transient private boolean zuLoeschen;
 	transient private boolean bewegt;
-	private transient Point2D.Double exactPosStart;
-	private transient Point2D.Double exactPosZiel;
-	
-	static final double PRECISION = 0.000001;
+	private transient Point exactPosStart; // Punkt an dem eine Jahresbewegegung startet
+	private transient Point exactPosZiel;
 	
 	Flugobjekt(int spl, int zpl, Point start, Point ziel,
 			int pos, ObjektTyp typ,
@@ -57,8 +54,8 @@ class Flugobjekt implements Serializable
 	{
 		this.spl = spl;
 		this.zpl = zpl;
-		this.start = start;
-		this.ziel = ziel;
+		this.s = start;
+		this.z = ziel;
 		this.pos = pos;
 		this.typ = typ;
 		this.anz = anz;
@@ -77,8 +74,8 @@ class Flugobjekt implements Serializable
 	{
 		this.spl = spl;
 		this.zpl = zpl;
-		this.start = start;
-		this.ziel = ziel;
+		this.s = start;
+		this.z = ziel;
 		this.pos = 0;
 		this.typ = typ;
 		this.anz = anz;
@@ -125,21 +122,21 @@ class Flugobjekt implements Serializable
 	}
 
 	public Point getStart() {
-		return start;
+		return s;
 	}
 
 	public void setStart(Point start) {
 		// sPl auf -1 setzen
-		this.start = start;
+		this.s = start;
 	}
 
 	public Point getZiel() {
-		return ziel;
+		return z;
 	}
 
 	public void setZiel(Point ziel) {
 		// zPl auf -1 setzen
-		this.ziel = ziel;
+		this.z = ziel;
 	}
 
 	public int getPos() {
@@ -210,40 +207,40 @@ class Flugobjekt implements Serializable
 
 	public Point getCurrentField()
 	{
-		Point2D.Double exactPos = this.getCurrentPos();
+		Point exactPos = this.getCurrentPos();
 		return new Point(Utils.round(exactPos.x), Utils.round(exactPos.y));
 	}
 	
-	public Point2D.Double getCurrentPos()
+	public Point getCurrentPos()
 	{
-		double dist = this.start.dist(this.ziel);
+		double dist = this.s.dist(this.z);
 		
 		if (this.pos < dist)
 		{
-			double x0 = (double)this.start.getX() + (double)this.pos * (double)(this.ziel.getX()-this.start.getX()) / dist;
-			double y0 = (double)this.start.getY() + (double)this.pos * (double)(this.ziel.getY()-this.start.getY()) / dist;
-			return new Point2D.Double(x0, y0);
+			double x0 = this.s.getX() + (double)this.pos * (this.z.getX()-this.s.getX()) / dist;
+			double y0 = this.s.getY() + (double)this.pos * (this.z.getY()-this.s.getY()) / dist;
+			return new Point(x0, y0);
 		}
 		else	
-			return new Point2D.Double(this.ziel.getX(), this.ziel.getY());
+			return this.z;
 	}
 	
-	public Point2D.Double getPosOnDay(int tag)
+	public Point getPosOnDay(int tag)
 	{
 		if (this.bewegt)
 		{
 			int v = getGeschwindigkeit(this.getTyp(), this.transfer);
-			double distTotal = this.start.dist(this.ziel);
+			double distTotal = this.s.dist(this.z);
 			
 			// Position am Tag 0
 			double pos = (double)(this.pos - v);
 			
 			if (tag <= 0)
 			{
-				double x0 = (double)this.start.getX() + pos * (double)(this.ziel.getX()-this.start.getX()) / distTotal;
-				double y0 = (double)this.start.getY() + pos * (double)(this.ziel.getY()-this.start.getY()) / distTotal;
+				double x0 = this.s.getX() + pos * (this.z.getX()-this.s.getX()) / distTotal;
+				double y0 = this.s.getY() + pos * (this.z.getY()-this.s.getY()) / distTotal;
 				
-				return new Point2D.Double(x0, y0);
+				return new Point(x0, y0);
 			}
 			
 			double bruchteilJahr = AuswertungEreignis.getBruchteilTag(tag);
@@ -252,13 +249,13 @@ class Flugobjekt implements Serializable
 			
 			if (posTag >= distTotal)
 			{
-				return this.ziel.toPoint2dDouble();
+				return this.z;
 			}
 			
-			double x = (double)this.start.getX() + posTag * (double)(this.ziel.getX()-this.start.getX()) / distTotal;
-			double y = (double)this.start.getY() + posTag * (double)(this.ziel.getY()-this.start.getY()) / distTotal;
+			double x = this.s.getX() + posTag * (this.z.getX()-this.s.getX()) / distTotal;
+			double y = this.s.getY() + posTag * (this.z.getY()-this.s.getY()) / distTotal;
 			
-			return new Point2D.Double(x, y);
+			return new Point(x, y);
 		}
 		else
 			return this.getCurrentPos();
@@ -278,10 +275,9 @@ class Flugobjekt implements Serializable
 	
 	Flugzeit getRestflugzeit()
 	{
-		Point2D.Double posNow = this.getCurrentPos();
-		Point2D.Double posZiel = this.ziel.toPoint2dDouble();
+		Point posNow = this.getCurrentPos();
 		
-		double dist = Utils.dist(posNow, posZiel);
+		double dist = posNow.dist(this.z);
 		double v = (double)getGeschwindigkeit(this.typ, this.transfer);
 		
 		return getFlugzeitInternal(dist, v);
@@ -301,30 +297,6 @@ class Flugobjekt implements Serializable
 		else
 			return new Flugzeit(tage / Constants.ANZ_TAGE_JAHR, tage % Constants.ANZ_TAGE_JAHR);
 	}
-	
-//	static int getFlugzeitTage(ObjektTyp typ, boolean transfer, Point startFeld, Point zielFeld)
-//	{
-//		double dist = startFeld.dist(zielFeld);
-//		double v = (double)getGeschwindigkeit(typ, transfer);
-//		
-//		return Utils.round(dist * (double)Constants.ANZ_TAGE_JAHR / v);
-//	}
-//	
-//	public int getFlugzeitTage()
-//	{
-//		return getFlugzeitTage(this.typ, this.transfer, this.start, this.ziel);
-//	}
-//		
-//	public int getRestFlugzeitTage()
-//	{
-//		Point2D.Double posNow = this.getExactPos();
-//		Point2D.Double posZiel = this.ziel.toPoint2dDouble();
-//		
-//		double dist = Utils.dist(posNow, posZiel);
-//		double v = (double)getGeschwindigkeit(this.typ, this.transfer);
-//		
-//		return Utils.round(dist * (double)Constants.ANZ_TAGE_JAHR / v);
-//	}
 	
 	private static int getGeschwindigkeit(ObjektTyp typ, boolean transfer)
 	{
@@ -353,7 +325,7 @@ class Flugobjekt implements Serializable
 		// Bewegen
 		this.pos += geschwindigkeit;
 		
-		this.angekommen = (this.pos >= this.start.dist(this.ziel));
+		this.angekommen = (this.pos >= this.s.dist(this.z));
 		this.bewegt = true;
 		
 		// Zielpunkt
@@ -371,7 +343,7 @@ class Flugobjekt implements Serializable
 			// Objekt ist angekommen.
 			AuswertungEreignis ereignis = new AuswertungEreignis(AuswertungEreignisTyp.ANKUNFT, this);
 			
-			ereignis.feld = this.ziel;
+			ereignis.feld = this.z;
 			ereignis.setTag(bruchteilJahrZiel);
 			
 			ereignisse.add(ereignis);
@@ -385,11 +357,11 @@ class Flugobjekt implements Serializable
 		// Die Ereignisse sind noch nicht zeitlich geordnet!
 		if (!feldStart.equals(feldZiel))
 		{
-			int xMin = Math.min(feldStart.getX(), feldZiel.getX());
-			int yMin = Math.min(feldStart.getY(), feldZiel.getY());
+			int xMin = (int)(Math.min(feldStart.getX(), feldZiel.getX()));
+			int yMin = (int)(Math.min(feldStart.getY(), feldZiel.getY()));
 			
-			int xMax = Math.max(feldStart.getX(), feldZiel.getX());
-			int yMax = Math.max(feldStart.getY(), feldZiel.getY());
+			int xMax = (int)(Math.max(feldStart.getX(), feldZiel.getX()));
+			int yMax = (int)(Math.max(feldStart.getY(), feldZiel.getY()));
 			
 			// Pruefe alle Felder im Rechteck xmin, ymin, xmax, ymax, ob sie
 			// durchflogen werden
@@ -402,12 +374,12 @@ class Flugobjekt implements Serializable
 						continue;
 					
 					// Pruefe, auf welcher Seite der Geraden die 4 Ecken des Feldes liegen
-					Point2D.Double pts[] = new Point2D.Double[4];
+					Point pts[] = new Point[4];
 					
-					pts[0] = new Point2D.Double(xCheck + 0.5, yCheck+0.5);
-					pts[1] = new Point2D.Double(xCheck + 0.5, yCheck-0.5);
-					pts[2] = new Point2D.Double(xCheck - 0.5, yCheck-0.5);
-					pts[3] = new Point2D.Double(xCheck - 0.5, yCheck+0.5);
+					pts[0] = new Point(xCheck + 0.5, yCheck+0.5);
+					pts[1] = new Point(xCheck + 0.5, yCheck-0.5);
+					pts[2] = new Point(xCheck - 0.5, yCheck-0.5);
+					pts[3] = new Point(xCheck - 0.5, yCheck+0.5);
 					
 					double vp[] = new double[4];
 					
@@ -431,15 +403,15 @@ class Flugobjekt implements Serializable
 						
 						// Ist die Kante i-j parallel zur Geraden?
 						double vprod = Utils.VektorproduktBetrag(
-								new Point2D.Double(0, 0),
-								new Point2D.Double(pts[j].x - pts[i].x, pts[j].y - pts[i].y),
-								new Point2D.Double(this.exactPosZiel.x - this.exactPosStart.x, this.exactPosZiel.y - this.exactPosStart.y));
+								new Point(0, 0),
+								new Point(pts[j].x - pts[i].x, pts[j].y - pts[i].y),
+								new Point(this.exactPosZiel.x - this.exactPosStart.x, this.exactPosZiel.y - this.exactPosStart.y));
 						
-						if (Math.abs(vprod) < PRECISION)
+						if (Math.abs(vprod) < Constants.PRECISION)
 							continue;
 
 						// Liegt der erste Eckpunkt auf der Geraden?
-						if (Math.abs(vp[i]) < PRECISION)
+						if (Math.abs(vp[i]) < Constants.PRECISION)
 						{
 							double t = Utils.dist(pts[i], this.exactPosStart) / distJahr;
 							
@@ -449,12 +421,12 @@ class Flugobjekt implements Serializable
 								tMin = t;
 							}
 						}
-						else if (Math.abs(vp[j]) >= PRECISION &&
+						else if (Math.abs(vp[j]) >= Constants.PRECISION &&
 								 Math.signum(vp[i]) != Math.signum(vp[j]))
 					    {
 							double t; 
 							
-							if (Math.abs(pts[i].x - pts[j].x) < PRECISION)
+							if (Math.abs(pts[i].x - pts[j].x) < Constants.PRECISION)
 								// X-Kante des Feldes
 								t =  (pts[i].x - this.exactPosStart.x) / 
 								     (this.exactPosZiel.x - this.exactPosStart.x);
@@ -541,12 +513,12 @@ class Flugobjekt implements Serializable
 	{
 		// Patrouille oder aehnlich dreht um
 		int dummyPl = this.spl;
-		Point dummyPoint = this.start.klon();
+		Point dummyPoint = this.s.klon();
 		
 		this.spl = this.zpl;
 		this.zpl = dummyPl;
-		this.start = this.ziel;
-		this.ziel = dummyPoint;
+		this.s = this.z;
+		this.z = dummyPoint;
 		this.pos = 0;
 		this.transfer = transfer;
 		
@@ -579,7 +551,7 @@ class Flugobjekt implements Serializable
 		this.bes = neuerBesitzer;
 		this.pos = 0;
 		this.transfer = true;
-		this.start = start;
+		this.s = start;
 		this.spl = Constants.KEIN_PLANET;
 		
 		// Objekt wird gestoppt
@@ -630,7 +602,7 @@ class Flugobjekt implements Serializable
 			
 
 		// Beteiligungen bei Buendnisflotten aendern
-		if (this.istBeteiligt(alterSpieler))
+		if (this.istBuendnis() && this.istBeteiligt(alterSpieler))
 		{
 			this.buendnis.spielerErsetzen(this.bes, neuerSpieler);
 			this.anz = this.buendnis.getSum();
