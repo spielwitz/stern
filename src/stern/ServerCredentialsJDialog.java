@@ -242,7 +242,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 		{
 			if (this.cuc != null && this.authUrlBefore != null &&
 				(!this.authUrlBefore.equals(this.tfAuthUrl.getText()) ||
-				 this.authPortBefore != Integer.parseInt(this.tfAuthPort.getText())))
+				 this.authPortBefore != this.tfAuthPort.getValue()))
 			{
 				DialogWindowResult dialogResult = DialogWindow.showYesNoCancel(
 						this,
@@ -252,7 +252,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 				if (dialogResult == DialogWindowResult.YES)
 				{
 					this.cuc.url = this.tfAuthUrl.getText();
-					this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+					this.cuc.port = this.tfAuthPort.getValue();
 					ServerUtils.writeClientUserCredentials(cuc, this.serverUserCredentialsFile);
 				}
 				else if (dialogResult == DialogWindowResult.CANCEL)
@@ -310,7 +310,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 			if (this.cuc != null)
 			{
 				this.cuc.url = this.tfAuthUrl.getText();
-				this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+				this.cuc.port = this.tfAuthPort.getValue();
 			}
 			
 			RequestMessage msg = new RequestMessage(RequestMessageType.PING);

@@ -402,7 +402,7 @@ import commonUi.TextFieldDark;
 					!this.tfAuthPort.error &&
 					this.authUrlBefore != null &&
 					(!this.authUrlBefore.equals(this.tfAuthUrl.getText()) ||
-					 this.authPortBefore != Integer.parseInt(this.tfAuthPort.getText())))
+					 this.authPortBefore != this.tfAuthPort.getValue()))
 			{
 				DialogWindowResult dialogResult = DialogWindow.showYesNoCancel(
 						this,
@@ -412,7 +412,7 @@ import commonUi.TextFieldDark;
 				if (dialogResult == DialogWindowResult.YES)
 				{
 					this.cuc.url = this.tfAuthUrl.getText();
-					this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+					this.cuc.port = this.tfAuthPort.getValue();
 					ServerUtils.writeClientUserCredentials(cuc, this.serverAdminCredentialsFile);
 				}
 				else if (dialogResult == DialogWindowResult.CANCEL)
@@ -467,7 +467,7 @@ import commonUi.TextFieldDark;
 			if (this.cuc != null)
 			{
 				this.cuc.url = this.tfAuthUrl.getText();
-				this.cuc.port = Integer.parseInt(this.tfAuthPort.getText());
+				this.cuc.port = this.tfAuthPort.getValue();
 			}
 			
 			RequestMessage msg = new RequestMessage(RequestMessageType.ADMIN_PING);

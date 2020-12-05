@@ -69,18 +69,29 @@ public class IntegerTextFieldDark extends JTextField  implements DocumentListene
 	{
 		if (checkInput)
 		{
-			try
+			if (this.getText().length() > 0)
 			{
-				Integer.parseInt(this.getText());
-				this.error = false;
-			}
-			catch (Exception x)
-			{
-				this.error = true;
+				this.error = this.getValue() <= 0;
 			}
 			
 			this.callback.setControlsEnabled();
 		}
+	}
+	
+	public int getValue()
+	{
+		int retval = 0;
+		
+		try
+		{
+			retval = Integer.parseInt(this.getText());
+		}
+		catch (Exception x)
+		{
+			retval = 0;
+		}
+		
+		return retval;
 	}
 	
 	public void enableCheckInput()
