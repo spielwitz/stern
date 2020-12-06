@@ -43,6 +43,7 @@ class MinBuildChecker
 			DialogWindow.showError(
 					parent, 
 					new MessageWithLink(
+						parent,
 						SternResources.MinBuild(false,
 									ReleaseGetter.format(minBuild),
 									ReleaseGetter.format(thisBuild),

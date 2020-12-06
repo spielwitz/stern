@@ -1361,7 +1361,13 @@ public class Stern extends Frame  // NO_UCD (use default)
 	@Override
 	public boolean launchEmail(String recipient, String subject, String bodyText, EmailTransportBase obj)
 	{
-		return EmailToolkit.launchEmailClient(recipient, subject, bodyText, null, obj);
+		return EmailToolkit.launchEmailClient(
+				this,
+				recipient, 
+				subject, 
+				bodyText, 
+				null, 
+				obj);
 	}
 
 	@Override

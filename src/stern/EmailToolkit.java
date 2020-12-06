@@ -16,6 +16,7 @@
 
 package stern;
 
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -26,14 +27,22 @@ import java.net.URLEncoder;
 
 import common.EmailTransportBase;
 import common.ReleaseGetter;
+import common.SternResources;
 import common.Utils;
+import commonUi.DialogWindow;
 
 class EmailToolkit
 {
 	private static final String BASE64_START = "----------begin:\n";
 	private static final String BASE64_END = "\n:end----------";
 	
-	static boolean launchEmailClient(String recipient, String subject, String bodyText, String password, EmailTransportBase obj)
+	static boolean launchEmailClient(
+			Component parent,
+			String recipient, 
+			String subject, 
+			String bodyText, 
+			String password, 
+			EmailTransportBase obj)
 	{
 		boolean ok = true;
 		
@@ -63,6 +72,10 @@ class EmailToolkit
 		}
 		catch (Exception x)
 		{
+			DialogWindow.showError(
+					parent, 
+					SternResources.EmailNichtGeoeffnet(false, x.getMessage()), 
+					SternResources.Fehler(false));
 			ok = false;
 		}
 		

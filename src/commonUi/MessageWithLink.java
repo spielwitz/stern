@@ -17,20 +17,22 @@
 package commonUi;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import common.SternResources;
+
 public class MessageWithLink extends JEditorPane {
     private static final long serialVersionUID = 1L;
 
-    public MessageWithLink(String htmlBody) {
+    public MessageWithLink(Component parent, String htmlBody) 
+    {
         super("text/html", "<html><body style=\"" + getStyle() + "\">" + htmlBody + "</body></html>");
         addHyperlinkListener(new HyperlinkListener() {
             @Override
@@ -39,10 +41,12 @@ public class MessageWithLink extends JEditorPane {
                 {
                 	try {
 						java.awt.Desktop.getDesktop().browse(new URI(e.getURL().toString()));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					} catch (URISyntaxException e1) {
-						e1.printStackTrace();
+					} catch (Exception x) 
+                	{
+						DialogWindow.showError(
+								parent, 
+								SternResources.BrowserNichtGeoeffnet(false, x.getMessage()), 
+								SternResources.Fehler(false));
 					}
                 }
             }

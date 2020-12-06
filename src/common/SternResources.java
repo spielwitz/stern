@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: II
+		// Hoechstes vergebenes Symbol: IK
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -583,6 +583,8 @@ public class SternResources
 		symbolDict.put("IG","SpielinformationenKampfschiffproduktion_IG");
 		symbolDict.put("IH","ServerUrlUebernehmen_IH");
 		symbolDict.put("II","ServerZugangsdatenAendern_II");
+		symbolDict.put("IJ","BrowserNichtGeoeffnet_IJ");
+		symbolDict.put("IK","EmailNichtGeoeffnet_IK");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4420,7 +4422,7 @@ public class SternResources
 	}
 
 	/**
-	   * Wollen Sie die ge\u00E4nderte Server-URL abspeichern? [IH]
+	   * Wollen Sie die ge\u00E4nderten Server-Zugangsdaten abspeichern? [IH]
 	   */
 	public static String ServerUrlUebernehmen(boolean symbol) {
 		return symbol ? "£IH£":messages.getString("ServerUrlUebernehmen_IH");
@@ -4431,5 +4433,19 @@ public class SternResources
 	   */
 	public static String ServerZugangsdatenAendern(boolean symbol) {
 		return symbol ? "£II£":messages.getString("ServerZugangsdatenAendern_II");
+	}
+
+	/**
+	   * Der Browser kann nicht ge\u00F6ffnet werden:\n{0} [IJ]
+	   */
+	public static String BrowserNichtGeoeffnet(boolean symbol, String arg0) {
+		return symbol ? "£IJ§"+arg0+"£":MessageFormat.format(messages.getString("BrowserNichtGeoeffnet_IJ"), arg0);
+	}
+
+	/**
+	   * E-Mail-Client kann nicht ge\u00F6ffnet werden:\n{0} [IK]
+	   */
+	public static String EmailNichtGeoeffnet(boolean symbol, String arg0) {
+		return symbol ? "£IK§"+arg0+"£":MessageFormat.format(messages.getString("EmailNichtGeoeffnet_IK"), arg0);
 	}
 }

@@ -88,6 +88,7 @@ public class UpdateChecker implements Runnable
 					DialogWindow.showInformation(
 							(Frame)parent, 
 							new MessageWithLink(
+									(Frame)parent,
 									SternResources.UpdateVerfuegbar(false) + " - <a href=\""+urlString+"\">"+urlString+"</a>"),
 							SternResources.Update(false));
 				}
@@ -98,6 +99,7 @@ public class UpdateChecker implements Runnable
 				DialogWindow.showInformation(
 						(Frame)parent, 
 						new MessageWithLink(
+								(Frame)parent,
 								SternResources.UpdateVerfuegbarWichtig(false) + " - <a href=\""+urlString+"\">"+urlString+"</a>"),
 						SternResources.Update(false));
 			}

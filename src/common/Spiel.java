@@ -897,9 +897,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.hauptmenue();
 			
 			// Auswertung im Hintergrund durchfuehren
+			ScreenDisplayContent sdc = (ScreenDisplayContent)Utils.klon(this.screenDisplayContent);
 			this.console.setBackground(true);
 			new Auswertung(this);
 			this.console.setBackground(false);
+			this.screenDisplayContent = sdc;
 			
 			// Auto-Save
 			this.autosave();

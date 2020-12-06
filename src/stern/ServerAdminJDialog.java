@@ -18,6 +18,7 @@ package stern;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FileDialog;
@@ -111,6 +112,7 @@ import commonUi.TextFieldDark;
 
 	private static Font font;
 	
+	private Component parent;
 	private String authUrlBefore;
 	private int authPortBefore;
 	
@@ -121,6 +123,7 @@ import commonUi.TextFieldDark;
 	{
 		super (parent, title, true);
 		
+		this.parent = parent;
 		this.serverAdminCredentialsFile = serverAdminCredentialsFile;
 		this.usersOnServer = new Hashtable<String, ResponseMessageGetUsers.UserInfo>();
 		
@@ -725,6 +728,7 @@ import commonUi.TextFieldDark;
 						SternResources.ServerAdminSpieler(false));
 				
 				EmailToolkit.launchEmailClient(
+						this.parent,
 						reqMsgChangeUser.email, 
 						SternResources.EmailSubjectNeuerUser(false, reqMsgChangeUser.userId), 
 						SternResources.NeuerUserEMailBody(

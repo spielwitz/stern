@@ -17,6 +17,7 @@
 package stern;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
@@ -43,6 +44,7 @@ import commonUi.DialogFontHelper;
 import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
+import commonUi.TextFieldDark;
 
 @SuppressWarnings("serial") class EmailCreatorJDialog extends JDialog
 			implements 	ActionListener
@@ -59,6 +61,7 @@ import commonUi.SpringUtilities;
 	
 	String separatorPreset;
 	boolean launched = false;
+	private Component parent;
 	
 	private static final String[] separators = new String[] {";", ","};
 	
@@ -72,6 +75,7 @@ import commonUi.SpringUtilities;
 	{
 		super (parent, SternResources.EmailErzeugen(false), true);
 		
+		this.parent = parent;
 		this.Initialize(spieler, emailSpielleiter, separatorPreset, subject, body);
 
 		this.setLocationRelativeTo(parent);	
@@ -87,6 +91,7 @@ import commonUi.SpringUtilities;
 	{
 		super (parent, SternResources.EmailErzeugen(false), true);
 		
+		this.parent = parent;
 		this.Initialize(spieler, emailSpielleiter, separatorPreset, subject, body);
 
 		this.setLocationRelativeTo(parent);	
@@ -132,13 +137,14 @@ import commonUi.SpringUtilities;
 			
 			checkbox2emailMap.put(cb, email);
 			
-			LabelDark lab = new LabelDark(
+			TextFieldDark tf = new TextFieldDark(
 					email.length() > 0 ?
 							email :
 							SternResources.EmailUnbekannt(false),
-					font);
+					font,
+					false);
 			
-			panTable.add(lab);
+			panTable.add(tf);
 			
 			rows++;
 		}
@@ -151,8 +157,8 @@ import commonUi.SpringUtilities;
 			
 			checkbox2emailMap.put(cb, emailSpielleiter);
 			
-			LabelDark lab = new LabelDark(emailSpielleiter, font);
-			panTable.add(lab);
+			TextFieldDark tf = new TextFieldDark(emailSpielleiter, font, false);
+			panTable.add(tf);
 			
 			rows++;
 		}
@@ -239,6 +245,7 @@ import commonUi.SpringUtilities;
 			}
 			
 			EmailToolkit.launchEmailClient(
+					this.parent,
 					sbEmail.toString(), 
 					this.subject, 
 					this.body, 
