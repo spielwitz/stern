@@ -21,11 +21,11 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	MIN_BUILD = "202012050000";
+	public static final String 	MIN_BUILD = "202012070000";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	RECOMMENDED_BUILD = "202012050000";
+	public static final String 	RECOMMENDED_BUILD = "202012070000";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
 	static final String 		MIGRATION_BUILD_LIMIT = "202012040000";
@@ -63,7 +63,7 @@ public class Constants
 	static final int 		EPROD_MAX = 100;
 	static final int 		ANZ_NAHE_PLANETEN_MAX_REISEDAUER_JAHRE = 2;
 	static final int 		ANZ_NAHE_PLANETEN = 4;
-	static final int 		SENDER_JAHRE = 8;
+	static final int 		SENDER_JAHRE = 10;
 	static final double		VERT_BONUS = 1.25;
 	
 	// Default-Werte bei neuem Spiel
