@@ -51,6 +51,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import common.ReleaseGetter;
 import common.SternResources;
 import common.Utils;
 import commonServer.ClientUserCredentials;
@@ -94,6 +95,7 @@ import commonUi.TextFieldDark;
 	private TextFieldDark tfServerStartDate;
 	private TextFieldDark tfServerLogSize;
 	private TextFieldDark tfServerBuild;
+	private TextFieldDark tfClientBuild;
 	private ComboBoxDark<String> comboServerLogLevel;
 	private LabelDark labPing;
 	private TextFieldDark tfAuthUrl;
@@ -217,6 +219,13 @@ import commonUi.TextFieldDark;
 		
 		PanelDark panServerStatus = new PanelDark(new SpringLayout());
 		
+		panServerStatus.add(new LabelDark(SternResources.ClientBuild(false), font));
+		this.tfClientBuild = new TextFieldDark(font, 30);
+		this.tfClientBuild.setEditable(false);
+		this.tfClientBuild.setText(ReleaseGetter.getRelease());
+		panServerStatus.add(this.tfClientBuild);
+		panServerStatus.add(new LabelDark("", font));
+		
 		panServerStatus.add(new LabelDark(SternResources.ServerBuild(false), font));
 		this.tfServerBuild = new TextFieldDark(font, 30);
 		this.tfServerBuild.setEditable(false);
@@ -253,7 +262,7 @@ import commonUi.TextFieldDark;
 		panServerStatus.add(this.butServerLogLevelChange);
 		
 		SpringUtilities.makeCompactGrid(panServerStatus,
-			      4, 3, //rows, cols
+			      5, 3, //rows, cols
 			      10, 10, //initialX, initialY
 			      10, 10);//xPad, yPad
 		

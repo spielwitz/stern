@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IK
+		// Hoechstes vergebenes Symbol: IL
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -585,6 +585,7 @@ public class SternResources
 		symbolDict.put("II","ServerZugangsdatenAendern_II");
 		symbolDict.put("IJ","BrowserNichtGeoeffnet_IJ");
 		symbolDict.put("IK","EmailNichtGeoeffnet_IK");
+		symbolDict.put("IL","ClientBuild_IL");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4447,5 +4448,12 @@ public class SternResources
 	   */
 	public static String EmailNichtGeoeffnet(boolean symbol, String arg0) {
 		return symbol ? "£IK§"+arg0+"£":MessageFormat.format(messages.getString("EmailNichtGeoeffnet_IK"), arg0);
+	}
+
+	/**
+	   * STERN-Build [IL]
+	   */
+	public static String ClientBuild(boolean symbol) {
+		return symbol ? "£IL£":messages.getString("ClientBuild_IL");
 	}
 }
