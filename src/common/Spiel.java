@@ -941,7 +941,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 					keys.add(new ConsoleKey("1",SternResources.AuswertungWiederholen(true)));
 				if (this.jahr > 0 && (!this.istSoloSpieler || this.abgeschlossen))
 					keys.add(new ConsoleKey("2",SternResources.Statistik(true)));
-				keys.add(new ConsoleKey("3",SternResources.Entfernungstabelle(true)));
 				if (!this.istSoloSpieler || this.abgeschlossen)
 					keys.add(new ConsoleKey("9",SternResources.Spielinformationen(true)));
 				if (!this.istSoloSpieler && this.jahr > 0 && !this.abgeschlossen)
@@ -973,8 +972,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.abschliessenFrage();
 				else if (this.jahr > 0 && input.equals("1"))
 					new Replay(this);
-				else if (input.equals("3"))
-					new Entfernungstabelle(this);
 				else if ((!this.istSoloSpieler  || this.abgeschlossen) && input.equals("9"))
 				{
 					this.console.clear();
@@ -2483,6 +2480,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  					else
  					{
  						keys.add(new ConsoleKey("5",SternResources.ZugeingabeKapitulieren(true)));
+ 						keys.add(new ConsoleKey("7",SternResources.Entfernungstabelle(true)));
  						keys.add(new ConsoleKey("8",SternResources.ZugeingabeObjekteAusblenden(true))); 						
  						keys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
  					}
@@ -2521,6 +2519,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.minenUndRaeumer(ObjektTyp.MINE50);
 				else if (!kapituliert && !simpel && (input.equals("7")))
 					this.minenUndRaeumer(ObjektTyp.MINENRAEUMER);
+				else if (simpel && (input.equals("7")))
+					new Entfernungstabelle(this.spiel);
 				else if (!kapituliert && !simpel && (input.equals("8")))
 					this.buendnis();
 				else if (!kapituliert && simpel && (input.equals("8")))
@@ -2571,7 +2571,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
 			
 			keys.add(new ConsoleKey("ESC",SternResources.Zurueck(true)));
-			
+			keys.add(new ConsoleKey("7",SternResources.Entfernungstabelle(true)));
 			keys.add(new ConsoleKey("8",SternResources.ZugeingabeObjekteAusblenden(true)));
 			keys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
 			keys.add(new ConsoleKey("-",SternResources.ZugeingabeKapitulieren(true)));
@@ -2592,6 +2592,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.spiel.console.clear();
 					exit = true;
 				}
+				else if (input.equals("7"))
+					new Entfernungstabelle(this.spiel);
 				else if (input.equals("8"))
 					this.objekteAusblenden();
 				else if (input.equals("9"))
