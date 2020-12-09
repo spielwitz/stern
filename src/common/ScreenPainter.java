@@ -104,7 +104,7 @@ public class ScreenPainter
 		titelBildTextLines.add("`   .@$kh#opV#pppgpHT`      `    `      `                `         `        ");
 		titelBildTextLines.add("   .@$#k3f#gg#H='                `           `    `      (c) 1989-2020      ");
 		titelBildTextLines.add("   @@$@8PT'           `     `    `      `              Michael Schweitzer   ");
-		titelBildTextLines.add("`              `  `    `                     `    `  Build " + ReleaseGetter.format(ReleaseGetter.getRelease()) + "  ");
+		titelBildTextLines.add("`              `  `    `                     `    `        Build " + ReleaseGetter.getRelease() + "  ");
 
 	}
 	

@@ -30,6 +30,6 @@ public class SternAbout
 				new MessageWithLink(
 						parent,
 						"STERN - (c) 1989-2020 Michael Schweitzer - <a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>"),
-				"Build " + ReleaseGetter.format(ReleaseGetter.getRelease()));
+				"Build " + ReleaseGetter.getRelease());
 	}
 }

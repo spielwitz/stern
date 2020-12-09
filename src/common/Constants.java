@@ -21,17 +21,17 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	MIN_BUILD = "202012070000";
+	public static final String 	BUILD_COMPATIBLE = "0001";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	RECOMMENDED_BUILD = "202012070000";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "0001";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
-	static final String 		MIGRATION_BUILD_LIMIT = "202012040000";
+	static final String 		BUILD_MIGRATION = "0001";
 	
 	public static final String 	STERN_URL = "https://stern.dyndns1.de";
-	public static final String 	NO_BUILD_INFO = "000000000000";
+	public static final String 	BUILD_NO_INFO = "9999";
 	
 	// Spielfeld
 	public static final int FELD_MAX_X = 20;

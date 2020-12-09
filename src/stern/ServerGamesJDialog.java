@@ -54,7 +54,6 @@ import com.google.gson.Gson;
 
 import common.Colors;
 import common.Constants;
-import common.ReleaseGetter;
 import common.Spiel;
 import common.Spiel.PlanetenInfo;
 import commonServer.ClientUserCredentials;
@@ -1083,13 +1082,13 @@ import common.Utils;
 				this.labLetztesUpdate.setText(
 						SternResources.ServerGamesLetzteAktivitaet(
 								false, 
-								ReleaseGetter.format(
+								Utils.dateStringFormat(
 										Utils.millisecondsToString(this.selectedGame.letztesUpdate))));
 				
 				this.labStartDatum.setText(
 						SternResources.ServerGamesBegonnen(
 								false, 
-								ReleaseGetter.format(
+								Utils.dateStringFormat(
 										Utils.millisecondsToString(this.selectedGame.startDatum))));
 				
 				this.cbSimple.setSelected(this.selectedGame.simpleStern);

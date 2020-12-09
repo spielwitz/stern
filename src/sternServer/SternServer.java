@@ -698,11 +698,11 @@ public class SternServer // NO_UCD (unused code)
 			
 			String serverBuild = ReleaseGetter.getRelease();
 			
-			if (!serverBuild.equals(Constants.NO_BUILD_INFO)) // Wenn der Server aus Eclipse heraus gestartet wird
+			if (!serverBuild.equals(Constants.BUILD_NO_INFO)) // Wenn der Server aus Eclipse heraus gestartet wird
 			{
-				 if (!(msg.build != null && msg.build.equals(Constants.NO_BUILD_INFO)))
+				 if (!(msg.build != null && msg.build.equals(Constants.BUILD_NO_INFO)))
 				 {
-					 if (msg.build == null || msg.build.compareTo(Constants.MIN_BUILD) < 0)
+					 if (msg.build == null || msg.build.compareTo(Constants.BUILD_COMPATIBLE) < 0)
 					 {
 						falscherBuild = true;
 					 }
@@ -724,8 +724,8 @@ public class SternServer // NO_UCD (unused code)
 		    	resp.error = true;
 		    	resp.errorMsg = SternResources.ServerBuildFalsch(
 						true,
-						ReleaseGetter.format(Constants.MIN_BUILD),
-						msg.build == null ? "" : ReleaseGetter.format(msg.build));
+						Constants.BUILD_COMPATIBLE,
+						msg.build == null ? "" : msg.build);
 		    }
 		    else
 		    {

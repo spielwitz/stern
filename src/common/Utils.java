@@ -293,8 +293,32 @@ public class Utils
 	    
 	    String dateBuildStyle = date.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 	    
-	    return ReleaseGetter.format2(dateBuildStyle);
+		String jahr = dateBuildStyle.substring(0, 4);
+		String monat = dateBuildStyle.substring(4, 6);
+		String tag = dateBuildStyle.substring(6, 8);
+		
+		String stunde = dateBuildStyle.substring(8, 10);
+		String minute = dateBuildStyle.substring(10, 12);
+		String sekunde = dateBuildStyle.substring(12, 14);
+		
+		return SternResources.ReleaseFormatted2(
+				false, tag, monat, jahr, stunde, minute, sekunde);
+
 	}
+	
+	public static String dateStringFormat(String unformattedString)
+	{
+		String jahr = unformattedString.substring(0, 4);
+		String monat = unformattedString.substring(4, 6);
+		String tag = unformattedString.substring(6, 8);
+		
+		String stunde = unformattedString.substring(8, 10);
+		String minute = unformattedString.substring(10, 12);
+		
+		return SternResources.ReleaseFormatted(
+				false, tag, monat, jahr, stunde, minute);
+	}
+
 	
 	public static String getMyIPAddress()
 	{

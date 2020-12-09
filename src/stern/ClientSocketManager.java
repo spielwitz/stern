@@ -180,17 +180,17 @@ class ClientSocketManager
 	    	return msgResponse;
 		}
 	    
-	    if (!ReleaseGetter.getRelease().equals(Constants.NO_BUILD_INFO)) // Wenn Stern aus Eclipse heraus gestartet wird
+	    if (!ReleaseGetter.getRelease().equals(Constants.BUILD_NO_INFO)) // Wenn Stern aus Eclipse heraus gestartet wird
 		{
-			 if (!(msgResponse.build != null && msgResponse.build.equals(Constants.NO_BUILD_INFO)))
+			 if (!(msgResponse.build != null && msgResponse.build.equals(Constants.BUILD_NO_INFO)))
 			 {
-				 if (msgResponse.build == null || msgResponse.build.compareTo(Constants.MIN_BUILD) < 0)
+				 if (msgResponse.build == null || msgResponse.build.compareTo(Constants.BUILD_COMPATIBLE) < 0)
 				 {
 					 msgResponse.error = true;
 					 msgResponse.errorMsg = SternResources.ServerBuildVeraltet(
 								false,
-								msgResponse.build == null ? "[null]" : ReleaseGetter.format(msgResponse.build),
-								ReleaseGetter.format(Constants.MIN_BUILD)
+								msgResponse.build == null ? "[null]" : msgResponse.build,
+								Constants.BUILD_COMPATIBLE
 								);
 				 }
 			 }

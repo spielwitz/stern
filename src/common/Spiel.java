@@ -490,7 +490,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		// 'spIndex' nichts angehen.
 		Spiel spClone = (Spiel)Utils.klon(this);
 		
-		spClone.setMinBuild(Constants.MIN_BUILD);
+		spClone.setMinBuild(Constants.BUILD_COMPATIBLE);
 		
 		// Spielleiter bei einem serverbasierten Spiel ist der erste Spieler
 		if (spClone.optionen.contains(SpielOptionen.SERVER_BASIERT))
@@ -558,7 +558,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	private void erzeugeSpielfeld()
 	{
 		this.name = this.getSpielname();
-		this.minBuild = Constants.MIN_BUILD;
+		this.minBuild = Constants.BUILD_COMPATIBLE;
 		this.abgeschlossen = false;
 		this.initial = true;
 		
@@ -2171,7 +2171,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				// Spielzuege abschicken
  				SpielzuegeEmailTransport set = new SpielzuegeEmailTransport(
  												this.spiel.spielzuegeReferenzCodes[spIndex],
- 												Constants.MIN_BUILD,
+ 												Constants.BUILD_COMPATIBLE,
  												this.spiel.spielzuege.get(spIndex));
  				
  				boolean success = false;
@@ -2221,7 +2221,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		 								this.spiel.name,
 		 								Integer.toString(this.spiel.jahr + 1),
 		 								this.spiel.spieler[spIndex].getName(),
-		 								ReleaseGetter.format(ReleaseGetter.getRelease()),
+		 								ReleaseGetter.getRelease(),
 		 								this.spiel.spieler[spIndex].getName(),
 		 								this.spiel.getName());
 		 				
@@ -2739,7 +2739,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  						SternResources.ZugeingabeEMailBody2(false,
  								spielKopie.name,
  								Integer.toString(spielKopie.jahr + 1),
- 								ReleaseGetter.format(ReleaseGetter.getRelease()),
+ 								ReleaseGetter.getRelease(),
  								sp.getName());
  				
  				this.spiel.spielThread.launchEmail(
@@ -8010,8 +8010,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   	{
   		boolean migrationNoetig =
   				this.saveBuild == null || // Bei alten STERN-Builds vor dem "grossen Umbau"
-  				(!this.saveBuild.equals(Constants.NO_BUILD_INFO) && 
-  						this.saveBuild.compareTo(Constants.MIGRATION_BUILD_LIMIT) < 0);
+  				(!this.saveBuild.equals(Constants.BUILD_NO_INFO) && 
+  						this.saveBuild.compareTo(Constants.BUILD_MIGRATION) < 0);
   		
   		if (!migrationNoetig)
   			return;

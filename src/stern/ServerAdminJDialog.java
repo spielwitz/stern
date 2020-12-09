@@ -51,7 +51,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import common.ReleaseGetter;
 import common.SternResources;
 import common.Utils;
 import commonServer.ClientUserCredentials;
@@ -808,8 +807,8 @@ import commonUi.TextFieldDark;
 				respMsgPayload = new ResponseMessageGetServerStatus();
 			}
 			
-			this.tfServerBuild.setText(ReleaseGetter.format(respMsgPayload.build));
-			this.tfServerStartDate.setText(ReleaseGetter.format(Utils.millisecondsToString(respMsgPayload.serverStartDate)));
+			this.tfServerBuild.setText(respMsgPayload.build);
+			this.tfServerStartDate.setText(Utils.dateStringFormat(Utils.millisecondsToString(respMsgPayload.serverStartDate)));
 			this.tfServerLogSize.setText(respMsgPayload.logSizeBytes + " Bytes");
 			this.comboServerLogLevel.setSelectedItem(respMsgPayload.logLevel.toString());
 		}

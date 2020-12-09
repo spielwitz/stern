@@ -224,13 +224,13 @@ import commonUi.SpringUtilities;
 					DialogWindow.showError(
 							this,
 							SternResources.ClipboardImportJDIalogImportFehler(false,
-									ReleaseGetter.format(ReleaseGetter.getRelease())),
+									ReleaseGetter.getRelease()),
 							SternResources.FehlerBeimLaden(false));
 				else
 					DialogWindow.showError(
 							this,
 							SternResources.ClipboardImportJDIalogImportFehlerPassword(false,
-									ReleaseGetter.format(ReleaseGetter.getRelease())),
+									ReleaseGetter.getRelease()),
 							SternResources.FehlerBeimLaden(false));
 			}
 		}

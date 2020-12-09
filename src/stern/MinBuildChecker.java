@@ -35,7 +35,7 @@ class MinBuildChecker
 		
 		String thisBuild = ReleaseGetter.getRelease();
 		
-		if (thisBuild.equals(Constants.NO_BUILD_INFO))
+		if (thisBuild.equals(Constants.BUILD_NO_INFO))
 			return true;
 		
 		if (thisBuild.compareTo(minBuild) < 0)
@@ -45,8 +45,8 @@ class MinBuildChecker
 					new MessageWithLink(
 						parent,
 						SternResources.MinBuild(false,
-									ReleaseGetter.format(minBuild),
-									ReleaseGetter.format(thisBuild),
+									minBuild,
+									thisBuild,
 							"<a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>")),
 					SternResources.Fehler(false));
 			

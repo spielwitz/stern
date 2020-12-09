@@ -550,7 +550,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			spiel.setName(filename.substring(0, filename.indexOf(FILE_SUFFIX)));
 			
 			// Mindest-Build-Version setzen
-			spiel.setMinBuild(Constants.MIN_BUILD);
+			spiel.setMinBuild(Constants.BUILD_COMPATIBLE);
 				
 			File file = new File(directory,filename);
 			

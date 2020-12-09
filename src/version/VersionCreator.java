@@ -22,8 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import common.Constants;
 import common.ReleaseGetter;
@@ -32,30 +30,33 @@ public class VersionCreator { // NO_UCD (unused code)
 
 	public static void main(String[] args)
 	{
-		Date d = new Date(System.currentTimeMillis());
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
-		String versionString = formatter.format(d);
-		String recommendedBuildString = Constants.RECOMMENDED_BUILD;
+		// Letzte Versionsdatei lesen
+		String versionString = readFile(args[0], Constants.RELEASE_FILE_NAME);
+		
+		if (versionString != null)
+		{
+			// Build hochzaehlen
+			int buildInt = Integer.parseInt(versionString);
+			versionString = getBuildString(buildInt + 1);
+		}
+		else
+		{
+			versionString = getBuildString(1);
+		}
 		
 		writeFile(versionString, args[0], Constants.RELEASE_FILE_NAME);
-		writeFile(recommendedBuildString, args[0], Constants.RELEASE_RECOMMENDED_FILE_NAME);
+		writeFile(Constants.BUILD_COMPATIBLE, args[0], Constants.RELEASE_RECOMMENDED_FILE_NAME);
 		
-		// HTML-Seiten anpassen
-		Path pathWeb = Paths.get(args[1], "DownloadTemplate.html");
-		Path pathWeb2 = Paths.get(args[1], "Download.html");
+		String dirBin = Paths.get(args[0], "bin").toString();
+		writeFile(versionString, dirBin, Constants.RELEASE_FILE_NAME);
+		writeFile(Constants.BUILD_COMPATIBLE, dirBin, Constants.RELEASE_RECOMMENDED_FILE_NAME);
 		
-		try {
-			byte[] encoded = Files.readAllBytes(pathWeb);
-			String sWeb = new String(encoded, StandardCharsets.UTF_8); 
-			
-			sWeb = sWeb.replaceAll("########", ReleaseGetter.format(versionString));
-			
-			Files.write(pathWeb2, sWeb.getBytes());
-			
-			System.out.println("Datei "+pathWeb2.toString()+ " angepasst");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// Build in HTML-Seite anpassen
+		String sWeb = readFile(args[1], "DownloadTemplate.html");		
+		sWeb = sWeb.replaceAll("########", ReleaseGetter.getRelease());		
+		writeFile(sWeb, args[1], "Download.html");
+				
+		System.out.println("Versionsdatei mit Build "+versionString+ " erzeugt");		
 	}
 	
 	private static void writeFile(String release, String dir, String fileName)
@@ -67,12 +68,28 @@ public class VersionCreator { // NO_UCD (unused code)
 			FileWriter writer = new FileWriter(s);
 			writer.write(release);
 			writer.close();
-			
-			System.out.println("Versionsdatei mit Build "+release+ " erzeugt");
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
+	
+	private static String readFile(String dir, String fileName)
+	{
+		Path path = Paths.get(dir, fileName);
+		
+		try
+		{
+			byte[] encoded = Files.readAllBytes(path);
+			return new String(encoded, StandardCharsets.UTF_8); 
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
+	}
+	
+	private static String getBuildString(int arg)
+	{
+		return String.format("%04d", arg);
+	}
 }
