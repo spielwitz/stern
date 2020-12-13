@@ -393,7 +393,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 	{
 	    MenuBar menueLeiste = new MenuBar ();
 	    
-	    Menu hilfe = new Menu (SternResources.MenuHilfe(false));
+	    Menu hilfe = new Menu (SternResources.SternTitel(false));
 	    
 	    if (Desktop.isDesktopSupported())
 	    {

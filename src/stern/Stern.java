@@ -384,28 +384,33 @@ public class Stern extends Frame  // NO_UCD (use default)
 	{
 	    MenuBar menueLeiste = new MenuBar ();
 	    
-	    Menu stern = new Menu (SternResources.MenuHilfe(false));
-	    
-	    if (Desktop.isDesktopSupported())
-	    {
-		    this.menuHilfe = new MenuItem (SternResources.MenuSpielanleitung(false));
-		    this.menuHilfe.addActionListener(this);
-		    stern.add (this.menuHilfe);
-	    }
+	    Menu stern = new Menu (SternResources.SternTitel(false));
 	    
 	    this.menuAbout = new MenuItem (SternResources.MenuUeberStern(false));
 	    this.menuAbout.addActionListener(this);
 	    stern.add (this.menuAbout);
 	    
-	    this.menuSearchForUpdates = new MenuItem (SternResources.MenuSearchForUpdates(false));
-	    this.menuSearchForUpdates.addActionListener(this);
-	    stern.add (this.menuSearchForUpdates);
-	    
 	    stern.addSeparator();
+	    
+	    Menu settings = new Menu (SternResources.MenuEinstellungen(false));
 	    
 	    this.menuSprache = new MenuItem(SternResources.MenuSpracheinstellungen(false));
 	    this.menuSprache.addActionListener(this);
-	    stern.add(this.menuSprache);
+	    settings.add(this.menuSprache);
+	    
+	    this.menuServerCredentials = new MenuItem(SternResources.MenuServerCredentials(false));
+	    this.menuServerCredentials.addActionListener(this);
+	    settings.add(this.menuServerCredentials);
+	    
+	    this.menuServerAdmin = new MenuItem(SternResources.MenuServerAdmin(false));
+	    this.menuServerAdmin.addActionListener(this);
+	    settings.add(this.menuServerAdmin);
+	    
+	    this.menuServer = new MenuItem(SternResources.MenuScreesharing(false));
+	    this.menuServer.addActionListener(this);
+	    settings.add(this.menuServer);
+	    
+	    stern.add(settings);
 	    
 	    stern.addSeparator();
 	    
@@ -443,10 +448,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 	    
 	    spiel.addSeparator();
 
-	    this.menuServerCredentials = new MenuItem(SternResources.MenuServerCredentials(false));
-	    this.menuServerCredentials.addActionListener(this);
-	    spiel.add(this.menuServerCredentials);
-	    
 	    this.menuServerGames = new MenuItem(SternResources.MenuServerbasierteSpiele(false));
 	    this.menuServerGames.addActionListener(this);
 	    spiel.add(this.menuServerGames);
@@ -462,23 +463,23 @@ public class Stern extends Frame  // NO_UCD (use default)
 	    spiel.add (this.menuParameter);
 	    
 	    menueLeiste.add(spiel);
-	    // ----
-	    
-	    Menu server = new Menu (SternResources.MenuEinstellungen(false));
-	    
-	    this.menuServerAdmin = new MenuItem(SternResources.MenuServerAdmin(false));
-	    this.menuServerAdmin.addActionListener(this);
-	    server.add(this.menuServerAdmin);
-	    
-	    server.addSeparator();
-	    
-	    this.menuServer = new MenuItem(SternResources.MenuScreesharing(false));
-	    this.menuServer.addActionListener(this);
-	    server.add(this.menuServer);
-	    
-	    menueLeiste.add(server);
 	    
 	    // ----
+	    Menu hilfe = new Menu(SternResources.MenuHilfe(false));
+	    
+	    if (Desktop.isDesktopSupported())
+	    {
+		    this.menuHilfe = new MenuItem (SternResources.MenuSpielanleitung(false));
+		    this.menuHilfe.addActionListener(this);
+		    hilfe.add (this.menuHilfe);
+	    }
+	    
+	    this.menuSearchForUpdates = new MenuItem (SternResources.MenuSearchForUpdates(false));
+	    this.menuSearchForUpdates.addActionListener(this);
+	    hilfe.add (this.menuSearchForUpdates);
+
+	    menueLeiste.add(hilfe);
+	    
 	    return menueLeiste;
 	}
 
@@ -1587,11 +1588,16 @@ public class Stern extends Frame  // NO_UCD (use default)
 				this, 
 				SternResources.ServerZugangsdaten(false),
 				this.serverCommunicationEnabled,
-				this.serverUserCredentialsFile);
+				this.serverUserCredentialsFile,
+				this.muteNotificationSound);
 		dlg.setVisible(true);
 		
 		if (dlg.ok)
 		{
+			this.muteNotificationSound = dlg.muteNotificationSound;
+			this.setProperty(
+					Stern.PROPERTY_MUTE_NOTIFICATION_SOUND, Boolean.toString(this.muteNotificationSound));
+
 			this.serverUserCredentialsFile = dlg.serverUserCredentialsFile;
 			this.serverCommunicationEnabled = dlg.serverCommunicationEnabled;
 			this.panToolbar.setVisible(this.serverCommunicationEnabled);
@@ -1648,13 +1654,8 @@ public class Stern extends Frame  // NO_UCD (use default)
 						SternResources.ServerbasierteSpiele(false, this.cuc.userId),
 						this.currentGameId,
 						this.cuc,
-						this.muteNotificationSound,
 						gamesAndUser);
 				dlg.setVisible(true);
-				
-				this.muteNotificationSound = dlg.muteNotificationSound;
-				this.setProperty(
-						Stern.PROPERTY_MUTE_NOTIFICATION_SOUND, Boolean.toString(this.muteNotificationSound));
 				
 				if (dlg.spielGeladen != null)
 				{

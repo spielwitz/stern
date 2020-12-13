@@ -1133,14 +1133,14 @@ public class SternResources
 	}
 
 	/**
-	   * Serverfunktionen [2A]
+	   * Einstellungen [2A]
 	   */
 	public static String MenuEinstellungen(boolean symbol) {
 		return symbol ? "£2A£":messages.getString("MenuEinstellungen_2A");
 	}
 
 	/**
-	   * STERN [2B]
+	   * Hilfe [2B]
 	   */
 	public static String MenuHilfe(boolean symbol) {
 		return symbol ? "£2B£":messages.getString("MenuHilfe_2B");
@@ -1154,7 +1154,7 @@ public class SternResources
 	}
 
 	/**
-	   * Bildschirm\u00FCbertragung [2D]
+	   * Bildschirm\u00FCbertragungsserver [2D]
 	   */
 	public static String MenuScreesharing(boolean symbol) {
 		return symbol ? "£2D£":messages.getString("MenuScreesharing_2D");
@@ -1168,14 +1168,14 @@ public class SternResources
 	}
 
 	/**
-	   * Server-Zugangsdaten [2F]
+	   * STERN-Server-Zugangsdaten [2F]
 	   */
 	public static String MenuServerCredentials(boolean symbol) {
 		return symbol ? "£2F£":messages.getString("MenuServerCredentials_2F");
 	}
 
 	/**
-	   * Meine serverbasierten Spiele [2G]
+	   * Spiele auf dem STERN-Server [2G]
 	   */
 	public static String MenuServerbasierteSpiele(boolean symbol) {
 		return symbol ? "£2G£":messages.getString("MenuServerbasierteSpiele_2G");
@@ -1658,7 +1658,7 @@ public class SternResources
 	}
 
 	/**
-	   * Verbundene Thin Clients [4F]
+	   * Verbundene STERN Clients [4F]
 	   */
 	public static String ServerSettingsJDialogVerbundeneClients(boolean symbol) {
 		return symbol ? "£4F£":messages.getString("ServerSettingsJDialogVerbundeneClients_4F");
@@ -2155,7 +2155,7 @@ public class SternResources
 	}
 
 	/**
-	   * Bildschirm\u00FCbertragung [6U]
+	   * Bildschirm\u00FCbertragungsserver [6U]
 	   */
 	public static String Terminalserver(boolean symbol) {
 		return symbol ? "£6U£":messages.getString("Terminalserver_6U");
@@ -3128,7 +3128,7 @@ public class SternResources
 	}
 
 	/**
-	   * Serverbasierte Spiele (Spieler {0}) [BA]
+	   * Spiele auf dem STERN-Server (Spieler {0}) [BA]
 	   */
 	public static String ServerbasierteSpiele(boolean symbol, String arg0) {
 		return symbol ? "£BA§"+arg0+"£":MessageFormat.format(messages.getString("ServerbasierteSpiele_BA"), arg0);

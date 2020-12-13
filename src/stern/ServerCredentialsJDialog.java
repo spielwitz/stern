@@ -70,6 +70,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 	private TextFieldDark tfAuthFile;
 	
 	private CheckBoxDark cbServerCommunicationEnabled;
+	private CheckBoxDark cbMuteNotificationSound;
 	
 	String serverUserCredentialsFile;
 	boolean serverCommunicationEnabled;
@@ -79,18 +80,21 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 	boolean ok = false;
 	
 	private static Font font;
+	public boolean muteNotificationSound;
 	
 	ServerCredentialsJDialog(
 			Stern parent,
 			String title,
 			boolean serverCommunicationEnabled,
-			String serverUserCredentialsFile)
+			String serverUserCredentialsFile,
+			boolean muteNotificationSound)
 	{
 		super (parent, title, true);
 		
 		this.serverCommunicationEnabled = serverCommunicationEnabled;
 		this.serverUserCredentialsFile = serverUserCredentialsFile;
 		this.cuc = ServerUtils.readClientUserCredentials(this.serverUserCredentialsFile);
+		this.muteNotificationSound = muteNotificationSound;
 		
 		if (this.cuc != null)
 		{
@@ -113,7 +117,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 		
 		GroupBoxDark panServerCommunicationEnabled = new GroupBoxDark(
 				SternResources.Serververbindung(false), font);
-		panServerCommunicationEnabled.setLayout(new FlowLayout(FlowLayout.LEFT));
+		panServerCommunicationEnabled.setLayout(new SpringLayout());
 		
 		this.cbServerCommunicationEnabled = new CheckBoxDark(
 				SternResources.Aktivieren(false),
@@ -121,6 +125,15 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 				font);
 		this.cbServerCommunicationEnabled.addActionListener(this);
 		panServerCommunicationEnabled.add(this.cbServerCommunicationEnabled);
+		
+		this.cbMuteNotificationSound = 
+				new CheckBoxDark(SternResources.BenachrichtigungStumm(false), muteNotificationSound, font);
+		panServerCommunicationEnabled.add(this.cbMuteNotificationSound);
+		
+		SpringUtilities.makeCompactGrid(panServerCommunicationEnabled,
+			      2, 1, //rows, cols
+			      0, 0, //initialX, initialY
+			      0, 0);//xPad, yPad
 		
 		panAuth.add(panServerCommunicationEnabled, BorderLayout.NORTH);
 		
@@ -440,6 +453,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 	
 	private void close()
 	{
+		this.muteNotificationSound = this.cbMuteNotificationSound.isSelected();
 		this.setVisible(false);
 		this.dispose();
 	}
