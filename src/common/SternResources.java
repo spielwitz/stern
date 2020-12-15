@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IL
+		// Hoechstes vergebenes Symbol: IM
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -586,6 +586,7 @@ public class SternResources
 		symbolDict.put("IJ","BrowserNichtGeoeffnet_IJ");
 		symbolDict.put("IK","EmailNichtGeoeffnet_IK");
 		symbolDict.put("IL","ClientBuild_IL");
+		symbolDict.put("IM","ZugeingabePlaneteninfo2_IM");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4332,7 +4333,7 @@ public class SternResources
 	}
 
 	/**
-	   * Benachrichtigungsklang stummschalten [HU]
+	   * Benachrichtigungsmeldung stummschalten [HU]
 	   */
 	public static String BenachrichtigungStumm(boolean symbol) {
 		return symbol ? "£HU£":messages.getString("BenachrichtigungStumm_HU");
@@ -4455,5 +4456,12 @@ public class SternResources
 	   */
 	public static String ClientBuild(boolean symbol) {
 		return symbol ? "£IL£":messages.getString("ClientBuild_IL");
+	}
+
+	/**
+	   * Produziert {0} Kampfschiffe pro Jahr. [IM]
+	   */
+	public static String ZugeingabePlaneteninfo2(boolean symbol, String arg0) {
+		return symbol ? "£IM§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabePlaneteninfo2_IM"), arg0);
 	}
 }

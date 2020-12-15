@@ -4118,7 +4118,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 				return;
 
 			spiel.console.appendText(
-					SternResources.InventurRaumerproduktionJahr(true)+": " + this.spiel.planeten[startPl].getEraum() + " " + SternResources.PlEditEe(true));
+					SternResources.ZugeingabePlaneteninfo2(
+							true, 
+							Integer.toString(this.spiel.planeten[startPl].getEraum())));
 			
 			spiel.console.waitForTaste();
 			spiel.console.clear();
