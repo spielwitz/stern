@@ -584,13 +584,14 @@ class SpielparameterJDialog extends JDialog implements ActionListener, IColorCho
 				sp.setEmailAdresse("");
 			}
 			
-			boolean userAllowed = (sp.getName().length() >= Constants.SPIELER_NAME_MIN_LAENGE &&
+			boolean userAllowed = 
+					(sp.getName().length() >= Constants.SPIELER_NAME_MIN_LAENGE &&
 					sp.getName().length() <= Constants.SPIELER_NAME_MAX_LAENGE &&
 					!sp.getName().toLowerCase().equals(ServerConstants.ADMIN_USER.toLowerCase()) &&
 					Pattern.matches(Constants.SPIELER_REGEX_PATTERN, sp.getName())
 					);
 			
-			if (!userAllowed)
+			if (this.tfSpieler[spIndex].isEditable() && !userAllowed)
 			{
 				DialogWindow.showError(
 						this,
