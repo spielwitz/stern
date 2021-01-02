@@ -18,7 +18,7 @@ package commonServer;
 
 import com.google.gson.Gson;
 
-public abstract class MessageBase
+abstract class MessageBase
 {
 	public String toJson()
 	{

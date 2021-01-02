@@ -23,14 +23,14 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-@SuppressWarnings("serial")
-public class IntegerTextFieldDark extends JTextField  implements DocumentListener
+@SuppressWarnings("serial") 
+class IntegerTextFieldDark extends JTextField  implements DocumentListener
 {
-	public boolean error = false;
+	boolean error = false;
 	private boolean checkInput = false;
 	private IIntegerTextFieldDarkCallback callback;
 	
-	public IntegerTextFieldDark(IIntegerTextFieldDarkCallback callback, Font f)
+	IntegerTextFieldDark(IIntegerTextFieldDarkCallback callback, Font f)
 	{
 		super();
 		this.callback = callback;
@@ -94,7 +94,7 @@ public class IntegerTextFieldDark extends JTextField  implements DocumentListene
 		return retval;
 	}
 	
-	public void enableCheckInput()
+	void enableCheckInput()
 	{
 		this.checkInput = true;
 		this.checkInput();

@@ -66,17 +66,4 @@ import java.util.ArrayList;
 		
 		return resultList;
 	}
-	
-	static ArrayList<Point> fromArray(PointLowRes[] list)
-	{
-		if (list == null)
-			return null;
-		
-		ArrayList<Point> resultList = new ArrayList<Point>(list.length);
-		
-		for (int i = 0; i < list.length; i++)
-			resultList.add(i, list[i].toPoint());
-		
-		return resultList;
-	}
 }

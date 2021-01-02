@@ -45,11 +45,11 @@ public class VersionCreator { // NO_UCD (unused code)
 		}
 		
 		writeFile(versionString, args[0], Constants.RELEASE_FILE_NAME);
-		writeFile(Constants.BUILD_COMPATIBLE, args[0], Constants.RELEASE_RECOMMENDED_FILE_NAME);
+		writeFile(Constants.BUILD_IMPORTANT_UPDATE, args[0], Constants.RELEASE_RECOMMENDED_FILE_NAME);
 		
 		String dirBin = Paths.get(args[0], "bin").toString();
 		writeFile(versionString, dirBin, Constants.RELEASE_FILE_NAME);
-		writeFile(Constants.BUILD_COMPATIBLE, dirBin, Constants.RELEASE_RECOMMENDED_FILE_NAME);
+		writeFile(Constants.BUILD_IMPORTANT_UPDATE, dirBin, Constants.RELEASE_RECOMMENDED_FILE_NAME);
 		
 		// Build in HTML-Seite anpassen
 		String sWeb = readFile(args[1], "DownloadTemplate.html");		

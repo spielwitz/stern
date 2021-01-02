@@ -16,7 +16,7 @@
 
 package stern;
 
-public interface IIntegerTextFieldDarkCallback 
+interface IIntegerTextFieldDarkCallback 
 {
 	void setControlsEnabled();
 }

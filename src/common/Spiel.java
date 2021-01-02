@@ -57,7 +57,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	private boolean abgeschlossen;
 	
 	private Hashtable<Integer,Archiv> archiv; // Punktestaende pro Jahr
-	private Replays replays;	// Auswertungen der vergangenen Jahre
+	private ArrayList<ScreenDisplayContent> lastReplay;
 	
 	// Transiente Felder
 	transient private boolean istSoloSpieler; // Spieler, der allein vor dem Rechner sitzt (E-Mail oder serverbasiert)
@@ -563,7 +563,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.initial = true;
 		
 		this.archiv = new Hashtable<Integer,Archiv>();
-		this.replays = new Replays();
+		this.lastReplay = new ArrayList<ScreenDisplayContent>();
 		this.jahr = 0;
 		
 		this.minen = new Hashtable<String,Mine>();
@@ -937,7 +937,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
 				if (!this.abgeschlossen)
 					keys.add(new ConsoleKey("TAB",SternResources.Zugeingabe(true)));
-				if (this.jahr > 0)
+				if (this.auswertungExists())
 					keys.add(new ConsoleKey("1",SternResources.AuswertungWiederholen(true)));
 				if (this.jahr > 0 && (!this.istSoloSpieler || this.abgeschlossen))
 					keys.add(new ConsoleKey("2",SternResources.Statistik(true)));
@@ -970,7 +970,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				else if (!this.istSoloSpieler && this.jahr > 0 && !this.abgeschlossen && input.equals("0"))
 					this.abschliessenFrage();
-				else if (this.jahr > 0 && input.equals("1"))
+				else if (this.auswertungExists() && input.equals("1"))
 					new Replay(this);
 				else if ((!this.istSoloSpieler  || this.abgeschlossen) && input.equals("9"))
 				{
@@ -4612,7 +4612,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   		private Spiel spiel;
   		private ArrayList<ScreenDisplayContent> replay = new ArrayList<ScreenDisplayContent>();
   		
-  		private Auswertung(Spiel spiel)
+  		@SuppressWarnings("unchecked")
+		private Auswertung(Spiel spiel)
   		{
   			this.spiel = spiel;
   			
@@ -4761,7 +4762,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.console.enableEvaluationProgressBar(false);
 			this.spiel.console.setModus(Console.ConsoleModus.TEXT_INPUT);
 			
-			this.spiel.replays.add(this.spiel.jahr, this.replay);
+			this.spiel.lastReplay = (ArrayList<ScreenDisplayContent>) Utils.klon(this.replay);
 			
 			// Neues Jahr beginnen
 			this.spiel.jahr++;
@@ -6018,11 +6019,16 @@ public class Spiel extends EmailTransportBase implements Serializable
  			{
  				spiel.goToReplay = false;
  				
- 				if (this.spiel.replays.auswertungExists(this.spiel.jahr - 1))
+ 				if (this.spiel.auswertungExists())
  				{
- 					this.replayArchive(this.spiel.jahr - 1);
+ 					this.replayArchive();
  				}
  				
+ 				return;
+ 			}
+ 			
+ 			if (!this.spiel.auswertungExists())
+ 			{
  				return;
  			}
  						
@@ -6030,108 +6036,25 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.console.setHeaderText(
 					this.spiel.hauptmenueHeaderGetJahrText() + " -> " + SternResources.ReplayAuswertungWiedergeben(true), Colors.INDEX_NEUTRAL);
 			
-			// Ab welchem Jahr gibt es Auswertungen?
-			ArrayList<Integer> jahre;
-			
-			if (this.spiel.archiv != null)
-			{
-				jahre = new ArrayList<Integer>(this.spiel.archiv.keySet());
-				Collections.sort(jahre);
-			}
-			else
-				jahre = new ArrayList<Integer>();
-			
-			if (jahre.size() == 0)
-			{
-				this.spiel.console.appendText(SternResources.ReplayKeineAuswertungen(true));
-				this.spiel.console.waitForTaste();
-				return;
-			}
-			
- 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
-			
- 			if (this.spiel.optionen.contains(SpielOptionen.SERVER_BASIERT))
- 				keys.add(new ConsoleKey("1-" + this.spiel.jahr,SternResources.ReplayErstesJahrServer(true)));
- 			else
- 				keys.add(new ConsoleKey("1-" + this.spiel.jahr,SternResources.ReplayErstesJahr(true)));
-			keys.add(new ConsoleKey("-",SternResources.ReplayLetztesJahr(true)));
-			
-			int erstesJahr = -1;
-			
-			do
-			{
-				this.spiel.console.appendText(
-						SternResources.ReplayWiedergabeAbWelchemJahr(true) + " ");
-				ConsoleInput input = this.spiel.console.waitForTextEntered(10, keys, false, true);
+			this.replayArchive();
 				
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
-				{
-					this.spiel.console.outAbbruch();
-					return;
-				}
-				
-				if (input.getInputText().toUpperCase().equals("-"))
-					erstesJahr = this.spiel.jahr - 1;
-				else
-				{
-					try
-					{
-						erstesJahr = Integer.parseInt(input.getInputText()) - 1; 
-					}
-					catch (Exception e)
-					{
-						this.spiel.console.outUngueltigeEingabe();
-						continue;
-					}
-				}
-				
-				if (erstesJahr < 0 || erstesJahr >= this.spiel.jahr)
-				{
-					this.spiel.console.outUngueltigeEingabe();
-					continue;
-				}
-				
-				if (erstesJahr == 0)
-					erstesJahr = jahre.get(0);
-				
-				break;
-			} while (true);
-					
-			// Startjahr ausgewaehlt			
-			boolean ende = false;
-			for (int jahrIndex = 0; jahrIndex < jahre.size(); jahrIndex++)
-			{
-				int jahr = jahre.get(jahrIndex);
-				if (jahr < erstesJahr ||
-					!this.spiel.archiv.containsKey(jahr) ||
-					this.spiel.replays.getReplaySize(jahr) <= 0)
-					continue;
-				
-				ende = this.replayArchive(jahr);
-				
-				if (ende)
-					break;
-			}
-			
 			this.spiel.updatePlanetenlisteDisplay(false);
 			this.spiel.updateSpielfeldDisplay();
  		}
  		
- 		private boolean replayArchive(int jahr)
+ 		private void replayArchive()
  		{
  			boolean ende = false;
  			
  			this.spiel.console.clear();
 			this.spiel.console.setHeaderText(
 					SternResources.ReplayWiedergabeJahr(true,
-							Integer.toString(jahr+1)),
+							Integer.toString(jahr)),
 					Colors.INDEX_NEUTRAL);
-			
-			ArrayList<ScreenDisplayContent> replay = this.spiel.replays.get(jahr);
 			
 			ScreenDisplayContent previousDay = null;
 			
-			for (ScreenDisplayContent currentDay: replay)
+			for (ScreenDisplayContent currentDay: this.spiel.lastReplay)
 			{
 				if (previousDay != null && 
 					currentDay.getEreignisTag() != previousDay.getEreignisTag())
@@ -6154,8 +6077,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 				previousDay = (ScreenDisplayContent)Utils.klon(currentDay);
 			}
-			
- 			return ende;
  		}
  		
  		private void animation(ScreenDisplayContent previousDay, ScreenDisplayContent currentDay)
@@ -8019,7 +7940,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			return;
   		
   		// Loesche alte Aufzeichnungen
-  		this.replays = new Replays();
+  		this.lastReplay = new ArrayList<ScreenDisplayContent>();
   		
   		// Loesche Objekttypen, die es nicht mehr gibt
   		if (this.objekte != null)
@@ -8049,5 +7970,10 @@ public class Spiel extends EmailTransportBase implements Serializable
   	public void updateSaveBuild()
   	{
   		this.saveBuild = ReleaseGetter.getRelease();
+  	}
+  	
+  	private boolean auswertungExists()
+  	{
+  		return (this.lastReplay != null && this.lastReplay.size() > 0);
   	}
 }

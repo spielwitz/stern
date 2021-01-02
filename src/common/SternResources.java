@@ -167,10 +167,6 @@ public class SternResources
 		symbolDict.put("3T","Raumer_3T");
 		symbolDict.put("3U","Rechts_3U");
 		symbolDict.put("3V","ReplayAuswertungWiedergeben_3V");
-		symbolDict.put("3W","ReplayErstesJahr_3W");
-		symbolDict.put("3X","ReplayKeineAuswertungen_3X");
-		symbolDict.put("3Y","ReplayLetztesJahr_3Y");
-		symbolDict.put("3Z","ReplayWiedergabeAbWelchemJahr_3Z");
 		symbolDict.put("40","AuswertungPatrouilleRaumerGekapert_40");
 		symbolDict.put("41","AuswertungPatrouilleRaumerGesichtet_41");
 		symbolDict.put("42","AuswertungPatrouilleTransporterGekapert_42");
@@ -499,7 +495,6 @@ public class SternResources
 		symbolDict.put("EX","Update_EX");
 		symbolDict.put("EY","ZugeingabeSpielzuegeSchonEingegeben_EY");
 		symbolDict.put("EZ","ServerAnwendungsfehler_EZ");
-		symbolDict.put("FA","ReplayErstesJahrServer_FA");
 		symbolDict.put("FB","ReleaseFormatted_FB");
 		symbolDict.put("FC","UpdateVerfuegbarWichtig_FC");
 		symbolDict.put("FD","MenuSearchForUpdates_FD");
@@ -1526,34 +1521,6 @@ public class SternResources
 	}
 
 	/**
-	   * Jahr\n [3W]
-	   */
-	public static String ReplayErstesJahr(boolean symbol) {
-		return symbol ? "£3W£":messages.getString("ReplayErstesJahr_3W");
-	}
-
-	/**
-	   * Zu diesem Spiel gibt es keine aufgezeichneten Auswertungen. [3X]
-	   */
-	public static String ReplayKeineAuswertungen(boolean symbol) {
-		return symbol ? "£3X£":messages.getString("ReplayKeineAuswertungen_3X");
-	}
-
-	/**
-	   * Letztes Jahr [3Y]
-	   */
-	public static String ReplayLetztesJahr(boolean symbol) {
-		return symbol ? "£3Y£":messages.getString("ReplayLetztesJahr_3Y");
-	}
-
-	/**
-	   * Wiedergabe ab welchem Jahr? [3Z]
-	   */
-	public static String ReplayWiedergabeAbWelchemJahr(boolean symbol) {
-		return symbol ? "£3Z£":messages.getString("ReplayWiedergabeAbWelchemJahr_3Z");
-	}
-
-	/**
 	   * {0} Kampfschiff(e) von {1} angehalten und gekapert. [40]
 	   */
 	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0, String arg1) {
@@ -1960,7 +1927,7 @@ public class SternResources
 	}
 
 	/**
-	   * Auswertungen [60]
+	   * Letzte Auswertung wiedergeben [60]
 	   */
 	public static String AuswertungWiederholen(boolean symbol) {
 		return symbol ? "£60£":messages.getString("AuswertungWiederholen_60");
@@ -3847,13 +3814,6 @@ public class SternResources
 	   */
 	public static String ServerAnwendungsfehler(boolean symbol, String arg0) {
 		return symbol ? "£EZ§"+arg0+"£":MessageFormat.format(messages.getString("ServerAnwendungsfehler_EZ"), arg0);
-	}
-
-	/**
-	   * Jahr [FA]
-	   */
-	public static String ReplayErstesJahrServer(boolean symbol) {
-		return symbol ? "£FA£":messages.getString("ReplayErstesJahrServer_FA");
 	}
 
 	/**

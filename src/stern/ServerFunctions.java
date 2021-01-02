@@ -33,7 +33,7 @@ import commonUi.DialogWindow;
 import commonUi.IClientMethods;
 import commonUi.IServerMethods;
 
-public class ServerFunctions
+class ServerFunctions
 {
 	private String meineIp;
 	private String clientCode; 
@@ -42,7 +42,7 @@ public class ServerFunctions
 	private Hashtable<String,ClientScreenDisplayContentUpdater> registeredClients;
 	private ExecutorService threadPool;
 	
-	public ServerFunctions(String meineIp)
+	ServerFunctions(String meineIp)
 	{
 		this.serverEnabled = false;
 		this.meineIp = (meineIp == null) ? Utils.getMyIPAddress() : meineIp;
@@ -79,7 +79,7 @@ public class ServerFunctions
 		return this.registeredClients.values().toArray();
 	}
 		
-	public void updateClients(
+	void updateClients(
 			ScreenDisplayContent content, 
 			ScreenDisplayContent contentWaehrendZugeingabe,
 			boolean inputEnabled)
@@ -104,12 +104,12 @@ public class ServerFunctions
 		}
 	}
 	
-	public boolean isClientRegistered(String clientId)
+	boolean isClientRegistered(String clientId)
 	{
 		return this.registeredClients.containsKey(clientId);
 	}
 	
-	public boolean openPdf(byte[] pdfBytes, String clientId)
+	boolean openPdf(byte[] pdfBytes, String clientId)
 	{
 		ClientScreenDisplayContentUpdater c = this.registeredClients.get(clientId);
 		
@@ -130,7 +130,7 @@ public class ServerFunctions
 			return false;
 	}
 	
-	public String connectClient(
+	String connectClient(
 			String clientId, 
 			String ip, 
 			String clientCode, 
@@ -150,13 +150,13 @@ public class ServerFunctions
 			return "Client Code ist ungueltig";
 	}
 	
-	public void disconnectClient(String clientId)
+	void disconnectClient(String clientId)
 	{
 		this.registeredClients.remove(clientId);
 	}
 	
 	
-	public class ClientScreenDisplayContentUpdater implements Runnable
+	class ClientScreenDisplayContentUpdater implements Runnable
 	{
 		private String clientId;
 		private String clientIp;
@@ -226,7 +226,7 @@ public class ServerFunctions
 		}
 	}
 	
-	public boolean startServer(Remote parent)
+	boolean startServer(Remote parent)
 	{
 		boolean ok = false;
 		
@@ -262,7 +262,7 @@ public class ServerFunctions
 		
 	}
 	
-	public boolean stopServer(Remote parent)
+	boolean stopServer(Remote parent)
 	{
 		boolean ok = false;
 		// Stop RMI
