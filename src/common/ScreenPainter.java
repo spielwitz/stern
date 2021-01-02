@@ -35,7 +35,6 @@ public class ScreenPainter
 	private static final int		SPIELFELD_YOFF = 10;
 	static final int				SPIELFELD_DX = 18;
 	
-	private static final double		LINIE_OBJEKT_RADIUS = 0.25;
 	private static final double		LINIE_OBJEKT_GROESSE = 0.5;
 	private static final double		OBJEKT_GROESSE = 0.75;
 	private static final int		OBJEKT_MIN_PIXEL = 2;
@@ -951,44 +950,49 @@ public class ScreenPainter
 		int[] xPoints = new int[4];
 		int[] yPoints = new int[4];
 		
+		int size = Math.max(
+				Utils.round(4 * OBJEKT_GROESSE * this.factor),
+				OBJEKT_MIN_PIXEL); 
+		
 		for (SpielfeldLineDisplayContent line: lines)
 		{
-			if (line.getEnd() != null && line.getStart() != null)
+			if (line.getPos() == null)
 			{
-				// Zeichne Richtungspfeil
-				double dx = (double)(line.getEnd().getX() - line.getStart().getX());
-				double dy = (double)(line.getEnd().getY() - line.getStart().getY());
-				
-				double dist = line.getStart().dist(line.getEnd());
-				
-				double w = (dy >= 0) ? 
-						Math.acos(dx/dist) : 
-						2.*Math.PI - Math.acos(dx/dist);
-				
-				double xPos = this.factor * ((double)SPIELFELD_XOFF + ((double)line.getPos().x + 0.5) * (double)SPIELFELD_DX);
-				double yPos = this.factor * ((double)SPIELFELD_YOFF + ((double)line.getPos().y + 0.5) * (double)SPIELFELD_DX);
-							
-				double groesse = this.factor * (double)SPIELFELD_DX * LINIE_OBJEKT_GROESSE;
-				
-				xPoints[0] = Utils.round(xPos);
-				yPoints[0] = Utils.round(yPos);
-				
-				xPoints[1] = Utils.round(Math.cos(w)*(xPos-1.*groesse)-Math.sin(w)*(yPos+0.3*groesse)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
-				yPoints[1] = Utils.round(Math.sin(w)*(xPos-1.*groesse)+Math.cos(w)*(yPos+0.3*groesse)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
-				
-				xPoints[2] = Utils.round(Math.cos(w)*(xPos-0.8*groesse)-Math.sin(w)*yPos-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
-				yPoints[2] = Utils.round(Math.sin(w)*(xPos-0.8*groesse)+Math.cos(w)*yPos-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
-				
-				xPoints[3] = Utils.round(Math.cos(w)*(xPos-1.*groesse)-Math.sin(w)*(yPos-0.3*groesse)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
-				yPoints[3] = Utils.round(Math.sin(w)*(xPos-1.*groesse)+Math.cos(w)*(yPos-0.3*groesse)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
-				
-				this.setColor(Colors.get(line.getCol()));
-				this.dbGraphics.fillPolygon(xPoints, yPoints, 4);
+				continue;
 			}
 			
-			// Zeichne Punkt
-			this.fillCircleSpielfeld(line.getPos(), LINIE_OBJEKT_RADIUS, Color.black);
-			this.drawCircleSpielfeld(line.getPos(), LINIE_OBJEKT_RADIUS, Colors.get(line.getCol()));
+			// Zeichne Richtungspfeil
+			double dx = (double)(line.getEnd().getX() - line.getStart().getX());
+			double dy = (double)(line.getEnd().getY() - line.getStart().getY());
+			
+			double dist = line.getStart().dist(line.getEnd());
+			
+			double w = (dy >= 0) ? 
+					Math.acos(dx/dist) : 
+					2.*Math.PI - Math.acos(dx/dist);
+			
+			double xPos = this.factor * ((double)SPIELFELD_XOFF + ((double)line.getPos().x + 0.5) * (double)SPIELFELD_DX);
+			double yPos = this.factor * ((double)SPIELFELD_YOFF + ((double)line.getPos().y + 0.5) * (double)SPIELFELD_DX);
+						
+			double groesse = this.factor * (double)SPIELFELD_DX * LINIE_OBJEKT_GROESSE;
+			
+			xPoints[0] = Utils.round(xPos);
+			yPoints[0] = Utils.round(yPos);
+			
+			xPoints[1] = Utils.round(Math.cos(w)*(xPos-1.*groesse)-Math.sin(w)*(yPos+0.3*groesse)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
+			yPoints[1] = Utils.round(Math.sin(w)*(xPos-1.*groesse)+Math.cos(w)*(yPos+0.3*groesse)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
+			
+			xPoints[2] = Utils.round(Math.cos(w)*(xPos-0.8*groesse)-Math.sin(w)*yPos-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
+			yPoints[2] = Utils.round(Math.sin(w)*(xPos-0.8*groesse)+Math.cos(w)*yPos-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
+			
+			xPoints[3] = Utils.round(Math.cos(w)*(xPos-1.*groesse)-Math.sin(w)*(yPos-0.3*groesse)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
+			yPoints[3] = Utils.round(Math.sin(w)*(xPos-1.*groesse)+Math.cos(w)*(yPos-0.3*groesse)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
+			
+			this.setColor(Colors.get(line.getCol()));
+			this.dbGraphics.fillPolygon(xPoints, yPoints, 4);
+			
+			// Zeichne Flugobjekt
+			this.zeichneFlugobjektSymbol(line.getPos(), size, line.getCol(), line.getSymbol());
 		}
 	}
 	
@@ -1004,139 +1008,141 @@ public class ScreenPainter
 		for (SpielfeldPointDisplayContent point: points)
 		{
 			Point pt = point.getPos();
-			this.setColor(Colors.get(point.getCol()));
 			
-			switch (point.getSymbol())
-			{
-			case 1: // Raumer
-				// Sanduhr (90 Grad)
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
-				break;
-			case 2: // Aufklaerer
-				// +
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y),
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y));
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) - size);
-				break;
-			case 3: // Patrouille
-				// Stern
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y),
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y));
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) - size);
-				break;
-			case 4: // Transporter
-				// Rechteck
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size);
-				break;
-						
-			case 5: // Minenleger
-				// Raute
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y));
-				
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y),
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) + size);
-				
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y));
-				
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y),
-						getPtSpielfeldX(pt.x),
-						getPtSpielfeldY(pt.y) - size);
-				
-				break;
-			case 6: // Minenraeumer
-				// X
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) - size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) + size);
-				this.dbGraphics.drawLine(
-						getPtSpielfeldX(pt.x) - size,
-						getPtSpielfeldY(pt.y) + size,
-						getPtSpielfeldX(pt.x) + size,
-						getPtSpielfeldY(pt.y) - size);
+			this.zeichneFlugobjektSymbol(pt, size, point.getCol(), point.getSymbol());
+		}
+	}
+	
+	private void zeichneFlugobjektSymbol(Point pt, int size, byte col, byte symbol)
+	{
+		this.setColor(Colors.get(col));
+		
+		switch (symbol)
+		{
+		case 1: // Raumer
+			// Sanduhr (90 Grad)
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) - size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) + size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) - size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) - size,
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) + size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) - size);
+			break;
+		case 2: // Aufklaerer
+			// +
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y),
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y));
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) - size);
+			break;
+		case 3: // Patrouille
+			// Stern
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) - size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) + size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) - size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y),
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y));
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) - size);
+			break;
+		case 4: // Transporter
+			// Rechteck
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) - size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) - size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) - size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) + size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) + size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) - size);
+			break;
+					
+		case 5: // Minenleger
+			// Raute
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) - size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y));
+			
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y),
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) + size);
+			
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y));
+			
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y),
+					getPtSpielfeldX(pt.x),
+					getPtSpielfeldY(pt.y) - size);
+			
+			break;
+		case 6: // Minenraeumer
+			// X
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) - size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) + size);
+			this.dbGraphics.drawLine(
+					getPtSpielfeldX(pt.x) - size,
+					getPtSpielfeldY(pt.y) + size,
+					getPtSpielfeldX(pt.x) + size,
+					getPtSpielfeldY(pt.y) - size);
 
-				break;
-			default:
-				// Kreis
-				this.fillCircleSpielfeld(pt, LINIE_OBJEKT_RADIUS, Color.black);
-				this.drawCircleSpielfeld(pt, LINIE_OBJEKT_RADIUS, Colors.get(point.getCol()));
-			}
+			break;
 		}
 	}
 	

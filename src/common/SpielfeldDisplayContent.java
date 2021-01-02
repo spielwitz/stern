@@ -56,6 +56,7 @@ import java.util.ArrayList;
 	{
 		this.m = null;
 		this.r = null;
+		this.l = null;
 		
 		for (SpielfeldPlanetDisplayContent pl: this.p)
 		{

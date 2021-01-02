@@ -26,13 +26,15 @@ import java.io.Serializable;
 	private Point e;
 	private Point p;
 	private byte c;
+	private byte y;
 	
-	SpielfeldLineDisplayContent(Point start, Point end, Point pos, byte col) {
+	SpielfeldLineDisplayContent(Point start, Point end, Point pos, byte col, byte symbol) {
 		super();
 		this.s = start;
 		this.e = end;
 		this.p = pos;
 		this.c = col;
+		this.y = symbol;
 	}
 
 	public Point getStart() {
@@ -52,4 +54,8 @@ import java.io.Serializable;
 		return this.p;
 	}
 	
+	public byte getSymbol()
+	{
+		return y;
+	}
 }

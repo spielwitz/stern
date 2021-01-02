@@ -140,7 +140,6 @@ public class SternResources
 		symbolDict.put("31","AuswertungNachrichtAnAusSektor_31");
 		symbolDict.put("33","AuswertungPatrouilleAngekommen_33");
 		symbolDict.put("34","AuswertungPatrouilleAufklaererGekapert_34");
-		symbolDict.put("35","AuswertungPatrouilleMeldetAusSektor_35");
 		symbolDict.put("36","AuswertungPatrouilleMinenlegerGekapert_36");
 		symbolDict.put("37","AuswertungPatrouilleMinenraeumerGekapert_37");
 		symbolDict.put("38","AuswertungPatrouillePatrouilleGekapert_38");
@@ -681,7 +680,7 @@ public class SternResources
 	}
 
 	/**
-	   * Raumschiffe [0A]
+	   * Raumschiffe (ohne Patrouillen im Einsatz) [0A]
 	   */
 	public static String InventurFlugobjekte(boolean symbol) {
 		return symbol ? "£0A£":messages.getString("InventurFlugobjekte_0A");
@@ -919,7 +918,7 @@ public class SternResources
 	}
 
 	/**
-	   * Planeten, B\u00FCndnisse und Minen [1E]
+	   * Planeten und B\u00FCndnisse [1E]
 	   */
 	public static String InventurPlanetenTitel(boolean symbol) {
 		return symbol ? "£1E£":messages.getString("InventurPlanetenTitel_1E");
@@ -1325,45 +1324,38 @@ public class SternResources
 	}
 
 	/**
-	   * 1 Aufkl\u00E4rer von {0} angehalten und gekapert. [34]
+	   * {0}: Sie haben einen Aufkl\u00E4rer mit Ziel {1} von {2} gekapert. [34]
 	   */
-	public static String AuswertungPatrouilleAufklaererGekapert(boolean symbol, String arg0) {
-		return symbol ? "£34§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleAufklaererGekapert_34"), arg0);
+	public static String AuswertungPatrouilleAufklaererGekapert(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£34§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleAufklaererGekapert_34"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * {0}: Patrouille meldet aus Sektor {1}: [35]
+	   * {0}: Sie haben einen Minenleger mit Ziel {1} von {2} gekapert. [36]
 	   */
-	public static String AuswertungPatrouilleMeldetAusSektor(boolean symbol, String arg0, String arg1) {
-		return symbol ? "£35§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMeldetAusSektor_35"), arg0, arg1);
+	public static String AuswertungPatrouilleMinenlegerGekapert(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£36§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenlegerGekapert_36"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * 1 Minenleger von {0} angehalten und gekapert. [36]
+	   * {0}: Sie haben einen Minenr\u00E4umer mit Ziel {1} von {2} gekapert. [37]
 	   */
-	public static String AuswertungPatrouilleMinenlegerGekapert(boolean symbol, String arg0) {
-		return symbol ? "£36§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenlegerGekapert_36"), arg0);
+	public static String AuswertungPatrouilleMinenraeumerGekapert(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£37§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenraeumerGekapert_37"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * 1 Minenr\u00E4umer von {0} angehalten und gekapert. [37]
+	   * {0}: Sie haben eine Patrouille mit Ziel {1} von {2} gekapert. [38]
 	   */
-	public static String AuswertungPatrouilleMinenraeumerGekapert(boolean symbol, String arg0) {
-		return symbol ? "£37§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleMinenraeumerGekapert_37"), arg0);
+	public static String AuswertungPatrouillePatrouilleGekapert(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£38§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleGekapert_38"), arg0, arg1, arg2);
 	}
 
 	/**
-	   * 1 Patrouille von {0} angehalten und gekapert. [38]
+	   * {0}: Ihre Patrouille mit Ziel {1} wurde von {2} zerst\u00F6rt. [39]
 	   */
-	public static String AuswertungPatrouillePatrouilleGekapert(boolean symbol, String arg0) {
-		return symbol ? "£38§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleGekapert_38"), arg0);
-	}
-
-	/**
-	   * 1 Patrouille von {0} zerst\u00F6rt. [39]
-	   */
-	public static String AuswertungPatrouillePatrouilleZerstoert(boolean symbol, String arg0) {
-		return symbol ? "£39§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleZerstoert_39"), arg0);
+	public static String AuswertungPatrouillePatrouilleZerstoert(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£39§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleZerstoert_39"), arg0, arg1, arg2);
 	}
 
 	/**
@@ -1521,24 +1513,24 @@ public class SternResources
 	}
 
 	/**
-	   * {0} Kampfschiff(e) von {1} angehalten und gekapert. [40]
+	   * {0}: Sie haben {1} Kampfschiffe mit Ziel {2} von {3} gekapert. [40]
 	   */
-	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0, String arg1) {
-		return symbol ? "£40§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0, arg1);
+	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0, String arg1, String arg2, String arg3) {
+		return symbol ? "£40§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0, arg1, arg2, arg3);
 	}
 
 	/**
-	   * {0} Kampfschiff(e) von {1} gesichtet. [41]
+	   * {0}: Ihre {1} Kampfschiffe mit Ziel {2} wurden von {3} gesichtet. [41]
 	   */
-	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1) {
-		return symbol ? "£41§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1);
+	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1, String arg2, String arg3) {
+		return symbol ? "£41§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1, arg2, arg3);
 	}
 
 	/**
-	   * 1 Transporter von {0} angehalten und gekapert. [42]
+	   * {0}: Sie haben einen Transporter mit Ziel {1} von {2} gekapert. [42]
 	   */
-	public static String AuswertungPatrouilleTransporterGekapert(boolean symbol, String arg0) {
-		return symbol ? "£42§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleTransporterGekapert_42"), arg0);
+	public static String AuswertungPatrouilleTransporterGekapert(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£42§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleTransporterGekapert_42"), arg0, arg1, arg2);
 	}
 
 	/**
