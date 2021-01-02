@@ -1,5 +1,5 @@
 /**	STERN, das Strategiespiel.
-    Copyright (C) 1989-2020 Michael Schweitzer, spielwitz@icloud.com
+    Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as

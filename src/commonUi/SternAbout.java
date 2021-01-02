@@ -1,5 +1,5 @@
 /**	STERN, das Strategiespiel.
-    Copyright (C) 1989-2020 Michael Schweitzer, spielwitz@icloud.com
+    Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -29,7 +29,7 @@ public class SternAbout
 				parent, 
 				new MessageWithLink(
 						parent,
-						"STERN - (c) 1989-2020 Michael Schweitzer - <a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>"),
+						"STERN - (c) 1989-2021 Michael Schweitzer - <a href=\""+Constants.STERN_URL+"\">"+Constants.STERN_URL+"</a>"),
 				"Build " + ReleaseGetter.getRelease());
 	}
 }

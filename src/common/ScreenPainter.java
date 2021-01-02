@@ -1,5 +1,5 @@
 /**	STERN, das Strategiespiel.
-    Copyright (C) 1989-2020 Michael Schweitzer, spielwitz@icloud.com
+    Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -102,7 +102,7 @@ public class ScreenPainter
 		titelBildTextLines.add("  `   .@@##Qm `:jjjwW$#pgpP                  `    `                         ");
 		titelBildTextLines.add("  `  .@@kh###D#VyyppogpP`   `           `              `  `                 ");
 		titelBildTextLines.add("`   .@$kh#opV#pppgpHT`      `    `      `                `         `        ");
-		titelBildTextLines.add("   .@$#k3f#gg#H='                `           `    `      (c) 1989-2020      ");
+		titelBildTextLines.add("   .@$#k3f#gg#H='                `           `    `      (c) 1989-2021      ");
 		titelBildTextLines.add("   @@$@8PT'           `     `    `      `              Michael Schweitzer   ");
 		titelBildTextLines.add("`              `  `    `                     `    `        Build " + ReleaseGetter.getRelease() + "  ");
 
