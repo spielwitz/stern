@@ -21,7 +21,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial") 
 class SpielfeldPointRadarDisplayContent implements Serializable
 {
-	private PointLowRes p; // Punkt
+	private Point p; // Punkt
 	private byte c; // Farbe
 	private int f; // Winkel Flugrichtung (in ganzzahligen Grad)
 	private int r; // Winkel Radarstrahl (in ganzzahligen Grad)
@@ -33,7 +33,7 @@ class SpielfeldPointRadarDisplayContent implements Serializable
 			int winkelRadarstrahl)
 	{
 		super();
-		this.p = new PointLowRes(pos);
+		this.p = pos;
 		this.c = col;
 		this.f = winkelFlugrichtung;
 		this.r = winkelRadarstrahl;
@@ -53,6 +53,6 @@ class SpielfeldPointRadarDisplayContent implements Serializable
 	
 	public Point getPos()
 	{
-		return this.p.toPoint();
+		return this.p;
 	}
 }

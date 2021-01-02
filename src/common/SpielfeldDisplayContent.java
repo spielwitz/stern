@@ -22,7 +22,7 @@ import java.util.ArrayList;
 @SuppressWarnings("serial") class SpielfeldDisplayContent implements Serializable
 {
 	private ArrayList<SpielfeldPlanetDisplayContent> p; // Planeten
-	private ArrayList<PointLowRes> m; // Markierte Felder
+	private ArrayList<Point> m; // Markierte Felder
 	private ArrayList<SpielfeldLineDisplayContent> l; // Linien
 	private ArrayList<SpielfeldPointDisplayContent> o; // Objekte
 	private ArrayList<MinenfeldDisplayContent> n; // Minen
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 			SpielfeldPointRadarDisplayContent radar) {
 
 		this.p = planets;
-		this.m = markedFields == null ? null : PointLowRes.toArrayList(markedFields);
+		this.m = markedFields;
 		this.l = lines;
 		this.o = points;
 		this.n = minen;
@@ -49,11 +49,6 @@ import java.util.ArrayList;
 	}
 
 	public ArrayList<Point> getMarkedFields() {
-		return this.m == null ? null : PointLowRes.fromArrayList(m);
-	}
-	
-	public ArrayList<PointLowRes> getMarkedFieldsRaw()
-	{
 		return this.m;
 	}
 	

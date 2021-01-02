@@ -22,7 +22,7 @@ import java.io.Serializable;
 class SpielfeldPointDisplayContent implements Serializable
 {
 	// Stellt einen Punkt dar, der im Spielfeld gezeichnet wird, z.B. um ein Objekt anzuzeigen
-	private PointLowRes p;
+	private Point p;
 	private byte c;
 	private byte s;
 	private int h;
@@ -34,7 +34,7 @@ class SpielfeldPointDisplayContent implements Serializable
 			int hash)
 	{
 		super();
-		this.p = pos == null ? null : new PointLowRes(pos);
+		this.p = pos;
 		this.c = col;
 		this.s = symbol;
 		this.h = hash;
@@ -46,7 +46,7 @@ class SpielfeldPointDisplayContent implements Serializable
 	
 	public Point getPos()
 	{
-		return this.p== null ? null : this.p.toPoint();
+		return this.p;
 	}
 	
 	public int getHash()

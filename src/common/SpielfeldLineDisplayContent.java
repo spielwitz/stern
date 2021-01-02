@@ -24,14 +24,14 @@ import java.io.Serializable;
 	// Wege der Patrouillen anzuzeigen
 	private Point s;
 	private Point e;
-	private PointLowRes p;
+	private Point p;
 	private byte c;
 	
 	SpielfeldLineDisplayContent(Point start, Point end, Point pos, byte col) {
 		super();
 		this.s = start;
 		this.e = end;
-		this.p = pos == null ? null : new PointLowRes(pos);
+		this.p = pos;
 		this.c = col;
 	}
 
@@ -49,7 +49,7 @@ import java.io.Serializable;
 	
 	public Point getPos()
 	{
-		return this.p== null ? null : this.p.toPoint();
+		return this.p;
 	}
 	
 }
