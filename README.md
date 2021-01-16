@@ -14,17 +14,17 @@ Michael Schweitzer
 
 ![STERN](sternEN.png)
 
-STERN is a digital board game with many strategic and only a few random elements. Two to six players sit around a computer and enter their moves one after the other. Communication among the other players for the purpose of cooperation or bluffing is an important part of the game. Therefore, a really exciting game needs at least four participants and several hours or days. The computer only monitors the rules of the game and evaluates the moves.
+STERN is a multiplayer game, similar to the board game "Risk". Players control planets, and attempt to take over the galaxy by sending spaceships to other planets. At the end of the game, the player with the most planets wins.
 
-Place of the action: Space. Conquer as many planets as possible and thus secure supremacy in the universe. In addition to spaceships for conquering and defending planets, you can complete your fleet with scouts, patrols, mines, minesweepers and transports. In addition, you can upgrade planets and protect them against attacks with defense shields. Make alliances with other players to go on campaigns of conquest or defend planets together.
+The game is turn based. When it is your turn, enter where you want to send your spaceships. You can enter multiple moves per round. When you have entered all the moves for a round, pass on to the next player. When all moves have been entered, the computer will move the spaceships.
 
-STERN offers two game modes: The STERN CLASSIC mode with all the features mentioned and the stripped-down STERN LIGHT mode with many simplifications for STERN beginners. The LIGHT mode offers the possibility to play against computer opponents.
+If you have ever played "Risk", you know how intense such a combat game can be. STERN is so addictive, not because of its spectacular graphics and sound effects - there are none at all - but because it requires communication and negotiations between the players. So invite some friends over give this game a good try. For a game with 30 rounds, you should calculate about three days with four hours per day.
 
-Instead of sitting in front of a single computer, the players can also make their entries on several computers that are connected to one another in a network. If a game afternoon or evening is not enough, a game can be continued via e-mail. And finally there is still the possibility for everyone to host STERN on a server and invite players from all over the world.
+Don't first-try this game with fewer than three players. If you do, you won't understand why it is any good. A great game takes four to six players with at least 28 planets.
 
-But the classic game variant, which has been around since 1989, is still best: Take an afternoon and an evening to spare, sit on a large couch in front of a large screen or projector, stand by chips and unhealthy drinks, switch off all devices that didn't exist in the 80s and have a good time together.
+In addition to the classic "hot seat" mode, STERN can also be played via e-mail or hosted on a server, so that the players do not necessarily have to gather around a single computer.
 
-STERN's presentation is consciously based on the computer systems of the early 80s. That means: text graphics, keyboard operation, no sound. Yes, I know, I'm already standing in the corner and I'm ashamed. But unfortunately my graphics programmer is on vacation and the sound artist is in hospital with hearing damage. However, I promise you that the fun of STERN will more than make up for it!
+But the best thing is still the classic game variant, which has been around since 1989: Sit with your friends on a large couch in front of a large screen or projector, serve chips and unhealthy drinks, switch off all devices that didn't exist in the 80s and have a good time together.
 
 For me, STERN is a hobby to try out programming techniques in my spare time and to imitate the lifecycle management of a very important open source software. I am realistic enough not to believe that STERN will be in the top 10 major game rankings. For me, STERN is a learning project that has been going on for over 30 years. Perhaps there is some intelligent life form in the vastness of the universe that shares the joy of STERN with me. If so: Please drop me a message!
 
