@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package sternClient;
+package sternDisplay;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -53,7 +53,7 @@ import commonUi.PasswordFieldDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial") class ClientSettingsJDialog extends JDialog implements ChangeListener, ActionListener
+@SuppressWarnings("serial") class SternDisplaySettingsJDialog extends JDialog implements ChangeListener, ActionListener
 {
 	private ButtonDark butConnect;
 	private ButtonDark butClose;
@@ -64,16 +64,16 @@ import commonUi.TextFieldDark;
 	private TextFieldDark tfMeinName;
 	private LabelDark labStatus;
 
-	private ClientSettings settings;
+	private SternDisplaySettings settings;
 	
-	private SternClient parent;
+	private SternDisplay parent;
 	private static Font font;
 	
-	ClientSettingsJDialog(
-			SternClient parent,
+	SternDisplaySettingsJDialog(
+			SternDisplay parent,
 			String title,
 			boolean modal,
-			ClientSettings settings)
+			SternDisplaySettings settings)
 	{
 		super (parent, title, modal);
 		

@@ -30,7 +30,7 @@ import common.ScreenDisplayContent;
 import common.SternResources;
 import common.Utils;
 import commonUi.DialogWindow;
-import commonUi.IClientMethods;
+import commonUi.ISternDisplayMethods;
 import commonUi.IServerMethods;
 
 class ServerFunctions
@@ -116,9 +116,9 @@ class ServerFunctions
 		if (c != null)
 		{
 			try {
-				IClientMethods rmiServer;
+				ISternDisplayMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(c.clientIp);
-				rmiServer = (IClientMethods) registry.lookup( c.clientId );
+				rmiServer = (ISternDisplayMethods) registry.lookup( c.clientId );
 				return rmiServer.openPdf(pdfBytes);
 			}
 			catch (Exception e)
@@ -192,9 +192,9 @@ class ServerFunctions
 		public void run()
 		{
 			try {
-				IClientMethods rmiServer;
+				ISternDisplayMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(this.clientIp);
-				rmiServer = (IClientMethods) registry.lookup( this.clientId );
+				rmiServer = (ISternDisplayMethods) registry.lookup( this.clientId );
 				rmiServer.updateScreenDisplayContent(
 						this.content, 
 						this.inputEnabled,

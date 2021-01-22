@@ -14,15 +14,13 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package commonUi;
+package sternDisplay;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-
-import common.ScreenDisplayContent;
-
-public interface IClientMethods extends Remote
+class SternDisplaySettings
 {
-	public void updateScreenDisplayContent(ScreenDisplayContent content, boolean inputEnabled, boolean showInputDisabled) throws RemoteException;
-	public boolean openPdf(byte[] pdfBytes) throws RemoteException;
+	String serverIp;
+	String meineIp;
+	String meinName;
+	String clientCode;
+	String clientId;
 }

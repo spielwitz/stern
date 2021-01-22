@@ -1149,7 +1149,7 @@ public class SternResources
 	}
 
 	/**
-	   * Bildschirm\u00FCbertragungsserver [2D]
+	   * STERN Display [2D]
 	   */
 	public static String MenuScreesharing(boolean symbol) {
 		return symbol ? "£2D£":messages.getString("MenuScreesharing_2D");
@@ -1205,7 +1205,7 @@ public class SternResources
 	}
 
 	/**
-	   * STERN Client verlassen [2M]
+	   * STERN Display verlassen [2M]
 	   */
 	public static String MenuSternClientVerlassen(boolean symbol) {
 		return symbol ? "£2M£":messages.getString("MenuSternClientVerlassen_2M");
@@ -1604,7 +1604,7 @@ public class SternResources
 	}
 
 	/**
-	   * Aktivieren [4D]
+	   * Server aktivieren [4D]
 	   */
 	public static String ServerSettingsJDialogTerminalServerAktiv(boolean symbol) {
 		return symbol ? "£4D£":messages.getString("ServerSettingsJDialogTerminalServerAktiv_4D");
@@ -1618,7 +1618,7 @@ public class SternResources
 	}
 
 	/**
-	   * Verbundene STERN Clients [4F]
+	   * Verbundene STERN Display-Rechner [4F]
 	   */
 	public static String ServerSettingsJDialogVerbundeneClients(boolean symbol) {
 		return symbol ? "£4F£":messages.getString("ServerSettingsJDialogVerbundeneClients_4F");
@@ -1933,7 +1933,7 @@ public class SternResources
 	}
 
 	/**
-	   * Client ist nicht am Server {0} registriert [62]
+	   * STERN Display ist nicht am Server {0} registriert [62]
 	   */
 	public static String ClientSettingsJDialogClientNichtRegistriert(boolean symbol, String arg0) {
 		return symbol ? "£62§"+arg0+"£":MessageFormat.format(messages.getString("ClientSettingsJDialogClientNichtRegistriert_62"), arg0);
@@ -2073,28 +2073,28 @@ public class SternResources
 	}
 
 	/**
-	   * STERN Client [6N]
+	   * STERN Display [6N]
 	   */
 	public static String SternClientTitel(boolean symbol) {
 		return symbol ? "£6N£":messages.getString("SternClientTitel_6N");
 	}
 
 	/**
-	   * M\u00F6chten Sie den STERN Client wirklich verlassen? [6P]
+	   * M\u00F6chten Sie STERN Display wirklich verlassen? [6P]
 	   */
 	public static String SternClientVerlassenFrage(boolean symbol) {
 		return symbol ? "£6P£":messages.getString("SternClientVerlassenFrage_6P");
 	}
 
 	/**
-	   * STERN - Bildschirm\u00FCbertragung aktiv [6Q]
+	   * STERN Display-Server aktiv [6Q]
 	   */
 	public static String SternTerminalServer(boolean symbol) {
 		return symbol ? "£6Q£":messages.getString("SternTerminalServer_6Q");
 	}
 
 	/**
-	   * STERN Client verlassen [6R]
+	   * STERN Display verlassen [6R]
 	   */
 	public static String SternThinClientVerlassen(boolean symbol) {
 		return symbol ? "£6R£":messages.getString("SternThinClientVerlassen_6R");
@@ -2115,7 +2115,7 @@ public class SternResources
 	}
 
 	/**
-	   * Bildschirm\u00FCbertragungsserver [6U]
+	   * STERN Display-Server [6U]
 	   */
 	public static String Terminalserver(boolean symbol) {
 		return symbol ? "£6U£":messages.getString("Terminalserver_6U");
@@ -3438,7 +3438,7 @@ public class SternResources
 	}
 
 	/**
-	   * Client-Verbindung IP {0} wird geschlossen. [CZ]
+	   * STERN Display-Verbindung IP {0} wird geschlossen. [CZ]
 	   */
 	public static String ServerInfoClientClosing(boolean symbol, String arg0) {
 		return symbol ? "£CZ§"+arg0+"£":MessageFormat.format(messages.getString("ServerInfoClientClosing_CZ"), arg0);
@@ -3676,7 +3676,7 @@ public class SternResources
 	}
 
 	/**
-	   * STERN-Bildschirm\u00FCbertragungsserver [EF]
+	   * STERN Display-Server [EF]
 	   */
 	public static String SternScreenSharingServer(boolean symbol) {
 		return symbol ? "£EF£":messages.getString("SternScreenSharingServer_EF");
@@ -4341,7 +4341,7 @@ public class SternResources
 	}
 
 	/**
-	   * Clients inaktiv w\u00E4hrend der Zugeingabe [IC]
+	   * STERN Displays passiv w\u00E4hrend Zugeingabe [IC]
 	   */
 	public static String ServerSettingsJDialogInaktiv(boolean symbol) {
 		return symbol ? "£IC£":messages.getString("ServerSettingsJDialogInaktiv_IC");

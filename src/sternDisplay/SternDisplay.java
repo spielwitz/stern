@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. **/
 
-package sternClient;
+package sternDisplay;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -54,7 +54,7 @@ import common.ScreenDisplayContent;
 import common.ScreenDisplayContentClient;
 import commonUi.DialogWindow;
 import commonUi.DialogWindowResult;
-import commonUi.IClientMethods;
+import commonUi.ISternDisplayMethods;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
 import commonUi.IUpdateCheckerCallback;
@@ -66,11 +66,11 @@ import common.SternResources;
 import common.Utils;
 
 @SuppressWarnings("serial") 
-public class SternClient extends Frame // NO_UCD (use default)
+public class SternDisplay extends Frame // NO_UCD (use default)
 	implements 
 		WindowListener, 
 		ActionListener,
-		IClientMethods,
+		ISternDisplayMethods,
 		IHostComponentMethods,
 		IUpdateCheckerCallback
 {
@@ -79,7 +79,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 	// UI components
 	private PaintPanel paintPanel;
 	
-	private ClientSettings settings;
+	private SternDisplaySettings settings;
 	
 	private Properties props;
 	
@@ -94,7 +94,7 @@ public class SternClient extends Frame // NO_UCD (use default)
     
     private String lastUpdateCheck;
     
-    transient private static final String PROPERTIES_FILE_NAME = "SternClientProperties";
+    transient private static final String PROPERTIES_FILE_NAME = "SternDisplayProperties";
 	transient private static final String PROPERTY_NAME_SERVER_IP = "serverIp";
 	transient private static final String PROPERTY_NAME_MEINE_IP = "ip";
 	transient private static final String PROPERTY_NAME_MEIN_NAME = "meinName";
@@ -103,14 +103,14 @@ public class SternClient extends Frame // NO_UCD (use default)
 	
 	public static void main(String[] args)
 	{
-		new SternClient();
+		new SternDisplay();
 	}
 	
-	private SternClient()
+	private SternDisplay()
 	{
 		super();
 		
-		this.settings = new ClientSettings();
+		this.settings = new SternDisplaySettings();
 		
 		UUID uuid = UUID.randomUUID();
         settings.clientId = uuid.toString();
@@ -154,9 +154,9 @@ public class SternClient extends Frame // NO_UCD (use default)
 		catch ( RemoteException e ) 
 		{}
 
-		IClientMethods stub;
+		ISternDisplayMethods stub;
 		try {
-			stub = (IClientMethods) UnicastRemoteObject.exportObject( this, 0 );
+			stub = (ISternDisplayMethods) UnicastRemoteObject.exportObject( this, 0 );
 			Registry registry;
 			registry = LocateRegistry.getRegistry();
 			registry.rebind( this.settings.clientId, stub );			
@@ -196,7 +196,7 @@ public class SternClient extends Frame // NO_UCD (use default)
 		}
 		else if (item == this.menuVerbindungseinstellungen)
 		{
-			ClientSettingsJDialog dlg = new ClientSettingsJDialog(
+			SternDisplaySettingsJDialog dlg = new SternDisplaySettingsJDialog(
 												this, 
 												SternResources.ClientSettingsJDialogTitel(false),
 												true,

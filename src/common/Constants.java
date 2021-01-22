@@ -21,11 +21,11 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	BUILD_COMPATIBLE = "1007";
+	public static final String 	BUILD_COMPATIBLE = "1012";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	BUILD_IMPORTANT_UPDATE = "1007";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "1012";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
 	static final String 		BUILD_MIGRATION = "1007";
