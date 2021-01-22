@@ -1156,21 +1156,21 @@ public class SternResources
 	}
 
 	/**
-	   * STERN-Server verwalten [2E]
+	   * STERN Server verwalten [2E]
 	   */
 	public static String MenuServerAdmin(boolean symbol) {
 		return symbol ? "£2E£":messages.getString("MenuServerAdmin_2E");
 	}
 
 	/**
-	   * STERN-Server-Zugangsdaten [2F]
+	   * STERN Server-Zugangsdaten [2F]
 	   */
 	public static String MenuServerCredentials(boolean symbol) {
 		return symbol ? "£2F£":messages.getString("MenuServerCredentials_2F");
 	}
 
 	/**
-	   * Spiele auf dem STERN-Server [2G]
+	   * Spiele auf dem STERN Server [2G]
 	   */
 	public static String MenuServerbasierteSpiele(boolean symbol) {
 		return symbol ? "£2G£":messages.getString("MenuServerbasierteSpiele_2G");
@@ -3039,7 +3039,7 @@ public class SternResources
 	}
 
 	/**
-	   * M\u00F6chten Sie den STERN-Server herunterfahren? [AT]
+	   * M\u00F6chten Sie den STERN Server herunterfahren? [AT]
 	   */
 	public static String ServerAdminShutdownFrage(boolean symbol) {
 		return symbol ? "£AT£":messages.getString("ServerAdminShutdownFrage_AT");
@@ -3053,7 +3053,7 @@ public class SternResources
 	}
 
 	/**
-	   * Der STERN-Server wird jetzt heruntergefahren... [AV]
+	   * Der STERN Server wird jetzt heruntergefahren... [AV]
 	   */
 	public static String ServerAdminShutdownDone(boolean symbol) {
 		return symbol ? "£AV£":messages.getString("ServerAdminShutdownDone_AV");
@@ -3088,21 +3088,21 @@ public class SternResources
 	}
 
 	/**
-	   * Spiele auf dem STERN-Server (Spieler {0}) [BA]
+	   * Spiele auf dem STERN Server (Spieler {0}) [BA]
 	   */
 	public static String ServerbasierteSpiele(boolean symbol, String arg0) {
 		return symbol ? "£BA§"+arg0+"£":MessageFormat.format(messages.getString("ServerbasierteSpiele_BA"), arg0);
 	}
 
 	/**
-	   * STERN-Server verwalten [BB]
+	   * STERN Server verwalten [BB]
 	   */
 	public static String SternServerVerwalten(boolean symbol) {
 		return symbol ? "£BB£":messages.getString("SternServerVerwalten_BB");
 	}
 
 	/**
-	   * Verbunden mit dem STERN-Server {0}:{1} als Benutzer {2} [BC]
+	   * Verbunden mit dem STERN Server {0}:{1} als Benutzer {2} [BC]
 	   */
 	public static String VerbundenMitServer(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "£BC§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("VerbundenMitServer_BC"), arg0, arg1, arg2);
@@ -3263,7 +3263,7 @@ public class SternResources
 	}
 
 	/**
-	   * Willkommen beim Einrichten des STERN-Servers! [CA]
+	   * Willkommen beim Einrichten des STERN Servers! [CA]
 	   */
 	public static String ServerWillkommen(boolean symbol) {
 		return symbol ? "£CA£":messages.getString("ServerWillkommen_CA");
@@ -3305,14 +3305,14 @@ public class SternResources
 	}
 
 	/**
-	   * STERN-Server auf Port {0} gestartet [CG]
+	   * STERN Server auf Port {0} gestartet [CG]
 	   */
 	public static String ServerStarted(boolean symbol, String arg0) {
 		return symbol ? "£CG§"+arg0+"£":MessageFormat.format(messages.getString("ServerStarted_CG"), arg0);
 	}
 
 	/**
-	   * STERN-Server auf Port {0} kann nicht gestartet werden. Wahrscheinlich ist der Port belegt. Programmende. [CH]
+	   * STERN Server auf Port {0} kann nicht gestartet werden. Wahrscheinlich ist der Port belegt. Programmende. [CH]
 	   */
 	public static String ServerNotStarted(boolean symbol, String arg0) {
 		return symbol ? "£CH§"+arg0+"£":MessageFormat.format(messages.getString("ServerNotStarted_CH"), arg0);
@@ -3697,7 +3697,7 @@ public class SternResources
 	}
 
 	/**
-	   * Sie sind nicht als Spieler {0} am STERN-Server angemeldet. [EI]
+	   * Sie sind nicht als Spieler {0} am STERN Server angemeldet. [EI]
 	   */
 	public static String SpielerNichtAngemeldet(boolean symbol, String arg0) {
 		return symbol ? "£EI§"+arg0+"£":MessageFormat.format(messages.getString("SpielerNichtAngemeldet_EI"), arg0);
