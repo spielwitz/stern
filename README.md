@@ -6,11 +6,11 @@ A strategy game since 1989.
 
 Michael Schweitzer
 
-## Website
+## Website and Download
 
 [https://stern.dyndns1.de](https://stern.dyndns1.de)
 
-## What is it?
+## What is STERN?
 
 ![STERN](sternEN.png)
 
