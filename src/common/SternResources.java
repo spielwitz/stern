@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IM
+		// Hoechstes vergebenes Symbol: IN
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -581,6 +581,7 @@ public class SternResources
 		symbolDict.put("IK","EmailNichtGeoeffnet_IK");
 		symbolDict.put("IL","ClientBuild_IL");
 		symbolDict.put("IM","ZugeingabePlaneteninfo2_IM");
+		symbolDict.put("IN","MenuAusgabeFenster_IN");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4415,5 +4416,12 @@ public class SternResources
 	   */
 	public static String ZugeingabePlaneteninfo2(boolean symbol, String arg0) {
 		return symbol ? "£IM§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabePlaneteninfo2_IM"), arg0);
+	}
+
+	/**
+	   * Zus\u00E4tzliches Ausgabefenster \u00F6ffnen [IN]
+	   */
+	public static String MenuAusgabeFenster(boolean symbol) {
+		return symbol ? "£IN£":messages.getString("MenuAusgabeFenster_IN");
 	}
 }

@@ -173,6 +173,7 @@ public class Stern extends Frame  // NO_UCD (use default)
     private MenuItem menuServerCredentials;
     private MenuItem menuSprache;
     private MenuItem menuSearchForUpdates;
+    private MenuItem menuOutputWindow;
     
     private MenuItem menuServer;
     
@@ -185,6 +186,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	// UI components
 	private PaintPanel paintPanel;
+	private OutputWindow outputWindow;
 	private PanelDark panToolbar;
 	private LabelDark labConnectionStatus;
 	private LabelDark labGamesWaitingForInput;
@@ -412,6 +414,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 	    
 	    stern.add(settings);
 	    
+	    this.menuOutputWindow = new MenuItem(SternResources.MenuAusgabeFenster(false));
+	    this.menuOutputWindow.addActionListener(this);
+	    stern.add(this.menuOutputWindow);
+	    
 	    stern.addSeparator();
 	    
 	    this.menuQuit = new MenuItem (SternResources.MenuSternVerlassen(false));
@@ -500,8 +506,18 @@ public class Stern extends Frame  // NO_UCD (use default)
 					contentWaehrendZugeingabe, 
 					this.inputEnabled);
 		}
-		
-		this.paintPanel.redraw(event.getContent(), this.inputEnabled, false);		
+
+		if (this.outputWindow != null && this.outputWindow.isVisible())
+		{
+			ScreenDisplayContent content = null;
+			if (this.t != null && this.t.getSpiel() != null)
+				content = this.t.getSpiel().getScreenDisplayContentWaehrendZugeingabe();
+			
+			this.outputWindow.redraw(
+					content != null ? content : event.getContent());
+		}
+
+		this.paintPanel.redraw(event.getContent(), this.inputEnabled, false);
 	}
 	
 	private void redrawScreen ()
@@ -847,6 +863,16 @@ public class Stern extends Frame  // NO_UCD (use default)
 			Thread tUpdateChecker = new Thread( new UpdateChecker(this, null, false) );
 			tUpdateChecker.start();
 		}
+		else if (item == this.menuOutputWindow)
+		{
+			if (this.outputWindow == null || !this.outputWindow.isVisible())
+			{
+				this.outputWindow = new OutputWindow();
+				this.outputWindow.setVisible(true);
+				this.redrawScreen();
+			}
+		}
+		
 		this.setMenuEnabled();
 	}
 	
