@@ -195,8 +195,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private String getSpielname()
 	{
-		char[] vokale = {'a','e','i','o','u','y'};
-		char[] konsonanten = {'b','c','d','f','g','h','j','k','l','m','n','p','r','s','t','v','w','x','z'}; 
+		char[] vokale = {'a','e','i','o','u'};
+		char[] konsonanten = {'b','c','d','f','g','h','j','k','l','m','n','p','r','s','t','v','w','x','y','z'};
 		
 		int silben;
 		StringBuilder sb = null;
