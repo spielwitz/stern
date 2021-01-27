@@ -281,6 +281,8 @@ class Console
 					 c == '~'
 					 )
 				{
+					c = Character.toUpperCase(c);
+					
 					if (!noDisplay)
 					{
 						if (hidden)

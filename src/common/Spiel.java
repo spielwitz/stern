@@ -373,6 +373,12 @@ public class Spiel extends EmailTransportBase implements Serializable
 		return this.istSoloSpieler;
 	}
 	
+	private boolean istZugeingabeOffen()
+	{
+		return this.istSoloSpieler ||
+			   this.spielThread.istZugeingabeOffen();
+	}
+	
 	public String getEmailAdresseSpielleiter()
 	{
 		return this.emailAdresseSpielleiter;
@@ -2441,6 +2447,9 @@ public class Spiel extends EmailTransportBase implements Serializable
  			this.spielerJetzt = spieler; 			
 			this.spiel.console.clear();
 			
+			PlanetenlisteDisplayContent pdc = 
+					(PlanetenlisteDisplayContent)Utils.klon(spiel.screenDisplayContent.getPlaneten());
+			
 			ArrayList<Spielzug> sz = new ArrayList<Spielzug>();
 			this.spiel.spielzuege.put(spieler, sz);
 			boolean simpel = this.spiel.optionen.contains(SpielOptionen.SIMPEL);
@@ -2556,13 +2565,24 @@ public class Spiel extends EmailTransportBase implements Serializable
 				else
 					this.spiel.console.outUngueltigeEingabe();
 				
-				if (spiel.istSoloSpieler)
+				if (spiel.istZugeingabeOffen())
 					spiel.updatePlanetenlisteDisplay(false);
+				else
+				{
+					this.spiel.screenDisplayContent.setPlaneten(pdc);
+	 				this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
+				}
 
  			} while (!exit);
  			
  			this.spiel.flugobjekteSpielerAusgeblendet = null;
  			this.spiel.updateSpielfeldDisplay();
+ 			
+ 			if (!spiel.istSoloSpieler)
+ 			{
+ 				this.spiel.screenDisplayContent.setPlaneten(pdc);
+ 				this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
+ 			}
 
  			return false;
  		}
@@ -2627,7 +2647,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.console.appendText(SternResources.AreYouSure(true));
 			this.spiel.console.lineBreak();
 
-			String input = this.spiel.console.waitForKeyPressedYesNo(!spiel.istSoloSpieler).getInputText().toUpperCase();
+			String input = this.spiel.console.waitForKeyPressedYesNo(!spiel.istZugeingabeOffen()).getInputText().toUpperCase();
 			
 			if (!input.equals(Console.KEY_YES))
 			{
@@ -2785,7 +2805,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
 				this.spiel.console.appendText(SternResources.ZugeingabeStartplanet(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{
@@ -2823,7 +2843,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
 				this.spiel.console.appendText(SternResources.ZugeingabeZielplanet(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{
@@ -2866,7 +2886,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				//buendnis = false;
 				this.spiel.console.appendText(SternResources.ZugeingabeAnzahl(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(10, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(10, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{
@@ -3013,7 +3033,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				this.spiel.console.appendText(
 						SternResources.ZugeingabeStartplanet(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{
@@ -3054,7 +3074,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				this.spiel.console.appendText(
 						SternResources.ZugeingabeZielplanet(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				// Zielplanet: Pruefung
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
@@ -3129,7 +3149,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						SternResources.ZugeingabeWievieleEe(true,
 									Integer.toString(Constants.TRANSPORTER_MAX_ENEGER)) + " ");
 
-					ConsoleInput input = this.spiel.console.waitForTextEntered(10, keys, !spiel.istSoloSpieler, true);
+					ConsoleInput input = this.spiel.console.waitForTextEntered(10, keys, !spiel.istZugeingabeOffen(), true);
 
 					if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 					{
@@ -3305,7 +3325,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
 				this.spiel.console.appendText(SternResources.ZugeingabeStartplanet(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{
@@ -3464,7 +3484,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
 				this.spiel.console.appendText(SternResources.ZugeingabeMineZielsektor(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{
@@ -3569,7 +3589,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  			{
  				this.spiel.console.appendText(SternResources.ZugeingabePlanet(true)+": ");
 
- 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+ 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
  				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
  				{
@@ -3629,7 +3649,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				this.spiel.console.appendText(
  						SternResources.ZugeingabeNeueBuendnisstruktur(true)+": ");
 
- 				ConsoleInput input = this.spiel.console.waitForTextEntered(10, keys, !spiel.istSoloSpieler, true);
+ 				ConsoleInput input = this.spiel.console.waitForTextEntered(10, keys, !spiel.istZugeingabeOffen(), true);
 
  				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
  				{
@@ -3907,7 +3927,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				{
  					this.spiel.console.appendText(objName + " ");
 	 				
-	 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, false);
+	 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), false);
 	 				
 	 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 	 				{
@@ -4040,7 +4060,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
 				this.spiel.console.appendText(SternResources.ZugeingabePlanet(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{
@@ -4094,7 +4114,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
 				this.spiel.console.appendText(SternResources.ZugeingabePlanet(true)+": ");
 
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istSoloSpieler, true);
+				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
 
 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 				{

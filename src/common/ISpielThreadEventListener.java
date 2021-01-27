@@ -30,4 +30,5 @@ public interface ISpielThreadEventListener extends EventListener
 	PostMovesResult postMovesToServer(String gameId, String spielerName, SpielzuegeEmailTransport set);
 	SpielzuegeEmailTransport importSpielzuegeAusEmail();
 	void triggerGameInfoUpdate();
+	boolean istZugeingabeOffen();
 }

@@ -1754,4 +1754,17 @@ public class Stern extends Frame  // NO_UCD (use default)
 		
 		this.setProperty(PROPERTY_CLIENTS_INACTIVE, Boolean.toString(this.clientsInaktivBeiZugeingabe));
 	}
+
+	@Override
+	public boolean istZugeingabeOffen() 
+	{
+		if ((this.serverFunctions != null && this.serverFunctions.isServerEnabled() && !this.getClientsInaktivBeiZugeingabe()))
+		{
+			return false;
+		}
+		
+		return
+				(this.outputWindow != null && this.outputWindow.isVisible()) ||
+				(this.serverFunctions != null && this.serverFunctions.isServerEnabled() && this.getClientsInaktivBeiZugeingabe());
+	}
 }

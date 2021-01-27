@@ -147,4 +147,8 @@ public class SpielThread extends Thread
 		this.screenUpdateListener.triggerGameInfoUpdate();
 	}
 	
+	boolean istZugeingabeOffen()
+	{
+		return this.screenUpdateListener.istZugeingabeOffen();
+	}
 }
