@@ -27,6 +27,7 @@ import java.awt.GridLayout;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -867,7 +868,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 		{
 			if (this.outputWindow == null || !this.outputWindow.isVisible())
 			{
-				this.outputWindow = new OutputWindow();
+				Point pt = this.getLocation();
+				Dimension dim = this.getSize();
+				
+				this.outputWindow = new OutputWindow(pt.x + 20, pt.y + 20, dim.width/2, dim.height/2);
 				this.outputWindow.setVisible(true);
 				this.redrawScreen();
 			}

@@ -17,7 +17,6 @@
 package stern;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -36,12 +35,11 @@ class OutputWindow extends Frame
 {
 	private PaintPanel paintPanel;
 	
-	OutputWindow()
+	OutputWindow(int x0, int y0, int w, int h)
 	{
 		super();
 		
-		Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-		this.setBounds(0, 0, dim.width/2, dim.height/2);
+		this.setBounds(x0, y0, w, h);
 		
 		this.setLayout(new BorderLayout());
 		this.addWindowListener(this);

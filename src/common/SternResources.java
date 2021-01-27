@@ -4419,7 +4419,7 @@ public class SternResources
 	}
 
 	/**
-	   * Zus\u00E4tzliches Ausgabefenster \u00F6ffnen [IN]
+	   * Ausgabefenster \u00F6ffnen [IN]
 	   */
 	public static String MenuAusgabeFenster(boolean symbol) {
 		return symbol ? "£IN£":messages.getString("MenuAusgabeFenster_IN");
