@@ -18,7 +18,7 @@ STERN is a multiplayer game, similar to the board game "Risk". Players control p
 
 The game is turn based. When it is your turn, enter where you want to send your spaceships. You can enter multiple moves per round. When you have entered all the moves for a round, pass on to the next player. When all moves have been entered, the computer will move the spaceships.
 
-If you have ever played "Risk", you know how intense such a combat game can be. STERN is so addictive, not because of its spectacular graphics and sound effects - there are none at all - but because it requires communication and negotiations between the players. So invite some friends over give this game a good try. For a game with 30 rounds, you should calculate about three days with four hours per day.
+If you have ever played "Risk", you know how intense such a game can be. STERN is so addictive, not because of its spectacular graphics and sound effects - in fact, there are none at all - but because it requires strategic decisions and diplomatic actions among the players. So invite some friends over give this game a good try. For a game with 30 rounds, you should calculate about three days with four hours per day.
 
 Don't first-try this game with fewer than three players. If you do, you won't understand why it is any good. A great game takes four to six players with at least 28 planets.
 
