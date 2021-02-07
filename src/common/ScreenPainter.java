@@ -69,7 +69,6 @@ public class ScreenPainter
 	
 	private ScreenDisplayContent cont;
 	private boolean inputEnabled;
-
 	static {
 		// ASCII-Art lesen
 		titelBildTextLines = new ArrayList<String>();
@@ -190,10 +189,8 @@ public class ScreenPainter
 		// --------------
 		// Console-Inhalt
 		// --------------
-		if (cdc.getEvaluationProgressBar() != null)
+		if (cdc.getProgressBarDay() >= 0)
 		{
-			ConsoleEvaluationProgressBarDisplayContent pb = cdc.getEvaluationProgressBar();
-			
 			int pbX = x0 + w/2;
 			int pbY = y0 + PROGRESS_BAR_RAND;
 			int pbW = w/2 - PROGRESS_BAR_RAND;
@@ -202,12 +199,12 @@ public class ScreenPainter
 			int wpb = 0;
 			String text = "";
 			
-			if (pb.isJahresbeginn())
+			if (cdc.getProgressBarDay() == 0)
 			{
 				wpb = 0;
 				text = SternResources.AuswertungEreignisJahresbeginn2(false);
 			}
-			else if (pb.isJahresenede())
+			else if (cdc.getProgressBarDay() == Constants.ANZ_TAGE_JAHR)
 			{
 				wpb = pbW;
 				text = SternResources.AuswertungEreignisJahresende2(false);
@@ -215,11 +212,11 @@ public class ScreenPainter
 			else
 			{
 				wpb = Utils.round(
-						(double) pbW * (double)pb.getTag() / 
+						(double) pbW * (double)cdc.getProgressBarDay() / 
 						(double)Constants.ANZ_TAGE_JAHR);
 				text = SternResources.AuswertungEreignisTag2(
 						false,
-						Integer.toString(pb.getTag()),
+						Integer.toString(cdc.getProgressBarDay()),
 						Integer.toString(Constants.ANZ_TAGE_JAHR));
 			}
 			
@@ -1164,40 +1161,13 @@ public class ScreenPainter
 		AlphaComposite composite = AlphaComposite.getInstance(type, alpha);
 		this.dbGraphics.setComposite(composite);
 		
-		this.dbGraphics.fillArc(
+		this.dbGraphics.fillOval(
 				Utils.round(this.factor * x), 
 				Utils.round(this.factor * y), 
 				Utils.round(this.factor * rr), 
-				Utils.round(this.factor * rr), 
-				-radar.getWinkelFlugrichtung(), 
-				radar.getWinkelRadarstrahl());
-		
-		double x1Line = Utils.round(SPIELFELD_XOFF + (0.5 + (double)radar.getPos().getX()) * (double)SPIELFELD_DX);
-		double y1Line = Utils.round(SPIELFELD_XOFF + (0.5 + (double)radar.getPos().getY()) * (double)SPIELFELD_DX);
-		
-		double w = (double)(radar.getWinkelFlugrichtung()) * Math.PI / 180;
-		
-		double x2Line = x1Line + rr * Math.cos(w) / 2;
-		double y2Line = y1Line + rr * Math.sin(w) / 2;
-		
-		this.dbGraphics.drawLine(
-				Utils.round(this.factor * x1Line), 
-				Utils.round(this.factor * y1Line), 
-				Utils.round(this.factor * x2Line), 
-				Utils.round(this.factor * y2Line));
+				Utils.round(this.factor * rr));
 		
 		this.dbGraphics.setComposite(compositeBefore);		
-
-		w = (double)(radar.getWinkelFlugrichtung() - radar.getWinkelRadarstrahl()) * Math.PI / 180;
-
-		x2Line = x1Line + rr * Math.cos(w) / 2;
-		y2Line = y1Line + rr * Math.sin(w) / 2;
-		
-		this.dbGraphics.drawLine(
-				Utils.round(this.factor * x1Line), 
-				Utils.round(this.factor * y1Line), 
-				Utils.round(this.factor * x2Line), 
-				Utils.round(this.factor * y2Line));
 		
 		this.dbGraphics.drawOval(
 				Utils.round(this.factor * x), 

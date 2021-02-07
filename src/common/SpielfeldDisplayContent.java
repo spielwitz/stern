@@ -52,7 +52,7 @@ import java.util.ArrayList;
 		return this.m;
 	}
 	
-	public void clearMarkedFieldsAndPlanets()
+	void clearMarkedFieldsAndPlanets()
 	{
 		this.m = null;
 		this.r = null;

@@ -32,12 +32,10 @@ class ConsoleDisplayContent implements Serializable
 	private String h;
 	private byte a;
 	private int o;
+	private int p;
 	
 	private boolean w;	// Wenn true, dann wird ein blinkender Cursor angezeigt.
 	
-	// Fortschrittsbalken waehrend der Auwertung
-	private ConsoleEvaluationProgressBarDisplayContent p;
-
 	public String getHeaderText() {
 		return h;
 	}
@@ -67,12 +65,12 @@ class ConsoleDisplayContent implements Serializable
 		return a;
 	}
 	
-	public ConsoleEvaluationProgressBarDisplayContent getEvaluationProgressBar()
+	public int getProgressBarDay()
 	{
 		return p;
 	}
 	
-	public void setEvaluationProgressBar(ConsoleEvaluationProgressBarDisplayContent p)
+	public void setProgressBarDay(int p)
 	{
 		this.p = p;
 	}
@@ -85,7 +83,7 @@ class ConsoleDisplayContent implements Serializable
 			byte headerCol, 
 			int outputLine, 
 			boolean waitingForInput,
-			ConsoleEvaluationProgressBarDisplayContent evaluationProgressBar)
+			int progressBarDay)
 	{
 		super();
 		this.t = text;
@@ -95,7 +93,7 @@ class ConsoleDisplayContent implements Serializable
 		this.a = headerCol;
 		this.w = waitingForInput;
 		this.o = outputLine;
-		this.p = evaluationProgressBar;
+		this.p = progressBarDay;
 	}
 
 	public int getOutputLine() {

@@ -41,6 +41,7 @@ public class ScreenDisplayContent implements Serializable
 	
 	private int m;
 	private boolean u;
+	private boolean s;
 	private int g;
 	
 	transient final static int MODUS_SPIELFELD = 0;
@@ -123,5 +124,15 @@ public class ScreenDisplayContent implements Serializable
 	public boolean getPause()
 	{
 		return this.u;
+	}
+	
+	void setSnapshot()
+	{
+		this.s = true;
+	}
+	
+	public boolean isSnapshot()
+	{
+		return this.s;
 	}
 }

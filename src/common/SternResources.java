@@ -319,7 +319,6 @@ public class SternResources
 		symbolDict.put("8N","ZugeingabeNeueBuendnisstruktur_8N");
 		symbolDict.put("8O","ZugeingabeNichtGenugRaumer_8O");
 		symbolDict.put("8P","ZugeingabePatrouille_8P");
-		symbolDict.put("8Q","ZugeingabePatrouilleMissionLinks_8Q");
 		symbolDict.put("8R","ZugeingabePatrouilleTransfer_8R");
 		symbolDict.put("8S","ZugeingabePlanet_8S");
 		symbolDict.put("8T","ZugeingabePlanetGehoertNicht_8T");
@@ -533,11 +532,8 @@ public class SternResources
 		symbolDict.put("GL","FlugzeitOutputJahresende_GL");
 		symbolDict.put("GM","FlugzeitOutputShort_GM");
 		symbolDict.put("GN","FlugzeitOutputJahresendeShort_GN");
-		symbolDict.put("GO","ZugeingabePatrouilleMissionRechts_GO");
 		symbolDict.put("GP","ZugeingabeMinenraeumerMission_GP");
-		symbolDict.put("GQ","InventurPatrouillenOrientierungLinks_GQ");
-		symbolDict.put("GR","InventurPatrouillenOrientierungRechts_GR");
-		symbolDict.put("GS","InventurPatrouillenOrientierung_GS");
+		symbolDict.put("GQ","ZugeingabePatrouilleMission_GQ");
 		symbolDict.put("GT","SpielinformationenKommandozentralenUnterwegs2_GT");
 		symbolDict.put("GV","ServerBuildVeraltet_GV");
 		symbolDict.put("GW","ServerGamesLetzteAktivitaet_GW");
@@ -2585,13 +2581,6 @@ public class SternResources
 	}
 
 	/**
-	   * Einsatz (linksdrehend) [8Q]
-	   */
-	public static String ZugeingabePatrouilleMissionLinks(boolean symbol) {
-		return symbol ? "£8Q£":messages.getString("ZugeingabePatrouilleMissionLinks_8Q");
-	}
-
-	/**
 	   * Transfer [8R]
 	   */
 	public static String ZugeingabePatrouilleTransfer(boolean symbol) {
@@ -4083,13 +4072,6 @@ public class SternResources
 	}
 
 	/**
-	   * Einsatz (rechtsdrehend) [GO]
-	   */
-	public static String ZugeingabePatrouilleMissionRechts(boolean symbol) {
-		return symbol ? "£GO£":messages.getString("ZugeingabePatrouilleMissionRechts_GO");
-	}
-
-	/**
 	   * Einsatz [GP]
 	   */
 	public static String ZugeingabeMinenraeumerMission(boolean symbol) {
@@ -4097,24 +4079,10 @@ public class SternResources
 	}
 
 	/**
-	   * Linksdrehend [GQ]
+	   * Einsatz [GQ]
 	   */
-	public static String InventurPatrouillenOrientierungLinks(boolean symbol) {
-		return symbol ? "£GQ£":messages.getString("InventurPatrouillenOrientierungLinks_GQ");
-	}
-
-	/**
-	   * Rechtsdrehend [GR]
-	   */
-	public static String InventurPatrouillenOrientierungRechts(boolean symbol) {
-		return symbol ? "£GR£":messages.getString("InventurPatrouillenOrientierungRechts_GR");
-	}
-
-	/**
-	   * Orientierung [GS]
-	   */
-	public static String InventurPatrouillenOrientierung(boolean symbol) {
-		return symbol ? "£GS£":messages.getString("InventurPatrouillenOrientierung_GS");
+	public static String ZugeingabePatrouilleMission(boolean symbol) {
+		return symbol ? "£GQ£":messages.getString("ZugeingabePatrouilleMission_GQ");
 	}
 
 	/**

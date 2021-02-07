@@ -91,7 +91,7 @@ public class PaintPanel extends Panel implements KeyListener
 		this.cont = screenDisplayContent;
 		this.inputEnabled = inputEnabled;
 		this.showInputDisabled = showInputDisabled;
-		this.repaint();
+		this.paint(this.getGraphics());
 	}
 	
 	public ScreenDisplayContent getScreenDisplayContent()

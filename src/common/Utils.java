@@ -16,7 +16,6 @@
 
 package common;
 
-import java.awt.geom.Point2D;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,11 +55,6 @@ public class Utils
 			Utils.secRandom = new SecureRandom();
 		
 		return (int) (Utils.secRandom.nextDouble() * max);
-	}
-	
-	static double dist(Point2D.Double p1, Point2D.Double p2)
-	{
-		return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 	}
 	
 	public static Object klon(Object obj)
@@ -234,28 +228,6 @@ public class Utils
 			Arrays.fill(chars, c);
 			return new String(chars);
 		}
-	}
-	
-	static int winkelVektoren(Point2D.Double pt1, Point2D.Double pt2, Point2D.Double pt3)
-	{
-		// Gibt den Winkel zwischen den Vektoren pt1-pt2 und pt1-pt3 in ganzen Grad zurueck
-		double x1 = pt2.x - pt1.x;
-		double y1 = pt2.y - pt1.y;
-		
-		double x2 = pt3.x - pt1.x;
-		double y2 = pt3.y - pt1.y;
-		
-		double w1 = Math.atan2(y1, x1);
-		double w2 = Math.atan2(y2, x2);
-		
-		double w = w2 - w1;
-		
-		int wGrad = Utils.round(180 * (w / Math.PI)); 
-		
-		if (wGrad < 0)
-			return 360 + wGrad;
-		else
-			return wGrad;
 	}
 	
 	static long getDateFromOldVega(String dateString)
@@ -472,18 +444,4 @@ public class Utils
 		
 		return retval;
 	}
-	
-	static double VektorproduktBetrag(Point2D.Double pt1, Point2D.Double pt2, Point2D.Double pt3)
-	{
-		// pt1 ist der gemeinsame Startpunkt von zwei Vektoren
-		// Vektor a= pt1 -> pt2, Vektor b = pt1 -> pt3
-		
-		double ax = pt2.x - pt1.x;
-		double ay = pt2.y - pt1.y;
-		
-		double bx = pt3.x - pt1.x;
-		double by = pt3.y - pt1.y;
-		
-		return ax * by - ay * bx;
-	}	
 }

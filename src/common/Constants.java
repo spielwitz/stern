@@ -21,14 +21,14 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	BUILD_COMPATIBLE = "1012";
+	public static final String 	BUILD_COMPATIBLE = "1019";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	BUILD_IMPORTANT_UPDATE = "1012";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "1019";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
-	static final String 		BUILD_MIGRATION = "1007";
+	static final String 		BUILD_MIGRATION = "1019";
 	
 	public static final String 	STERN_URL = "https://stern.dyndns1.de";
 	public static final String 	BUILD_NO_INFO = "9999";

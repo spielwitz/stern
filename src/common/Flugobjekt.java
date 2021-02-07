@@ -17,7 +17,6 @@
 package common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.UUID;
 
 @SuppressWarnings("serial") 
@@ -41,11 +40,8 @@ class Flugobjekt implements Serializable
 	private Buendnis buendnis; // Darf keinesfalls von aussen manipuliert werden, da sonst nicht mehr sychron mit "anz"
 	
 	// Felder, die zur Laufzeit berechnet werden
-	transient private boolean angekommen;
 	transient private boolean zuLoeschen;
-	transient private boolean bewegt;
-	private transient Point exactPosStart; // Punkt an dem eine Jahresbewegegung startet
-	private transient Point exactPosZiel;
+	transient private boolean wenden;
 	
 	Flugobjekt(int spl, int zpl, Point start, Point ziel,
 			int pos, ObjektTyp typ,
@@ -62,7 +58,6 @@ class Flugobjekt implements Serializable
 		this.bes = bes;
 		this.transfer = transfer;
 		this.kz = kz;
-		this.angekommen = false;
 		this.zuLoeschen = false;
 		this.buendnis = buendnis;
 	}
@@ -83,7 +78,6 @@ class Flugobjekt implements Serializable
 		this.transfer = transfer;
 		this.neu = neu;
 		this.kz = kz;
-		this.angekommen = false;
 		this.zuLoeschen = false;
 		this.buendnis = buendnis;
 	}
@@ -107,11 +101,6 @@ class Flugobjekt implements Serializable
 		this.neu = false;
 	}
 	
-	void resetBewegt()
-	{
-		this.bewegt = false;
-	}
-
 	public int getZpl() {
 		return zpl;
 	}
@@ -142,6 +131,11 @@ class Flugobjekt implements Serializable
 	public int getPos() {
 		return pos;
 	}
+	
+	public void incPos()
+	{
+		this.pos += getGeschwindigkeit(this.typ, this.transfer);
+	}
 
 	public int getAnz() {
 		return anz;
@@ -152,6 +146,16 @@ class Flugobjekt implements Serializable
 		// ==== Bei Raumern auf "anz" gehen, wenn kein Buendnis vorliegt und auf "buendnisRaumer",
 		// ==== wenn ein Buendnis existiert
 		this.anz = anz;
+	}
+	
+	public boolean istZuWenden()
+	{
+		return this.wenden;
+	}
+	
+	public void setZuWenden()
+	{
+		this.wenden = true;
 	}
 
 	int getRaumerProSpieler(int spieler)
@@ -204,63 +208,62 @@ class Flugobjekt implements Serializable
 		else
 			this.stopLabel = null;
 	}
-
-	public Point getCurrentField()
-	{
-		Point exactPos = this.getCurrentPos();
-		return new Point(Utils.round(exactPos.x), Utils.round(exactPos.y));
-	}
 	
-	public Point getCurrentPos()
+	public Point getPositionOnDay(int day)
 	{
-		double dist = this.s.dist(this.z);
+		double distTotal = this.s.dist(this.z);
 		
-		if (this.pos < dist)
+		if (distTotal < Constants.PRECISION)
 		{
-			double x0 = this.s.getX() + (double)this.pos * (this.z.getX()-this.s.getX()) / dist;
-			double y0 = this.s.getY() + (double)this.pos * (this.z.getY()-this.s.getY()) / dist;
+			return this.s;
+		}
+		
+		// Position am Tag 0
+		if (day <= 0)
+		{
+			double x0 = this.s.getX() + this.pos * (this.z.getX()-this.s.getX()) / distTotal;
+			double y0 = this.s.getY() + this.pos * (this.z.getY()-this.s.getY()) / distTotal;
+			
 			return new Point(x0, y0);
 		}
-		else	
+		
+		int v = getGeschwindigkeit(this.getTyp(), this.transfer);
+		
+		double bruchteilJahr = Flugobjekt.getYearFraction(day);
+		
+		double posTag = (double)pos +  bruchteilJahr * (double)v;
+		
+		if (posTag > distTotal - Constants.PRECISION)
+		{
 			return this.z;
+		}
+		
+		double x = this.s.getX() + posTag * (this.z.getX()-this.s.getX()) / distTotal;
+		double y = this.s.getY() + posTag * (this.z.getY()-this.s.getY()) / distTotal;
+		
+		return new Point(x, y);
 	}
 	
-	public Point getPosOnDay(int tag)
+	public Point getSectorOnDay(int day)
 	{
-		if (this.bewegt)
+		Point pos = this.getPositionOnDay(day);
+		
+		// Befinden wir uns auf einer Sektorengrenze?
+		double fractionX = Math.abs(pos.x - (double)((int)pos.x) - 0.5);
+		double fractionY = Math.abs(pos.y - (double)((int)pos.y) - 0.5);
+		
+		if (fractionX < Constants.PRECISION || fractionY < Constants.PRECISION)
 		{
-			int v = getGeschwindigkeit(this.getTyp(), this.transfer);
-			double distTotal = this.s.dist(this.z);
-			
-			// Position am Tag 0
-			double pos = (double)(this.pos - v);
-			
-			if (tag <= 0)
-			{
-				double x0 = this.s.getX() + pos * (this.z.getX()-this.s.getX()) / distTotal;
-				double y0 = this.s.getY() + pos * (this.z.getY()-this.s.getY()) / distTotal;
-				
-				return new Point(x0, y0);
-			}
-			
-			double bruchteilJahr = AuswertungEreignis.getBruchteilTag(tag);
-			
-			double posTag = (double)pos +  bruchteilJahr * (double)v;
-			
-			if (posTag >= distTotal)
-			{
-				return this.z;
-			}
-			
-			double x = this.s.getX() + posTag * (this.z.getX()-this.s.getX()) / distTotal;
-			double y = this.s.getY() + posTag * (this.z.getY()-this.s.getY()) / distTotal;
-			
-			return new Point(x, y);
+			return null;
 		}
 		else
-			return this.getCurrentPos();
+		{
+			return new Point(
+					Utils.round(pos.x),
+					Utils.round(pos.y));
+		}
 	}
-
+	
 	public Kommandozentrale getKz() {
 		return kz;
 	}
@@ -275,7 +278,7 @@ class Flugobjekt implements Serializable
 	
 	Flugzeit getRestflugzeit()
 	{
-		Point posNow = this.getCurrentPos();
+		Point posNow = this.getPositionOnDay(0);
 		
 		double dist = posNow.dist(this.z);
 		double v = (double)getGeschwindigkeit(this.typ, this.transfer);
@@ -311,161 +314,7 @@ class Flugobjekt implements Serializable
 		
 		return v;
 	}
-	
-	ArrayList<AuswertungEreignis> bewegen()
-	{
-		ArrayList<AuswertungEreignis> ereignisse = new ArrayList<AuswertungEreignis>();
 		
-		double geschwindigkeit = (double)getGeschwindigkeit(this.typ, this.transfer);
-		
-		// Startpunkt
-		Point feldStart = this.getCurrentField();
-		this.exactPosStart = this.getCurrentPos();
-		
-		// Bewegen
-		this.pos += geschwindigkeit;
-		
-		this.angekommen = (this.pos >= this.s.dist(this.z));
-		this.bewegt = true;
-		
-		// Zielpunkt
-		Point feldZiel = this.getCurrentField();
-		this.exactPosZiel = this.getCurrentPos();
-		
-		double distJahr = this.angekommen ? 
-					Utils.dist(exactPosZiel, exactPosStart) :
-					geschwindigkeit;
-		
-		double bruchteilJahrZiel = distJahr / geschwindigkeit;
-		
-		if (this.angekommen)
-		{
-			// Objekt ist angekommen.
-			AuswertungEreignis ereignis = new AuswertungEreignis(AuswertungEreignisTyp.ANKUNFT, this);
-			
-			ereignis.feld = this.z;
-			ereignis.setTag(bruchteilJahrZiel);
-			
-			ereignisse.add(ereignis);
-		}
-
-		if (this.typ != ObjektTyp.RAUMER && this.typ != ObjektTyp.MINENRAEUMER)
-			return ereignisse;
-		
-		// -------------------
-		// Felder, ueber die ein Objekt fliegt, ermittln. Das Startfeld ist NICHT mit dabei.
-		// Die Ereignisse sind noch nicht zeitlich geordnet!
-		if (!feldStart.equals(feldZiel))
-		{
-			int xMin = (int)(Math.min(feldStart.getX(), feldZiel.getX()));
-			int yMin = (int)(Math.min(feldStart.getY(), feldZiel.getY()));
-			
-			int xMax = (int)(Math.max(feldStart.getX(), feldZiel.getX()));
-			int yMax = (int)(Math.max(feldStart.getY(), feldZiel.getY()));
-			
-			// Pruefe alle Felder im Rechteck xmin, ymin, xmax, ymax, ob sie
-			// durchflogen werden
-			for (int xCheck = xMin; xCheck <= xMax; xCheck++)
-			{
-				for (int yCheck = yMin; yCheck <= yMax; yCheck++)
-				{
-					// Startfeld ausschliessen
-					if (xCheck == feldStart.getX() && yCheck == feldStart.getY())
-						continue;
-					
-					// Pruefe, auf welcher Seite der Geraden die 4 Ecken des Feldes liegen
-					Point pts[] = new Point[4];
-					
-					pts[0] = new Point(xCheck + 0.5, yCheck+0.5);
-					pts[1] = new Point(xCheck + 0.5, yCheck-0.5);
-					pts[2] = new Point(xCheck - 0.5, yCheck-0.5);
-					pts[3] = new Point(xCheck - 0.5, yCheck+0.5);
-					
-					double vp[] = new double[4];
-					
-					for (int i = 0; i < 4; i++)
-						vp[i] = Utils.VektorproduktBetrag(exactPosStart, exactPosZiel, pts[i]); 
-					
-					boolean found = false;
-					double tMin = 0.;
-					
-					// Liegen wenigstens zwei Punkte auf unterschiedlichen Seiten der Geraden?
-					double vpMax = Math.max(vp[0], Math.max(vp[1], Math.max(vp[2], vp[3])));				
-					double vpMin = Math.min(vp[0], Math.min(vp[1], Math.min(vp[2], vp[3])));
-					
-					if (!(vpMin <= -0.000001 && vpMax >= 0.000001))
-						continue;
-					
-					// Pruefe, wann die Kanten des Feldes die Gerade schneiden
-					for (int i = 0; i < 4; i++)
-					{
-						int j = (i + 1) % 4; 
-						
-						// Ist die Kante i-j parallel zur Geraden?
-						double vprod = Utils.VektorproduktBetrag(
-								new Point(0, 0),
-								new Point(pts[j].x - pts[i].x, pts[j].y - pts[i].y),
-								new Point(this.exactPosZiel.x - this.exactPosStart.x, this.exactPosZiel.y - this.exactPosStart.y));
-						
-						if (Math.abs(vprod) < Constants.PRECISION)
-							continue;
-
-						// Liegt der erste Eckpunkt auf der Geraden?
-						if (Math.abs(vp[i]) < Constants.PRECISION)
-						{
-							double t = Utils.dist(pts[i], this.exactPosStart) / distJahr;
-							
-							if (t >= 0 && (!found || t < tMin))
-							{
-								found = true;
-								tMin = t;
-							}
-						}
-						else if (Math.abs(vp[j]) >= Constants.PRECISION &&
-								 Math.signum(vp[i]) != Math.signum(vp[j]))
-					    {
-							double t; 
-							
-							if (Math.abs(pts[i].x - pts[j].x) < Constants.PRECISION)
-								// X-Kante des Feldes
-								t =  (pts[i].x - this.exactPosStart.x) / 
-								     (this.exactPosZiel.x - this.exactPosStart.x);
-							else
-								// Y-Kante des Feldes
-								t =  (pts[i].y - this.exactPosStart.y) / 
-							     	 (this.exactPosZiel.y - this.exactPosStart.y);
-							
-							if (t >= 0 && (!found || t < tMin))
-							{
-								found = true;
-								tMin = t;
-							}
-					    }
-					}
-					
-					if (found)
-					{
-						// Das Feld xCheck/yCheck wird durchflogen 
-						// -> Ereignis daraus machen.
-						AuswertungEreignis feldGrenzeEreignis = 
-								new AuswertungEreignis(AuswertungEreignisTyp.SEKTOR_BETRETEN, this);
-						
-						feldGrenzeEreignis.feld = new Point(xCheck, yCheck);
-						feldGrenzeEreignis.setTag(tMin * bruchteilJahrZiel);
-						
-						ereignisse.add(feldGrenzeEreignis);
-					}
-				}
-			}
-		}
-		
-		return ereignisse;
-	}
-		
-	boolean istAngekommen() {
-		return this.angekommen;
-	}
-	
 	boolean istBuendnis()
 	{
 		return (this.buendnis != null);
@@ -506,12 +355,7 @@ class Flugobjekt implements Serializable
 	
 	void wenden()
 	{
-		// Transfer-Kennzeichen unveraendert lassen
-		this.wenden(this.transfer);
-	}
-	void wenden(boolean transfer)
-	{
-		// Patrouille oder aehnlich dreht um
+		// Patrouille oder Minenraeumer dreht um
 		int dummyPl = this.spl;
 		Point dummyPoint = this.s.klon();
 		
@@ -520,11 +364,11 @@ class Flugobjekt implements Serializable
 		this.s = this.z;
 		this.z = dummyPoint;
 		this.pos = 0;
-		this.transfer = transfer;
 		
-		this.angekommen = false;
+		this.transfer = (this.typ == ObjektTyp.MINENRAEUMER);
+		
 		this.zuLoeschen = false;
-		this.bewegt = false;
+		this.wenden = false;
 	}
 
 	void subtractRaumer(int anz, int bevorzugterSpieler)
@@ -546,13 +390,15 @@ class Flugobjekt implements Serializable
 		}
 	}
 	
-	void gekapert(int neuerBesitzer, Point start)
+	void gekapert(int neuerBesitzer, Point pos)
 	{
 		this.bes = neuerBesitzer;
 		this.pos = 0;
 		this.transfer = true;
-		this.s = start;
+		this.z   = pos;
+		this.s	 = pos;
 		this.spl = Constants.KEIN_PLANET;
+		this.zpl = Constants.KEIN_PLANET;
 		
 		// Objekt wird gestoppt
 		this.setStop(true);
@@ -631,15 +477,9 @@ class Flugobjekt implements Serializable
 		this.buendnis = buendnis;
 	}
 	
-	Point getFeldTag(int tag)
+	private static double getYearFraction(int day)
 	{
-		// Berechne, auf welchem Feld sich das Flugobjekt an einem bestimmten Tag befindet
-		double bruchteilJahr = AuswertungEreignis.getBruchteilTag(tag);
-		
-		int x = Utils.round(bruchteilJahr * (this.exactPosZiel.x - this.exactPosStart.x) + this.exactPosStart.x);
-		int y = Utils.round(bruchteilJahr * (this.exactPosZiel.y - this.exactPosStart.y) + this.exactPosStart.y);
-		
-		return new Point(x, y);
+		return (double)day / (double)Constants.ANZ_TAGE_JAHR;
 	}
 	
 	byte getScreenDisplaySymbol()

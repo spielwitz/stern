@@ -23,28 +23,14 @@ class SpielfeldPointRadarDisplayContent implements Serializable
 {
 	private Point p; // Punkt
 	private byte c; // Farbe
-	private int f; // Winkel Flugrichtung (in ganzzahligen Grad)
-	private int r; // Winkel Radarstrahl (in ganzzahligen Grad)
 	
 	SpielfeldPointRadarDisplayContent(
 			Point pos, 
-			byte col,
-			int winkelFlugrichtung,
-			int winkelRadarstrahl)
+			byte col)
 	{
 		super();
 		this.p = pos;
 		this.c = col;
-		this.f = winkelFlugrichtung;
-		this.r = winkelRadarstrahl;
-	}
-
-	public int getWinkelFlugrichtung() {
-		return f;
-	}
-
-	public int getWinkelRadarstrahl() {
-		return r;
 	}
 
 	public byte getCol() {

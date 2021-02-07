@@ -485,7 +485,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						cons.getHeaderCol(), 
 						0, 
 						false,
-						cons.getEvaluationProgressBar());
+						cons.getProgressBarDay());
 		
 		this.contentWaehrendZugeingabe.setCons(cons);
 	}
@@ -903,11 +903,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.hauptmenue();
 			
 			// Auswertung im Hintergrund durchfuehren
-			ScreenDisplayContent sdc = (ScreenDisplayContent)Utils.klon(this.screenDisplayContent);
 			this.console.setBackground(true);
 			new Auswertung(this);
 			this.console.setBackground(false);
-			this.screenDisplayContent = sdc;
 			
 			// Auto-Save
 			this.autosave();
@@ -1259,8 +1257,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	}
 	
 	private void updateSpielfeldDisplay (
-			Hashtable<Integer, 
-			ArrayList<Byte>> frames, 
+			Hashtable<Integer, ArrayList<Byte>> frames, 
 			ArrayList<Point> markedField, 
 			int tag)
 	{
@@ -1312,7 +1309,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			
 			SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
- 					obj.getPosOnDay(tag), 
+ 					obj.getPositionOnDay(tag), 
  					this.spieler[obj.getBes()].getColIndex(),
  					obj.getScreenDisplaySymbol(),
  					obj.hashCode());
@@ -3235,9 +3232,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 				// Patrouille: Mission oder Transfer?
 				keys = new ArrayList<ConsoleKey>();
 
-				keys.add(new ConsoleKey("1",SternResources.ZugeingabePatrouilleMissionLinks(true)));
-				keys.add(new ConsoleKey("2",SternResources.ZugeingabePatrouilleMissionRechts(true)));
-				keys.add(new ConsoleKey("3", SternResources.ZugeingabePatrouilleTransfer(true)));
+				keys.add(new ConsoleKey("1",SternResources.ZugeingabePatrouilleMission(true)));
+				keys.add(new ConsoleKey("2", SternResources.ZugeingabePatrouilleTransfer(true)));
 				keys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 
 				boolean transfer = false;
@@ -3260,15 +3256,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 					String key = input.getInputText().toUpperCase();
 
 					if (!key.equals("1") &&
-						!key.equals("2") && 
-					    !key.equals("3"))
+						!key.equals("2"))
 					{
 						this.spiel.console.outUngueltigeEingabe();
 						continue;
 					}
 
-					anz = key.equals("1") ? 1 : 2;
-					transfer = (key.equals("3"));
+					transfer = (key.equals("2"));
 
 					break;
 
@@ -4667,18 +4661,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 				pl.produziereRaumer();
 			}
 			
-			// Die Kennzeichen "Neu" und "Bewegt" bei allen Flugobjekten loeschen
+			// Kennzeichen "Neu" bei allen Flugobjekten loeschen
 			for (Flugobjekt obj: this.spiel.objekte)
 			{
 				obj.resetNeu();
-				obj.resetBewegt();
 			}
 			
 			// Alle Bildschirminhalte aktualisieren
 			this.spiel.updatePlanetenlisteDisplay(false);
 			this.spiel.updateSpielfeldDisplay();
 			
-			this.pause(0);
+			this.addScreenSnapshotToReplay(0);
 			
 			// Buendnisse aufraeumen
 			this.buendnisseAufraeumen();
@@ -4686,96 +4679,54 @@ public class Spiel extends EmailTransportBase implements Serializable
 			// Kapitulationen einarbeiten
 			this.kapitulationen();
 			
-			// Patrouillen beobachten, bevor sich andere Objekte bewegt haben
-			this.patrouillenBeobachten(false);
-
-			// Ereignisse der Flugobjekte sammeln
-			ArrayList<AuswertungEreignis> alleEreignisse = new ArrayList<AuswertungEreignis>(); 
+			// Nun die Tage des Jahres abarbeiten (0 - 365)
+			Hashtable<Integer, HashSet<Integer>> patrBeobachtet = new Hashtable<Integer, HashSet<Integer>>();
 			
-			for (Flugobjekt obj: this.spiel.objekte)
+			for (int day = 0; day <= Constants.ANZ_TAGE_JAHR; day++)
 			{
-				if (obj.isStop() || obj.istZuLoeschen())
-					continue;
-				
-				ArrayList<AuswertungEreignis> ereignisse = obj.bewegen();
-				
-				alleEreignisse.addAll(ereignisse);				
-			}
-			
-			// Ereignisse sortieren
-			Collections.sort(alleEreignisse, new AuswertungEreignis());
-			
-			// Gibt es gleiche Ereignisse, also z.B. zwei Ankuenfte
-			// auf demselben Planeten? Sortiere diese Ereignisse zufaellig um
-			for (int i = 0; i < alleEreignisse.size(); i++)
-			{
-				AuswertungEreignis ereignis = alleEreignisse.get(i);
-				
-				ArrayList<AuswertungEreignis> ereignisseKopie = new ArrayList<AuswertungEreignis>(); 
-				ereignisseKopie.add(ereignis);
-				
-				for (int j = i + 1; j < alleEreignisse.size(); j++)
+				if (day > 0)
 				{
-					AuswertungEreignis ereignis2 = alleEreignisse.get(j);
+					// Flugobjekte in zufaelliger Reihenfolge bewegen
+					int objectSequence[] = Utils.randomList(this.spiel.objekte.size());
 					
-					if (ereignis.compare(ereignis, ereignis2) == 0	)
-						ereignisseKopie.add(ereignis2);
-					else
-						break;
+					for (int i = 0; i < objectSequence.length; i ++)
+					{
+						this.moveObject(this.spiel.objekte.get(objectSequence[i]), day);
+					}
 				}
 				
-				if (ereignisseKopie.size() == 1)
-					continue;
+				// Am Ende des Tages beobachten die Patrouillen
+				this.patrouillenBeobachten(patrBeobachtet, day);
 				
-				int seq[] = Utils.randomList(ereignisseKopie.size());
-				
-				for (int k = 0; k < seq.length; k++)
-					alleEreignisse.set(i + k, ereignisseKopie.get(seq[k]));
-				
-				i += (ereignisseKopie.size()-1);
-			}
-			
-			// Ereignisse abarbeiten
-			for (AuswertungEreignis ereignis: alleEreignisse)
-			{
-				if (ereignis.obj.isStop() || ereignis.obj.istZuLoeschen())
-					continue;
-
-				if (ereignis.typ == AuswertungEreignisTyp.SEKTOR_BETRETEN)
+				// Ggeloeschte Objekte entfernen
+				for (int i = this.spiel.objekte.size() - 1; i >= 0; i--)
 				{
-					// Minen pruefen
-					this.minenfeld(ereignis);
-				}
-				else if (ereignis.typ == AuswertungEreignisTyp.ANKUNFT)
-				{
-					// Objekt ist angekommen
-					this.ankunft(ereignis);
+					Flugobjekt obj = this.spiel.objekte.get(i);
+					
+					if (obj.istZuLoeschen())
+					{
+						this.spiel.objekte.remove(i);
+					}
 				}
 			}
-			
-			// Patrouillen beobachten noch einmal
-			this.patrouillenBeobachten(true);
-			
-			// Nicht mehr benoetigte Objekte loeschen
-			for (int i = this.spiel.objekte.size() - 1; i >= 0; i--)
-			{
-				Flugobjekt obj = this.spiel.objekte.get(i);
-				if (obj.istZuLoeschen())
-					this.spiel.objekte.remove(i);
-			}
-			
-			// Patrouillen wenden
-			this.patrouillenWenden();
 
 			// Ende der Auwertung
-			// Kennzeichen "Bewegt" bei allen Flugobjekten loeschen
+			this.spiel.updateSpielfeldDisplay(Constants.ANZ_TAGE_JAHR);
+			this.spiel.updatePlanetenlisteDisplay(false);
+			
+			// Am Ende des Jahres Positionszaehler der Objekte erhoehen
+			// und Objekte wenden
 			for (Flugobjekt obj: this.spiel.objekte)
 			{
-				obj.resetBewegt();
+				if (obj.istZuWenden())
+				{
+					obj.wenden();
+				}
+				else if (!obj.isStop())
+				{
+					obj.incPos();
+				}
 			}
-			
-			this.spiel.updateSpielfeldDisplay(Constants.ANZ_TAGE_JAHR+1);
-			this.spiel.updatePlanetenlisteDisplay(false);
 			
 			this.checkSpielerTot();
 
@@ -4797,7 +4748,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.punktestandBerechnen();
 			
 			// Neue Preise berechnen
-			this.spiel.jahrVorbereiten();
+			this.spiel.jahrVorbereiten();			
   		}
   		
   		private void spielzuege()
@@ -4829,6 +4780,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   							}
   						}
   						
+  						obj.setStart(obj.getZiel());
+  						obj.setSpl(Constants.KEIN_PLANET);
   						obj.setZpl(zug.getPlIndex());
   						obj.setZiel(this.spiel.planeten[zug.getPlIndex()].getPos());
   						obj.setStop(false);
@@ -5103,11 +5056,22 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.replay.add(cont);
   		}
   		
+  		private void addScreenSnapshotToReplay(int day)
+  		{
+			this.spiel.updateSpielfeldDisplay(day);
+  			ScreenDisplayContent cont = (ScreenDisplayContent)Utils.klon(this.spiel.screenDisplayContent);
+  			cont.setPlEdit(null);
+  			cont.setSnapshot();
+  			cont.getCons().clearKeys();
+  			cont.getCons().setProgressBarDay(day);
+			this.replay.add(cont);
+  		}
+  		
   		private void writeEreignisDatum(int tag)
   		{
   			if (tag < 1)
   				writeEreignisDatumJahresbeginn();
-  			else if (tag > Constants.ANZ_TAGE_JAHR)
+  			else if (tag >= Constants.ANZ_TAGE_JAHR)
   				writeEreignisDatumJahresende();
   			else
   			{		
@@ -5125,275 +5089,281 @@ public class Spiel extends EmailTransportBase implements Serializable
   		private void writeEreignisDatumJahresende()
   		{
   			this.spiel.console.appendText(">>> ");
-			this.spiel.console.setEvaluationProgressBarYearEnd();
+			this.spiel.console.setEvaluationProgressBarDay(Constants.ANZ_TAGE_JAHR);
   		}
   		
-  		private void patrouillenBeobachten(boolean jahresende)
+  		private void patrouillenBeobachten(
+  				Hashtable<Integer, HashSet<Integer>> patrBeobachtet,
+  				int day)
   		{
-  			ArrayList<AuswertungEreignisPatrouille> alleEreignisse = new ArrayList<AuswertungEreignisPatrouille>();
+  			// Gibt es aktive Patrouillen?
+  			ArrayList<Integer> patrIndices = new ArrayList<Integer>();
   			
-  			// Gehe alle Patrouillen durch. Stelle eine Ereignisliste auf, geordnet
-  			// nach Beobachtungswinkel (0 - 359 Grad, Aufloesung 1 Grad)
-  			for (Flugobjekt obj: this.spiel.objekte)
+  			for (int i = 0; i < this.spiel.objekte.size(); i++)
   			{
-  				if (obj.istZuLoeschen())
-  					continue;
+  				Flugobjekt obj = this.spiel.objekte.get(i);
   				
-  				if (obj.getTyp() == ObjektTyp.PATROUILLE &&
+  				if (!obj.istZuLoeschen() && 
+  					 obj.getTyp() == ObjektTyp.PATROUILLE &&
   					!obj.isTransfer())
   				{
-  					alleEreignisse.addAll(this.patrouilleBeobachtet(obj));
+  					patrIndices.add(i);
   				}
   			}
   			
-  			if (alleEreignisse.size() == 0)
+  			if (patrIndices.size() == 0)
+  			{
+  				// Nichts zu tun
   				return;
+  			}
   			
-  			// Sortiere Ereignisse nach Winkel
-  			Collections.sort(alleEreignisse, new AuswertungEreignisPatrouille());
+  			// Jetzt die Patrouillen in zufaelliger Reihenfolge abarbeiten
+  			int objectSequence[] = Utils.randomList(patrIndices.size());
   			
-  			// Wenn mehrere Ereignisse im selben Winkel stattfinden, dann Ereignisse
-  			// zufaellig umsortieren
-			for (int i = 0; i < alleEreignisse.size(); i++)
+  			for (int i = 0; i < patrIndices.size(); i++)
+  			{
+  				Flugobjekt patr = this.spiel.objekte.get(patrIndices.get(objectSequence[i]));
+  				Point patrPos = patr.getPositionOnDay(day);
+  				
+  				for (Flugobjekt anderesObj: this.spiel.objekte)
+  				{
+  					if (anderesObj == patr || anderesObj.istZuLoeschen())
+  					{
+  						continue;
+  					}
+  					  					
+  					Point anderesObjPos = anderesObj.getPositionOnDay(day);
+  					
+  					// Ist das andere Objekt im Erfassungskreis?
+  					if (patrPos.dist(anderesObjPos) > Constants.PATROUILLE_BEOBACHTUNGSRADIUS + Constants.PRECISION)
+					{
+						continue;
+					}
+  					
+					int patrHashCode = patr.hashCode();
+					HashSet<Integer> beobachteteObjekte = patrBeobachtet.get(patrHashCode);
+  					
+  					boolean relevant = this.patrouilleErfasst(
+  							patr, 
+  							anderesObj, 
+  							day,
+  							beobachteteObjekte);
+
+					int anderesObjHashCode = anderesObj.hashCode();
+
+  					if (relevant)
+  					{
+  						if (beobachteteObjekte == null)
+  						{
+  							patrBeobachtet.put(patrHashCode, new HashSet<Integer>());
+  						}
+  						
+  						patrBeobachtet.get(patrHashCode).add(anderesObjHashCode);
+  					}
+  					else
+  					{
+  						if (beobachteteObjekte != null)
+  						{
+  							if (beobachteteObjekte.contains(anderesObjHashCode))
+  							{
+  								beobachteteObjekte.remove(anderesObjHashCode);
+  							}
+  						}
+  					}
+  				}
+  			}
+  		}
+  		
+  		private boolean patrouilleErfasst(
+  				Flugobjekt objPatr, 
+  				Flugobjekt anderesObj, 
+  				int day,
+  				HashSet<Integer> beobachteteObjekte)
+  		{
+			if (objPatr.istZuLoeschen() || anderesObj.istZuLoeschen())
+				return false;
+			
+			// Eigene Objekte nicht melden
+			if (objPatr.getBes() == anderesObj.getBes())
+				return false;
+			
+			//Spezialfall Buendnisraumer. Wenn der Besitzer der Raumer Buendnismitglied auf dem Zielplaneten ist, 
+			// dann nicht melden
+			if (anderesObj.getTyp() == ObjektTyp.RAUMER &&
+				anderesObj.getZpl() >= 0 &&
+				this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(anderesObj.getBes()))
 			{
-				AuswertungEreignisPatrouille ereignis = alleEreignisse.get(i);
-				
-				ArrayList<AuswertungEreignisPatrouille> ereignisseKopie = new ArrayList<AuswertungEreignisPatrouille>(); 
-				ereignisseKopie.add(ereignis);
-				
-				for (int j = i + 1; j < alleEreignisse.size(); j++)
-				{
-					AuswertungEreignisPatrouille ereignis2 = alleEreignisse.get(j);
-					
-					if (ereignis.winkel == ereignis2.winkel)
-						ereignisseKopie.add(ereignis2);
-					else
-						break;
-				}
-				
-				if (ereignisseKopie.size() == 1)
-					continue;
-				
-				int seq[] = Utils.randomList(ereignisseKopie.size());
-				
-				for (int k = 0; k < seq.length; k++)
-					alleEreignisse.set(i + k, ereignisseKopie.get(seq[k]));
-				
-				i += (ereignisseKopie.size()-1);
+				return false;
 			}
 			
-			// Patrouillenereignisse abarbeiten
-  			for (AuswertungEreignisPatrouille ereignis: alleEreignisse)
-  			{
-  				Flugobjekt objPatr = ereignis.objPatrouille;
-  				
-  				Flugobjekt anderesObj = ereignis.objAnderes;
-  				
-  				if (objPatr.istZuLoeschen() || anderesObj.istZuLoeschen())
-  					continue;
-  				
-  				// Eigene Objekte nicht melden
-  				if (objPatr.getBes() == anderesObj.getBes())
-  					continue;
-  				
-  				//Spezialfall Buendnisraumer. Wenn der Besitzer der Raumer Buendnismitglied auf dem Zielplaneten ist, 
-				// dann nicht melden
-				if (anderesObj.getTyp() == ObjektTyp.RAUMER &&
-					anderesObj.getZpl() >= 0 &&
-					this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(anderesObj.getBes()))
-				{
-					continue;
-				}
+			// Wenn der Besitzer der Patrouille an der Buendnisflotte beteiligt ist, dann auch nicht melden.
+			if (anderesObj.istBeteiligt(objPatr.getBes()))
+			{
+				return false;
+			}
+			
+			// Ist das andere Objekte bereits vorher als relevant eingestuft worden?
+			if (beobachteteObjekte != null &&
+				beobachteteObjekte.contains(anderesObj.hashCode()))
+			{
+				return true;
+			}
+			
+			this.writeEreignisDatum(day);			
+			this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
+			
+			Point objPatrPos = objPatr.getPositionOnDay(day);
+			Point anderesObjPos = anderesObj.getPositionOnDay(day);
+			
+			// Radar
+			SpielfeldPointRadarDisplayContent radar = 
+					new SpielfeldPointRadarDisplayContent(
+							objPatrPos,
+							this.spiel.spieler[objPatr.getBes()].getColIndex());
+			
+			String namePatr = this.spiel.spieler[objPatr.getBes()].getName();
+			String nameAnderesObj = this.spiel.spieler[anderesObj.getBes()].getName();
+			String zielAnderesObj = this.spiel.getFeldNameFromPoint(anderesObj.getZiel());
+			
+			boolean anderesObjRelevant = true;
 				
-				// Wenn der Besitzer der Patrouille an der Buendnisflotte beteiligt ist, dann auch nicht melden.
-				if (anderesObj.istBeteiligt(objPatr.getBes()))
-				{
-					continue;
-				}
-  				
-  				if (jahresende)  					
-  					this.writeEreignisDatumJahresende();
-  				else
-  					this.writeEreignisDatumJahresbeginn();
-  				
+			if (anderesObj.getTyp() == ObjektTyp.PATROUILLE &&
+				!anderesObj.isTransfer())
+			{
+				// Kampf zweier Patrouillen. Die beobachtende Patrouille
+				// war schneller und vernichtet die andere
+				this.spiel.updateSpielfeldDisplay(
+						null,
+						this.spiel.getSimpleMarkedField(anderesObjPos),
+						radar,
+						day);
+				
+				this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
+				this.spiel.console.appendText(
+						SternResources.AuswertungPatrouillePatrouilleZerstoert(
+								true, nameAnderesObj, zielAnderesObj, namePatr));
+				
+				this.taste();
+				anderesObjRelevant = false;
+				anderesObj.setZuLoeschen();
+			}
+			else
+			{
+				// Andere Objekte
+				// Meldung machen. Kleinobjekte kapern
+				// Feld markieren
+				this.spiel.updateSpielfeldDisplay(
+						null,
+						this.spiel.getSimpleMarkedField(anderesObjPos),
+						radar,
+						day);
+
+				boolean kapern = true;
 				this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
 				
-				// Radar
-				int winkelFlugrichtung = Utils.winkelVektoren(
-						objPatr.getStart(), 
-						new Point(objPatr.getStart().getX() + 10, objPatr.getStart().getY()), 
-						objPatr.getZiel());
-				
-				int winkelRadar = 
-						objPatr.getAnz() == 1 ?
-								ereignis.winkel :
-								- ereignis.winkel;
-					
-				SpielfeldPointRadarDisplayContent radar = 
-						new SpielfeldPointRadarDisplayContent(
-								objPatr.getCurrentPos(),
-								this.spiel.spieler[objPatr.getBes()].getColIndex(),
-								winkelFlugrichtung,
-								winkelRadar);
-				
-				String namePatr = this.spiel.spieler[objPatr.getBes()].getName();
-				String nameAnderesObj = this.spiel.spieler[anderesObj.getBes()].getName();
-				String zielAnderesObj = this.spiel.getFeldNameFromPoint(anderesObj.getZiel());
-  					
-  				if (anderesObj.getTyp() == ObjektTyp.PATROUILLE &&
-  					!anderesObj.isTransfer())
-  				{
-  					// Kampf zweier Patrouillen. Die beobachtende Patrouille
-  					// war schneller und vernichtet die andere
-					this.spiel.updateSpielfeldDisplay(
-							null,
-							this.spiel.getSimpleMarkedField(
-									ereignis.markierungPos),
-							radar,
-							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
-					
-					this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
+				if (anderesObj.getTyp() == ObjektTyp.AUFKLAERER)
 					this.spiel.console.appendText(
-							SternResources.AuswertungPatrouillePatrouilleZerstoert(
-									true, nameAnderesObj, zielAnderesObj, namePatr));
-					
-					this.taste();
-					anderesObj.setZuLoeschen();
-  				}
-  				else
-  				{
-  					// Andere Objekte
-					// Meldung machen. Kleinobjekte kapern
-					// Feld markieren
-					this.spiel.updateSpielfeldDisplay(
-							null,
-							this.spiel.getSimpleMarkedField(ereignis.markierungPos),
-							radar,
-							jahresende ? Constants.ANZ_TAGE_JAHR : 0);
-
-					boolean kapern = true;
-					this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
-					
-					if (anderesObj.getTyp() == ObjektTyp.AUFKLAERER)
-						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleAufklaererGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
-					else if (anderesObj.getTyp() == ObjektTyp.TRANSPORTER)
-						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleTransporterGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
-					else if (anderesObj.getTyp() == ObjektTyp.MINENRAEUMER)
-						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleMinenraeumerGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
-					else if (anderesObj.getTyp() == ObjektTyp.MINE50 || 
-							 anderesObj.getTyp() == ObjektTyp.MINE100 ||
-							 anderesObj.getTyp() == ObjektTyp.MINE250 ||
-							 anderesObj.getTyp() == ObjektTyp.MINE500)
-						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouilleMinenlegerGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
-					else if (anderesObj.getTyp() == ObjektTyp.PATROUILLE)
-						this.spiel.console.appendText(
-										SternResources.AuswertungPatrouillePatrouilleGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
-					else if (anderesObj.getTyp() == ObjektTyp.RAUMER)
+									SternResources.AuswertungPatrouilleAufklaererGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
+				else if (anderesObj.getTyp() == ObjektTyp.TRANSPORTER)
+					this.spiel.console.appendText(
+									SternResources.AuswertungPatrouilleTransporterGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
+				else if (anderesObj.getTyp() == ObjektTyp.MINENRAEUMER)
+					this.spiel.console.appendText(
+									SternResources.AuswertungPatrouilleMinenraeumerGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
+				else if (anderesObj.getTyp() == ObjektTyp.MINE50 || 
+						 anderesObj.getTyp() == ObjektTyp.MINE100 ||
+						 anderesObj.getTyp() == ObjektTyp.MINE250 ||
+						 anderesObj.getTyp() == ObjektTyp.MINE500)
+					this.spiel.console.appendText(
+									SternResources.AuswertungPatrouilleMinenlegerGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
+				else if (anderesObj.getTyp() == ObjektTyp.PATROUILLE)
+					this.spiel.console.appendText(
+									SternResources.AuswertungPatrouillePatrouilleGekapert(true, namePatr, zielAnderesObj, nameAnderesObj));
+				else if (anderesObj.getTyp() == ObjektTyp.RAUMER)
+				{
+					if (anderesObj.getAnz() > Constants.PATROUILLE_KAPERT_RAUMER)
 					{
-						if (anderesObj.getAnz() > Constants.PATROUILLE_KAPERT_RAUMER)
-						{
-							this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
-							this.spiel.console.appendText(
-									SternResources.AuswertungPatrouilleRaumerGesichtet(true, 
-											nameAnderesObj, Integer.toString(anderesObj.getAnz()), zielAnderesObj, namePatr));
-							kapern = false;
-							this.taste();
-						}
-						else
-						{
-							this.spiel.console.appendText(
-									SternResources.AuswertungPatrouilleRaumerGekapert(true, 
-											namePatr, Integer.toString(anderesObj.getAnz()), zielAnderesObj, nameAnderesObj));
-						}
-					}
-					
-					if (kapern)
-					{
-						anderesObj.gekapert(
-								objPatr.getBes(),
-								ereignis.posObjAnderes);
-						
-						this.spiel.updateSpielfeldDisplay(
-								null,
-								this.spiel.getSimpleMarkedField(ereignis.markierungPos),
-								radar,
-								jahresende ? Constants.ANZ_TAGE_JAHR : 0);
-						
+						this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
+						this.spiel.console.appendText(
+								SternResources.AuswertungPatrouilleRaumerGesichtet(true, 
+										nameAnderesObj, Integer.toString(anderesObj.getAnz()), zielAnderesObj, namePatr));
+						kapern = false;
 						this.taste();
 					}
-  				}
-  			}
+					else
+					{
+						this.spiel.console.appendText(
+								SternResources.AuswertungPatrouilleRaumerGekapert(true, 
+										namePatr, Integer.toString(anderesObj.getAnz()), zielAnderesObj, nameAnderesObj));
+					}
+				}
+				
+				if (kapern)
+				{
+					anderesObj.gekapert(
+							objPatr.getBes(),
+							anderesObjPos);
+					
+					this.spiel.updateSpielfeldDisplay(
+							null,
+							this.spiel.getSimpleMarkedField(anderesObjPos),
+							radar,
+							day);
+					
+					this.taste();
+					anderesObjRelevant = false;
+				}
+			}
+			
+			return anderesObjRelevant;
   		}
   		
-  		private ArrayList<AuswertungEreignisPatrouille> patrouilleBeobachtet(Flugobjekt objPatr)
+  		private void moveObject(Flugobjekt obj, int day)
   		{
-  			Point momPos = objPatr.getCurrentPos();
-  			
-  			ArrayList<AuswertungEreignisPatrouille> ereignisse = new ArrayList<AuswertungEreignisPatrouille>();
-  			
-  			// Gehe alle Flugobjekte durch und pruefe, ob sie in Beobachtungsreichweite sind
-  			// und berechne den Winkel, von Flugrichtung aus gesehen.
-  			for (Flugobjekt otherObj: this.spiel.objekte)
+  			if (obj.istZuLoeschen() || obj.istZuWenden() || obj.isStop())
   			{
-  				if (otherObj == objPatr ||
-  					otherObj.istZuLoeschen())
-  					continue;
-  				
-  				Point momPosOther = otherObj.getCurrentPos();
-  					
-  				double dist = Utils.dist(momPosOther, momPos);
-  				
-  				if (dist > Constants.PATROUILLE_BEOBACHTUNGSRADIUS)
-  					continue;
-  				
-  				AuswertungEreignisPatrouille ereignis = 
-  						new AuswertungEreignisPatrouille(objPatr, otherObj);
-  				
-  				Point zielPosPatr = objPatr.getZiel();
-  				
-  				if (Utils.dist(momPos, momPosOther) <= Constants.PRECISION)
-  					ereignis.winkel = 0;
-  				else
-	  				ereignis.winkel = objPatr.getAnz() == 1 ?
-	  						// linksdrehend
-	  						Utils.winkelVektoren(momPos, momPosOther, zielPosPatr) :
-	  						//rechtsdrehend
-	  						Utils.winkelVektoren(momPos, zielPosPatr, momPosOther);
-  				
-  				ereignis.markierungPos = momPosOther;
-  				ereignis.posObjAnderes = otherObj.getCurrentPos();
-  				
-  				ereignisse.add(ereignis);
+  				return;
+  			}
+
+  			// Betritt das Objekt einen neuen Sektor?
+  			Point sectorCurrent = obj.getSectorOnDay(day);
+  			
+  			if (sectorCurrent != null)
+  			{
+  	  			Point sectorPrevious = obj.getSectorOnDay(day-1);
+  	  			
+  	  			if (sectorPrevious == null || !sectorCurrent.equals(sectorPrevious))
+  	  			{
+  	  				// Minencheck
+  	  				this.mineCheck(obj, sectorCurrent, day);
+  	  			}
   			}
   			
-  			return ereignisse;
-  		}
-  		
-  		private void patrouillenWenden()
-  		{
-  			for (Flugobjekt obj: this.spiel.objekte)
+  			if (obj.istZuLoeschen())
   			{
-  				if (obj.getTyp() == ObjektTyp.PATROUILLE &&
-  					!obj.isTransfer() &&
-  					obj.istAngekommen())
-  				{
-  					obj.wenden();
-  				}
+  				return;
   			}
+  			
+  			// Hat das Objekt sein Ziel erreicht?
+  			this.ankunft(obj, day);
   		}
   		  		
-  		private void minenfeld(AuswertungEreignis ereignis)
+  		private void mineCheck(Flugobjekt obj, Point feld, int day)
   		{
-  			Flugobjekt obj = ereignis.obj;
-  			Point feld = ereignis.feld;
-  			
-  			if (this.spiel.minen == null || this.spiel.minen.size() == 0 || obj.istZuLoeschen())
+  			if (obj.istZuLoeschen() ||
+  				feld == null ||
+  				this.spiel.minen == null || 
+	  	  		this.spiel.minen.size() == 0)
+  			{
   				return;
-		
+  			}
+  			
+  			Point objField = obj.getSectorOnDay(day);
+  			if (objField == null || !objField.equals(feld))
+  			{
+  				return;
+  			}
+  			
 			Mine mine = this.spiel.minen.get(feld.getString());
 			if (mine == null)
 				return;
@@ -5405,7 +5375,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			if (obj.getTyp() == ObjektTyp.RAUMER)
 			{
-				this.writeEreignisDatum(ereignis.getTag());
+				this.writeEreignisDatum(day);
 				
 				if (obj.getAnz() >= mine.getStaerke())
 				{
@@ -5447,7 +5417,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			else if (obj.getTyp() == ObjektTyp.MINENRAEUMER)
 			{
-				this.writeEreignisDatum(ereignis.getTag());
+				this.writeEreignisDatum(day);
 				this.spiel.console.appendText (
 						SternResources.AuswertungNachrichtAnAusSektor(true,
 								this.spiel.spieler[obj.getBes()].getName(),
@@ -5467,8 +5437,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			// Spielfeld aktualisieren
 			this.spiel.updateSpielfeldDisplay(
-					this.spiel.getSimpleMarkedField(obj.getPosOnDay(ereignis.getTag())),
-					ereignis.getTag());
+					this.spiel.getSimpleMarkedField(obj.getPositionOnDay(day)),
+					day);
 			
 			// Taste.
 			this.taste();
@@ -5477,13 +5447,18 @@ public class Spiel extends EmailTransportBase implements Serializable
 				obj.setZuLoeschen();
   		}
   		
-  		private void ankunft(AuswertungEreignis ereignis)
+  		private void ankunft(Flugobjekt obj, int day)
   		{
-  			Flugobjekt obj = ereignis.obj;
+  			// Hat das Objekt sein Ziel erreicht?
+  			double totalDist = obj.getStart().dist(obj.getZiel());
+  			double currentDist = obj.getStart().dist(obj.getPositionOnDay(day));
   			
-  			if (obj.istZuLoeschen() || !obj.istAngekommen())
+  			if (currentDist <= totalDist - Constants.PRECISION)
+  			{
   				return;
+  			}
   			
+  			// Objekt hat sein Ziel erreicht
 			int plIndex = obj.getZpl();
 			Planet pl = null;
 			
@@ -5495,13 +5470,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			if (obj.getTyp() == ObjektTyp.AUFKLAERER)
 			{
-				this.writeEreignisDatum(ereignis.getTag());
+				this.writeEreignisDatum(day);
 				
 				if (pl.getBes() == obj.getBes())
 				{
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-							ereignis.getTag());
+							day);
 					
 					pl.incObjekt(obj.getTyp(), 1);
 					
@@ -5514,7 +5489,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				else
 				{
 					// Aufklaerer installiert einen Spionagesender
-					this.spiel.updateSpielfeldDisplay(ereignis.getTag());
+					this.spiel.updateSpielfeldDisplay(day);
 					pl.setSender(obj.getBes(), this.spiel.jahr + Constants.SENDER_JAHRE);
 					
 					this.spiel.console.appendText(
@@ -5527,11 +5502,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			else if (obj.getTyp() == ObjektTyp.TRANSPORTER)
 			{
-				this.writeEreignisDatum(ereignis.getTag());
+				this.writeEreignisDatum(day);
 				
 				this.spiel.updateSpielfeldDisplay(
 						this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-						ereignis.getTag());
+						day);
 				
 				// Energie uebertragen
 				pl.addEvorrat(obj.getAnz());
@@ -5569,7 +5544,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 								obj.getKz().getSp(), 
 								pl.getBes(), 
 								false,
-								ereignis.getTag());
+								day);
 					}
 				}
 				else
@@ -5583,11 +5558,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 				{
 					if (obj.isTransfer())
 					{
-						this.writeEreignisDatum(ereignis.getTag());
+						this.writeEreignisDatum(day);
 						
 						this.spiel.updateSpielfeldDisplay(
 								this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-								ereignis.getTag());
+								day);
 						if (obj.getBes() == pl.getBes())
 						{
 							pl.incObjekt(obj.getTyp(), 1);
@@ -5606,14 +5581,20 @@ public class Spiel extends EmailTransportBase implements Serializable
 						this.taste();
 						obj.setZuLoeschen();
 					}
+					else
+					{
+						// Patrouille wenden
+						this.addScreenSnapshotToReplay(day);
+						obj.setZuWenden();
+					}
 				}
 				else
 				{
-					this.writeEreignisDatum(ereignis.getTag());
+					this.writeEreignisDatum(day);
 					
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-							ereignis.getTag());
+							day);
 					this.spiel.console.appendText(
 						SternResources.AuswertungPatrouilleZerschellt(
 								true, 
@@ -5628,13 +5609,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 					 obj.getTyp() == ObjektTyp.MINE250 ||
 					 obj.getTyp() == ObjektTyp.MINE500)
 			{
-				this.writeEreignisDatum(ereignis.getTag());
+				this.writeEreignisDatum(day);
 				
 				if (obj.isTransfer())
 				{
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-							ereignis.getTag());
+							day);
 					if (obj.getBes() == pl.getBes())
 					{
 						pl.incObjekt(obj.getTyp(), 1);
@@ -5659,8 +5640,8 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.mineLegen(obj);
 
 					this.spiel.updateSpielfeldDisplay(
-							this.spiel.getSimpleMarkedField(obj.getPosOnDay(ereignis.getTag())),
-							ereignis.getTag());
+							this.spiel.getSimpleMarkedField(obj.getPositionOnDay(day)),
+							day);
 							
 					this.spiel.console.appendText(
 							SternResources.AuswertungMineGelegt(
@@ -5669,35 +5650,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 					this.taste();
 					obj.setZuLoeschen();
 					
-					// Pruefe, ob sich gerade Raumer auf dem Minenfeld befinden
-					ArrayList<AuswertungEreignis> minenEreignisse = new ArrayList<AuswertungEreignis>();
+					// Pruefe, ob sich gerade Raumer und Minenraeumer auf dem Minenfeld befinden
+					Point feld = obj.getSectorOnDay(day);
+					int objectSequence[] = Utils.randomList(this.spiel.objekte.size());
 					
-					for (Flugobjekt objRaumer: this.spiel.objekte)
+					for (int i = 0; i < objectSequence.length; i++)
 					{
-						if (objRaumer.istZuLoeschen() || objRaumer.getTyp() != ObjektTyp.RAUMER)
-							continue;
-						
-						// Wo befindet sich die Raumerflotte an diesem Tag?
-						Point feldRaumer = objRaumer.getFeldTag(ereignis.getTag());
-						
-						if (feldRaumer.equals(ereignis.feld))
-						{
-							AuswertungEreignis minenEreignis = new AuswertungEreignis(AuswertungEreignisTyp.SEKTOR_BETRETEN, ereignis.getTag(), objRaumer);
-							
-							minenEreignis.feld = ereignis.feld;							
-							minenEreignisse.add(minenEreignis);
-						}
-					}
-					
-					if (minenEreignisse.size() > 0)
-					{
-						int seq[] = Utils.randomList(minenEreignisse.size());
-						
-						for (int k = 0; k < seq.length; k++)
-						{
-							// Raumer laufen auf Mine
-							this.minenfeld(minenEreignisse.get(seq[k]));
-						}
+						this.mineCheck(this.spiel.objekte.get(objectSequence[i]), feld, day);
 					}
 				}
 			}
@@ -5705,19 +5664,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 			{
 				if (obj.getZpl() == Constants.KEIN_PLANET)
 				{
-					// Pruefe auf Minenfeld
-					this.minenfeld(ereignis);
-					
-					// Minenraeumer wenden. Transfer-Kennzeichen aendern
-					obj.wenden(true);
+					// Minenraeumer wenden
+					this.addScreenSnapshotToReplay(day);
+					obj.setZuWenden();
 				}
 				else
 				{
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-							ereignis.getTag());
+							day);
 					
-					this.writeEreignisDatum(ereignis.getTag());
+					this.writeEreignisDatum(day);
 					
 					if (obj.getBes() == pl.getBes())
 					{
@@ -5741,7 +5698,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			else if (obj.getTyp() == ObjektTyp.RAUMER)
 			{
-				this.writeEreignisDatum(ereignis.getTag());
+				this.writeEreignisDatum(day);
 
 				if (this.spiel.planeten[obj.getZpl()].getBes() == obj.getBes() ||
 					this.spiel.planeten[obj.getZpl()].istBuendnisMitglied(obj.getBes()))
@@ -5749,7 +5706,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					// Freund
 					this.spiel.updateSpielfeldDisplay(
 							this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-							ereignis.getTag());
+							day);
 					this.spiel.planeten[obj.getZpl()].mergeRaumer(this.spiel.anzSp, obj);
 					
 					this.spiel.console.appendText(
@@ -5763,22 +5720,21 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				else
 					// Feind. Angriff auf Planet
-					this.raumerAngriff(ereignis, plIndex);
+					this.raumerAngriff(obj, plIndex, day);
 				
 				obj.setZuLoeschen();
 			}
   		}
   		  		
-  		private void raumerAngriff(AuswertungEreignis ereignis, int plIndex)
+  		private void raumerAngriff(Flugobjekt obj, int plIndex, int day)
   		{
-  			Flugobjekt obj = ereignis.obj;
   			String name = this.spiel.spieler[obj.getBes()].getName();
   			
   			Planet pl = this.spiel.planeten[plIndex];
   			
   			this.spiel.updateSpielfeldDisplay(
   					this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-  					ereignis.getTag());
+  					day);
   			
   			KampfStruct struct = new KampfStruct();
   			
@@ -5860,7 +5816,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.updatePlanetenlisteDisplay(false);
 			this.spiel.updateSpielfeldDisplay(
 					this.spiel.getSimpleFrameObjekt(plIndex, Colors.INDEX_WEISS),
-					ereignis.getTag());
+					day);
 			
 			this.taste();
 			
@@ -5869,7 +5825,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						kz.getSp(), 
 						obj.getBes(), 
 						false,
-						ereignis.getTag());
+						day);
   		}
   		
   		private void kampf(KampfStruct struct)
@@ -6064,6 +6020,8 @@ public class Spiel extends EmailTransportBase implements Serializable
  		{
  			boolean ende = false;
  			
+ 			this.spiel.screenDisplayContent = null;
+ 			
  			this.spiel.console.clear();
 			this.spiel.console.setHeaderText(
 					SternResources.ReplayWiedergabeJahr(true,
@@ -6087,14 +6045,14 @@ public class Spiel extends EmailTransportBase implements Serializable
 				
 				if (currentDay.getPause())
 					this.spiel.pause(Constants.PAUSE_MILLISECS);
-				else
+				else if (!currentDay.isSnapshot())
 					ende = this.spiel.console.waitForTasteReplay();
 				
 				if (ende)
 					break;
 				
 				previousDay = (ScreenDisplayContent)Utils.klon(currentDay);
-			}
+			}				
  		}
  		
  		private void animation(ScreenDisplayContent previousDay, ScreenDisplayContent currentDay)
@@ -6129,8 +6087,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				this.spiel.pause(Constants.PAUSE_MILLISECS_ANIMATION);
  				
 	 			// Zeitanzeige in der Fortschrittsanzeige
- 				previousDay.getCons().setEvaluationProgressBar(
- 						ConsoleEvaluationProgressBarDisplayContent.setTag(tag));
+ 				previousDay.getCons().setProgressBarDay(tag);
 	 			
  				points.clear();
  				
@@ -6514,7 +6471,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
  	 					obj.getStart(), 
  	 					obj.getZiel(), 
- 	 					obj.getCurrentPos(), 
+ 	 					obj.getPositionOnDay(0), 
  	 					this.spiel.spieler[obj.getKz().getSp()].getColIndex(),
  	 					obj.getScreenDisplaySymbol());
  				
@@ -6592,7 +6549,7 @@ public class Spiel extends EmailTransportBase implements Serializable
  				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
  	 					obj.getStart(), 
  	 					obj.getZiel(), 
- 	 					obj.getCurrentPos(), 
+ 	 					obj.getPositionOnDay(0), 
  	 					this.spiel.spieler[obj.getBes()].getColIndex(),
  	 					obj.getScreenDisplaySymbol());
  				
@@ -6834,7 +6791,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!obj.istBeteiligt(spieler))
   				{
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
-		 	 					obj.getCurrentPos(), 
+		 	 					obj.getPositionOnDay(0), 
 		 	 					spiel.spieler[obj.getBes()].getColIndex(),
 		 	 					obj.getScreenDisplaySymbol(),
 		 	 					obj.hashCode());
@@ -6915,7 +6872,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
  	 					obj.getStart(), 
  	 					obj.getZiel(), 
- 	 					obj.getCurrentPos(), 
+ 	 					obj.getPositionOnDay(0), 
  	 					this.spiel.spieler[obj.getBes()].getColIndex(),
  	 					obj.getScreenDisplaySymbol());
  				
@@ -7071,7 +7028,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   				if (!obj.istBeteiligt(this.spieler ))
   				{
   					SpielfeldPointDisplayContent point = new SpielfeldPointDisplayContent(
-		 	 					obj.getCurrentPos(), 
+		 	 					obj.getPositionOnDay(0), 
 		 	 					spiel.spieler[obj.getBes()].getColIndex(),
 		 	 					obj.getScreenDisplaySymbol(),
 		 	 					obj.hashCode());
@@ -7100,7 +7057,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				SpielfeldLineDisplayContent line = new SpielfeldLineDisplayContent(
  	 					obj.getStart(), 
  	 					obj.getZiel(), 
- 	 					obj.getCurrentPos(), 
+ 	 					obj.getPositionOnDay(0), 
  	 					this.spiel.spieler[obj.getBes()].getColIndex(),
  	 					obj.getScreenDisplaySymbol());
  				
@@ -7123,7 +7080,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			
   			if (patPerLine != null)
   			{
-  				chapter.table = new InventurPdfTable(4);
+  				chapter.table = new InventurPdfTable(3);
   				
   				// Spaltenueberschriften
   				chapter.table.cells.add(SternResources.InventurPlanet1(false));
@@ -7132,11 +7089,8 @@ public class Spiel extends EmailTransportBase implements Serializable
   				chapter.table.cells.add(SternResources.InventurPlanet2(false));
   				chapter.table.colAlignRight[1] = false;
   				
-  				chapter.table.cells.add(SternResources.InventurPatrouillenOrientierung(false));
-  				chapter.table.colAlignRight[2] = false;
-  				
   				chapter.table.cells.add(SternResources.InventurPatrouillen(false));
-  				chapter.table.colAlignRight[3] = true;
+  				chapter.table.colAlignRight[2] = true;
   				
   				ArrayList<String> keys = new ArrayList<String>(patPerLine.keySet());
   				Collections.sort(keys);
@@ -7145,11 +7099,6 @@ public class Spiel extends EmailTransportBase implements Serializable
   				{
   					chapter.table.cells.add(key.substring(0, 2));
   					chapter.table.cells.add(key.substring(2, 4));
-  					
-  					chapter.table.cells.add(
-  							key.charAt(4) == 'L' ?
-  									SternResources.InventurPatrouillenOrientierungLinks(false) :
-  									SternResources.InventurPatrouillenOrientierungRechts(false));
   					
   					chapter.table.cells.add(patPerLine.get(key).toString());
   				}
@@ -7975,14 +7924,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				{
 					this.objekte.remove(i);
 					continue;
-				}
-				
-				// Bei Patrouillen im Einsatz: Mache sie durch Zufall links- oder rechtsdrehend
-				if (obj.getTyp() == ObjektTyp.PATROUILLE &&
-					!obj.isTransfer())
-				{
-					// 1 == linksdrehend, 2 == rechtsdrehend
-					obj.setAnz(Utils.random(2) + 1);
 				}
 			}
   		}
