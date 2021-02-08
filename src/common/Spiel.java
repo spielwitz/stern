@@ -5143,7 +5143,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 					int patrHashCode = patr.hashCode();
 					HashSet<Integer> beobachteteObjekte = patrBeobachtet.get(patrHashCode);
   					
-  					boolean relevant = this.patrouilleErfasst(
+  					boolean relevant = this.patrouilleEreignis(
   							patr, 
   							anderesObj, 
   							day,
@@ -5174,7 +5174,7 @@ public class Spiel extends EmailTransportBase implements Serializable
   			}
   		}
   		
-  		private boolean patrouilleErfasst(
+  		private boolean patrouilleEreignis(
   				Flugobjekt objPatr, 
   				Flugobjekt anderesObj, 
   				int day,
@@ -5241,7 +5241,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
 				this.spiel.console.appendText(
 						SternResources.AuswertungPatrouillePatrouilleZerstoert(
-								true, nameAnderesObj, zielAnderesObj, namePatr));
+								true, namePatr, nameAnderesObj));
 				
 				this.taste();
 				anderesObjRelevant = false;
@@ -5286,7 +5286,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
 						this.spiel.console.appendText(
 								SternResources.AuswertungPatrouilleRaumerGesichtet(true, 
-										nameAnderesObj, Integer.toString(anderesObj.getAnz()), zielAnderesObj, namePatr));
+										Integer.toString(anderesObj.getAnz()), nameAnderesObj, zielAnderesObj));
 						kapern = false;
 						this.taste();
 					}
@@ -6019,8 +6019,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  		private void replayArchive()
  		{
  			boolean ende = false;
- 			
- 			this.spiel.screenDisplayContent = null;
  			
  			this.spiel.console.clear();
 			this.spiel.console.setHeaderText(

@@ -712,7 +712,7 @@ public class SternResources
 	}
 
 	/**
-	   * Es sind keine Patrouillen im Einsatz. [0F]
+	   * Es befinden sich keine Patrouillen im Einsatz. [0F]
 	   */
 	public static String InventurKeinePatrouillen(boolean symbol) {
 		return symbol ? "£0F£":messages.getString("InventurKeinePatrouillen_0F");
@@ -1349,10 +1349,10 @@ public class SternResources
 	}
 
 	/**
-	   * {0}: Ihre Patrouille mit Ziel {1} wurde von {2} zerst\u00F6rt. [39]
+	   * {0}: Sie haben eine Patrouille von {1} zerst\u00F6rt. [39]
 	   */
-	public static String AuswertungPatrouillePatrouilleZerstoert(boolean symbol, String arg0, String arg1, String arg2) {
-		return symbol ? "£39§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleZerstoert_39"), arg0, arg1, arg2);
+	public static String AuswertungPatrouillePatrouilleZerstoert(boolean symbol, String arg0, String arg1) {
+		return symbol ? "£39§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungPatrouillePatrouilleZerstoert_39"), arg0, arg1);
 	}
 
 	/**
@@ -1517,10 +1517,10 @@ public class SternResources
 	}
 
 	/**
-	   * {0}: Ihre {1} Kampfschiffe mit Ziel {2} wurden von {3} gesichtet. [41]
+	   * {0} Kampfschiffe von {1} mit Ziel {2} gesichtet. [41]
 	   */
-	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1, String arg2, String arg3) {
-		return symbol ? "£41§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1, arg2, arg3);
+	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£41§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1, arg2);
 	}
 
 	/**
@@ -1916,7 +1916,7 @@ public class SternResources
 	}
 
 	/**
-	   * Letzte Auswertung wiedergeben [60]
+	   * Auswertung wiederholen [60]
 	   */
 	public static String AuswertungWiederholen(boolean symbol) {
 		return symbol ? "£60£":messages.getString("AuswertungWiederholen_60");
