@@ -138,11 +138,7 @@ public class ScreenPainter
 		if (this.cont != null)
 		{
 			this.fmFelder = this.dbGraphics.getFontMetrics(this.fontFelder);
-			
-			if (this.cont.getSpielfeld().getMinen() != null)
-			{
-				this.fmMinen = this.dbGraphics.getFontMetrics(this.fontMinen);
-			}
+			this.fmMinen = this.dbGraphics.getFontMetrics(this.fontMinen);
 			
 			this.drawConsole();
 			
