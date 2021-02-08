@@ -5238,7 +5238,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 						radar,
 						day);
 				
-				this.spiel.console.setLineColor(this.spiel.spieler[anderesObj.getBes()].getColIndex());
+				this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
 				this.spiel.console.appendText(
 						SternResources.AuswertungPatrouillePatrouilleZerstoert(
 								true, namePatr, nameAnderesObj));
