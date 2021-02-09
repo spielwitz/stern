@@ -221,17 +221,17 @@ class Flugobjekt implements Serializable
 		// Position am Tag 0
 		if (day <= 0)
 		{
-			double x0 = this.s.getX() + this.pos * (this.z.getX()-this.s.getX()) / distTotal;
-			double y0 = this.s.getY() + this.pos * (this.z.getY()-this.s.getY()) / distTotal;
+			double x0 = this.s.getX() + (double)this.pos * (this.z.getX()-this.s.getX()) / distTotal;
+			double y0 = this.s.getY() + (double)this.pos * (this.z.getY()-this.s.getY()) / distTotal;
 			
 			return new Point(x0, y0);
 		}
 		
-		int v = getGeschwindigkeit(this.getTyp(), this.transfer);
+		double v = getGeschwindigkeit(this.getTyp(), this.transfer);
 		
 		double bruchteilJahr = Flugobjekt.getYearFraction(day);
 		
-		double posTag = (double)pos +  bruchteilJahr * (double)v;
+		double posTag = (double)this.pos +  bruchteilJahr * v;
 		
 		if (posTag > distTotal - Constants.PRECISION)
 		{

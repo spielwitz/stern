@@ -5118,15 +5118,18 @@ public class Spiel extends EmailTransportBase implements Serializable
   			}
   			
   			// Jetzt die Patrouillen in zufaelliger Reihenfolge abarbeiten
-  			int objectSequence[] = Utils.randomList(patrIndices.size());
+  			int patrSequence[] = Utils.randomList(patrIndices.size());
+  			int objSequence[] = Utils.randomList(this.spiel.objekte.size());
   			
   			for (int i = 0; i < patrIndices.size(); i++)
   			{
-  				Flugobjekt patr = this.spiel.objekte.get(patrIndices.get(objectSequence[i]));
+  				Flugobjekt patr = this.spiel.objekte.get(patrIndices.get(patrSequence[i]));
   				Point patrPos = patr.getPositionOnDay(day);
   				
-  				for (Flugobjekt anderesObj: this.spiel.objekte)
+  				for (int j = 0; j <  this.spiel.objekte.size(); j++)
   				{
+  					Flugobjekt anderesObj = this.spiel.objekte.get(objSequence[j]);
+  					
   					if (anderesObj == patr || anderesObj.istZuLoeschen())
   					{
   						continue;
