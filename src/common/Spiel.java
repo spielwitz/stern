@@ -5124,6 +5124,12 @@ public class Spiel extends EmailTransportBase implements Serializable
   			for (int i = 0; i < patrIndices.size(); i++)
   			{
   				Flugobjekt patr = this.spiel.objekte.get(patrIndices.get(patrSequence[i]));
+  				
+  				if (patr.istZuLoeschen())
+  				{
+  					continue;
+  				}
+  				
   				Point patrPos = patr.getPositionOnDay(day);
   				
   				for (int j = 0; j <  this.spiel.objekte.size(); j++)
@@ -5151,6 +5157,12 @@ public class Spiel extends EmailTransportBase implements Serializable
   							anderesObj, 
   							day,
   							beobachteteObjekte);
+  					
+  					if (patr.istZuLoeschen())
+  					{
+  						// Patrouille wurde von anderer Patrouille vernichtet
+  						break;
+  					}
 
 					int anderesObjHashCode = anderesObj.hashCode();
 
@@ -5178,39 +5190,52 @@ public class Spiel extends EmailTransportBase implements Serializable
   		}
   		
   		private boolean patrouilleEreignis(
-  				Flugobjekt objPatr, 
-  				Flugobjekt anderesObj, 
+  				Flugobjekt objPatr1, 
+  				Flugobjekt anderesObj1, 
   				int day,
   				HashSet<Integer> beobachteteObjekte)
   		{
-			if (objPatr.istZuLoeschen() || anderesObj.istZuLoeschen())
+			if (objPatr1.istZuLoeschen() || anderesObj1.istZuLoeschen())
 				return false;
 			
 			// Eigene Objekte nicht melden
-			if (objPatr.getBes() == anderesObj.getBes())
+			if (objPatr1.getBes() == anderesObj1.getBes())
 				return false;
 			
 			//Spezialfall Buendnisraumer. Wenn der Besitzer der Raumer Buendnismitglied auf dem Zielplaneten ist, 
 			// dann nicht melden
-			if (anderesObj.getTyp() == ObjektTyp.RAUMER &&
-				anderesObj.getZpl() >= 0 &&
-				this.spiel.planeten[anderesObj.getZpl()].istBuendnisMitglied(anderesObj.getBes()))
+			if (anderesObj1.getTyp() == ObjektTyp.RAUMER &&
+				anderesObj1.getZpl() >= 0 &&
+				this.spiel.planeten[anderesObj1.getZpl()].istBuendnisMitglied(anderesObj1.getBes()))
 			{
 				return false;
 			}
 			
 			// Wenn der Besitzer der Patrouille an der Buendnisflotte beteiligt ist, dann auch nicht melden.
-			if (anderesObj.istBeteiligt(objPatr.getBes()))
+			if (anderesObj1.istBeteiligt(objPatr1.getBes()))
 			{
 				return false;
 			}
 			
 			// Ist das andere Objekte bereits vorher als relevant eingestuft worden?
 			if (beobachteteObjekte != null &&
-				beobachteteObjekte.contains(anderesObj.hashCode()))
+				beobachteteObjekte.contains(anderesObj1.hashCode()))
 			{
 				return true;
 			}
+			
+			// Wenn zwei Patrouillen im Einsatz aufeinander treffen, dann auswuerfeln,
+			// wer gewinnt.
+			boolean swapObjects = false;
+			
+			if (anderesObj1.getTyp() == ObjektTyp.PATROUILLE &&
+			   !anderesObj1.isTransfer())
+			{
+				swapObjects = Utils.random(100) < 50;
+			}
+			
+			Flugobjekt objPatr = swapObjects ? anderesObj1 : objPatr1;
+			Flugobjekt anderesObj = swapObjects ? objPatr1 : anderesObj1;
 			
 			this.writeEreignisDatum(day);			
 			this.spiel.console.setLineColor(this.spiel.spieler[objPatr.getBes()].getColIndex());
@@ -5233,8 +5258,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			if (anderesObj.getTyp() == ObjektTyp.PATROUILLE &&
 				!anderesObj.isTransfer())
 			{
-				// Kampf zweier Patrouillen. Die beobachtende Patrouille
-				// war schneller und vernichtet die andere
 				this.spiel.updateSpielfeldDisplay(
 						null,
 						this.spiel.getSimpleMarkedField(anderesObjPos),
