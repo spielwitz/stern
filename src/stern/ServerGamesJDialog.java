@@ -34,6 +34,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -455,7 +456,6 @@ import common.Utils;
 		PanelDark panSpielName = new PanelDark(new FlowLayout(FlowLayout.LEFT));
 		panSpielName.add(new LabelDark(SternResources.ServerGamesSpielname(false), font));
 		this.tfSpielName = new TextFieldDark(font, 18);
-		this.tfSpielName.setEditable(false);
 		panSpielName.add(this.tfSpielName);
 		panMain.add(panSpielName);
 		
@@ -678,12 +678,32 @@ import common.Utils;
 				anzPl,
 				30); // Wird spaeter noch angepasst
 		
-		this.tfSpielName.setText(this.spiel.getName());
 		this.panSpielfeldDisplay.refresh(this.spiel.getPlanetenInfo());
 	}
 	
 	private void submitSpiel()
 	{
+		// Ist ein Spielname gewaehlt?
+		String spielName = this.tfSpielName.getText().trim();
+		this.tfSpielName.setText(spielName);
+		
+		if (spielName.length() < Constants.SPIEL_NAME_SERVER_MIN_LAENGE ||
+			spielName.length() > Constants.SPIEL_NAME_SERVER_MAX_LAENGE ||
+			!Pattern.matches(Constants.SPIELER_REGEX_PATTERN, spielName))
+		{
+			DialogWindow.showError(
+					this,
+					SternResources.ServerGamesSubmitSpielname(
+							false, 
+							spielName, 
+							Integer.toString(Constants.SPIEL_NAME_SERVER_MIN_LAENGE), 
+							Integer.toString(Constants.SPIEL_NAME_SERVER_MAX_LAENGE)),
+					SternResources.Fehler(false));
+			return;
+		}
+		
+		this.spiel.setName(spielName);
+		
 		// Pruefen, ob alle Spieler zugewiesen sind.
 		Spieler[] alleSpieler = this.getSpieler(this.spiel.getAnzSp());
 		

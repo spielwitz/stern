@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IN
+		// Hoechstes vergebenes Symbol: IP
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -578,6 +578,8 @@ public class SternResources
 		symbolDict.put("IL","ClientBuild_IL");
 		symbolDict.put("IM","ZugeingabePlaneteninfo2_IM");
 		symbolDict.put("IN","MenuAusgabeFenster_IN");
+		symbolDict.put("IO","ServerGamesSubmitSpielname_IO");
+		symbolDict.put("IP","ServerErrorSpielExistiert_IP");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4391,5 +4393,19 @@ public class SternResources
 	   */
 	public static String MenuAusgabeFenster(boolean symbol) {
 		return symbol ? "£IN£":messages.getString("MenuAusgabeFenster_IN");
+	}
+
+	/**
+	   * Der Spielname [{0}] ist unzul\u00E4ssig.\nEin Spielname muss zwischen {1} und {2} Zeichen lang sein\nund darf nur die Zeichen a-z, A-Z und 0-9 enthalten. [IO]
+	   */
+	public static String ServerGamesSubmitSpielname(boolean symbol, String arg0, String arg1, String arg2) {
+		return symbol ? "£IO§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("ServerGamesSubmitSpielname_IO"), arg0, arg1, arg2);
+	}
+
+	/**
+	   * Ein gleichnamiges Spiel existiert bereits! [IP]
+	   */
+	public static String ServerErrorSpielExistiert(boolean symbol) {
+		return symbol ? "£IP£":messages.getString("ServerErrorSpielExistiert_IP");
 	}
 }

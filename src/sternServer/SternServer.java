@@ -1552,7 +1552,17 @@ public class SternServer // NO_UCD (unused code)
 		synchronized(this.users)
 		{
 			Gson gson = new Gson();
-			Spiel spiel = gson.fromJson(msg.payloadSerialized, Spiel.class); 
+			Spiel spiel = gson.fromJson(msg.payloadSerialized, Spiel.class);
+			
+			// Ist der Spielname schon vergeben?
+			if (this.games.containsKey(spiel.getName()))
+			{
+				msgResponse.error = true;
+				msgResponse.errorMsg = 
+						SternResources.ServerErrorSpielExistiert(true);
+				
+				return msgResponse;
+			}
 			
 			for (Spieler spieler: spiel.getSpieler())
 			{

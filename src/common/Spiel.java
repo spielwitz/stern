@@ -193,45 +193,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 		this.hauptschleife();
 	}
 	
-	private String getSpielname()
-	{
-		char[] vokale = {'a','e','i','o','u'};
-		char[] konsonanten = {'b','c','d','f','g','h','j','k','l','m','n','p','r','s','t','v','w','x','y','z'};
-		
-		int silben;
-		StringBuilder sb = null;
-		boolean ersterKons = false;
-		
-		// 2 oder 3 Silben
-		silben = Utils.random(2)+2;
-		sb = new StringBuilder();
-
-		for (int s = 0; s < silben; s++)
-		{					
-			// Erster Konsonant
-			if (Utils.random(2) == 0)
-			{
-				sb.append(konsonanten[Utils.random(konsonanten.length)]);
-				ersterKons = true;
-			}
-			else
-				ersterKons = false;
-
-			// Vokal
-			sb.append(vokale[Utils.random(vokale.length)]);
-
-			// Zweiter Konsonant
-			if (!ersterKons || Utils.random(2) == 0)
-				sb.append(konsonanten[Utils.random(konsonanten.length)]);
-		}
-		
-		// Erster Buchstabe in Grossbuchstaben umwandeln
-		sb.setCharAt(0, sb.substring(0,1).toUpperCase().charAt(0));
-		
-		return sb.toString();
-		
-	}
-	
 	private boolean istSpielerEmail(int spIndex)
 	{
 		if (this.optionen.contains(SpielOptionen.EMAIL))
@@ -563,7 +524,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	private void erzeugeSpielfeld()
 	{
-		this.name = this.getSpielname();
+		this.name = "";
 		this.minBuild = Constants.BUILD_COMPATIBLE;
 		this.abgeschlossen = false;
 		this.initial = true;

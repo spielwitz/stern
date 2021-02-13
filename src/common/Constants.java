@@ -21,11 +21,11 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	BUILD_COMPATIBLE = "1026";
+	public static final String 	BUILD_COMPATIBLE = "1027";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	BUILD_IMPORTANT_UPDATE = "1026";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "1027";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
 	static final String 		BUILD_MIGRATION = "1019";
@@ -59,6 +59,8 @@ public class Constants
 	public static final int SPIELER_NAME_MIN_LAENGE = 3;
 	public static final int SPIELER_NAME_MAX_LAENGE = 10;
 	static final int 		PLANETEN_NAME_MAX_LAENGE = 5;
+	public static final int SPIEL_NAME_SERVER_MIN_LAENGE = 3;
+	public static final int SPIEL_NAME_SERVER_MAX_LAENGE = 18;
 	public static final 	String SPIELER_REGEX_PATTERN = "[0-9a-zA-Z]*";
 	static final int 		EPROD_MAX = 100;
 	static final int 		ANZ_NAHE_PLANETEN_MAX_REISEDAUER_JAHRE = 2;

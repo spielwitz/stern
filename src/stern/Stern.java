@@ -547,26 +547,45 @@ public class Stern extends Frame  // NO_UCD (use default)
 		}
 		else
 		{
-			FileDialog fd = new FileDialog(this, SternResources.SpielSpeichern(false), FileDialog.SAVE);
+			filename = null;
 			
-			if (this.letztesVerzeichnis != null && !this.letztesVerzeichnis.isEmpty())
-				fd.setDirectory(this.letztesVerzeichnis);
-
-			fd.setFile(spiel.getName() + FILE_SUFFIX);
-			fd.setVisible(true);
-			
-			filename = fd.getFile();
-			directory = fd.getDirectory();
+			do
+			{
+				FileDialog fd = new FileDialog(this, SternResources.SpielSpeichern(false), FileDialog.SAVE);
+				
+				if (this.letztesVerzeichnis != null && !this.letztesVerzeichnis.isEmpty())
+					fd.setDirectory(this.letztesVerzeichnis);
+	
+				fd.setFile(spiel.getName() + FILE_SUFFIX);
+				fd.setVisible(true);
+				
+				filename = fd.getFile();
+				directory = fd.getDirectory();
+				
+				if (filename == null)
+				{
+					break;
+				}
+				
+				// Dateinamen ueberpruefen
+				if (filename.toLowerCase().endsWith(FILE_SUFFIX))
+				{
+					filename = filename.substring(0, filename.indexOf(FILE_SUFFIX));
+				}
+				
+				if (filename.length() > 0)
+				{
+					// Dateiname (ohne Suffix) als Spielname übernehmen
+					spiel.setName(filename);
+					filename = filename + FILE_SUFFIX;
+					break;
+				}
+				
+			} while (true);
 		}
 		
-		if (filename != null && filename.length() > 0 && !filename.equals("*"+FILE_SUFFIX))
+		if (filename != null)
 		{
-			if (!filename.toLowerCase().endsWith(FILE_SUFFIX))
-				filename = filename + FILE_SUFFIX;
-			
-			// Dateiname als Spielname übernehmen
-			spiel.setName(filename.substring(0, filename.indexOf(FILE_SUFFIX)));
-			
 			// Mindest-Build-Version setzen
 			spiel.setMinBuild(Constants.BUILD_COMPATIBLE);
 				
@@ -1315,7 +1334,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	private void updateTitle()
 	{
-		String filename = (this.t != null && this.t.getSpiel() != null && this.t.getSpiel().getName() != null) ?
+		String filename = (this.t != null && 
+						   this.t.getSpiel() != null && 
+						   this.t.getSpiel().getName() != null &&
+						   this.t.getSpiel().getName().length() > 0) ?
 							" <" + this.t.getSpiel().getName() + ">" :
 							"";
 		
