@@ -1512,14 +1512,14 @@ public class SternResources
 	}
 
 	/**
-	   * {0}: Sie haben {1} Kampfschiffe mit Ziel {2} von {3} gekapert. [40]
+	   * {0}: Sie haben {1} Kampfschiff(e) mit Ziel {2} von {3} gekapert. [40]
 	   */
 	public static String AuswertungPatrouilleRaumerGekapert(boolean symbol, String arg0, String arg1, String arg2, String arg3) {
 		return symbol ? "£40§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGekapert_40"), arg0, arg1, arg2, arg3);
 	}
 
 	/**
-	   * {0} Kampfschiffe von {1} mit Ziel {2} gesichtet. [41]
+	   * {0} Kampfschiff(e) von {1} mit Ziel {2} gesichtet. [41]
 	   */
 	public static String AuswertungPatrouilleRaumerGesichtet(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "£41§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungPatrouilleRaumerGesichtet_41"), arg0, arg1, arg2);
@@ -1568,7 +1568,7 @@ public class SternResources
 	}
 
 	/**
-	   * {1}: {0} Kampfschiffe wurden von Planet {2} vertrieben. [48]
+	   * {1}: {0} Kampfschiff(e) wurde(n) von Planet {2} vertrieben. [48]
 	   */
 	public static String AuswertungRaumerVertrieben(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "£48§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("AuswertungRaumerVertrieben_48"), arg0, arg1, arg2);
@@ -2492,7 +2492,7 @@ public class SternResources
 	}
 
 	/**
-	   * Sie k\u00F6nnen maximal {0} Kampfschiffe starten. [8D]
+	   * Sie k\u00F6nnen maximal {0} Kampfschiff(e) starten. [8D]
 	   */
 	public static String ZugeingabeMaxAnzahlRaumer(boolean symbol, String arg0) {
 		return symbol ? "£8D§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeMaxAnzahlRaumer_8D"), arg0);
@@ -3717,7 +3717,7 @@ public class SternResources
 	}
 
 	/**
-	   * Auf dem Planeten befinden sich {0} Kampfschiffe. [EM]
+	   * Auf dem Planeten befindet/n sich {0} Kampfschiff(e). [EM]
 	   */
 	public static String ZugeingabeRaumerAnzeigen(boolean symbol, String arg0) {
 		return symbol ? "£EM§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeRaumerAnzeigen_EM"), arg0);

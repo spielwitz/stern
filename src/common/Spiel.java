@@ -4593,6 +4593,11 @@ public class Spiel extends EmailTransportBase implements Serializable
   		private Spiel spiel;
   		private ArrayList<ScreenDisplayContent> replay = new ArrayList<ScreenDisplayContent>();
   		
+  		// Erster Schluessel: Hashcode des gesichteten Objects
+  		// Zweiter Schluessel: Hashcode des sichtenden Objekts
+  		// Liste der Events
+  		private Hashtable<Integer, Hashtable<Integer, ArrayList<ScreenDisplayContent>>> patrouillenEvents = new Hashtable<Integer, Hashtable<Integer, ArrayList<ScreenDisplayContent>>>(); 
+  		
   		@SuppressWarnings("unchecked")
 		private Auswertung(Spiel spiel)
   		{
@@ -4641,8 +4646,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.kapitulationen();
 			
 			// Nun die Tage des Jahres abarbeiten (0 - 365)
-			Hashtable<Integer, HashSet<Integer>> patrBeobachtet = new Hashtable<Integer, HashSet<Integer>>();
-			
 			for (int day = 0; day <= Constants.ANZ_TAGE_JAHR; day++)
 			{
 				if (day > 0)
@@ -4657,7 +4660,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				
 				// Am Ende des Tages beobachten die Patrouillen
-				this.patrouillenBeobachten(patrBeobachtet, day);
+				this.patrouillenBeobachten(day);
 				
 				// Ggeloeschte Objekte entfernen
 				for (int i = this.spiel.objekte.size() - 1; i >= 0; i--)
@@ -4699,6 +4702,9 @@ public class Spiel extends EmailTransportBase implements Serializable
 			
 			this.spiel.console.enableEvaluationProgressBar(false);
 			this.spiel.console.setModus(Console.ConsoleModus.TEXT_INPUT);
+			
+			// Mehrfache Kaper- und Sichtungsevents entfernen
+			this.patrouillenEventAussortieren(this.patrouillenEvents);
 			
 			this.spiel.lastReplay = (ArrayList<ScreenDisplayContent>) Utils.klon(this.replay);
 			
@@ -5053,9 +5059,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.spiel.console.setEvaluationProgressBarDay(Constants.ANZ_TAGE_JAHR);
   		}
   		
-  		private void patrouillenBeobachten(
-  				Hashtable<Integer, HashSet<Integer>> patrBeobachtet,
-  				int day)
+  		private void patrouillenBeobachten(int day)
   		{
   			// Gibt es aktive Patrouillen?
   			ArrayList<Integer> patrIndices = new ArrayList<Integer>();
@@ -5110,58 +5114,31 @@ public class Spiel extends EmailTransportBase implements Serializable
 						continue;
 					}
   					
-					int patrHashCode = patr.hashCode();
-					HashSet<Integer> beobachteteObjekte = patrBeobachtet.get(patrHashCode);
-  					
-  					boolean relevant = this.patrouilleEreignis(
+  					this.patrouilleEreignis(
   							patr, 
   							anderesObj, 
-  							day,
-  							beobachteteObjekte);
+  							day);
   					
   					if (patr.istZuLoeschen())
   					{
   						// Patrouille wurde von anderer Patrouille vernichtet
   						break;
   					}
-
-					int anderesObjHashCode = anderesObj.hashCode();
-
-  					if (relevant)
-  					{
-  						if (beobachteteObjekte == null)
-  						{
-  							patrBeobachtet.put(patrHashCode, new HashSet<Integer>());
-  						}
-  						
-  						patrBeobachtet.get(patrHashCode).add(anderesObjHashCode);
-  					}
-  					else
-  					{
-  						if (beobachteteObjekte != null)
-  						{
-  							if (beobachteteObjekte.contains(anderesObjHashCode))
-  							{
-  								beobachteteObjekte.remove(anderesObjHashCode);
-  							}
-  						}
-  					}
   				}
   			}
   		}
   		
-  		private boolean patrouilleEreignis(
+  		private void patrouilleEreignis(
   				Flugobjekt objPatr1, 
   				Flugobjekt anderesObj1, 
-  				int day,
-  				HashSet<Integer> beobachteteObjekte)
+  				int day)
   		{
 			if (objPatr1.istZuLoeschen() || anderesObj1.istZuLoeschen())
-				return false;
+				return;
 			
 			// Eigene Objekte nicht melden
 			if (objPatr1.getBes() == anderesObj1.getBes())
-				return false;
+				return;
 			
 			//Spezialfall Buendnisraumer. Wenn der Besitzer der Raumer Buendnismitglied auf dem Zielplaneten ist, 
 			// dann nicht melden
@@ -5169,20 +5146,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 				anderesObj1.getZpl() >= 0 &&
 				this.spiel.planeten[anderesObj1.getZpl()].istBuendnisMitglied(anderesObj1.getBes()))
 			{
-				return false;
+				return;
 			}
 			
 			// Wenn der Besitzer der Patrouille an der Buendnisflotte beteiligt ist, dann auch nicht melden.
 			if (anderesObj1.istBeteiligt(objPatr1.getBes()))
 			{
-				return false;
-			}
-			
-			// Ist das andere Objekte bereits vorher als relevant eingestuft worden?
-			if (beobachteteObjekte != null &&
-				beobachteteObjekte.contains(anderesObj1.hashCode()))
-			{
-				return true;
+				return;
 			}
 			
 			// Wenn zwei Patrouillen im Einsatz aufeinander treffen, dann auswuerfeln,
@@ -5214,8 +5184,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 			String nameAnderesObj = this.spiel.spieler[anderesObj.getBes()].getName();
 			String zielAnderesObj = this.spiel.getFeldNameFromPoint(anderesObj.getZiel());
 			
-			boolean anderesObjRelevant = true;
-				
 			if (anderesObj.getTyp() == ObjektTyp.PATROUILLE &&
 				!anderesObj.isTransfer())
 			{
@@ -5231,7 +5199,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 								true, namePatr, nameAnderesObj));
 				
 				this.taste();
-				anderesObjRelevant = false;
 				anderesObj.setZuLoeschen();
 			}
 			else
@@ -5298,11 +5265,63 @@ public class Spiel extends EmailTransportBase implements Serializable
 							day);
 					
 					this.taste();
-					anderesObjRelevant = false;
 				}
+				
+				this.patrouillenEventHinzufuegen(
+						anderesObj.hashCode(),
+						objPatr.hashCode(),
+						this.patrouillenEvents);
 			}
-			
-			return anderesObjRelevant;
+  		}
+  		
+  		private void patrouillenEventHinzufuegen(
+  				int patrHashCode, 
+  				int anderesObjHashCode, 
+  				Hashtable<Integer, Hashtable<Integer, ArrayList<ScreenDisplayContent>>> list)
+  		{
+  			Hashtable<Integer, ArrayList<ScreenDisplayContent>> patrList = list.get(anderesObjHashCode);
+  			
+  			if (patrList == null)
+  			{
+  				patrList = new Hashtable<Integer, ArrayList<ScreenDisplayContent>>();
+  				list.put(anderesObjHashCode, patrList);
+  			}
+  			
+  			ArrayList<ScreenDisplayContent> eventList = patrList.get(patrHashCode);
+  			
+  			if (eventList == null)
+  			{
+  				eventList = new ArrayList<ScreenDisplayContent>();
+  				patrList.put(patrHashCode, eventList);
+  			}
+  			
+  			eventList.add(this.replay.get(this.replay.size() - 1));
+  		}
+  		
+  		private void patrouillenEventAussortieren(
+  				Hashtable<Integer, Hashtable<Integer, ArrayList<ScreenDisplayContent>>> list)
+  		{
+  			// Events aus replay entfernen
+  			for (Integer i1: list.keySet())
+  			{
+  				Hashtable<Integer, ArrayList<ScreenDisplayContent>> patrList = list.get(i1);
+  				
+  				for (Integer i2: patrList.keySet())
+  				{
+  					ArrayList<ScreenDisplayContent> eventList = patrList.get(i2);
+  					
+  					for (int index = 0; index < eventList.size(); index++)
+  					{
+  						if (index == 0 || index == eventList.size() - 1)
+  						{
+  							// Erstes und letztes Event behalten
+  							continue;
+  						}
+  						
+  						this.replay.remove(eventList.get(index));
+  					}
+  				}
+  			}
   		}
   		
   		private void moveObject(Flugobjekt obj, int day)
