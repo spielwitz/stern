@@ -21,14 +21,14 @@ public class Constants
 	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
 	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
 	// Programmfehler zu vermeiden.
-	public static final String 	BUILD_COMPATIBLE = "1028";
+	public static final String 	BUILD_COMPATIBLE = "1029";
 	
 	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
 	// Zeigt ein wichtiges Update an
-	public static final String 	BUILD_IMPORTANT_UPDATE = "1028";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "1029";
 	
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
-	static final String 		BUILD_MIGRATION = "1019";
+	static final String 		BUILD_MIGRATION = "1029";
 	
 	public static final String 	STERN_URL = "https://stern.dyndns1.de";
 	public static final String 	BUILD_NO_INFO = "9999";
@@ -65,7 +65,6 @@ public class Constants
 	static final int 		EPROD_MAX = 100;
 	static final int 		ANZ_NAHE_PLANETEN_MAX_REISEDAUER_JAHRE = 2;
 	static final int 		ANZ_NAHE_PLANETEN = 4;
-	static final int 		SENDER_JAHRE = 10;
 	static final double		VERT_BONUS = 1.25;
 	
 	// Default-Werte bei neuem Spiel

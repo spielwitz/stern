@@ -485,7 +485,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 		{
 			Planet plClone = this.planeten[plIndex].getSpielerInfo(
 					spIndex, 
-					this.jahr,
 					this.optionen.contains(SpielOptionen.SIMPEL));
 			
 			spClone.planeten[plIndex] = plClone;
@@ -3565,7 +3564,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 
  				if (pl.getBes() != this.spielerJetzt && 
  				   !pl.istBuendnisMitglied(this.spielerJetzt) &&
- 				   !pl.hatSender(this.spielerJetzt, this.spiel.jahr))
+ 				   !pl.hatSender(this.spielerJetzt))
  				{
  					console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
  					console.lineBreak();
@@ -4029,7 +4028,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				if (startPl >= 0)
 				{
 					if (this.spiel.planeten[startPl].getBes() == this.spielerJetzt ||
-						this.spiel.planeten[startPl].hatSender(this.spielerJetzt, this.spiel.jahr))
+						this.spiel.planeten[startPl].hatSender(this.spielerJetzt))
 						break; // Weiter
 					else
 					{
@@ -5496,12 +5495,13 @@ public class Spiel extends EmailTransportBase implements Serializable
 				{
 					// Aufklaerer installiert einen Spionagesender
 					this.spiel.updateSpielfeldDisplay(day);
-					pl.setSender(obj.getBes(), this.spiel.jahr + Constants.SENDER_JAHRE);
+					pl.setSender(obj.getBes());
 					
 					this.spiel.console.appendText(
 							SternResources.AuswertungAufklaererSender(
 									true,
-									this.spiel.spieler[obj.getBes()].getName()));								
+									this.spiel.spieler[obj.getBes()].getName(),
+									this.spiel.getPlanetenNameFromIndex(plIndex)));								
 				}
 				this.taste();
 				obj.setZuLoeschen();
@@ -6183,6 +6183,8 @@ public class Spiel extends EmailTransportBase implements Serializable
  					keys.add(new ConsoleKey("4", SternResources.SpielinformationenKommandozentralen(true)));
  				if (!simpel)
  					keys.add(new ConsoleKey("5",SternResources.SpielinformationenBuendnisse(true)));
+ 				if (!simpel)
+ 					keys.add(new ConsoleKey("6",SternResources.SpielinformationenSender(true)));
  				 				
  				ConsoleInput input = this.spiel.console.waitForKeyPressed(keys, false);
  				
@@ -6198,6 +6200,8 @@ public class Spiel extends EmailTransportBase implements Serializable
  					this.energieprod(simpel);
  				else if (!simpel && inputString.equals("5"))
  					this.buendnisse();
+ 				else if (!simpel && inputString.equals("6"))
+ 					this.sender();
  				else if (!simpel && inputString.equals("2") && this.spiel.optionen.contains(SpielOptionen.FESTUNGEN))
  					this.festungen();
  				else if (!simpel && inputString.equals("3"))
@@ -6352,6 +6356,49 @@ public class Spiel extends EmailTransportBase implements Serializable
  				
  				this.spiel.console.lineBreak();
  			} while (true);
+ 		}
+ 		
+ 		private void sender()
+ 		{
+ 			this.spiel.console.setHeaderText(this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenSender(true), Colors.INDEX_NEUTRAL);
+ 			
+ 			HashSet<Integer> brighterPlanets = new HashSet<Integer>();
+ 			Hashtable<Integer, ArrayList<Byte>> frames = new Hashtable<Integer, ArrayList<Byte>>();
+ 			
+ 			for (int index = 0; index < this.spiel.anzPl; index++)
+ 			{
+ 				int plIndex = getPlanetenSortiert()[index];
+ 				
+ 				ArrayList<Byte> frameCols = new ArrayList<Byte>();
+ 				
+ 				for (int spieler = 0; spieler < this.spiel.anzSp; spieler++)
+ 				{
+ 					if (this.spiel.planeten[plIndex].hatSender(spieler))
+ 					{
+ 						frameCols.add(this.spiel.spieler[spieler].getColIndex());
+ 					}
+ 				}
+ 				
+ 				if (frameCols.size() > 0)
+ 				{
+ 					frames.put(plIndex, frameCols);
+ 					brighterPlanets.add(plIndex);
+ 				}
+ 			}
+ 			
+ 			ArrayList<SpielfeldPlanetDisplayContent> plData = this.standardSpielfeld(frames, brighterPlanets);
+ 			
+ 			this.spiel.screenDisplayContent.setSpielfeld(
+ 					new SpielfeldDisplayContent(plData,
+ 					null,
+ 					null,
+ 					null,
+ 					null,
+ 					null));
+
+ 			this.spiel.spielThread.updateDisplay(this.spiel.screenDisplayContent);
+
+ 			this.spiel.console.waitForTaste();
  		}
  		
  		private void festungen()
@@ -7211,11 +7258,11 @@ public class Spiel extends EmailTransportBase implements Serializable
   				
   				if (spiel.planeten[plIndex].getBes() != spieler &&
   					!spiel.planeten[plIndex].istBuendnisMitglied(spieler) &&
-  					!spiel.planeten[plIndex].hatSender(spieler, spiel.jahr))
+  					!spiel.planeten[plIndex].hatSender(spieler))
   					continue;
   				
   				boolean istBes = (spiel.planeten[plIndex].getBes() == spieler ||
-  								  spiel.planeten[plIndex].hatSender(spieler, spiel.jahr));
+  								  spiel.planeten[plIndex].hatSender(spieler));
   				Planet pl = spiel.planeten[plIndex];
   				
   				chapter.table.cells.add(Utils.padString(" " + spiel.getPlanetenNameFromIndex(plIndex), 2));

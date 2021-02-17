@@ -17,6 +17,7 @@
 package common;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 @SuppressWarnings("serial") class Planet implements Serializable
@@ -30,7 +31,7 @@ import java.util.Hashtable;
 	private int eprod;
 	private int eraum;
 	private Kommandozentrale kz;
-	private Hashtable<Integer,Integer> sender; // Spionagesender. Schluessel ist Spieler, Wert ist Jahr wenn Sender zum letzten Mal sendet
+	private HashSet<Integer> sender; // Spionagesender
 	
 	Planet(Point pos, Buendnis buendnis,
 			Hashtable<ObjektTyp, Integer> anz, int bes, Festung festung,
@@ -487,21 +488,14 @@ import java.util.Hashtable;
 		}
 		
 		// Sender ersetzen
-		if (this.sender != null && this.sender.containsKey(alterSpieler))
+		if (this.sender != null && this.sender.contains(alterSpieler))
 		{
 			if (neuerSpieler == Constants.BESITZER_NEUTRAL)
 				// Sender loeschen, wenn Planet wieder neutral ist
 				this.sender.remove(alterSpieler);
 			else
 			{
-				// Sender auf den neuen Spieler uebertragen
-				int jahrEndeAlt = this.sender.get(alterSpieler);
-				int jahrEndeNeu = (this.sender.contains(neuerSpieler)) ?
-										this.sender.get(neuerSpieler) :
-										-1;
-										
-				if (jahrEndeAlt > jahrEndeNeu)
-					this.sender.put(neuerSpieler, jahrEndeAlt);
+				this.sender.add(neuerSpieler);
 			}
 		}
 
@@ -644,33 +638,30 @@ import java.util.Hashtable;
 		return objBuendnis;
 	}
 	
-	void setSender(int spieler, int jahr)
+	void setSender(int spieler)
 	{
 		if (this.sender == null)
-			this.sender = new Hashtable<Integer, Integer>();
+			this.sender = new HashSet<Integer>();
 		
-		this.sender.put(spieler, jahr);
+		this.sender.add(spieler);
 	}
 	
-	boolean hatSender(int spieler, int momentanesJahr)
+	boolean hatSender(int spieler)
 	{
 		if (this.sender == null)
 			return false;
 		
-		if (this.sender.containsKey(spieler))
-			return momentanesJahr <= this.sender.get(spieler);
-		else
-			return false;
+		return this.sender.contains(spieler);
 	}
 	
-	Planet getSpielerInfo(int spIndex, int momentanesJahr, boolean zeigeNeutralePlaneten)
+	Planet getSpielerInfo(int spIndex, boolean zeigeNeutralePlaneten)
 	{
 		// Erzeuge einen Clone und reduziere alle Informationen,
 		// die den Spieler nichts angehen
 		Planet plClone = (Planet)Utils.klon(this);
 		
 		if (this.bes == spIndex ||
-			this.hatSender(spIndex, momentanesJahr))
+			this.hatSender(spIndex))
 		{
 			return plClone;
 		}

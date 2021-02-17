@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IP
+		// Hoechstes vergebenes Symbol: IQ
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -580,6 +580,7 @@ public class SternResources
 		symbolDict.put("IN","MenuAusgabeFenster_IN");
 		symbolDict.put("IO","ServerGamesSubmitSpielname_IO");
 		symbolDict.put("IP","ServerErrorSpielExistiert_IP");
+		symbolDict.put("IQ","SpielinformationenSender_IQ");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -3696,10 +3697,10 @@ public class SternResources
 	}
 
 	/**
-	   * {0}: Spionagesender installiert. [EJ]
+	   * {0}: Spionagesender auf Planet {1} installiert. [EJ]
 	   */
-	public static String AuswertungAufklaererSender(boolean symbol, String arg0) {
-		return symbol ? "£EJ§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0);
+	public static String AuswertungAufklaererSender(boolean symbol, String arg0, String arg1) {
+		return symbol ? "£EJ§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungAufklaererSender_EJ"), arg0, arg1);
 	}
 
 	/**
@@ -4407,5 +4408,12 @@ public class SternResources
 	   */
 	public static String ServerErrorSpielExistiert(boolean symbol) {
 		return symbol ? "£IP£":messages.getString("ServerErrorSpielExistiert_IP");
+	}
+
+	/**
+	   * Spionagesender [IQ]
+	   */
+	public static String SpielinformationenSender(boolean symbol) {
+		return symbol ? "£IQ£":messages.getString("SpielinformationenSender_IQ");
 	}
 }

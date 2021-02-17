@@ -370,7 +370,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		try {
 			Path path = Paths.get(filePath);
 			String spielName = path.getFileName().toString();
-			if (spielName.contains("."));
+			if (spielName.contains("."))
 				spielName = spielName.substring(0, spielName.indexOf("."));
 			
 			 bytes = Files.readAllBytes(path);
