@@ -58,7 +58,7 @@ public class Constants
 	static final int 		EPROD_ZU_BEGINN_NEUTRAL_EXTRA_W2 = 200;
 	public static final int SPIELER_NAME_MIN_LAENGE = 3;
 	public static final int SPIELER_NAME_MAX_LAENGE = 10;
-	static final int 		PLANETEN_NAME_MAX_LAENGE = 5;
+	static final int 		PLANETEN_NAME_MAX_LAENGE = 2;
 	public static final int SPIEL_NAME_SERVER_MIN_LAENGE = 3;
 	public static final int SPIEL_NAME_SERVER_MAX_LAENGE = 18;
 	public static final 	String SPIELER_REGEX_PATTERN = "[0-9a-zA-Z]*";

@@ -1402,7 +1402,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 		Integer index = this.mapPlanetNameToIndex.get(name.toUpperCase());
 		
 		if (index == null)
-			return -1;
+			return Constants.KEIN_PLANET;
 		else
 			return index;
 	}
@@ -2760,74 +2760,56 @@ public class Spiel extends EmailTransportBase implements Serializable
 
 			do
 			{
-				this.spiel.console.appendText(SternResources.ZugeingabeStartplanet(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabeStartplanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
 				{
-					this.spiel.console.outAbbruch();
-					startPl = -1;
 					return;
 				}
+				
+				startPl = input.planetIndex;
 
-				startPl = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
-				if (startPl >= 0)
-				{
-					if (!buend && this.spiel.planeten[startPl].getAnzProTypUndSpieler(ObjektTyp.RAUMER,this.spielerJetzt) > 0)
-						break; // Ok. Weiter
-					else if (buend && this.spiel.planeten[startPl].istBuendnis() && this.spiel.planeten[startPl].getRaumerProSpieler(this.spielerJetzt) > 0)
-						break;
-					else
-					{
-						this.spiel.console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
-						this.spiel.console.lineBreak();
-					}
-				}
+				if (!buend && this.spiel.planeten[startPl].getAnzProTypUndSpieler(ObjektTyp.RAUMER,this.spielerJetzt) > 0)
+					break; // Ok. Weiter
+				else if (buend && this.spiel.planeten[startPl].istBuendnis() && this.spiel.planeten[startPl].getRaumerProSpieler(this.spielerJetzt) > 0)
+					break;
 				else
-					this.spiel.console.outUngueltigeEingabe();
+				{
+					this.spiel.console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
+					this.spiel.console.lineBreak();
+				}
 
 			} while (true);
-
-			if (startPl < 0)
-				return;
 
 			// Zielplanet
 			int zielPl = -1;
 
 			do
 			{
-				this.spiel.console.appendText(SternResources.ZugeingabeZielplanet(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabeZielplanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
 				{
-					this.spiel.console.outAbbruch();
-					zielPl = -1;
-					break;
+					return;
 				}
+				
+				zielPl = input.planetIndex;
 
-				zielPl = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
-				if (zielPl >= 0)
-				{
-					if (startPl != zielPl)
-						break; // Ok. Weiter
-					else
-					{
-						this.spiel.console.appendText(SternResources.ZugeingabeZielplanetIstStartplanet(true));
-						this.spiel.console.lineBreak();
-					}
-				}
+				if (startPl != zielPl)
+					break; // Ok. Weiter
 				else
-					this.spiel.console.outUngueltigeEingabe();
+				{
+					this.spiel.console.appendText(SternResources.ZugeingabeZielplanetIstStartplanet(true));
+					this.spiel.console.lineBreak();
+				}
 
 			} while (true);
-
-			if (zielPl < 0)
-				return;
 
 			// Anzahl
 			int anzahl = -1;
@@ -2987,26 +2969,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 
 			do
 			{
-				this.spiel.console.appendText(
-						SternResources.ZugeingabeStartplanet(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabeStartplanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
 				{
-					startPl = -1;
-					this.spiel.console.outAbbruch();
-					break;
+					return;
 				}
-
-				// Gueltiger Planet?
-				startPl = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
-				if (startPl < 0 || startPl >= this.spiel.anzPl)
-				{
-					this.spiel.console.outUngueltigeEingabe();
-					continue;
-				}
+				
+				startPl = input.planetIndex;
 
 				// Hat der Spieler ein Objekt dieses Typs
 				if (this.spiel.planeten[startPl].getBes() != this.spielerJetzt || this.spiel.planeten[startPl].getAnz(typ) < 1)
@@ -3020,36 +2993,23 @@ public class Spiel extends EmailTransportBase implements Serializable
 
 			} while(true);
 
-			if (startPl < 0)
-				return;
-
 			// Zielplanet
 			int zielPl = -1;
 
 			do
 			{
-				this.spiel.console.appendText(
-						SternResources.ZugeingabeZielplanet(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				// Zielplanet: Pruefung
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabeZielplanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
 				{
-					zielPl = -1;
-					this.spiel.console.outAbbruch();
-					break;
+					return;
 				}
-
+				
 				// Gueltiger Planet?
-				zielPl = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
-				if (zielPl < 0 || zielPl >= this.spiel.anzPl)
-				{
-					zielPl = -1;
-					this.spiel.console.outUngueltigeEingabe();
-					continue;
-				}
+				zielPl = input.planetIndex;
 
 				// Start- und Zielplanet duerfen nicht gleich sein
 				if (zielPl == startPl)
@@ -3063,9 +3023,6 @@ public class Spiel extends EmailTransportBase implements Serializable
 				break;
 
 			} while (true);
-
-			if (zielPl < 0)
-				return;
 
 			// Objekt Starten
 			Planet plKopie = (Planet)Utils.klon(this.spiel.planeten[startPl]);
@@ -3277,25 +3234,18 @@ public class Spiel extends EmailTransportBase implements Serializable
 
 			do
 			{
-				this.spiel.console.appendText(SternResources.ZugeingabeStartplanet(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabeStartplanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
 				{
-					startPl = -1;
-					this.spiel.console.outAbbruch();
-					break;
+					return;
 				}
-
+				
 				// Gueltiger Planet?
-				startPl = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
-				if (startPl < 0 || startPl >= this.spiel.anzPl)
-				{
-					this.spiel.console.outUngueltigeEingabe();
-					continue;
-				}
+				startPl = input.planetIndex;
 
 				// Gehoehrt der Planet dem Spieler?
 				if (this.spiel.planeten[startPl].getBes() != this.spielerJetzt)
@@ -3319,10 +3269,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 				break;
 
 			} while (true);
-
-			if (startPl < 0)
-				return;
-
+			
 			boolean transfer = false;
 			ObjektTyp typ = ObjektTyp.MINENRAEUMER;
 
@@ -3430,42 +3377,24 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 
 			// Typ steht fest. Ziel festlegen
-			Point ptZiel = null;
+			PlanetInputStruct inputZiel;
 
 			keys = new ArrayList<ConsoleKey>();						
 
 			do
 			{
-				this.spiel.console.appendText(SternResources.ZugeingabeMineZielsektor(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				inputZiel = this.spiel.getPlanetInput(
+						SternResources.ZugeingabeMineZielsektor(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_SECTOR);
+				
+				if (inputZiel == null)
 				{
-					this.spiel.console.outAbbruch();
-					ptZiel = null;
-					break;
+					return;
 				}
-
-				// Gueltiger Sektor?
-				ptZiel = this.spiel.getPointFromFeldName(input.getInputText());
-
-				if (ptZiel == null)
-				{
-					// Vielleicht war es ein Planet?
-					int plZielIndex = this.spiel.getPlanetenIndexFromName(input.getInputText());
-					
-					if (plZielIndex == -1)
-					{
-						this.spiel.console.outUngueltigeEingabe();
-						continue;
-					}
-					
-					ptZiel = this.spiel.planeten[plZielIndex].getPos();
-				}
-
+				
 				// Zielsektor == Startplanet?
-				if (ptZiel.equals(this.spiel.planeten[startPl].getPos()))
+				if (inputZiel.sector.equals(this.spiel.planeten[startPl].getPos()))
 				{
 					console.appendText(SternResources.ZugeingabeZielplanetIstStartplanet(true));
 					console.lineBreak();
@@ -3473,38 +3402,29 @@ public class Spiel extends EmailTransportBase implements Serializable
 				}
 				
 				// Nur fuer Minenraeumer: Transfert darf nur auf einen Planeten gehen
-				if (typ == ObjektTyp.MINENRAEUMER && transfer)
+				if ((typ == ObjektTyp.MINENRAEUMER && transfer) &&
+						inputZiel.planetIndex == Constants.KEIN_PLANET)
 				{
-					int plZielIndex = this.spiel.getPlanetenIndexFromName(input.getInputText());
-					
-					if (plZielIndex == -1)
-					{
-						console.appendText(SternResources.ZugeingabeZielTransfer(true));
-						console.lineBreak();
-						continue;
-					}
+					console.appendText(SternResources.ZugeingabeZielTransfer(true));
+					console.lineBreak();
+					continue;
 				}
 
 				break;
 			} while (true);
 
-			if (ptZiel == null)
-				return;
-
 			Planet plKopie = (Planet)Utils.klon(this.spiel.planeten[startPl]);
 
-			int zielPl = this.spiel.getPlanetIndexFromPoint(ptZiel);
-
 			if (typ != ObjektTyp.MINENRAEUMER)
-				transfer = (zielPl != Constants.KEIN_PLANET);
+				transfer = (inputZiel.planetIndex != Constants.KEIN_PLANET);
 
 			this.spiel.planeten[startPl].decObjekt(typ, 1);
 
 			Flugobjekt obj = new Flugobjekt(
 					startPl,
-					zielPl,
+					inputZiel.planetIndex,
 					this.spiel.planeten[startPl].getPos(),
-					ptZiel,
+					inputZiel.sector,
 					typ,
 					1,
 					this.spielerJetzt,
@@ -3541,25 +3461,17 @@ public class Spiel extends EmailTransportBase implements Serializable
 
  			do
  			{
- 				this.spiel.console.appendText(SternResources.ZugeingabePlanet(true)+": ");
-
- 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
- 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
- 				{
- 					this.spiel.console.outAbbruch();
- 					plIndex = -1;
- 					return;
- 				}
-
- 				plIndex = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
- 				if (plIndex < 0 || plIndex >= this.spiel.anzPl)
- 				{
- 					this.spiel.console.outUngueltigeEingabe();
- 					continue;
- 				}
-
+ 				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabePlanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
+				{
+					return;
+				}
+				
+ 				plIndex = input.planetIndex;
  				pl = this.spiel.planeten[plIndex];
 
  				if (pl.getBes() != this.spielerJetzt && 
@@ -3574,9 +3486,6 @@ public class Spiel extends EmailTransportBase implements Serializable
  				break;
  			} while (true);
 
- 			if (plIndex < 0)
- 				return;
- 			
  			if (pl.getBes() != this.spielerJetzt && 
  	 				    !pl.istBuendnisMitglied(this.spielerJetzt))
 			{
@@ -4008,36 +3917,28 @@ public class Spiel extends EmailTransportBase implements Serializable
 			// Startplanet
 			int startPl = -1;
 
-			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();	
-
 			do
 			{
-				this.spiel.console.appendText(SternResources.ZugeingabePlanet(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabePlanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
 				{
-					this.spiel.console.outAbbruch();
-					startPl = -1;
-					break;
+					return;
 				}
+				
+				startPl = input.planetIndex;
 
-				startPl = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
-				if (startPl >= 0)
-				{
-					if (this.spiel.planeten[startPl].getBes() == this.spielerJetzt ||
-						this.spiel.planeten[startPl].hatSender(this.spielerJetzt))
-						break; // Weiter
-					else
-					{
-						this.spiel.console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
-						this.spiel.console.lineBreak();
-					}
-				}
+				if (this.spiel.planeten[startPl].getBes() == this.spielerJetzt ||
+					this.spiel.planeten[startPl].hatSender(this.spielerJetzt))
+					break; // Weiter
 				else
-					this.spiel.console.outUngueltigeEingabe();
+				{
+					this.spiel.console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
+					this.spiel.console.lineBreak();
+				}
 
 			} while (true);
 
@@ -4062,40 +3963,29 @@ public class Spiel extends EmailTransportBase implements Serializable
 			// Nur im Simpel-Modus
 			int startPl = -1;
 
-			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();	
-
 			do
 			{
-				this.spiel.console.appendText(SternResources.ZugeingabePlanet(true)+": ");
-
-				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, !spiel.istZugeingabeOffen(), true);
-
-				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.ZugeingabePlanet(true), 
+						!spiel.istZugeingabeOffen(), 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
 				{
-					this.spiel.console.outAbbruch();
-					startPl = -1;
-					break;
+					return;
 				}
+				
+				startPl = input.planetIndex;
 
-				startPl = this.spiel.getPlanetenIndexFromName(input.getInputText());
-
-				if (startPl >= 0)
-				{
-					if (this.spiel.planeten[startPl].getBes() == this.spielerJetzt)
-						break; // Weiter
-					else
-					{
-						this.spiel.console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
-						this.spiel.console.lineBreak();
-					}
-				}
+				if (this.spiel.planeten[startPl].getBes() == this.spielerJetzt)
+					break; // Weiter
 				else
-					this.spiel.console.outUngueltigeEingabe();
+				{
+					this.spiel.console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
+					this.spiel.console.lineBreak();
+				}
 
 			} while (true);
-
-			if (startPl < 0)
-				return;
 
 			spiel.console.appendText(
 					SternResources.ZugeingabePlaneteninfo2(
@@ -4125,6 +4015,28 @@ public class Spiel extends EmailTransportBase implements Serializable
 			}
 			
 			return true;
+ 		}
+ 	}
+ 	
+ 	// =============================
+ 	
+ 	private class PlanetInputStruct
+ 	{
+ 		public static final int ALLOWED_INPUT_PLANET = 1;
+ 		public static final int ALLOWED_INPUT_SECTOR = 2;
+ 		
+ 		public int planetIndex = Constants.KEIN_PLANET;
+ 		public Point sector = null;
+ 		
+ 		public PlanetInputStruct(int planetenIndex)
+ 		{
+ 			this.planetIndex = planetenIndex;
+ 		}
+ 		
+ 		public PlanetInputStruct(Point sector, int planetenIndex)
+ 		{
+ 			this.sector = sector;
+ 			this.planetIndex = planetenIndex;
  		}
  	}
  	
@@ -6317,27 +6229,19 @@ public class Spiel extends EmailTransportBase implements Serializable
  				return;
  			}
 
- 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
- 			
  			do
  			{
- 				this.spiel.console.appendText(
- 						SternResources.SpielinformationenBuendnisPlanet(true) + ": ");
- 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, false, true);
- 				
- 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
- 				{
- 					this.spiel.console.outAbbruch();
- 					break;
- 				}
- 				
- 				int plIndex = this.spiel.getPlanetenIndexFromName(input.getInputText().toUpperCase());
- 				
- 				if (plIndex < 0 || plIndex >= this.spiel.anzPl)
- 				{
- 					this.spiel.console.outUngueltigeEingabe();
- 					continue;
- 				}
+ 				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.SpielinformationenBuendnisPlanet(true), 
+						false, 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
+				{
+					break;
+				}
+				
+ 				int plIndex = input.planetIndex;
  				
  				if (this.spiel.planeten[plIndex].istBuendnis())
  				{
@@ -6628,28 +6532,21 @@ public class Spiel extends EmailTransportBase implements Serializable
  		
  		private void editor()
  		{
- 			ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();
- 			
  			do
  			{
  				this.spiel.console.setHeaderText(this.spiel.hauptmenueHeaderGetJahrText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenPlanetTitel(true), Colors.INDEX_NEUTRAL);
- 				this.spiel.console.appendText(SternResources.SpielinformationenPlanet(true)+": ");
- 				ConsoleInput input = this.spiel.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, false, true);
  				
- 				if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
- 				{
- 					this.spiel.console.outAbbruch();
- 					break;
- 				}
- 				
- 				int plIndex = this.spiel.getPlanetenIndexFromName(input.getInputText().toUpperCase());
- 				
- 				if (plIndex < 0 || plIndex >= this.spiel.anzPl)
- 				{
- 					this.spiel.console.outUngueltigeEingabe();
- 					continue;
- 				}
- 				
+ 				PlanetInputStruct input = this.spiel.getPlanetInput(
+						SternResources.SpielinformationenPlanet(true), 
+						false, 
+						PlanetInputStruct.ALLOWED_INPUT_PLANET);
+				
+				if (input == null)
+				{
+					break;
+				}
+				
+ 				int plIndex = input.planetIndex;
  				Planet pl = this.spiel.planeten[plIndex];
  				
  				byte col = (this.spiel.planeten[plIndex].getBes() == Constants.BESITZER_NEUTRAL) ?
@@ -7988,5 +7885,49 @@ public class Spiel extends EmailTransportBase implements Serializable
   	private boolean auswertungExists()
   	{
   		return (this.lastReplay != null && this.lastReplay.size() > 0);
+  	}
+  	
+  	private PlanetInputStruct getPlanetInput(String label, boolean hidden, int allowedInput)
+  	{
+  		ArrayList<ConsoleKey> keys = new ArrayList<ConsoleKey>();			  		
+  		
+  		do
+  		{
+	  		this.console.appendText(label+": ");
+	
+			ConsoleInput input = this.console.waitForTextEntered(Constants.PLANETEN_NAME_MAX_LAENGE, keys, hidden, true);
+	
+			if (input.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+			{
+				this.console.outAbbruch();
+				return null;
+			}
+	
+			if (allowedInput == PlanetInputStruct.ALLOWED_INPUT_SECTOR)
+			{
+				Point ptZiel = this.getPointFromFeldName(input.getInputText());
+				
+				if (ptZiel != null)
+				{
+					return new PlanetInputStruct(ptZiel, this.getPlanetenIndexFromName(input.getInputText()));
+				}
+			}
+			
+			if (allowedInput == PlanetInputStruct.ALLOWED_INPUT_PLANET)
+			{
+				int plZielIndex = this.getPlanetenIndexFromName(input.getInputText());
+				
+				if (plZielIndex != Constants.KEIN_PLANET)
+				{
+					return new PlanetInputStruct(plZielIndex);
+				}
+			}
+			
+			this.console.outUngueltigeEingabe();
+
+		}
+  		
+		while (true);
+
   	}
 }
