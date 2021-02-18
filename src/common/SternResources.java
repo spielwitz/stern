@@ -2836,7 +2836,7 @@ public class SternResources
 	}
 
 	/**
-	   * Auf welchen Planeten m\u00F6chten Sie {0} Kampfschiffe schicken? [9R]
+	   * Auf welchen Planeten m\u00F6chten Sie {0} Kampfschiff(e) schicken? [9R]
 	   */
 	public static String ZugeingabeWohinRaumer(boolean symbol, String arg0) {
 		return symbol ? "£9R§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeWohinRaumer_9R"), arg0);
