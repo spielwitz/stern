@@ -36,6 +36,7 @@ import common.Constants;
 import common.ScreenDisplayContent;
 import common.ScreenPainter;
 import common.Utils;
+import commonUi.DialogFontHelper;
 import commonUi.PaintPanel;
 
 class Webserver implements Runnable
@@ -146,13 +147,11 @@ class Webserver implements Runnable
 					if (socket != null) socket.close();
 				} catch (Exception e) {
 					e.printStackTrace();
-				} 
+			} 
 		}
 			
 			
 		} while (true);
-		
-		System.out.println("Webserver gestoppt");
 	}
 	
 	String getUrl()
@@ -186,9 +185,11 @@ class Webserver implements Runnable
 		g2d.setColor(Color.black);
         g2d.fillRect(0, 0, width, height);
         
-        Font fontPlaneten = new Font(Font.MONOSPACED, Font.PLAIN, Utils.round((double)PaintPanel.FONT_SIZE_PLANETEN * FACTOR));
-        Font fontMinen = new Font(Font.MONOSPACED, Font.PLAIN, Utils.round((double)PaintPanel.FONT_SIZE_MINEN * FACTOR));
-        Font fontFelder = new Font(Font.MONOSPACED, Font.PLAIN, Utils.round((double)PaintPanel.FONT_SIZE_FELDER * FACTOR));
+        Font fontBasis = DialogFontHelper.getFontBasis();
+        
+        Font fontPlaneten = fontBasis.deriveFont((float)Utils.round((double)PaintPanel.FONT_SIZE_PLANETEN * FACTOR));
+        Font fontMinen = fontBasis.deriveFont((float)Utils.round((double)PaintPanel.FONT_SIZE_MINEN * FACTOR));
+        Font fontFelder = fontBasis.deriveFont((float)Utils.round((double)PaintPanel.FONT_SIZE_FELDER * FACTOR));
         
         new ScreenPainter(sdc, true, g2d, fontPlaneten, fontMinen, fontFelder, FACTOR);
         

@@ -25,6 +25,7 @@ import common.Constants;
 public class DialogFontHelper
 {
 	private static Font font;
+	private static Font fontBasis ;
 	
 	public static Font getFont()
 	{
@@ -34,10 +35,18 @@ public class DialogFontHelper
 		return font;
 	}
 	
+	public static Font getFontBasis()
+	{
+		if (fontBasis == null)
+			new DialogFontHelper();
+		
+		return fontBasis;
+	}
+	
 	private DialogFontHelper()
 	{
 		try {
-			Font fontBasis = Font.createFont( Font.TRUETYPE_FONT,
+			fontBasis = Font.createFont( Font.TRUETYPE_FONT,
 					getClass().getResourceAsStream(Constants.FONT_NAME));
 			font = fontBasis.deriveFont(Constants.DIALOG_FONT_SIZE);
 		} catch (FontFormatException e) {
@@ -45,6 +54,5 @@ public class DialogFontHelper
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-//		font = new Font(Font.MONOSPACED, Font.PLAIN, (int)Constants.DIALOG_FONT_SIZE);
 	}
 }
