@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IQ
+		// Hoechstes vergebenes Symbol: IV
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -581,6 +581,11 @@ public class SternResources
 		symbolDict.put("IO","ServerGamesSubmitSpielname_IO");
 		symbolDict.put("IP","ServerErrorSpielExistiert_IP");
 		symbolDict.put("IQ","SpielinformationenSender_IQ");
+		symbolDict.put("IR","MenuWebserverAktivieren_IR");
+		symbolDict.put("IS","MenuWebserverDeaktivieren_IS");
+		symbolDict.put("IT","WebserverAktiviert_IT");
+		symbolDict.put("IU","WebserverDeaktiviert_IU");
+		symbolDict.put("IV","Webserver_IV");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4415,5 +4420,40 @@ public class SternResources
 	   */
 	public static String SpielinformationenSender(boolean symbol) {
 		return symbol ? "£IQ£":messages.getString("SpielinformationenSender_IQ");
+	}
+
+	/**
+	   * Webserver aktivieren [IR]
+	   */
+	public static String MenuWebserverAktivieren(boolean symbol) {
+		return symbol ? "£IR£":messages.getString("MenuWebserverAktivieren_IR");
+	}
+
+	/**
+	   * Webserver deaktivieren [IS]
+	   */
+	public static String MenuWebserverDeaktivieren(boolean symbol) {
+		return symbol ? "£IS£":messages.getString("MenuWebserverDeaktivieren_IS");
+	}
+
+	/**
+	   * Webserver aktiv [IT]
+	   */
+	public static String WebserverAktiviert(boolean symbol) {
+		return symbol ? "£IT£":messages.getString("WebserverAktiviert_IT");
+	}
+
+	/**
+	   * Webserver deaktiviert [IU]
+	   */
+	public static String WebserverDeaktiviert(boolean symbol) {
+		return symbol ? "£IU£":messages.getString("WebserverDeaktiviert_IU");
+	}
+
+	/**
+	   * Webserver [IV]
+	   */
+	public static String Webserver(boolean symbol) {
+		return symbol ? "£IV£":messages.getString("Webserver_IV");
 	}
 }

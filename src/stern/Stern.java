@@ -102,6 +102,7 @@ import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
 import commonUi.IUpdateCheckerCallback;
 import commonUi.LabelDark;
+import commonUi.MessageWithLink;
 import commonUi.PaintPanel;
 import commonUi.PanelDark;
 import commonUi.SpracheJDialog;
@@ -177,6 +178,7 @@ public class Stern extends Frame  // NO_UCD (use default)
     private MenuItem menuOutputWindow;
     
     private MenuItem menuServer;
+    private MenuItem menuWebserver;
     
     private MenuItem menuHighscore;
     
@@ -213,6 +215,8 @@ public class Stern extends Frame  // NO_UCD (use default)
 	private boolean muteNotificationSound;
 	private boolean clientsInaktivBeiZugeingabe;
 	private String meineIp;
+	
+	private Webserver webserver;
 	
 	public static void main(String[] args)
 	{
@@ -412,6 +416,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 	    this.menuServer = new MenuItem(SternResources.MenuScreesharing(false));
 	    this.menuServer.addActionListener(this);
 	    settings.add(this.menuServer);
+	    
+	    this.menuWebserver = new MenuItem(SternResources.MenuWebserverAktivieren(false));
+	    this.menuWebserver.addActionListener(this);
+	    settings.add(this.menuWebserver);
 	    
 	    stern.add(settings);
 	    
@@ -800,6 +808,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 		else if (item == this.menuServerGames)
 		{
 			this.openServerGamesDialog();
+		}
+		else if (item == this.menuWebserver)
+		{
+			this.activateWebServer();
 		}
 		else if (item == this.menuHighscore)
 		{
@@ -1726,6 +1738,43 @@ public class Stern extends Frame  // NO_UCD (use default)
 
 	}
 	
+	private void activateWebServer()
+	{
+		this.inputEnabled = false;
+		this.redrawScreen();
+		
+		if (this.webserver == null)
+		{
+			this.webserver = new Webserver(this);
+			webserver.start();
+			this.menuWebserver.setLabel(SternResources.MenuWebserverDeaktivieren(false));
+			
+			String url = this.webserver.getUrl();
+			
+			DialogWindow.showInformation(
+					this, 
+					new MessageWithLink(
+							this,
+							"<a href=\""+url+"\">"+url+"</a>"),
+					SternResources.WebserverAktiviert(false));
+		}
+		else
+		{
+			this.webserver.stop();
+			this.webserver = null;
+			this.menuWebserver.setLabel(SternResources.MenuWebserverAktivieren(false));
+			
+			DialogWindow.showInformation(
+					this, 
+					SternResources.WebserverDeaktiviert(false), 
+					SternResources.Webserver(false));
+		}
+		
+		this.inputEnabled = true;
+		this.redrawScreen();
+
+	}
+	
 	private void reloadCurrentGame()
 	{
 		this.inputEnabled = false;
@@ -1792,5 +1841,17 @@ public class Stern extends Frame  // NO_UCD (use default)
 		return
 				(this.outputWindow != null && this.outputWindow.isVisible()) ||
 				(this.serverFunctions != null && this.serverFunctions.isServerEnabled() && this.getClientsInaktivBeiZugeingabe());
+	}
+	
+	public ScreenDisplayContent getScreenDisplayContentStartOfYear()
+	{
+		if (this.t != null && this.t.getSpiel() != null)
+		{
+			return this.t.getSpiel().getScreenDisplayContentStartOfYear();
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

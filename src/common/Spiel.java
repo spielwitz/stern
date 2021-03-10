@@ -66,6 +66,7 @@ public class Spiel extends EmailTransportBase implements Serializable
 	
 	transient private Console console;
 	transient private ScreenDisplayContent screenDisplayContent;
+	transient private ScreenDisplayContent screenDisplayContentStartOfYear;
 	transient private SpielThread spielThread;
 	
 	transient private Hashtable<Integer,String> mapPlanetIndexToName;
@@ -383,6 +384,11 @@ public class Spiel extends EmailTransportBase implements Serializable
 		}
 		
 		return info;
+	}
+	
+	public ScreenDisplayContent getScreenDisplayContentStartOfYear()
+	{
+		return this.screenDisplayContentStartOfYear;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -855,6 +861,10 @@ public class Spiel extends EmailTransportBase implements Serializable
 			this.updatePlanetenlisteDisplay(false);
 			
 			this.console.clear();
+			
+			// Bildschirminhalt zu Beginn des Jahres fuer HTTP-Server merken
+			this.screenDisplayContentStartOfYear = (ScreenDisplayContent) Utils.klon(this.screenDisplayContent);
+			this.screenDisplayContentStartOfYear.setCons(null);
 			
 			// Ist das Spiel abgeschlossen?
 			this.abschliessenPruefung(false);

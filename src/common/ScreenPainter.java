@@ -33,7 +33,7 @@ public class ScreenPainter
 	
 	private static final int		SPIELFELD_XOFF = 10;
 	private static final int		SPIELFELD_YOFF = 10;
-	static final int				SPIELFELD_DX = 18;
+	public static final int			SPIELFELD_DX = 18;
 	
 	private static final double		LINIE_OBJEKT_GROESSE = 0.5;
 	private static final double		OBJEKT_GROESSE = 0.75;
