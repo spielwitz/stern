@@ -30,7 +30,7 @@ public class Constants
 	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
 	static final String 		BUILD_MIGRATION = "1029";
 	
-	public static final String 	STERN_URL = "https://stern.dyndns1.de";
+	public static final String 	STERN_URL = "https://github.com/spielwitz/stern";
 	public static final String 	BUILD_NO_INFO = "9999";
 	
 	// Spielfeld

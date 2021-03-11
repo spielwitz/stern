@@ -57,11 +57,9 @@ import commonUi.DialogWindowResult;
 import commonUi.ISternDisplayMethods;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
-import commonUi.IUpdateCheckerCallback;
 import commonUi.PaintPanel;
 import commonUi.SpracheJDialog;
 import commonUi.SternAbout;
-import commonUi.UpdateChecker;
 import common.SternResources;
 import common.Utils;
 
@@ -71,8 +69,7 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		WindowListener, 
 		ActionListener,
 		ISternDisplayMethods,
-		IHostComponentMethods,
-		IUpdateCheckerCallback
+		IHostComponentMethods
 {
 	boolean connected = false;
 	
@@ -90,16 +87,12 @@ public class SternDisplay extends Frame // NO_UCD (use default)
     private MenuItem menuHilfe;
     private MenuItem menuAbout;
     private MenuItem menuSprache;
-    private MenuItem menuSearchForUpdates;
-    
-    private String lastUpdateCheck;
     
     transient private static final String PROPERTIES_FILE_NAME = "SternDisplayProperties";
 	transient private static final String PROPERTY_NAME_SERVER_IP = "serverIp";
 	transient private static final String PROPERTY_NAME_MEINE_IP = "ip";
 	transient private static final String PROPERTY_NAME_MEIN_NAME = "meinName";
 	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
-	transient private static final String PROPERTY_LAST_UPDATE_FOUND = "lastUpdateFound";
 	
 	public static void main(String[] args)
 	{
@@ -171,10 +164,6 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		this.setVisible(true);
 		this.paintPanel.requestFocusInWindow(); // Muss nach SetVisible kommen!
 		
-		// Auf Updates checken
-		Thread tUpdateChecker = new Thread( new UpdateChecker(this, this.lastUpdateCheck, true) );
-		tUpdateChecker.start();
-
 		// Gleich nach dem Programmstart die Verbindungseinstellungen aufmachen.
 		// Sonst ist der Client ja sinnlos.
 		ActionEvent e = new ActionEvent(
@@ -262,11 +251,6 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		else if (item == this.menuAbout)
 		{
 			SternAbout.show(this);
-		}
-		else if (item == this.menuSearchForUpdates)
-		{
-			Thread tUpdateChecker = new Thread( new UpdateChecker(this, null, false) );
-			tUpdateChecker.start();
 		}
 	}
 
@@ -406,10 +390,6 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 	    this.menuAbout.addActionListener(this);
 	    hilfe.add (this.menuAbout);
 	    
-	    this.menuSearchForUpdates = new MenuItem (SternResources.MenuSearchForUpdates(false));
-	    this.menuSearchForUpdates.addActionListener(this);
-	    hilfe.add (this.menuSearchForUpdates);
-	    
 	    hilfe.addSeparator();
 	    
 	    this.menuVerbindungseinstellungen = new MenuItem(SternResources.MenuVerbindungseinstellungen(false));
@@ -463,8 +443,6 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 			if (languageCode != null)
 				SternResources.setLocale(languageCode);
 		}
-		if (prop.containsKey(PROPERTY_LAST_UPDATE_FOUND))
-			this.lastUpdateCheck = prop.getProperty(PROPERTY_LAST_UPDATE_FOUND);
 
 		return prop;
 	}
@@ -502,13 +480,5 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 	public boolean openPdf(byte[] pdfBytes) throws RemoteException
 	{
 		return PdfLauncher.showPdf(pdfBytes);
-	}
-
-	@Override
-	public void lastUpdateFound(String updateBuild)
-	{
-		this.props.setProperty(PROPERTY_LAST_UPDATE_FOUND, updateBuild);
-		writeProperties(this.props);
-		
 	}
 }

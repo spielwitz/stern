@@ -6,9 +6,9 @@ A strategy game since 1989.
 
 Michael Schweitzer
 
-## Website and Download
+## Documentation
 
-[https://stern.dyndns1.de](https://stern.dyndns1.de)
+[SternHelp.pdf](resources/SternHelp.pdf) (German)
 
 ## What is STERN?
 

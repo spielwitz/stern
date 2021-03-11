@@ -100,7 +100,6 @@ import commonUi.DialogWindow;
 import commonUi.DialogWindowResult;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
-import commonUi.IUpdateCheckerCallback;
 import commonUi.LabelDark;
 import commonUi.MessageWithLink;
 import commonUi.PaintPanel;
@@ -108,7 +107,6 @@ import commonUi.PanelDark;
 import commonUi.SpracheJDialog;
 import commonUi.SpringUtilities;
 import commonUi.SternAbout;
-import commonUi.UpdateChecker;
 
 @SuppressWarnings("serial") 
 public class Stern extends Frame  // NO_UCD (use default)
@@ -118,8 +116,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		ActionListener,
 		MouseListener,
 		IServerMethods,
-		IHostComponentMethods,
-		IUpdateCheckerCallback
+		IHostComponentMethods
 {
 	transient private final static String FILE_SUFFIX = ".stn";
 	transient private final static String FILE_SUFFIX_BACKUP = ".BAK";
@@ -130,7 +127,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 	transient private static final String PROPERTY_NAME_LETZTES_VERZEICHNIS = "lastDir";
 	transient private static final String PROPERTY_EMAIL_ADRESSEN = "emailAdressen";
 	transient static final String PROPERTY_EMAIL_SEPARATOR = "emailSeparator";
-	transient private static final String PROPERTY_LAST_UPDATE_FOUND = "lastUpdateFound";
 	transient private static final String PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE = "serverAdminCredentials";
 	transient private static final String PROPERTY_SERVER_USER_CREDENTIAL_FILE = "serverUserCredentials";
 	transient private static final String PROPERTY_SERVER_COMMUNICATION_ENABLED = "serverCommunicationEnabled";
@@ -174,7 +170,6 @@ public class Stern extends Frame  // NO_UCD (use default)
     private MenuItem menuServerGames;
     private MenuItem menuServerCredentials;
     private MenuItem menuSprache;
-    private MenuItem menuSearchForUpdates;
     private MenuItem menuOutputWindow;
     
     private MenuItem menuServer;
@@ -207,8 +202,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 	private int currentGameJahr;
 	
 	private Timer gameInfoUpdateTimer;
-	
-	private String lastUpdateCheck;
 	
 	private Clip soundClipGlocke;
 	
@@ -321,10 +314,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 		
 		// Verbindungsstatus setzen
 		this.getGameInfoByTimer();
-		
-		// Auf Updates checken
-		Thread tUpdateChecker = new Thread( new UpdateChecker(this, this.lastUpdateCheck, true) );
-		tUpdateChecker.start();
 	}
 	
 	private void keyPressed(KeyEventExtended event)
@@ -489,10 +478,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 		    hilfe.add (this.menuHilfe);
 	    }
 	    
-	    this.menuSearchForUpdates = new MenuItem (SternResources.MenuSearchForUpdates(false));
-	    this.menuSearchForUpdates.addActionListener(this);
-	    hilfe.add (this.menuSearchForUpdates);
-
 	    menueLeiste.add(hilfe);
 	    
 	    return menueLeiste;
@@ -890,11 +875,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuSearchForUpdates)
-		{
-			Thread tUpdateChecker = new Thread( new UpdateChecker(this, null, false) );
-			tUpdateChecker.start();
-		}
 		else if (item == this.menuOutputWindow)
 		{
 			if (this.outputWindow == null || !this.outputWindow.isVisible())
@@ -1096,9 +1076,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 			if (languageCode != null)
 				SternResources.setLocale(languageCode);
 		}
-		
-		if (prop.containsKey(PROPERTY_LAST_UPDATE_FOUND))
-			this.lastUpdateCheck = prop.getProperty(PROPERTY_LAST_UPDATE_FOUND);
 		
 		if (prop.containsKey(PROPERTY_EMAIL_SEPARATOR))
 			this.emailSeparator = prop.getProperty(PROPERTY_EMAIL_SEPARATOR);
@@ -1812,12 +1789,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 		this.getGameInfoByTimer();
 	}
 
-	@Override
-	public void lastUpdateFound(String updateBuild) 
-	{
-		this.setProperty(PROPERTY_LAST_UPDATE_FOUND, updateBuild);
-	}
-	
 	public boolean getClientsInaktivBeiZugeingabe()
 	{
 		return this.clientsInaktivBeiZugeingabe;
