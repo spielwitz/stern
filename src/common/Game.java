@@ -344,13 +344,13 @@ public class Game extends EmailTransportBase implements Serializable
 	{
 		ArrayList<PlanetInfo> retval = new ArrayList<PlanetInfo>(this.planetsCount);
 		
-		for (Planet pl: this.planets)
+		for (Planet planet: this.planets)
 			retval.add(new PlanetInfo(
-					(int)pl.getPosition().getX(), 
-					(int)pl.getPosition().getY(), 
-					pl.getOwner() == Constants.NEUTRAL ?
+					(int)planet.getPosition().getX(), 
+					(int)planet.getPosition().getY(), 
+					planet.getOwner() == Constants.NEUTRAL ?
 							Colors.NEUTRAL :
-							this.players[pl.getOwner()].getColorIndex()));
+							this.players[planet.getOwner()].getColorIndex()));
 		
 		return retval;
 	}
@@ -394,12 +394,12 @@ public class Game extends EmailTransportBase implements Serializable
 	{
 		this.options = (HashSet<GameOptions>) Utils.klon(options);
 		
-		for (int sp = 0; sp < players.size(); sp++)
+		for (int playerIndex = 0; playerIndex < players.size(); playerIndex++)
 		{
-			this.players[sp].setName(players.get(sp).getName());
-			this.players[sp].setColorIndex(players.get(sp).getColorIndex());
-			this.players[sp].setEmailPlayer(players.get(sp).isEmailPlayer());
-			this.players[sp].setEmail(players.get(sp).getEmail());
+			this.players[playerIndex].setName(players.get(playerIndex).getName());
+			this.players[playerIndex].setColorIndex(players.get(playerIndex).getColorIndex());
+			this.players[playerIndex].setEmailPlayer(players.get(playerIndex).isEmailPlayer());
+			this.players[playerIndex].setEmail(players.get(playerIndex).getEmail());
 		}
 		
 		this.emailAddressGameHost = emailAddressGameHost;
@@ -419,7 +419,7 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	private void save(boolean autoSave)
 	{
-		this.gameThread.save(this, autoSave);
+		this.gameThread.saveGame(this, autoSave);
 	}
 	
 	public ScreenContent getScreenContentWhileMovesEntered()
@@ -1861,7 +1861,7 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			game.archive = new Hashtable<Integer,Archive>();
 			
-			for (int j = 0; j <= game.year; j++)
+			for (int year = 0; year <= game.year; year++)
 			{
 				int[] scores = new int[game.playersCount];
 				int[] fightersCount = new int[game.playersCount];
@@ -1878,8 +1878,8 @@ public class Game extends EmailTransportBase implements Serializable
 					scores[playerIndex] = Game.getScore(planetsCount[playerIndex], game.playersCount);
 				}
 								
-				if (j < game.year)
-					game.archive.put(j, new Archive(scores, fightersCount, planetsCount, moneyProductions));
+				if (year < game.year)
+					game.archive.put(year, new Archive(scores, fightersCount, planetsCount, moneyProductions));
 			}
 			
 			game.mines = new Hashtable<String,Mine>();
@@ -3526,16 +3526,16 @@ public class Game extends EmailTransportBase implements Serializable
 				allowedKeys.add(new ConsoleKey("-",SternResources.ZugeingabeObjekteAusblendenAlleAus(true)));
 				allowedKeys.add(new ConsoleKey("+",SternResources.ZugeingabeObjekteAusblendenAlleAn(true)));
 		 				
-				for (int i = 1; i <= game.playersCount; i++)
+				for (int playerIndex = 1; playerIndex <= game.playersCount; playerIndex++)
 				{
 					String onOff = 
-							game.shipsOfPlayerHidden.get(i-1) ?
+							game.shipsOfPlayerHidden.get(playerIndex-1) ?
 									SternResources.ZugeingabeObjekteAusblendenAn(true) :
 									SternResources.ZugeingabeObjekteAusblendenAus(true);
 					allowedKeys.add(
 							new ConsoleKey(
-									Integer.toString(i), 
-								game.players[i-1].getName() + " " + onOff));
+									Integer.toString(playerIndex), 
+								game.players[playerIndex-1].getName() + " " + onOff));
 				}
 				
 				ConsoleInput input = this.game.console.waitForKeyPressed(allowedKeys, false);

@@ -27,8 +27,13 @@ class ScreenContentBoardPlanet implements Serializable
 	private byte c;
 	private ArrayList<Byte> f;
 	
-	ScreenContentBoardPlanet(String name, Point position, byte colorIndex,
-			ArrayList<Byte> frameColors) {
+	ScreenContentBoardPlanet(
+			String name, 
+			Point position, 
+			byte colorIndex,
+			ArrayList<Byte> 
+			frameColors)
+	{
 		super();
 		this.n = name;
 		this.p = position;

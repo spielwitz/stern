@@ -51,7 +51,7 @@ public class GameThread extends Thread
 		this.gameThreadEventListener.checkMenuEnabled();
 	}
 	
-	void save(Game game, boolean autoSave)
+	void saveGame(Game game, boolean autoSave)
 	{
 		this.gameThreadEventListener.saveGame(game, autoSave);
 	}

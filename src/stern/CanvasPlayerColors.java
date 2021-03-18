@@ -33,16 +33,16 @@ import common.Colors;
 	int playerIndex;
 	private Font font;
 	
-	CanvasPlayerColors(JDialog parent, IColorChooserCallback callback, int spieler, byte colIndex, Font font)
+	CanvasPlayerColors(JDialog parent, IColorChooserCallback callback, int playerIndex, byte colorIndex, Font font)
 	{
 		super();
-		this.colorIndex = colIndex;
+		this.colorIndex = colorIndex;
 		this.parent = parent;
-		this.playerIndex = spieler;
+		this.playerIndex = playerIndex;
 		this.font = font;
 		this.callback = callback;
 		
-		this.setBackground(Colors.get(colIndex));
+		this.setBackground(Colors.get(colorIndex));
 		
 		this.addActionListener(this);
 	}

@@ -342,7 +342,7 @@ public class ScreenPainter
 			for (int x = 0; x < Constants.BOARD_MAX_X; x++)
 			{
 				Point pt = new Point(x,y);
-				this.drawTextCenteredBoard(
+				this.drawBoardTextCentered(
 						pt, 
 						Game.getSectorNameFromPositionStatic(pt),
 						new Color(60, 60, 60),
@@ -355,17 +355,17 @@ public class ScreenPainter
 		{
 			for (ScreenContentBoardPlanet screenContentBoardPlanet: screenContentBoard.getPlanets())
 			{
-				this.fillCircleBoard(screenContentBoardPlanet.getPosition(), 1.2, 
+				this.drawBoardFillCircle(screenContentBoardPlanet.getPosition(), 1.2, 
 						this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX ?
 								Color.white :
 								Colors.getColorDarker2(Colors.get(screenContentBoardPlanet.getColorIndex())));
 				
 				if (this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX)
-	                this.drawCircleBoard(screenContentBoardPlanet.getPosition(), 1.2, Colors.get(screenContentBoardPlanet.getColorIndex())); 
+	                this.drawBoardCircle(screenContentBoardPlanet.getPosition(), 1.2, Colors.get(screenContentBoardPlanet.getColorIndex())); 
 				
-				this.drawTextCenteredBoard(screenContentBoardPlanet.getPosition(), screenContentBoardPlanet.getName(),Colors.get(screenContentBoardPlanet.getColorIndex()), this.fontPlanets, this.fmPlanets);
+				this.drawBoardTextCentered(screenContentBoardPlanet.getPosition(), screenContentBoardPlanet.getName(),Colors.get(screenContentBoardPlanet.getColorIndex()), this.fontPlanets, this.fmPlanets);
 				
-				this.drawPlanetFrames(screenContentBoardPlanet);
+				this.drawBoardPlanetFrames(screenContentBoardPlanet);
 			}
 		}
 		
@@ -373,7 +373,7 @@ public class ScreenPainter
 		
 		this.drawBoardRadarCircles(screenContentBoard.getRadarCircle());
 		
-		this.drawPositionsMarked(screenContentBoard.getPositionsMarked());		
+		this.drawBoardPositionsMarked(screenContentBoard.getPositionsMarked());		
 		
 		this.drawBoardLinesWithShips(screenContentBoard.getLines());		
 		
@@ -447,14 +447,14 @@ public class ScreenPainter
 				SCREEN_WIDTH - 2 * BOARD_OFFSET_X,
 				Constants.BOARD_MAX_Y * BOARD_DX);
 		
-		this.drawTextLeftEditor(Utils.padString(screenContentPlanetEditor.getMoneySupply(),4), PLANET_EDITOR_COLUMN1, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
-		this.drawTextLeftEditor(SternResources.PlEditEeEnergievorrat(false), PLANET_EDITOR_COLUMN1+5, 1, Colors.get(Colors.NEUTRAL));
+		this.drawPlanetEditorTextLeft(Utils.padString(screenContentPlanetEditor.getMoneySupply(),4), PLANET_EDITOR_COLUMN1, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
+		this.drawPlanetEditorTextLeft(SternResources.PlEditEeEnergievorrat(false), PLANET_EDITOR_COLUMN1+5, 1, Colors.get(Colors.NEUTRAL));
 		
 		if (screenContentPlanetEditor.hasCommandRoom())
-			this.drawTextLeftEditor(SternResources.Kommandozentrale(false), PLANET_EDITOR_COLUMN2+8, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
+			this.drawPlanetEditorTextLeft(SternResources.Kommandozentrale(false), PLANET_EDITOR_COLUMN2+8, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
 		
-		this.drawTextLeftEditor(SternResources.PlEditKaufpreis(false), PLANET_EDITOR_COLUMN2+2, 2, Colors.get(Colors.NEUTRAL));
-		this.drawTextLeftEditor(SternResources.PlEditVerkaufspreis(false), PLANET_EDITOR_COLUMN3, 2, Colors.get(Colors.NEUTRAL));
+		this.drawPlanetEditorTextLeft(SternResources.PlEditKaufpreis(false), PLANET_EDITOR_COLUMN2+2, 2, Colors.get(Colors.NEUTRAL));
+		this.drawPlanetEditorTextLeft(SternResources.PlEditVerkaufspreis(false), PLANET_EDITOR_COLUMN3, 2, Colors.get(Colors.NEUTRAL));
 		
 		this.drawPlanetEditorLine(ShipType.MONEY_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditEprodPlus4(false), 3);
 		this.drawPlanetEditorLine(ShipType.FIGHTER_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditRaumerProd(false), 4);
@@ -475,14 +475,14 @@ public class ScreenPainter
 	
 	private void drawPlanetEditorLine(ShipType type, ScreenContentPlanetEditor screenContentPlanetEditor, String name, int line)
 	{
-		this.drawTextLeftEditor(Utils.padString(screenContentPlanetEditor.getCount().get(type),4), PLANET_EDITOR_COLUMN1, line, Colors.get(screenContentPlanetEditor.getColorIndex()));
-		this.drawTextLeftEditor(name, PLANET_EDITOR_COLUMN1+5, line, 
+		this.drawPlanetEditorTextLeft(Utils.padString(screenContentPlanetEditor.getCount().get(type),4), PLANET_EDITOR_COLUMN1, line, Colors.get(screenContentPlanetEditor.getColorIndex()));
+		this.drawPlanetEditorTextLeft(name, PLANET_EDITOR_COLUMN1+5, line, 
 				!screenContentPlanetEditor.isReadOnly() && screenContentPlanetEditor.getTypeHighlighted() == type ?
 						Color.white :
 						Colors.get(Colors.NEUTRAL));
 		
 		if (!screenContentPlanetEditor.isReadOnly() && screenContentPlanetEditor.getTypeHighlighted() == type)
-			this.drawTextLeftEditor(">>>>", 0, line, Color.white);
+			this.drawPlanetEditorTextLeft(">>>>", 0, line, Color.white);
 
 		if (type == ShipType.FIGHTER_PRODUCTION)
 			return;
@@ -491,8 +491,8 @@ public class ScreenPainter
 		if (screenContentPlanetEditor.getBuyImpossible().contains(type))
 			colorIndex = Colors.NEUTRAL;
 				
-		this.drawTextLeftEditor(Utils.padString(Game.editorPricesBuy.get(type),2), PLANET_EDITOR_COLUMN2 + 4, line, Colors.get(colorIndex));
-		this.drawTextLeftEditor(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN2+7, line, Colors.get(colorIndex));
+		this.drawPlanetEditorTextLeft(Utils.padString(Game.editorPricesBuy.get(type),2), PLANET_EDITOR_COLUMN2 + 4, line, Colors.get(colorIndex));
+		this.drawPlanetEditorTextLeft(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN2+7, line, Colors.get(colorIndex));
 		
 		if (type == ShipType.MONEY_PRODUCTION || type == ShipType.DEFENCE_SHIELD_REPAIR)
 			return;
@@ -501,11 +501,11 @@ public class ScreenPainter
 		if (screenContentPlanetEditor.getSellImpossible().contains(type))
 			colorIndex = Colors.NEUTRAL;
 		
-		this.drawTextLeftEditor(Utils.padString(Game.editorPricesSell.get(type),2), PLANET_EDITOR_COLUMN3 + 4, line, Colors.get(colorIndex));
-		this.drawTextLeftEditor(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN3+7, line, Colors.get(colorIndex));
+		this.drawPlanetEditorTextLeft(Utils.padString(Game.editorPricesSell.get(type),2), PLANET_EDITOR_COLUMN3 + 4, line, Colors.get(colorIndex));
+		this.drawPlanetEditorTextLeft(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN3+7, line, Colors.get(colorIndex));
 	}
 	
-	private void drawTextLeftEditor(String text, int column, int line, Color color)
+	private void drawPlanetEditorTextLeft(String text, int column, int line, Color color)
 	{
 		int charWidth = this.fmPlanets.charWidth('H');
 		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
@@ -562,7 +562,7 @@ public class ScreenPainter
 		}
 
 		
-		this.drawTextLeftEditor(
+		this.drawPlanetEditorTextLeft(
 				title,
 				0,
 				0,
@@ -576,16 +576,16 @@ public class ScreenPainter
 			int playerIndex = playerListSequence[i];
 			Player player = screenContentStatistics.getPlayers()[playerIndex];
 		
-			this.drawTextLeftEditor(screenContentStatistics.getPlayers()[playerIndex].getName(), 0, 2 + i, Colors.get(player.getColorIndex()));
+			this.drawPlanetEditorTextLeft(screenContentStatistics.getPlayers()[playerIndex].getName(), 0, 2 + i, Colors.get(player.getColorIndex()));
 			
-			this.drawTextLeftEditor(Utils.padString(Integer.toString(valuePerPlayer[playerIndex]), 7), 14, 2 + i, Colors.get(player.getColorIndex()));
+			this.drawPlanetEditorTextLeft(Utils.padString(Integer.toString(valuePerPlayer[playerIndex]), 7), 14, 2 + i, Colors.get(player.getColorIndex()));
 		}
 		
-		this.drawTextLeftEditor(SternResources.StatistikSpielBegonnen(false), 0, 16, Color.white);
+		this.drawPlanetEditorTextLeft(SternResources.StatistikSpielBegonnen(false), 0, 16, Color.white);
 		
-		this.drawTextLeftEditor(Utils.convertDateToString(screenContentStatistics.getDateStart()), 0, 17, Color.white);
+		this.drawPlanetEditorTextLeft(Utils.convertDateToString(screenContentStatistics.getDateStart()), 0, 17, Color.white);
 		
-		this.drawTextLeftEditor(
+		this.drawPlanetEditorTextLeft(
 				SternResources.StatistikMax(
 						false, 
 						Integer.toString(screenContentStatistics.getValueMax()), 
@@ -594,7 +594,7 @@ public class ScreenPainter
 				0,
 				Colors.get(screenContentStatistics.getPlayers()[screenContentStatistics.getMaxValuePlayerIndex()].getColorIndex()));
 		
-		this.drawTextLeftEditor(
+		this.drawPlanetEditorTextLeft(
 				SternResources.StatistikMin(false,
 						Integer.toString(screenContentStatistics.getValueMin()),
 						Integer.toString(screenContentStatistics.getValueMinYear()+1)),
@@ -734,7 +734,7 @@ public class ScreenPainter
 		this.dbGraphics.drawLine(xx1, yy1, xx2, yy2);
 	}
 	
-	private void drawCircleBoard(Point position, double radius, Color color)
+	private void drawBoardCircle(Point position, double radius, Color color)
 	{
 		this.setColor(color);
 		
@@ -750,7 +750,7 @@ public class ScreenPainter
 				Utils.round(this.factor * rr));
 	}
 	
-	private void fillCircleBoard(Point position, double radius, Color color)
+	private void drawBoardFillCircle(Point position, double radius, Color color)
 	{
 		this.setColor(color);
 		
@@ -768,7 +768,7 @@ public class ScreenPainter
 	}
 	
 	
-	private void fillDiamondBoard(Point position, Color color)
+	private void drawBoardFillDiamond(Point position, Color color)
 	{
 		this.setColor(color);
 		
@@ -790,7 +790,7 @@ public class ScreenPainter
 		this.dbGraphics.fillPolygon(x, y, 4);
 	}
 	
-	private void drawTextCenteredBoard(Point position, String text, Color color, Font font, FontMetrics fm)
+	private void drawBoardTextCentered(Point position, String text, Color color, Font font, FontMetrics fm)
 	{
 		this.dbGraphics.setFont(font);
 		
@@ -810,7 +810,7 @@ public class ScreenPainter
 		this.dbGraphics.setColor(color);
 	}
 	
-	private void drawPlanetFrames (ScreenContentBoardPlanet screenContentBoardPlanet)
+	private void drawBoardPlanetFrames (ScreenContentBoardPlanet screenContentBoardPlanet)
 	{
 		if (screenContentBoardPlanet.getFrameColors() == null || screenContentBoardPlanet.getFrameColors().size() == 0)
 			return;
@@ -829,14 +829,14 @@ public class ScreenPainter
 		}
 	}
 	
-	private void drawPositionsMarked (ArrayList<Point> positions)
+	private void drawBoardPositionsMarked (ArrayList<Point> positions)
 	{
 		if (positions == null)
 			return;
 		
 		for (Point position: positions)
 		{
-			this.drawCircleBoard(position, 0.8, Color.white);
+			this.drawBoardCircle(position, 0.8, Color.white);
 			
 			this.setColor(Color.white);
 			
@@ -863,11 +863,11 @@ public class ScreenPainter
 		{
 			Point position = new Point(mine.getPositionX(), mine.getPositionY()); 
 			
-			this.fillDiamondBoard(
+			this.drawBoardFillDiamond(
 					position,
 					Color.darkGray);
 		
-			this.drawTextCenteredBoard(
+			this.drawBoardTextCentered(
 					position,
 					Integer.toString(mine.getStrength()),
 					Colors.get(Colors.NEUTRAL), this.fontMines, this.fmMines);
