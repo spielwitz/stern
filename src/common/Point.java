@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -27,16 +27,8 @@ class Point extends Point2D.Double implements Serializable
 		super(x, y);
 	}
 
-	double dist(Point p)
-	{
-		return Math.sqrt(
-				Math.pow(this.x - p.x, 2) + 
-				Math.pow(this.y - p.y, 2));
-	}
-	
 	public String getString()
 	{
-		// Nur fuer die Schluesselbildung der Minen-Hashtable
 		return this.x + ";" + this.y;
 	}
 	
@@ -48,13 +40,13 @@ class Point extends Point2D.Double implements Serializable
 	  if (obj==null) {
 	     return false;
 	  }
-	  if (!(obj instanceof Point )) {
-	     return false; // different class
+	  if (!(obj instanceof Point ))
+	  {
+	     return false;
 	  }
 	  Point other = (Point) obj;
 	  
-	  if (Math.abs(other.x - this.x) < Constants.PRECISION && 
-		  Math.abs(other.y - this.y) < Constants.PRECISION)
+	  if (this.distance(other) < Constants.PRECISION)
 		  return true;
 	  else
 		  return false;

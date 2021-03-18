@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -55,13 +55,12 @@ public class MessageWithLink extends JEditorPane {
         setBorder(null);
     }
 
-    private static StringBuffer getStyle() {
-        // for copying style
+    private static StringBuffer getStyle()
+    {
         JLabel label = new JLabel();
         Font font = label.getFont();
         Color color = label.getBackground();
 
-        // create some css from the label's font
         StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
         style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
         style.append("font-size:" + font.getSize() + "pt;");

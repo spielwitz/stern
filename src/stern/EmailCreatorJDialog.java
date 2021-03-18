@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
 import common.Colors;
-import common.Spieler;
+import common.Player;
 import common.SternResources;
 import commonUi.ButtonDark;
 import commonUi.ComboBoxDark;
@@ -67,8 +67,8 @@ import commonUi.TextFieldDark;
 	
 	EmailCreatorJDialog(
 			JDialog parent,
-			Spieler[] spieler,
-			String emailSpielleiter,
+			Player[] players,
+			String emailGameHost,
 			String separatorPreset,
 			String subject,
 			String body)
@@ -76,15 +76,15 @@ import commonUi.TextFieldDark;
 		super (parent, SternResources.EmailErzeugen(false), true);
 		
 		this.parent = parent;
-		this.Initialize(spieler, emailSpielleiter, separatorPreset, subject, body);
+		this.Initialize(players, emailGameHost, separatorPreset, subject, body);
 
 		this.setLocationRelativeTo(parent);	
 	}
 	
 	EmailCreatorJDialog(
 			Frame parent,
-			Spieler[] spieler,
-			String emailSpielleiter,
+			Player[] players,
+			String emailHost,
 			String separatorPreset,
 			String subject,
 			String body)
@@ -92,14 +92,14 @@ import commonUi.TextFieldDark;
 		super (parent, SternResources.EmailErzeugen(false), true);
 		
 		this.parent = parent;
-		this.Initialize(spieler, emailSpielleiter, separatorPreset, subject, body);
+		this.Initialize(players, emailHost, separatorPreset, subject, body);
 
 		this.setLocationRelativeTo(parent);	
 	}
 	
 	private void Initialize(
-			Spieler[] spieler,
-			String emailSpielleiter,
+			Player[] players,
+			String emailHost,
 			String separatorPreset,
 			String subject,
 			String body)
@@ -124,13 +124,12 @@ import commonUi.TextFieldDark;
 		
 		int rows = 0;
 		
-		// Erst die Spieler hinzufuegen
-		for (Spieler sp: spieler)
+		for (Player player: players)
 		{
-			String email = sp.getEmailAdresse();
+			String email = player.getEmail();
 			
-			CheckBoxDark cb = new CheckBoxDark(sp.getName(), false, font);
-			cb.setForeground(Colors.get(sp.getColIndex()));
+			CheckBoxDark cb = new CheckBoxDark(player.getName(), false, font);
+			cb.setForeground(Colors.get(player.getColorIndex()));
 			cb.setEnabled(email.length() > 0);
 			cb.addActionListener(this);
 			panTable.add(cb);
@@ -149,15 +148,15 @@ import commonUi.TextFieldDark;
 			rows++;
 		}
 		
-		if (emailSpielleiter != null && emailSpielleiter.length() > 0)
+		if (emailHost != null && emailHost.length() > 0)
 		{
 			CheckBoxDark cb = new CheckBoxDark(SternResources.Spielleiter(false), false, font);
 			cb.addActionListener(this);
 			panTable.add(cb);
 			
-			checkbox2emailMap.put(cb, emailSpielleiter);
+			checkbox2emailMap.put(cb, emailHost);
 			
-			TextFieldDark tf = new TextFieldDark(emailSpielleiter, font, false);
+			TextFieldDark tf = new TextFieldDark(emailHost, font, false);
 			panTable.add(tf);
 			
 			rows++;
@@ -172,7 +171,7 @@ import commonUi.TextFieldDark;
 		
 		PanelDark panButtons = new PanelDark(new FlowLayout(FlowLayout.RIGHT));
 		
-		panButtons.add(new LabelDark("Adressen-Separator", font));
+		panButtons.add(new LabelDark(SternResources.AddressSeparator(false), font));
 		this.comboSeparators = new ComboBoxDark<String>(separators, font);
 		this.comboSeparators.setSelectedItem(this.separatorPreset);
 		panButtons.add(this.comboSeparators);
@@ -215,7 +214,6 @@ import commonUi.TextFieldDark;
 		
 		this.pack();
 		this.setResizable(false);
-
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -26,16 +26,15 @@ import java.nio.file.Paths;
 import common.Constants;
 import common.ReleaseGetter;
 
-public class VersionCreator { // NO_UCD (unused code)
+public class VersionCreator  // NO_UCD (unused code)
+{
 
 	public static void main(String[] args)
 	{
-		// Letzte Versionsdatei lesen
-		String versionString = readFile(args[0], Constants.RELEASE_FILE_NAME);
+		String versionString = readFile(args[0], Constants.FILE_NAME_RELEASE);
 		
 		if (versionString != null)
 		{
-			// Build hochzaehlen
 			int buildInt = Integer.parseInt(versionString);
 			versionString = getBuildString(buildInt + 1);
 		}
@@ -44,24 +43,23 @@ public class VersionCreator { // NO_UCD (unused code)
 			versionString = getBuildString(1);
 		}
 		
-		writeFile(versionString, args[0], Constants.RELEASE_FILE_NAME);
-		writeFile(Constants.BUILD_IMPORTANT_UPDATE, args[0], Constants.RELEASE_RECOMMENDED_FILE_NAME);
+		writeFile(versionString, args[0], Constants.FILE_NAME_RELEASE);
+		writeFile(Constants.BUILD_IMPORTANT_UPDATE, args[0], Constants.FILE_NAME_RELEASE_RECOMMENDED);
 		
-		String dirBin = Paths.get(args[0], "bin").toString();
-		writeFile(versionString, dirBin, Constants.RELEASE_FILE_NAME);
-		writeFile(Constants.BUILD_IMPORTANT_UPDATE, dirBin, Constants.RELEASE_RECOMMENDED_FILE_NAME);
+		String dirrectoryNameBin = Paths.get(args[0], "bin").toString();
+		writeFile(versionString, dirrectoryNameBin, Constants.FILE_NAME_RELEASE);
+		writeFile(Constants.BUILD_IMPORTANT_UPDATE, dirrectoryNameBin, Constants.FILE_NAME_RELEASE_RECOMMENDED);
 		
-		// Build in HTML-Seite anpassen
 		String sWeb = readFile(args[1], "DownloadTemplate.html");		
 		sWeb = sWeb.replaceAll("########", ReleaseGetter.getRelease());		
 		writeFile(sWeb, args[1], "Download.html");
 				
-		System.out.println("Versionsdatei mit Build "+versionString+ " erzeugt");		
+		System.out.println("Version file for build "+versionString+ " created");		
 	}
 	
-	private static void writeFile(String release, String dir, String fileName)
+	private static void writeFile(String release, String directoryName, String fileName)
 	{
-		Path path = Paths.get(dir, fileName);
+		Path path = Paths.get(directoryName, fileName);
 		String s = path.toString();
 		try {
 			
@@ -73,9 +71,9 @@ public class VersionCreator { // NO_UCD (unused code)
 		}
 	}
 	
-	private static String readFile(String dir, String fileName)
+	private static String readFile(String directoryName, String fileName)
 	{
-		Path path = Paths.get(dir, fileName);
+		Path path = Paths.get(directoryName, fileName);
 		
 		try
 		{

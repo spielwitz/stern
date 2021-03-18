@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -25,11 +25,6 @@ import java.io.IOException;
 
 public class ServerUtils
 {
-	public static final String ARG_PORT = "port"; // NO_UCD (unused code)
-	public static final String ARG_HOSTNAME = "host"; // NO_UCD (unused code)
-	public static final String ARG_LOGLEVEL = "log"; // NO_UCD (unused code)
-	public static final String ARG_CLIENT_CREDENTIALS = "credentials"; // NO_UCD (unused code)
-	
 	public static String getHomeFolder()
 	{
 		return System.getProperty("user.dir");

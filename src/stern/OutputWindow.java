@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import common.ScreenDisplayContent;
+import common.ScreenContent;
 import common.SternResources;
 import commonUi.IHostComponentMethods;
-import commonUi.PaintPanel;
+import commonUi.PanelScreenContent;
 
 @SuppressWarnings("serial")
 class OutputWindow extends Frame
@@ -33,24 +33,24 @@ class OutputWindow extends Frame
 							IHostComponentMethods,
 							WindowListener
 {
-	private PaintPanel paintPanel;
+	private PanelScreenContent paintPanel;
 	
-	OutputWindow(int x0, int y0, int w, int h)
+	OutputWindow(int x0, int y0, int width, int height)
 	{
 		super();
 		
-		this.setBounds(x0, y0, w, h);
+		this.setBounds(x0, y0, width, height);
 		
 		this.setLayout(new BorderLayout());
 		this.addWindowListener(this);
 		
-		this.paintPanel = new PaintPanel(this);
+		this.paintPanel = new PanelScreenContent(this);
 		this.add(this.paintPanel, BorderLayout.CENTER);
 		
 		this.setTitle(SternResources.SternTitel(false));
 	}
 	
-	void redraw (ScreenDisplayContent cont)
+	void redraw (ScreenContent cont)
 	{
 		this.paintPanel.redraw(cont, false, false);
 	}

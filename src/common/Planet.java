@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -22,664 +22,629 @@ import java.util.Hashtable;
 
 @SuppressWarnings("serial") class Planet implements Serializable
 {
-	private Point pos; // Koordinaten des Planeten
-	private Buendnis buendnis; // Nicht von aussen manipulieren, da sonst nicht mehr synchron mit "anz"
-	private Hashtable<ObjektTyp,Integer> anz; // Anzahl Objekte nach Typ
-	private int bes;
-	private Festung festung;
-	private int evorrat;
-	private int eprod;
-	private int eraum;
-	private Kommandozentrale kz;
-	private HashSet<Integer> sender; // Spionagesender
+	private Point position;
+	private Alliance alliance;
+	private Hashtable<ShipType,Integer> ships;
+	private int owner;
+	private DefenceShield defenceShield;
+	private int moneySupply;
+	private int moneyProduction;
+	private int fighterProduction;
+	private CommandRoom commandRoom;
+	private HashSet<Integer> radioStationsByPlayer;
 	
-	Planet(Point pos, Buendnis buendnis,
-			Hashtable<ObjektTyp, Integer> anz, int bes, Festung festung,
-			int evorrat, int eprod, int eraum, Kommandozentrale kz)
+	Planet(Point position, Alliance alliance,
+			Hashtable<ShipType, Integer> ships, int owner, DefenceShield defenceShield,
+			int moneySupply, int moneyProduction, int fighterProduction, CommandRoom commandRoom)
 	{
 		super();
-		this.pos = pos;
-		this.buendnis = buendnis;
-		this.anz = anz;
-		this.bes = bes;
-		this.festung = festung;
-		this.evorrat = evorrat;
-		this.eprod = eprod;
-		this.eraum = eraum;
-		this.kz = kz;
+		this.position = position;
+		this.alliance = alliance;
+		this.ships = ships;
+		this.owner = owner;
+		this.defenceShield = defenceShield;
+		this.moneySupply = moneySupply;
+		this.moneyProduction = moneyProduction;
+		this.fighterProduction = fighterProduction;
+		this.commandRoom = commandRoom;
 	}
 	
-	// ==== Keine Getter-Methode fuer "anz" machen, sondern Methode nach Typ anbieten,
-	// ==== die bei Raumern auf "anz" geht, wenn kein Buendnis vorliegt und auf "buendnisRaumer",
-	// ==== wenn ein Buendnis existiert
-	
-	int getAnz(ObjektTyp typ)
+	int getShipsCount(ShipType type)
 	{
-		Integer anz = this.anz.get(typ);
+		Integer count = this.ships.get(type);
 		
-		if (anz != null)
-			return anz.intValue();
+		if (count != null)
+			return count.intValue();
 		else
 			return 0;
 	}
 	
-	int getRaumerProSpieler(int spieler)
+	int getFightersCount(int playerIndex)
 	{
-		if (!this.istBuendnis())
+		if (!this.allianceExists())
 		{
-			if (spieler == this.bes)
-				return this.getAnz(ObjektTyp.RAUMER);
+			if (playerIndex == this.owner)
+				return this.getShipsCount(ShipType.FIGHTERS);
 			else
 				return 0;
 		}
 		else
-			return this.buendnis.getAnz(spieler);
+			return this.alliance.getFightersCount(playerIndex);
 	}
 	
-	int getAnzProTypUndSpieler(ObjektTyp typ, int spieler)
+	int getShipsCount(ShipType type, int playerIndex)
 	{
-		if (typ == ObjektTyp.RAUMER && this.istBuendnis())
-			return this.buendnis.getAnz(spieler);
-		else if (this.bes == spieler)
-			return this.getAnz(typ);
+		if (type == ShipType.FIGHTERS && this.allianceExists())
+			return this.alliance.getFightersCount(playerIndex);
+		else if (this.owner == playerIndex)
+			return this.getShipsCount(type);
 		else
 			return 0;
 	}
 	
-	private void incRaumerProSpieler(int spieler, int anz)
+	private void incrementFightersCount(int playerIndex, int count)
 	{
-		if (this.istBuendnis())
+		if (this.allianceExists())
 		{
-			this.buendnis.addRaumer(spieler, anz);
-			this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
+			this.alliance.addFightersCount(playerIndex, count);
+			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
 		}
 		else
-			this.incObjekt(ObjektTyp.RAUMER, anz);
+			this.incrementShipsCount(ShipType.FIGHTERS, count);
 	}
 	
-	public Point getPos()
+	public Point getPosition()
 	{
-		return this.pos;
+		return this.position;
 	}
 	
-	public void setPos(Point pt)
+	public void setPosition(Point position)
 	{
-		this.pos = pt;
+		this.position = position;
 	}
 	
-	public int getBes()
+	public int getOwner()
 	{
-		return this.bes;
+		return this.owner;
 	}
 	
-	public int getEvorrat()
+	public int getMoneySupply()
 	{
-		return this.evorrat;
+		return this.moneySupply;
 	}
 	
 	public boolean isNeutral()
 	{
-		return (this.bes == Constants.BESITZER_NEUTRAL);
+		return (this.owner == Constants.NEUTRAL);
 	}
 	
-	public int getEprod()
+	public int getMoneyProduction()
 	{
-		return this.eprod;
+		return this.moneyProduction;
 	}
 	
-	public void setEprod(int eprod)
+	public void setMoneyProduction(int moneyProduction)
 	{
-		this.eprod = eprod;
+		this.moneyProduction = moneyProduction;
 	}
 	
-	public int getEraum()
+	public int getFighterProduction()
 	{
-		return this.eraum;
+		return this.fighterProduction;
 	}
 	
-	public void setEraum(int eraum)
+	public void setFighterProduction(int fighterProduction)
 	{
-		this.eraum = eraum;
+		this.fighterProduction = fighterProduction;
 	}
 	
-	public int getFestungRaumer()
+	public int getDefenceShieldFightersCount()
 	{
-		if (this.festung == null)
+		if (this.defenceShield == null)
 			return 0;
 		else
-			return this.festung.getRaumer();
+			return this.defenceShield.getFightersCount();
 	}
 	
-	public int getFestungFaktor()
+	public int getDefenceShieldFactor()
 	{
-		if (this.festung == null)
+		if (this.defenceShield == null)
 			return 0;
 		else
-			return this.festung.getFaktor();
+			return this.defenceShield.getFactor();
 	}
 	
-	boolean istBuendnis()
+	boolean allianceExists()
 	{
-		if (this.buendnis == null)
+		if (this.alliance == null)
 			return false;
 		
-		return (this.buendnis.getAnzahlMitglieder() > 1);
+		return (this.alliance.getMembersCount() > 1);
 	}
 	
-	boolean istKommandozentrale()
+	boolean hasCommandRoom()
 	{
-		return (this.kz != null);
+		return (this.commandRoom != null);
 	}
 	
-	public Kommandozentrale getKommandozentrale()
+	public CommandRoom getCommandRoom()
 	{
-		return this.kz;
+		return this.commandRoom;
 	}
 	
-	boolean istBuendnisMitglied(int spieler)
+	boolean isAllianceMember(int playerIndex)
 	{
-		if (!this.istBuendnis())
+		if (!this.allianceExists())
 			return false;
 		else
-			return this.buendnis.istMitglied(spieler);
+			return this.alliance.isMember(playerIndex);
 	}
 	
-	int[] subtractRaumer(int anzSp, int anz, int bevorzugterSpieler, boolean buendnis)
+	int[] subtractFightersCount(int playersCount, int count, int playerIndexPreferred, boolean isAlliance)
 	{
-		int[] abzuege = new int[anzSp];
+		int[] reductions = new int[playersCount];
 		
-		if (!this.istBuendnis())
+		if (!this.allianceExists())
 		{
-			if (this.anz.containsKey(ObjektTyp.RAUMER))
-				this.anz.put(ObjektTyp.RAUMER, this.anz.get(ObjektTyp.RAUMER) - anz);
+			if (this.ships.containsKey(ShipType.FIGHTERS))
+				this.ships.put(ShipType.FIGHTERS, this.ships.get(ShipType.FIGHTERS) - count);
 			
-			if (this.bes != Constants.BESITZER_NEUTRAL)
-				abzuege[this.bes] = anz;
-
+			if (this.owner != Constants.NEUTRAL)
+				reductions[this.owner] = count;
 		}
 		else
 		{
-			if (buendnis)
-				abzuege = this.buendnis.subtract(anz, bevorzugterSpieler);
+			if (isAlliance)
+				reductions = this.alliance.subtractFighters(count, playerIndexPreferred);
 			else
 			{
-				this.buendnis.subRaumer(bevorzugterSpieler, anz);
+				this.alliance.subtractFightersCount(playerIndexPreferred, count);
 				
-				abzuege[bevorzugterSpieler] = anz;
+				reductions[playerIndexPreferred] = count;
 			}
 			
-			this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
+			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
 		}
 		
-		return abzuege;
+		return reductions;
 	}
 	
-	public Buendnis getEmptyCopyOfBuendnis()
+	public Alliance getAllianceStructure()
 	{
-		if (!this.istBuendnis())
+		if (!this.allianceExists())
 			return null;
 		else
 		{
-			Buendnis copy = new Buendnis(this.buendnis.getAnzSp());
+			Alliance allianceCopy = new Alliance(this.alliance.getPlayersCount());
 			
-			for (int spieler = 0; spieler < this.buendnis.getAnzSp(); spieler++)
-				if (this.buendnis.istMitglied(spieler))
-					copy.addSpieler(spieler);
+			for (int playerIndex = 0; playerIndex < this.alliance.getPlayersCount(); playerIndex++)
+				if (this.alliance.isMember(playerIndex))
+					allianceCopy.addPlayer(playerIndex);
 			
-			return copy;
+			return allianceCopy;
 		}
 	}
 	
-	void kaufeEprod(int preis)
+	void buyMoneyProduction(int price)
 	{
-		if (this.evorrat >= preis && this.eprod < Constants.EPROD_MAX)
+		if (this.moneySupply >= price && this.moneyProduction < Constants.MONEY_PRODUCTION_MAX)
 		{
-			this.eprod += Constants.KAUF_EPROD;
-			if (this.eprod > Constants.EPROD_MAX)
-				this.eprod = Constants.EPROD_MAX;
+			this.moneyProduction += Constants.MONEY_PRODUCTION_PURCHASE;
+			if (this.moneyProduction > Constants.MONEY_PRODUCTION_MAX)
+				this.moneyProduction = Constants.MONEY_PRODUCTION_MAX;
 			
-			this.evorrat -= preis;
+			this.moneySupply -= price;
 		}
 	}
 	
-	void kaufeFestung(int preis)
+	void buyDefenceShield(int price)
 	{
-		if (this.evorrat >= preis && this.getFestungFaktor() < Constants.MAX_ANZ_FESTUNGEN)
+		if (this.moneySupply >= price && this.getDefenceShieldFactor() < Constants.DEFENSE_SHIELDS_COUNT_MAX)
 		{
-			if (this.festung == null)
-				this.festung = new Festung();
+			if (this.defenceShield == null)
+				this.defenceShield = new DefenceShield();
 			else
-				this.festung.add();
+				this.defenceShield.add();
 			
-			this.evorrat -= preis;
+			this.moneySupply -= price;
 		}
 	}
 	
-	void verkaufeFestung(int preis)
+	void sellDefenceShield(int price)
 	{
-		if (this.festung != null)
+		if (this.defenceShield != null)
 		{
-			if (this.festung.getFaktor() == 1)
-				this.festung = null;
+			if (this.defenceShield.getFactor() == 1)
+				this.defenceShield = null;
 			else
 			{
-				this.festung.subtract();
+				this.defenceShield.subtract();
 				
-				if (this.festung.getRaumer() == 0)
-					this.festung = null;
+				if (this.defenceShield.getFightersCount() == 0)
+					this.defenceShield = null;
 			}
 			
-			this.evorrat += preis;
+			this.moneySupply += price;
 		}
 	}
 	
-	void repariereFestung(int preis)
+	void repairDefenceShield(int price)
 	{
-		if (this.evorrat >= preis && this.festung != null && !this.festung.istVollIntakt())
+		if (this.moneySupply >= price && this.defenceShield != null && !this.defenceShield.isComplete())
 		{
-			this.festung.repair();
-			this.evorrat -= preis;
+			this.defenceShield.repair();
+			this.moneySupply -= price;
 		}
 	}
 	
-	boolean istFestungVollIntakt()
+	boolean isDefenceShieldComplete()
 	{
-		if (this.festung == null)
+		if (this.defenceShield == null)
 			return true;
 		else
-			return this.festung.istVollIntakt();
+			return this.defenceShield.isComplete();
 	}
 	
-	double getFestungZustand()
+	double getDefenceShieldStateFactor()
 	{
-		if (this.festung == null)
+		if (this.defenceShield == null)
 			return 0;
 		else
-			return this.festung.getZustand();
+			return this.defenceShield.getStateFactor();
 	}
 	
-	void setFestungRaumer(int raumer)
+	void setDefenceShieldFightersCount(int fightersCount)
 	{
-		if (this.festung != null)
-			this.festung.setRaumer(raumer);
+		if (this.defenceShield != null)
+			this.defenceShield.setFightersCount(fightersCount);
 	}
 	
-	void incEraum()
+	void incrementFighterProduction()
 	{
-		if (this.eraum < this.eprod)
-			this.eraum++;
+		if (this.fighterProduction < this.moneyProduction)
+			this.fighterProduction++;
 	}
 	
-	void decEraum()
+	void decrementFighterProduction()
 	{
-		if (this.eraum > 0)
-			this.eraum--;
+		if (this.fighterProduction > 0)
+			this.fighterProduction--;
 	}
 	
-	void subEvorrat(int anz)
+	void subtractMoneySupply(int count)
 	{
-		this.evorrat -= anz;
+		this.moneySupply -= count;
 		
-		if (this.evorrat < 0)
-			this.evorrat = 0;
+		if (this.moneySupply < 0)
+			this.moneySupply = 0;
 	}
 	
-	void addEvorrat(int anz)
+	void addToMoneySupply(int count)
 	{
-		this.evorrat += anz;
+		this.moneySupply += count;
 	}
 	
-	Kommandozentrale kommandozentraleVerlegen()
+	CommandRoom removeCommandRoom()
 	{
-		Kommandozentrale kz = (Kommandozentrale)Utils.klon(this.kz);
-		this.kz = null;
-		return kz;
+		CommandRoom commandRoom = (CommandRoom)Utils.klon(this.commandRoom);
+		this.commandRoom = null;
+		return commandRoom;
 	}
 	
-	void kommandozentraleAufnehmen(Kommandozentrale kz)
+	void setCommandRoom(CommandRoom commandRoom)
 	{
-		this.kz = (Kommandozentrale)Utils.klon(kz);
+		this.commandRoom = (CommandRoom)Utils.klon(commandRoom);
 	}
 	
-	void incObjekt(ObjektTyp typ, int anz)
+	void incrementShipsCount(ShipType type, int count)
 	{
-		if (this.anz.containsKey(typ))
-			this.anz.put(typ, this.anz.get(typ)+ anz);
+		if (this.ships.containsKey(type))
+			this.ships.put(type, this.ships.get(type)+ count);
 		else
-			this.anz.put(typ, anz);
+			this.ships.put(type, count);
 	}
 	
-	void decObjekt(ObjektTyp typ, int anz)
+	void decrementShipsCount(ShipType type, int ount)
 	{
-		if (this.anz.containsKey(typ))
+		if (this.ships.containsKey(type))
 		{
-			if (this.anz.get(typ) - anz > 0)
-				this.anz.put(typ, this.anz.get(typ) - anz);			
+			if (this.ships.get(type) - ount > 0)
+				this.ships.put(type, this.ships.get(type) - ount);			
 			else
-				this.anz.remove(typ);
+				this.ships.remove(type);
 		}
 	}
 	
-	void kaufeObjekt(ObjektTyp typ, int anz, int preis)
+	void buyShip(ShipType type, int count, int price)
 	{
-		if (this.evorrat >= preis)
+		if (this.moneySupply >= price)
 		{
-			this.incObjekt(typ,anz);
-			this.evorrat -= preis;
+			this.incrementShipsCount(type,count);
+			this.moneySupply -= price;
 		}
 	}
 	
-	void verkaufeObjekt(ObjektTyp typ, int preis)
+	void sellShip(ShipType type, int price)
 	{
-		int anz = this.getAnz(typ);
+		int count = this.getShipsCount(type);
 		
-		if (anz > 0)
+		if (count > 0)
 		{
-			if (anz > 1)
-				this.anz.put(typ, this.anz.get(typ)- 1);
+			if (count > 1)
+				this.ships.put(type, this.ships.get(type)- 1);
 			else
-				this.anz.remove(typ);
+				this.ships.remove(type);
 			
-			this.evorrat += preis;
+			this.moneySupply += price;
 		}
 	}
 	
-	void produziereEvorrat()
+	void produceMoneySupply()
 	{
-		this.evorrat += (this.eprod - this.eraum);
+		this.moneySupply += (this.moneyProduction - this.fighterProduction);
 	}
 	
-	void produziereRaumer()
+	void produceFighters()
 	{
-		if (this.eraum <= 0)
+		if (this.fighterProduction <= 0)
 			return;
 		
-		if (this.istBuendnis())
+		if (this.allianceExists())
 		{
-			this.buendnis.addRaumer(this.bes, this.eraum);
-			this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
+			this.alliance.addFightersCount(this.owner, this.fighterProduction);
+			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
 		}
 		else
 		{
-			if (this.anz.containsKey(ObjektTyp.RAUMER))
-				this.anz.put(ObjektTyp.RAUMER, this.anz.get(ObjektTyp.RAUMER)+ this.eraum);
+			if (this.ships.containsKey(ShipType.FIGHTERS))
+				this.ships.put(ShipType.FIGHTERS, this.ships.get(ShipType.FIGHTERS)+ this.fighterProduction);
 			else
-				this.anz.put(ObjektTyp.RAUMER, eraum);
+				this.ships.put(ShipType.FIGHTERS, fighterProduction);
 		}
 	}
 	
-	void mergeRaumer(int anzSp, Flugobjekt obj)
+	void mergeFighters(int playerIndex, Ship ship)
 	{
-		if (obj.istBuendnis())
+		if (ship.isAlliance())
 		{
-			// Buendnisflotte.
-			// Ist der Planet schon ein Buendnisplanet?
-			if (!this.istBuendnis())
+			if (!this.allianceExists())
 			{
-				// Planet wird zum Buendnisplaneten
-				this.buendnis = new Buendnis(anzSp);
-				this.buendnis.addRaumer(this.bes, this.getAnz(ObjektTyp.RAUMER));
+				this.alliance = new Alliance(playerIndex);
+				this.alliance.addFightersCount(this.owner, this.getShipsCount(ShipType.FIGHTERS));
 			}
 			
-			for (int sp = 0; sp < anzSp; sp++)
-				if (obj.istBuendnisMitglied(sp))
-					// Jeder Spieler der Raumerflotte wird automatisch Buendnismitglied auf dem Planeten
-					this.buendnis.addRaumer(sp, obj.getRaumerProSpieler(sp));
+			for (int playerIndex2 = 0; playerIndex2 < playerIndex; playerIndex2++)
+				if (ship.isAllianceMember(playerIndex2))
+					this.alliance.addFightersCount(playerIndex2, ship.getFightersCount(playerIndex2));
 			
-			this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
+			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
 		}
 		else
-			this.incRaumerProSpieler(obj.getBes(), obj.getRaumerProSpieler(obj.getBes()));
+			this.incrementFightersCount(ship.getOwner(), ship.getFightersCount(ship.getOwner()));
 			
 	}
 	
-	void deleteFestung()
+	void deleteDefenceShield()
 	{
-		this.festung = null;
+		this.defenceShield = null;
 	}
 	
-	Kommandozentrale erobert(int anzSp, int sp, Flugobjekt obj)
+	CommandRoom conquer(int playersCount, int newOwner, Ship ship)
 	{
-		Kommandozentrale kz = null;
-		if (this.istKommandozentrale())
-			kz = (Kommandozentrale)Utils.klon(this.kz);
+		CommandRoom commandRoom = null;
+		if (this.hasCommandRoom())
+			commandRoom = (CommandRoom)Utils.klon(this.commandRoom);
 		
-		// Zunaechst alle Raumer auf 0 setzen, ausserdem Buendnis und Festung loeschen
-		this.anz.remove(ObjektTyp.RAUMER);
-		this.buendnis = null;
-		this.festung = null;
+		this.ships.remove(ShipType.FIGHTERS);
+		this.alliance = null;
+		this.defenceShield = null;
 		
-		// Kommandozentrale entfernen
-		this.kz = null;
+		this.commandRoom = null;
 
-		// Besitzer aendern
-		this.bes = sp;
+		this.owner = newOwner;
 		
-		// Raumer hinzufuegen
-		if (obj != null)
-			this.mergeRaumer(anzSp, obj);
+		if (ship != null)
+			this.mergeFighters(playersCount, ship);
 		
-		return kz;
+		return commandRoom;
 	}
 	
-	void spielerwechsel(int alterSpieler, int neuerSpieler)
+	void changeOwner(int playerIndexBefore, int playerIndexAfter)
 	{
-		// Besitzer des Planeten wechseln
-		if (this.bes == alterSpieler)
+		if (this.owner == playerIndexBefore)
 		{
-			// Kommandozentrale entfernen
-			this.kz = null;
+			this.commandRoom = null;
 			
-			// Wird aufgerufen, wenn die Kommandozentrale in fremde Haende gefallen ist
-			if (neuerSpieler == Constants.BESITZER_NEUTRAL)
+			if (playerIndexAfter == Constants.NEUTRAL)
 			{
-				if (this.istBuendnis())
+				if (this.allianceExists())
 				{
-					// Keine Buendnisse auf neutralen Planeten. Alle fremden Spieler
-					// "toeten"
-					this.anz.put(ObjektTyp.RAUMER, this.buendnis.getAnz(this.bes));
-					this.buendnis = null;
+					this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount(this.owner));
+					this.alliance = null;
 				}
 			}
 			
-			// Besitzer aendern
-			this.bes = neuerSpieler;
+			this.owner = playerIndexAfter;
 
 		}
 		
-		// Sender ersetzen
-		if (this.sender != null && this.sender.contains(alterSpieler))
+		if (this.radioStationsByPlayer != null && this.radioStationsByPlayer.contains(playerIndexBefore))
 		{
-			if (neuerSpieler == Constants.BESITZER_NEUTRAL)
-				// Sender loeschen, wenn Planet wieder neutral ist
-				this.sender.remove(alterSpieler);
+			if (playerIndexAfter == Constants.NEUTRAL)
+				this.radioStationsByPlayer.remove(playerIndexBefore);
 			else
 			{
-				this.sender.add(neuerSpieler);
+				this.radioStationsByPlayer.add(playerIndexAfter);
 			}
 		}
 
-		// Buendnis ersetzen
-		if (this.istBuendnisMitglied(alterSpieler))
+		if (this.isAllianceMember(playerIndexBefore))
 		{
-			this.buendnis.spielerErsetzen(alterSpieler, neuerSpieler);
-			this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
+			this.alliance.replacePlayer(playerIndexBefore, playerIndexAfter);
+			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
 			
-			if (this.buendnis.getAnzahlMitglieder() <= 1)
-				this.buendnis = null;
+			if (this.alliance.getMembersCount() <= 1)
+				this.alliance = null;
 		}
 		
-		// Planet produziert wieder nur Raumer
-		this.eraum = this.eprod;
+		this.fighterProduction = this.moneyProduction;
 	}
 	
-	void buendnisKuendigen(int spieler)
+	void cancelAlliance(int playerIndex)
 	{
-		// spieler: Spieler, der die Kuendigung ausgesprochen hat
-		if (!this.istBuendnis())
+		if (!this.allianceExists())
 			return;
 		
-		if (!this.istBuendnisMitglied(spieler))
+		if (!this.isAllianceMember(playerIndex))
 			return;
 		
-		if (spieler == this.bes)
+		if (playerIndex == this.owner)
 		{
-			// Spieler kuendigt auf seinem eigenen Planeten allen anderen Spielern
-			this.anz.put(ObjektTyp.RAUMER, this.buendnis.getAnz(spieler));
+			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount(playerIndex));
 			
-			for (int sp = 0; sp < this.buendnis.getAnzSp(); sp++)
-				this.buendnis.removeSpieler(sp, false);
+			for (int playerIndex2 = 0; playerIndex2 < this.alliance.getPlayersCount(); playerIndex2++)
+				this.alliance.removePlayer(playerIndex2, false);
 			
 		}
 		else
 		{
-			// Spieler kuendigt auf fremdem Planeten
-			this.buendnis.removeSpieler(spieler, false);
-			this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
+			this.alliance.removePlayer(playerIndex, false);
+			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
 		}
-		
 	}
 	
-	void buendnisSpielerHinzufuegen(int anzSp, int spieler)
+	void addPlayerToAlliance(int playersCount, int playerIndex)
 	{
-		// Fremde Spieler zum Buendnis auf einem Planeten hinzufuegen
-		if (!this.istBuendnis())
+		if (!this.allianceExists())
 		{
-			if (this.buendnis == null)
-				this.buendnis = new Buendnis(anzSp);
+			if (this.alliance == null)
+				this.alliance = new Alliance(playersCount);
 			
-			this.buendnis.addRaumer(this.bes, this.getAnz(ObjektTyp.RAUMER));
+			this.alliance.addFightersCount(this.owner, this.getShipsCount(ShipType.FIGHTERS));
 		}
 		
-		this.buendnis.addSpieler(spieler);
-		this.anz.put(ObjektTyp.RAUMER, this.buendnis.getSum());
+		this.alliance.addPlayer(playerIndex);
+		this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
 	}
 	
-	boolean[] buendnisGetMitglieder()
+	boolean[] getAllianceMembers()
 	{
-		if (this.buendnis != null)
-			return this.buendnis.getMitglieder();
+		if (this.alliance != null)
+			return this.alliance.getMembers();
 		else
 			return null;
 	}
 
-	int[] buendnisAufraeumen(int anzSp)
+	int[] correctAlliance(int playersCount)
 	{
-		if (this.buendnis == null)
-			return new int[anzSp];
+		if (this.alliance == null)
+			return new int[playersCount];
 		
-		int[] abzuege = this.buendnis.aufraeumen();
+		int[] reductions = this.alliance.correct();
 
-		if (this.buendnis.getAnzahlMitglieder() <= 1)
-			this.buendnis = null;
+		if (this.alliance.getMembersCount() <= 1)
+			this.alliance = null;
 		
-		return abzuege;
+		return reductions;
 	}
 	
-	@SuppressWarnings("unchecked") void spielzugUebernahmePlanet(Planet pl)
+	@SuppressWarnings("unchecked") 
+	void acceptPlanetDataChange(Planet planet)
 	{
-		// Flugobjekte kopieren, vorher Raumer sichern
-		Integer raumer = this.anz.get(ObjektTyp.RAUMER);
+		Integer fightersCount = this.ships.get(ShipType.FIGHTERS);
 		
-		this.anz = (Hashtable<ObjektTyp, Integer>)Utils.klon(pl.anz);
+		this.ships = (Hashtable<ShipType, Integer>)Utils.klon(planet.ships);
 		
-		if (raumer == null)
-			this.anz.remove(ObjektTyp.RAUMER);
+		if (fightersCount == null)
+			this.ships.remove(ShipType.FIGHTERS);
 		else
-			this.anz.replace(ObjektTyp.RAUMER, raumer.intValue());
+			this.ships.replace(ShipType.FIGHTERS, fightersCount.intValue());
 		
-		// Andere Daten des Planeten, die im Planeteneditor geaendert werden koennen, kopieren
-		this.evorrat = pl.evorrat;
-		this.eprod = pl.eprod;
-		this.eraum = pl.eraum;
-		this.festung = pl.festung;
+		this.moneySupply = planet.moneySupply;
+		this.moneyProduction = planet.moneyProduction;
+		this.fighterProduction = planet.fighterProduction;
+		this.defenceShield = planet.defenceShield;
 	}
 	
-	boolean spielzugUebernahmeBuendnis(int spieler, boolean[] mitglieder)
+	boolean acceptAllianceChange(int playerIndex, boolean[] members)
 	{
-		if (spieler == this.bes)
+		if (playerIndex == this.owner)
 		{
-			for (int sp = 0; sp < mitglieder.length; sp++)
+			for (int playerIndex2 = 0; playerIndex2 < members.length; playerIndex2++)
 			{
-				if (sp != this.bes)
+				if (playerIndex2 != this.owner)
 				{
-					if (this.istBuendnisMitglied(sp) && !mitglieder[sp])
-						this.buendnisKuendigen(sp);
+					if (this.isAllianceMember(playerIndex2) && !members[playerIndex2])
+						this.cancelAlliance(playerIndex2);
 					else
-						this.buendnisSpielerHinzufuegen(mitglieder.length, sp);
+						this.addPlayerToAlliance(members.length, playerIndex2);
 				}
 			}
 		}
 		else
 		{		
-			// Pruefen, ob ein Spieler seine Teilenahme auf einem fremden Planeten
-			// kuendigt, aber dort noch Raumer hat.
-			if (this.getRaumerProSpieler(spieler) > 0)
+			if (this.getFightersCount(playerIndex) > 0)
 				return false;
 			
-			this.buendnisKuendigen(spieler);
+			this.cancelAlliance(playerIndex);
 		}
 		
 		return true;
 	}
 	
-	Buendnis uebertrageBuendnisAufFlotte(int[] abzuege)
+	Alliance copyAllianceStructure(int[] reductions)
 	{
-		// Starte eine Buendnisflotte. Die Buendnisstruktur des Planeten wird auf die Flotte 
-		// uebertragen
-		Buendnis objBuendnis = this.getEmptyCopyOfBuendnis();
-		if (objBuendnis == null)
+		Alliance alliance = this.getAllianceStructure();
+		if (alliance == null)
 			return null;
 		
-		for (int spieler = 0; spieler < objBuendnis.getAnzSp(); spieler++)
-			if (this.istBuendnisMitglied(spieler))
-				objBuendnis.addRaumer(spieler, abzuege[spieler]);
+		for (int playerIndex = 0; playerIndex < alliance.getPlayersCount(); playerIndex++)
+			if (this.isAllianceMember(playerIndex))
+				alliance.addFightersCount(playerIndex, reductions[playerIndex]);
 		
-		return objBuendnis;
+		return alliance;
 	}
 	
-	void setSender(int spieler)
+	void setRadioStation(int playerIndex)
 	{
-		if (this.sender == null)
-			this.sender = new HashSet<Integer>();
+		if (this.radioStationsByPlayer == null)
+			this.radioStationsByPlayer = new HashSet<Integer>();
 		
-		this.sender.add(spieler);
+		this.radioStationsByPlayer.add(playerIndex);
 	}
 	
-	boolean hatSender(int spieler)
+	boolean hasRadioStation(int playerIndex)
 	{
-		if (this.sender == null)
+		if (this.radioStationsByPlayer == null)
 			return false;
 		
-		return this.sender.contains(spieler);
+		return this.radioStationsByPlayer.contains(playerIndex);
 	}
 	
-	Planet getSpielerInfo(int spIndex, boolean zeigeNeutralePlaneten)
+	Planet createCopyForPlayer(int playerIndex)
 	{
-		// Erzeuge einen Clone und reduziere alle Informationen,
-		// die den Spieler nichts angehen
 		Planet plClone = (Planet)Utils.klon(this);
 		
-		if (this.bes == spIndex ||
-			this.hatSender(spIndex))
+		if (this.owner == playerIndex ||
+			this.hasRadioStation(playerIndex))
 		{
 			return plClone;
 		}
 
-		if (!this.istBuendnisMitglied(spIndex))
+		if (!this.isAllianceMember(playerIndex))
 		{
-			plClone.buendnis = null;
+			plClone.alliance = null;
 		}
 
-		plClone.anz = new Hashtable<ObjektTyp,Integer>();
-		plClone.anz.put(ObjektTyp.RAUMER, this.getAnz(ObjektTyp.RAUMER));
+		plClone.ships = new Hashtable<ShipType,Integer>();
+		plClone.ships.put(ShipType.FIGHTERS, this.getShipsCount(ShipType.FIGHTERS));
 		
-		plClone.eprod = 0;
-		plClone.eraum = 0;
-		plClone.evorrat = 0;
-		plClone.festung = null;
-		plClone.kz = null;
-		plClone.sender = null;
+		plClone.moneyProduction = 0;
+		plClone.fighterProduction = 0;
+		plClone.moneySupply = 0;
+		plClone.defenceShield = null;
+		plClone.commandRoom = null;
+		plClone.radioStationsByPlayer = null;
 		
 		return plClone;
 	}

@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -53,15 +53,16 @@ import commonUi.PasswordFieldDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial") class SternDisplaySettingsJDialog extends JDialog implements ChangeListener, ActionListener
+@SuppressWarnings("serial") 
+class SternDisplaySettingsJDialog extends JDialog implements ChangeListener, ActionListener
 {
 	private ButtonDark butConnect;
 	private ButtonDark butClose;
-	private ButtonDark butGetIp;
-	private TextFieldDark tfServerIp;
-	private TextFieldDark tfMeineIp;
+	private ButtonDark butGetMyIpAddress;
+	private TextFieldDark tfServerIpAddress;
+	private TextFieldDark tfMyIpAddress;
 	private PasswordFieldDark tfClientCode;
-	private TextFieldDark tfMeinName;
+	private TextFieldDark tfMyName;
 	private LabelDark labStatus;
 
 	private SternDisplaySettings settings;
@@ -77,7 +78,6 @@ import commonUi.TextFieldDark;
 	{
 		super (parent, title, modal);
 		
-		/// Font laden
 		font = DialogFontHelper.getFont();
 		
 		this.settings = settings;
@@ -100,21 +100,21 @@ import commonUi.TextFieldDark;
 		
 		panServer.add(new LabelDark(SternResources.ClientSettingsJDialogMeineIp(false), font));
 
-		PanelDark panIp = new PanelDark(new GridLayout(1,2, 10, 0));
+		PanelDark panIpAddresses = new PanelDark(new GridLayout(1,2, 10, 0));
 		
-		this.tfMeineIp = new TextFieldDark(font, 18);
-		this.tfMeineIp.setText(this.settings.meineIp);
-		panIp.add(this.tfMeineIp);
+		this.tfMyIpAddress = new TextFieldDark(font, 18);
+		this.tfMyIpAddress.setText(this.settings.myIpAddress);
+		panIpAddresses.add(this.tfMyIpAddress);
 		
-		this.butGetIp = new ButtonDark(this, SternResources.ClientSettingsJDialogIpErmitteln(false) , font);
-		panIp.add(this.butGetIp);
+		this.butGetMyIpAddress = new ButtonDark(this, SternResources.ClientSettingsJDialogIpErmitteln(false) , font);
+		panIpAddresses.add(this.butGetMyIpAddress);
 		
-		panServer.add(panIp);
+		panServer.add(panIpAddresses);
 		
 		panServer.add(new LabelDark(SternResources.ServerSettingsJDialogIpServer(false), font));
 		
-		this.tfServerIp = new TextFieldDark(this.settings.serverIp, font);
-		panServer.add(this.tfServerIp);
+		this.tfServerIpAddress = new TextFieldDark(this.settings.serverIpAddress, font);
+		panServer.add(this.tfServerIpAddress);
 		
 		panServer.add(new LabelDark(SternResources.ThinClientCode(false), font));
 		
@@ -123,8 +123,8 @@ import commonUi.TextFieldDark;
 		
 		panServer.add(new LabelDark(SternResources.ClientSettingsJDialogMeinName(false), font));
 		
-		this.tfMeinName = new TextFieldDark(this.settings.meinName, font);
-		panServer.add(this.tfMeinName);
+		this.tfMyName = new TextFieldDark(this.settings.myName, font);
+		panServer.add(this.tfMyName);
 		
 		SpringUtilities.makeCompactGrid(panServer,
                 4, 2, //rows, cols
@@ -204,34 +204,34 @@ import commonUi.TextFieldDark;
 			
 			this.close();
 		}
-		else if (source == this.butGetIp)
+		else if (source == this.butGetMyIpAddress)
 		{
-			this.tfMeineIp.setText(Utils.getMyIPAddress());
+			this.tfMyIpAddress.setText(Utils.getMyIPAddress());
 		}
 		else if (source == this.butConnect)
 		{
 			this.updateSettings();
-			System.setProperty("java.rmi.server.hostname",this.settings.meineIp);
+			System.setProperty("java.rmi.server.hostname",this.settings.myIpAddress);
 			
 			String errorMsg = null;
 			
 			this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			
 			try {
-				if (!InetAddress.getByName( this.settings.serverIp ).isReachable( 2000 ))
+				if (!InetAddress.getByName( this.settings.serverIpAddress ).isReachable( 2000 ))
 					throw new Exception(
 							SternResources.ClientSettingsJDialogServerNichtErreichbar(false,
-									this.settings.serverIp));
+									this.settings.serverIpAddress));
 				IServerMethods rmiServer;
-				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
+				Registry registry = LocateRegistry.getRegistry(this.settings.serverIpAddress);
+				rmiServer = (IServerMethods) registry.lookup( Constants.RMI_REGISTRATION_NAME_SERVER );
 				
 				errorMsg = rmiServer.rmiClientConnectionRequest(
 						this.settings.clientId,
 						ReleaseGetter.getRelease(),
-						this.settings.meineIp,
+						this.settings.myIpAddress,
 						this.settings.clientCode,
-						this.settings.meinName);
+						this.settings.myName);
 				
 				if (errorMsg.length() > 0)
 					DialogWindow.showError(
@@ -267,24 +267,25 @@ import commonUi.TextFieldDark;
 		if (this.parent.connected)
 		{
 
-			try {
+			try 
+			{
 				IServerMethods rmiServer;
-				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
+				Registry registry = LocateRegistry.getRegistry(this.settings.serverIpAddress);
+				rmiServer = (IServerMethods) registry.lookup( Constants.RMI_REGISTRATION_NAME_SERVER );
 
 				authorized = rmiServer.rmiClientCheckRegistration(this.settings.clientId);
 			}
 			catch (Exception e)
 			{
-				text = SternResources.ClientSettingsJDialogKeineVerbindung2(false, this.settings.serverIp);
+				text = SternResources.ClientSettingsJDialogKeineVerbindung2(false, this.settings.serverIpAddress);
 			}
 
 			if (text.length() == 0)
 			{
 				if (authorized)
-					text = SternResources.ClientSettingsJDialogVerbunden(false, this.settings.serverIp); 
+					text = SternResources.ClientSettingsJDialogVerbunden(false, this.settings.serverIpAddress); 
 				else
-					text = SternResources.ClientSettingsJDialogClientNichtRegistriert(false, this.settings.serverIp); 
+					text = SternResources.ClientSettingsJDialogClientNichtRegistriert(false, this.settings.serverIpAddress); 
 			}
 		}
 		else
@@ -297,9 +298,9 @@ import commonUi.TextFieldDark;
 	private void updateSettings()
 	{
 		this.settings.clientCode = this.tfClientCode.getText();
-		this.settings.meinName = this.tfMeinName.getText();
-		this.settings.meineIp = this.tfMeineIp.getText();
-		this.settings.serverIp = this.tfServerIp.getText();
+		this.settings.myName = this.tfMyName.getText();
+		this.settings.myIpAddress = this.tfMyIpAddress.getText();
+		this.settings.serverIpAddress = this.tfServerIpAddress.getText();
 	}
 
 	@Override
@@ -311,10 +312,10 @@ import commonUi.TextFieldDark;
 	{
 		PanelDark panel = new PanelDark();
 		
-		TitledBorder titled = new TitledBorder(title);
-		titled.setTitleFont(font);
-		titled.setTitleColor(Color.white);
-		panel.setBorder(titled);
+		TitledBorder titledBorder = new TitledBorder(title);
+		titledBorder.setTitleFont(font);
+		titledBorder.setTitleColor(Color.white);
+		panel.setBorder(titledBorder);
 		
 		return panel;
 	}

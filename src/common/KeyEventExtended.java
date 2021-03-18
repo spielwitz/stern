@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,4 @@ public class KeyEventExtended
 		this.ClientId = clientId;
 		this.languageCode = languageCode;
 	}
-	
-	
 }

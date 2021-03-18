@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -91,7 +91,6 @@ import commonUi.SpringUtilities;
 	{
 		this.expectedClass = expectedClass;
 		
-		// Font laden
 		font = DialogFontHelper.getFont();
 		
 		this.setLayout(new BorderLayout(5, 5));
@@ -180,7 +179,6 @@ import commonUi.SpringUtilities;
 		getRootPane().setDefaultButton(this.butCancel);
 		
 		this.pack();
-		//this.setLocationRelativeTo(parent);	
 		this.setResizable(false);
 	}
 	

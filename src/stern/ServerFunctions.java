@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import common.Constants;
-import common.ScreenDisplayContent;
+import common.ScreenContent;
 import common.SternResources;
 import common.Utils;
 import commonUi.DialogWindow;
@@ -35,20 +35,20 @@ import commonUi.IServerMethods;
 
 class ServerFunctions
 {
-	private String meineIp;
+	private String myIpAddress;
 	private String clientCode; 
 	private boolean serverEnabled = false;
 	
 	private Hashtable<String,ClientScreenDisplayContentUpdater> registeredClients;
 	private ExecutorService threadPool;
 	
-	ServerFunctions(String meineIp)
+	ServerFunctions(String myIpAddress)
 	{
 		this.serverEnabled = false;
-		this.meineIp = (meineIp == null) ? Utils.getMyIPAddress() : meineIp;
-		System.setProperty("java.rmi.server.hostname",this.meineIp);
+		this.myIpAddress = (myIpAddress == null) ? Utils.getMyIPAddress() : myIpAddress;
+		System.setProperty("java.rmi.server.hostname",this.myIpAddress);
 		
-		int clientCode = Utils.random(10000);
+		int clientCode = Utils.getRandomInteger(10000);
 		this.clientCode = ("0000"+Integer.toString(clientCode));
 		this.clientCode = this.clientCode.substring(this.clientCode.length()-4, this.clientCode.length());
 		
@@ -58,12 +58,12 @@ class ServerFunctions
 	
 	public void setIp(String meineIp)
 	{
-		this.meineIp = (meineIp == null) ? Utils.getMyIPAddress() : meineIp;
-		System.setProperty("java.rmi.server.hostname",this.meineIp);
+		this.myIpAddress = (meineIp == null) ? Utils.getMyIPAddress() : meineIp;
+		System.setProperty("java.rmi.server.hostname",this.myIpAddress);
 	}
 
 	public String getMeineIp() {
-		return meineIp;
+		return myIpAddress;
 	}
 
 	public String getClientCode() {
@@ -80,20 +80,19 @@ class ServerFunctions
 	}
 		
 	void updateClients(
-			ScreenDisplayContent content, 
-			ScreenDisplayContent contentWaehrendZugeingabe,
+			ScreenContent screenContent, 
+			ScreenContent screenContentCopy,
 			boolean inputEnabled)
 	{
 		for (ClientScreenDisplayContentUpdater updater: this.registeredClients.values())
 		{
-			if (contentWaehrendZugeingabe != null && updater.inaktivBeiZugeingabe)
+			if (screenContentCopy != null && updater.inactiveWhileEnterMoves)
 			{
-				// Tastatureingabe ist inaktiv weahrend der Zugeingabe
-				updater.setContent(contentWaehrendZugeingabe, false, false);
+				updater.setContent(screenContentCopy, false, false);
 			}
 			else
 			{
-				updater.setContent(content, inputEnabled, !inputEnabled);
+				updater.setContent(screenContent, inputEnabled, !inputEnabled);
 			}
 			
 			try
@@ -135,19 +134,17 @@ class ServerFunctions
 			String ip, 
 			String clientCode, 
 			String clientName,
-			boolean inaktivBeiZugeingabe)
+			boolean inactiveWhileEnterMoves)
 	{
-		// Ueberpruefe den code
 		if (clientCode.equals(this.clientCode))
 		{
-			// Nimm den Client in die Liste der registrierten Clients auf
 			ClientScreenDisplayContentUpdater updater = 
-					new ClientScreenDisplayContentUpdater(clientId, ip, clientName, inaktivBeiZugeingabe);
+					new ClientScreenDisplayContentUpdater(clientId, ip, clientName, inactiveWhileEnterMoves);
 			this.registeredClients.put(clientId, updater);
 			return "";
 		}
 		else
-			return "Client Code ist ungueltig";
+			return SternResources.ClientCodeInvalid(false);
 	}
 	
 	void disconnectClient(String clientId)
@@ -161,8 +158,8 @@ class ServerFunctions
 		private String clientId;
 		private String clientIp;
 		private String clientName;
-		private boolean inaktivBeiZugeingabe;
-		private ScreenDisplayContent content;
+		private boolean inactiveWhileEnterMoves;
+		private ScreenContent content;
 		private boolean inputEnabled;
 		private boolean showInputDisabled;
 		
@@ -170,16 +167,16 @@ class ServerFunctions
 				String clientId, 
 				String clientIp, 
 				String clientName,
-				boolean inaktivBeiZugeingabe)
+				boolean inactiveWhileEnterMoves)
 		{
 			this.clientId = clientId;
 			this.clientIp = clientIp;
 			this.clientName = clientName;
-			this.inaktivBeiZugeingabe = inaktivBeiZugeingabe;
+			this.inactiveWhileEnterMoves = inactiveWhileEnterMoves;
 		}
 		
 		private void setContent(
-				ScreenDisplayContent content, 
+				ScreenContent content, 
 				boolean inputEnabled,
 				boolean showInputDisabled)
 		{
@@ -195,7 +192,7 @@ class ServerFunctions
 				ISternDisplayMethods rmiServer;
 				Registry registry = LocateRegistry.getRegistry(this.clientIp);
 				rmiServer = (ISternDisplayMethods) registry.lookup( this.clientId );
-				rmiServer.updateScreenDisplayContent(
+				rmiServer.updateScreen(
 						this.content, 
 						this.inputEnabled,
 						this.showInputDisabled);
@@ -217,8 +214,8 @@ class ServerFunctions
 			return clientName;
 		}
 
-		public boolean isInaktivBeiZugeingabe() {
-			return inaktivBeiZugeingabe;
+		public boolean isInactiveWhileEnterMoves() {
+			return inactiveWhileEnterMoves;
 		}
 
 		public boolean isShowInputDisabled() {
@@ -240,7 +237,7 @@ class ServerFunctions
 			stub = (IServerMethods) UnicastRemoteObject.exportObject(parent, 0 );
 			Registry registry;
 			registry = LocateRegistry.getRegistry();
-			registry.rebind( Constants.REG_NAME_SERVER, stub );
+			registry.rebind( Constants.RMI_REGISTRATION_NAME_SERVER, stub );
 			
 			ok = true;
 			
@@ -265,13 +262,10 @@ class ServerFunctions
 	boolean stopServer(Remote parent)
 	{
 		boolean ok = false;
-		// Stop RMI
 		try {
-            // access the service
 			Registry registry = LocateRegistry.getRegistry();
 			this.unbindRegistry(registry);
 
-            // get rid of the service object
             UnicastRemoteObject.unexportObject(parent, true);
             ok = true;
 
@@ -300,7 +294,7 @@ class ServerFunctions
 	{
 		try
 		{
-			registry.unbind(Constants.REG_NAME_SERVER);
+			registry.unbind(Constants.RMI_REGISTRATION_NAME_SERVER);
 		}
 		catch (Exception x) {}
 	}

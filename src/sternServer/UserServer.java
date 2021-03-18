@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -25,11 +25,11 @@ import commonServer.CryptoLib;
 
 class UserServer
 {
-	String userId; // z.B. "Zorro", 3-10 Zeichen, A-Z, a-z, 0-9
+	String userId;
 	
-	boolean active; // Benutzer ist aktiv
+	boolean active;
 	
-	String userPublicKey; // Public key des Users: Verschluesselung der Response auf Server-Seite
+	String userPublicKey;
 	String name;
 	
 	String email;

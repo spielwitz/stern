@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@ package common;
 
 public enum PostMovesResult 
 {
-	FEHLER,
-	WARTE,
-	AUSWERTUNG_VERFUEGBAR,
-	BENUTZER_NICHT_ANGEMELDET
+	ERROR,
+	WAIT_FOR_EVAULATION,
+	EVALUATION_AVAILABLE,
+	USER_NOT_CONNECTED
 }

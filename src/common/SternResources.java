@@ -6,11 +6,11 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
-   * Diese Klasse wurde mit dem Resource Bundle Utility aus der Ressourcen-Datei
+   * This class was created with the Resource Bundle Utility from the resource file
    *
    *   SternResources_de_DE
    *
-   * erzeugt. Die Ressourcen-Datei wird mit dem Eclipse-Plugin ResourceBundle Editor gepflegt.
+   * The resource file is maintained with the Eclipse-Plugin ResourceBundle Editor.
    */
 public class SternResources
 {
@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Hoechstes vergebenes Symbol: IV
+		// Last used symbolic key: JA
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -161,7 +161,6 @@ public class SternResources
 		symbolDict.put("3O","PlaneteneditorKaufen_3O");
 		symbolDict.put("3P","PlaneteneditorUebernehmen_3P");
 		symbolDict.put("3Q","PlaneteneditorVerkaufen_3Q");
-		symbolDict.put("3R","ProgramArgument_3R");
 		symbolDict.put("3S","Punkte_3S");
 		symbolDict.put("3T","Raumer_3T");
 		symbolDict.put("3U","Rechts_3U");
@@ -205,8 +204,6 @@ public class SternResources
 		symbolDict.put("5C","SpielinformationenKommandozentralen_5C");
 		symbolDict.put("5D","SpielinformationenKommandozentralenTitel_5D");
 		symbolDict.put("5E","SpielinformationenKommandozentralenUnterwegs_5E");
-		symbolDict.put("5F","SpielinformationenMinenfelder_5F");
-		symbolDict.put("5G","SpielinformationenMinenfelderTitel_5G");
 		symbolDict.put("5H","SpielinformationenPatrouillen_5H");
 		symbolDict.put("5I","SpielinformationenPatrouillenTitel_5I");
 		symbolDict.put("5J","SpielinformationenPlanet_5J");
@@ -241,7 +238,6 @@ public class SternResources
 		symbolDict.put("6F","StatistikMin_6F");
 		symbolDict.put("6G","StatistikSchliessen_6G");
 		symbolDict.put("6H","StatistikSpielBegonnen_6H");
-		symbolDict.put("6I","StatistikStunden_6I");
 		symbolDict.put("6J","StatistikTitelEnergieproduktion_6J");
 		symbolDict.put("6K","StatistikTitelPlaneten_6K");
 		symbolDict.put("6L","StatistikTitelPunkte_6L");
@@ -302,7 +298,6 @@ public class SternResources
 		symbolDict.put("86","Hauptmenue_86");
 		symbolDict.put("87","HighscoreFrage_87");
 		symbolDict.put("88","InventurAnkunft_88");
-		symbolDict.put("89","InventurAnkunftJahr_89");
 		symbolDict.put("8A","ZugeingabeKeineSpielzuege_8A");
 		symbolDict.put("8B","ZugeingabeKommandozentraleVerlegen_8B");
 		symbolDict.put("8C","ZugeingabeKuendigen_8C");
@@ -365,7 +360,6 @@ public class SternResources
 		symbolDict.put("9Y","Zurueck_9Y");
 		symbolDict.put("9Z","Auswertung_9Z");
 		symbolDict.put("AA","ClientSettingsJDialogKeineVerbindung2_AA");
-		symbolDict.put("AB","StatistikMinuten_AB");
 		symbolDict.put("AC","ZugeingabeBuendnis0NichtKombinieren_AC");
 		symbolDict.put("AD","ZugeingabeKeineSpielzuegeAbbrechen_AD");
 		symbolDict.put("AE","ZugeingabeMine100_AE");
@@ -471,8 +465,6 @@ public class SternResources
 		symbolDict.put("E6","PasswoerterUnterschiedlich_E6");
 		symbolDict.put("E7","PasswortZuKurz_E7");
 		symbolDict.put("E8","Passwort_E8");
-		symbolDict.put("EC","SpielinformationenNeutralePlaneten_EC");
-		symbolDict.put("ED","SpielinformationenNeutralePlanetenTitel_ED");
 		symbolDict.put("EE","ServerBuildFalsch_EE");
 		symbolDict.put("EF","SternScreenSharingServer_EF");
 		symbolDict.put("EG","EmailSubjectEingeladen_EG");
@@ -480,8 +472,6 @@ public class SternResources
 		symbolDict.put("EI","SpielerNichtAngemeldet_EI");
 		symbolDict.put("EJ","AuswertungAufklaererSender_EJ");
 		symbolDict.put("EK","ZugeingabeMehr_EK");
-		symbolDict.put("EL","ZugeingabeRaumerAufPlanet_EL");
-		symbolDict.put("EM","ZugeingabeRaumerAnzeigen_EM");
 		symbolDict.put("EN","AuswertungVerfuegbar2_EN");
 		symbolDict.put("EO","ServerGamesSubmitAngelegt2_EO");
 		symbolDict.put("EP","LetztesJahr_EP");
@@ -489,15 +479,9 @@ public class SternResources
 		symbolDict.put("ER","AbgeschlossenesSpiel_ER");
 		symbolDict.put("ET","ZugeingabeKapitulieren_ET");
 		symbolDict.put("EU","AuswertungKapitulation_EU");
-		symbolDict.put("EV","UpdateVerfuegbar_EV");
-		symbolDict.put("EX","Update_EX");
 		symbolDict.put("EY","ZugeingabeSpielzuegeSchonEingegeben_EY");
 		symbolDict.put("EZ","ServerAnwendungsfehler_EZ");
 		symbolDict.put("FB","ReleaseFormatted_FB");
-		symbolDict.put("FC","UpdateVerfuegbarWichtig_FC");
-		symbolDict.put("FD","MenuSearchForUpdates_FD");
-		symbolDict.put("FE","UpdateAktuell_FE");
-		symbolDict.put("FF","UpdateServerNichtErreichbar_FF");
 		symbolDict.put("FG","ServerAdminSpielerLoeschen_FG");
 		symbolDict.put("FH","ServerAdminSpielerAnlegen_FH");
 		symbolDict.put("FI","ServerAdminAnmeldedatenErneuern_FI");
@@ -525,9 +509,6 @@ public class SternResources
 		symbolDict.put("GE","ServerLogLevelAendernErfolg_GE");
 		symbolDict.put("GF","ServerLogLeer_GF");
 		symbolDict.put("GG","ReleaseFormatted2_GG");
-		symbolDict.put("GH","AuswertungEreignisTag_GH");
-		symbolDict.put("GI","AuswertungEreignisJahresbeginn_GI");
-		symbolDict.put("GJ","AuswertungEreignisJahresende_GJ");
 		symbolDict.put("GK","FlugzeitOutput_GK");
 		symbolDict.put("GL","FlugzeitOutputJahresende_GL");
 		symbolDict.put("GM","FlugzeitOutputShort_GM");
@@ -561,7 +542,6 @@ public class SternResources
 		symbolDict.put("HU","BenachrichtigungStumm_HU");
 		symbolDict.put("HV","ServerUserLesen_HV");
 		symbolDict.put("HW","ServerConfigLaden_HW");
-		symbolDict.put("HX","ServerConfigErzeugen_HX");
 		symbolDict.put("HY","ServerSpielLesen_HY");
 		symbolDict.put("HZ","ServerOrdnerErzeugen_HZ");
 		symbolDict.put("IA","ServerAdminErzeugen_IA");
@@ -586,6 +566,11 @@ public class SternResources
 		symbolDict.put("IT","WebserverAktiviert_IT");
 		symbolDict.put("IU","WebserverDeaktiviert_IU");
 		symbolDict.put("IV","Webserver_IV");
+		symbolDict.put("IW","LogOnDataIncomplete_IW");
+		symbolDict.put("IX","ConnectionClosed_IX");
+		symbolDict.put("IY","NoConnectionToServer_IY");
+		symbolDict.put("IZ","AddressSeparator_IZ");
+		symbolDict.put("JA","ClientCodeInvalid_JA");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -1483,13 +1468,6 @@ public class SternResources
 	}
 
 	/**
-	   * Ung\u00FCltiges Programmargument [{0}] [3R]
-	   */
-	public static String ProgramArgument(boolean symbol, String arg0) {
-		return symbol ? "£3R§"+arg0+"£":MessageFormat.format(messages.getString("ProgramArgument_3R"), arg0);
-	}
-
-	/**
 	   * Punkte [3S]
 	   */
 	public static String Punkte(boolean symbol) {
@@ -1791,20 +1769,6 @@ public class SternResources
 	}
 
 	/**
-	   * Minenfelder [5F]
-	   */
-	public static String SpielinformationenMinenfelder(boolean symbol) {
-		return symbol ? "£5F£":messages.getString("SpielinformationenMinenfelder_5F");
-	}
-
-	/**
-	   * Minenfelder [5G]
-	   */
-	public static String SpielinformationenMinenfelderTitel(boolean symbol) {
-		return symbol ? "£5G£":messages.getString("SpielinformationenMinenfelderTitel_5G");
-	}
-
-	/**
 	   * Patrouillen [5H]
 	   */
 	public static String SpielinformationenPatrouillen(boolean symbol) {
@@ -2040,13 +2004,6 @@ public class SternResources
 	   */
 	public static String StatistikSpielBegonnen(boolean symbol) {
 		return symbol ? "£6H£":messages.getString("StatistikSpielBegonnen_6H");
-	}
-
-	/**
-	   * Std. [6I]
-	   */
-	public static String StatistikStunden(boolean symbol) {
-		return symbol ? "£6I£":messages.getString("StatistikStunden_6I");
 	}
 
 	/**
@@ -2467,13 +2424,6 @@ public class SternResources
 	   */
 	public static String InventurAnkunft(boolean symbol) {
 		return symbol ? "£88£":messages.getString("InventurAnkunft_88");
-	}
-
-	/**
-	   * J{0}T{1} [89]
-	   */
-	public static String InventurAnkunftJahr(boolean symbol, String arg0, String arg1) {
-		return symbol ? "£89§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("InventurAnkunftJahr_89"), arg0, arg1);
 	}
 
 	/**
@@ -2908,13 +2858,6 @@ public class SternResources
 	   */
 	public static String ClientSettingsJDialogKeineVerbindung2(boolean symbol, String arg0) {
 		return symbol ? "£AA§"+arg0+"£":MessageFormat.format(messages.getString("ClientSettingsJDialogKeineVerbindung2_AA"), arg0);
-	}
-
-	/**
-	   * Min. [AB]
-	   */
-	public static String StatistikMinuten(boolean symbol) {
-		return symbol ? "£AB£":messages.getString("StatistikMinuten_AB");
 	}
 
 	/**
@@ -3653,20 +3596,6 @@ public class SternResources
 	}
 
 	/**
-	   * Neutrale Pl. [EC]
-	   */
-	public static String SpielinformationenNeutralePlaneten(boolean symbol) {
-		return symbol ? "£EC£":messages.getString("SpielinformationenNeutralePlaneten_EC");
-	}
-
-	/**
-	   * Neutrale Planeten [ED]
-	   */
-	public static String SpielinformationenNeutralePlanetenTitel(boolean symbol) {
-		return symbol ? "£ED£":messages.getString("SpielinformationenNeutralePlanetenTitel_ED");
-	}
-
-	/**
 	   * Der Server setzt mindestens Build {0} voraus. Sie verwenden Build {1}. [EE]
 	   */
 	public static String ServerBuildFalsch(boolean symbol, String arg0, String arg1) {
@@ -3713,20 +3642,6 @@ public class SternResources
 	   */
 	public static String ZugeingabeMehr(boolean symbol) {
 		return symbol ? "£EK£":messages.getString("ZugeingabeMehr_EK");
-	}
-
-	/**
-	   * Kampfschiffe auf Planet anzeigen [EL]
-	   */
-	public static String ZugeingabeRaumerAufPlanet(boolean symbol) {
-		return symbol ? "£EL£":messages.getString("ZugeingabeRaumerAufPlanet_EL");
-	}
-
-	/**
-	   * Auf dem Planeten befindet/n sich {0} Kampfschiff(e). [EM]
-	   */
-	public static String ZugeingabeRaumerAnzeigen(boolean symbol, String arg0) {
-		return symbol ? "£EM§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabeRaumerAnzeigen_EM"), arg0);
 	}
 
 	/**
@@ -3779,20 +3694,6 @@ public class SternResources
 	}
 
 	/**
-	   * Ein Update ist verf\u00FCgbar [EV]
-	   */
-	public static String UpdateVerfuegbar(boolean symbol) {
-		return symbol ? "£EV£":messages.getString("UpdateVerfuegbar_EV");
-	}
-
-	/**
-	   * Update [EX]
-	   */
-	public static String Update(boolean symbol) {
-		return symbol ? "£EX£":messages.getString("Update_EX");
-	}
-
-	/**
 	   * Sie haben Ihre Spielz\u00FCge bereits eingegeben. Bitte warten Sie auf die Auswertung. [EY]
 	   */
 	public static String ZugeingabeSpielzuegeSchonEingegeben(boolean symbol) {
@@ -3811,34 +3712,6 @@ public class SternResources
 	   */
 	public static String ReleaseFormatted(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4) {
 		return symbol ? "£FB§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"£":MessageFormat.format(messages.getString("ReleaseFormatted_FB"), arg0, arg1, arg2, arg3, arg4);
-	}
-
-	/**
-	   * Ein wichtiges Update ist verf\u00FCgbar [FC]
-	   */
-	public static String UpdateVerfuegbarWichtig(boolean symbol) {
-		return symbol ? "£FC£":messages.getString("UpdateVerfuegbarWichtig_FC");
-	}
-
-	/**
-	   * Nach Updates suchen [FD]
-	   */
-	public static String MenuSearchForUpdates(boolean symbol) {
-		return symbol ? "£FD£":messages.getString("MenuSearchForUpdates_FD");
-	}
-
-	/**
-	   * Ihr STERN-Build ist auf dem neusten Stand. [FE]
-	   */
-	public static String UpdateAktuell(boolean symbol) {
-		return symbol ? "£FE£":messages.getString("UpdateAktuell_FE");
-	}
-
-	/**
-	   * Der Update-Server ist nicht erreichbar. [FF]
-	   */
-	public static String UpdateServerNichtErreichbar(boolean symbol) {
-		return symbol ? "£FF£":messages.getString("UpdateServerNichtErreichbar_FF");
 	}
 
 	/**
@@ -4028,27 +3901,6 @@ public class SternResources
 	   */
 	public static String ReleaseFormatted2(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4, String arg5) {
 		return symbol ? "£GG§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"§"+arg5+"£":MessageFormat.format(messages.getString("ReleaseFormatted2_GG"), arg0, arg1, arg2, arg3, arg4, arg5);
-	}
-
-	/**
-	   * ++ Jahr {0}, Tag {1} ++ [GH]
-	   */
-	public static String AuswertungEreignisTag(boolean symbol, String arg0, String arg1) {
-		return symbol ? "£GH§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungEreignisTag_GH"), arg0, arg1);
-	}
-
-	/**
-	   * ++ Jahr {0}, Jahresbeginn ++ [GI]
-	   */
-	public static String AuswertungEreignisJahresbeginn(boolean symbol, String arg0) {
-		return symbol ? "£GI§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungEreignisJahresbeginn_GI"), arg0);
-	}
-
-	/**
-	   * ++ Jahr {0}, Jahresende ++ [GJ]
-	   */
-	public static String AuswertungEreignisJahresende(boolean symbol, String arg0) {
-		return symbol ? "£GJ§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungEreignisJahresende_GJ"), arg0);
 	}
 
 	/**
@@ -4283,13 +4135,6 @@ public class SternResources
 	}
 
 	/**
-	   * Konfiguration neu anlegen... [HX]
-	   */
-	public static String ServerConfigErzeugen(boolean symbol) {
-		return symbol ? "£HX£":messages.getString("ServerConfigErzeugen_HX");
-	}
-
-	/**
 	   * Spiel {0} einlesen... [HY]
 	   */
 	public static String ServerSpielLesen(boolean symbol, String arg0) {
@@ -4455,5 +4300,40 @@ public class SternResources
 	   */
 	public static String Webserver(boolean symbol) {
 		return symbol ? "£IV£":messages.getString("Webserver_IV");
+	}
+
+	/**
+	   * Unvollst\u00E4ndige Anmeldedaten. [IW]
+	   */
+	public static String LogOnDataIncomplete(boolean symbol) {
+		return symbol ? "£IW£":messages.getString("LogOnDataIncomplete_IW");
+	}
+
+	/**
+	   * Der Server hat die Verbindung beendet. Pr\u00FCfen Sie Ihre Anmeldedaten oder probieren Sie es nochmal. [IX]
+	   */
+	public static String ConnectionClosed(boolean symbol) {
+		return symbol ? "£IX£":messages.getString("ConnectionClosed_IX");
+	}
+
+	/**
+	   * Keine Verbindung mit dem Server:\n{0} [IY]
+	   */
+	public static String NoConnectionToServer(boolean symbol, String arg0) {
+		return symbol ? "£IY§"+arg0+"£":MessageFormat.format(messages.getString("NoConnectionToServer_IY"), arg0);
+	}
+
+	/**
+	   * Adressen-Separator [IZ]
+	   */
+	public static String AddressSeparator(boolean symbol) {
+		return symbol ? "£IZ£":messages.getString("AddressSeparator_IZ");
+	}
+
+	/**
+	   * Der Sicherheitscode ist ung\u00FCltig. [JA]
+	   */
+	public static String ClientCodeInvalid(boolean symbol) {
+		return symbol ? "£JA£":messages.getString("ClientCodeInvalid_JA");
 	}
 }

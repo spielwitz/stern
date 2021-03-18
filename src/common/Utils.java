@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -49,12 +49,12 @@ public class Utils
 {
 	private static SecureRandom secRandom;
 		
-	public static int random(int max)
+	public static int getRandomInteger(int valueMax)
 	{
 		if (Utils.secRandom == null)
 			Utils.secRandom = new SecureRandom();
 		
-		return (int) (Utils.secRandom.nextDouble() * max);
+		return (int) (Utils.secRandom.nextDouble() * valueMax);
 	}
 	
 	public static Object klon(Object obj)
@@ -70,7 +70,7 @@ public class Utils
 			ObjectOutputStream os = new ObjectOutputStream(out);
 			os.writeObject(obj);
 			os.flush();
-			//Deserialisieren des Objekts
+
 			ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 			ObjectInputStream is = new ObjectInputStream(in);
 			retval = (Object)is.readObject();
@@ -89,32 +89,32 @@ public class Utils
 	{
 		return (int)Math.round(arg);		
 	}
-	static int[] randomList(int num)
+	static int[] getRandomList(int elementsCount)
 	{
-		return randomList(num, num);
+		return getRandomList(elementsCount, elementsCount);
 	}
-	static int[] sequentialList(int num)
+	static int[] getSequentialList(int elementsCount)
 	{
-		int retval[] = new int[num];
+		int retval[] = new int[elementsCount];
 		
-		for (int t = 0; t < num; t++)
+		for (int t = 0; t < elementsCount; t++)
 			retval[t] = t;
 		
 		return retval;
 	}
-	private static int[] randomList(int maxNum, int anz)
+	private static int[] getRandomList(int valueMax, int elementsCount)
 	{
-		int retval[] = new int[anz];
+		int retval[] = new int[elementsCount];
 		int t, tt;
 
-		BitSet b = new BitSet(maxNum);
+		BitSet b = new BitSet(valueMax);
 
-		for (t = 0; t < anz; t++)
+		for (t = 0; t < elementsCount; t++)
 		{
-			tt = Utils.random(maxNum);
+			tt = Utils.getRandomInteger(valueMax);
 
 			while (b.get(tt) == true)
-				tt = (tt + 1) % maxNum;
+				tt = (tt + 1) % valueMax;
 
 			retval[t] = tt;
 			b.set(tt);
@@ -124,107 +124,103 @@ public class Utils
 
 		return retval;
 	}
-	static int[] listeSortieren (int liste[], boolean absteigend)
+	static int[] sortValues (int values[], boolean descending)
 	{
-		int reihenfolge[] = new int[liste.length];
+		int sequence[] = new int[values.length];
 		int swap;
 		boolean ok = false;
 		
-		// Initiale Verteilung
-		for (int t = 0; t < liste.length; t++)
-			reihenfolge[t] = t;
+		for (int t = 0; t < values.length; t++)
+			sequence[t] = t;
 		
-		// Sortieren
 		while (ok == false)
 		{
 			ok = true;
 			
-			for (int t = 0; t < liste.length - 1; t++)
+			for (int t = 0; t < values.length - 1; t++)
 			{
-				if (absteigend == false && liste[reihenfolge[t]] > liste[reihenfolge[t+1]])
+				if (descending == false && values[sequence[t]] > values[sequence[t+1]])
 					ok = false;
-				else if (absteigend == true && liste[reihenfolge[t]] < liste[reihenfolge[t+1]])
+				else if (descending == true && values[sequence[t]] < values[sequence[t+1]])
 					ok = false;
 				
 				if (ok == false)
 				{
-					swap = reihenfolge[t];
-					reihenfolge[t] = reihenfolge[t+1];
-					reihenfolge[t+1] = swap;
+					swap = sequence[t];
+					sequence[t] = sequence[t+1];
+					sequence[t+1] = swap;
 				}
 			}
 		}
 		
-		return reihenfolge;
+		return sequence;
 	}
-	public static int[] listeSortieren (String liste[], boolean absteigend)
+	public static int[] sortList (String values[], boolean descending)
 	{
-		int reihenfolge[] = new int[liste.length];
+		int sequence[] = new int[values.length];
 		int swap;
 		boolean ok = false;
 		
-		// Initiale Verteilung
-		for (int t = 0; t < liste.length; t++)
-			reihenfolge[t] = t;
+		for (int t = 0; t < values.length; t++)
+			sequence[t] = t;
 		
-		// Sortieren
 		while (ok == false)
 		{
 			ok = true;
 			
-			for (int t = 0; t < liste.length - 1; t++)
+			for (int t = 0; t < values.length - 1; t++)
 			{
-				if (absteigend == false && liste[reihenfolge[t]].compareTo(liste[reihenfolge[t+1]]) > 0)
+				if (descending == false && values[sequence[t]].compareTo(values[sequence[t+1]]) > 0)
 					ok = false;
-				else if (absteigend == true && liste[reihenfolge[t]].compareTo(liste[reihenfolge[t+1]]) < 0)
+				else if (descending == true && values[sequence[t]].compareTo(values[sequence[t+1]]) < 0)
 					ok = false;
 				
 				if (ok == false)
 				{
-					swap = reihenfolge[t];
-					reihenfolge[t] = reihenfolge[t+1];
-					reihenfolge[t+1] = swap;
+					swap = sequence[t];
+					sequence[t] = sequence[t+1];
+					sequence[t+1] = swap;
 				}
 			}
 		}
 		
-		return reihenfolge;
+		return sequence;
 	}
 	
-	static String numToString(int num)
+	static String convertToString(int value)
 	{
-		if (num == 0)
+		if (value == 0)
 			return "";
 		else
-			return Integer.toString(num);
+			return Integer.toString(value);
 	}
-	static String padString(int num, int length)
+	static String padString(int value, int stringLength)
 	{
-		return padString(Integer.toString(num), length);
+		return padString(Integer.toString(value), stringLength);
 	}
-	static  String padString(String text, int length)
+	static  String padString(String text, int stringLength)
 	{
 		StringBuilder sb = null;
-		String fillUpString = new String(new char[length]).replace('\0', ' ');
+		String stringTemplate = new String(new char[stringLength]).replace('\0', ' ');
 		
-		sb = new StringBuilder(fillUpString);
+		sb = new StringBuilder(stringTemplate);
 		sb.append(text);
 		
-		return sb.substring(sb.length()-length, sb.length());
+		return sb.substring(sb.length()-stringLength, sb.length());
 	}	
 	
-	static String padStringLeft(String text, int length)
+	static String padStringLeft(String text, int stringLength)
 	{
-		return (text + getStringWithGivenLength(' ', length)).substring(0, length);
+		return (text + getStringWithGivenLength(' ', stringLength)).substring(0, stringLength);
 	}
 	
-	private static String getStringWithGivenLength(char c, int length)
+	private static String getStringWithGivenLength(char c, int stringLength)
 	{
-		if (length <= 0)
+		if (stringLength <= 0)
 			return "";
 		else
 		{
-			char[] chars = new char[length];
+			char[] chars = new char[stringLength];
 			Arrays.fill(chars, c);
 			return new String(chars);
 		}
@@ -241,14 +237,14 @@ public class Utils
 		return date.getTime();
 	}
 	
-	static String dateToString(long dateLong)
+	static String convertDateToString(long dateLong)
 	{
 		Date date = new Date(dateLong);
 		DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM); 
 		return df.format(date);
 	}
 	
-	public static String millisecondsToString(long dateLong)
+	public static String convertMillisecondsToString(long dateLong)
 	{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 		
@@ -258,7 +254,7 @@ public class Utils
 	    return date.format(formatter);
 	}
 	
-	public static String currentTimeToLocalizedString()
+	public static String getLocalizedDateString()
 	{
 		Instant instant = Instant.ofEpochMilli(System.currentTimeMillis());
 	    LocalDateTime date = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -278,7 +274,7 @@ public class Utils
 
 	}
 	
-	public static String dateStringFormat(String unformattedString)
+	public static String formatDateString(String unformattedString)
 	{
 		String jahr = unformattedString.substring(0, 4);
 		String monat = unformattedString.substring(4, 6);
@@ -306,7 +302,7 @@ public class Utils
 		return meineIP;
 	}
 	
-	public static String objectToBase64(Object obj, String password)
+	public static String convertToBase64(Object obj, String password)
 	{
 		String outString = "";
 		
@@ -333,12 +329,11 @@ public class Utils
 		return outString;
 	}
 		
-	public static <T> Object base64ToObject(String base64, Class<T> expectedClass, String password)
+	public static <T> Object convertFromBase64(String base64, Class<T> expectedClass, String password)
 	{
 		Object retval = null;
 		Gson serializer = new Gson();
 		
-		// Erzeuge Objekt aus der Zeichenkette
 		try {
 			byte[] byteArray = Base64.getMimeDecoder().decode(base64.getBytes());
 			
@@ -361,7 +356,6 @@ public class Utils
 	
 	private static byte[] aesEncrypt(byte[] unencryptedBytes, String password) throws Exception
 	{
-		// Verschluesseln
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, aesGetKey(password));
 		byte[] encrypted = cipher.doFinal(unencryptedBytes);
@@ -383,34 +377,33 @@ public class Utils
 		byte[] key = password.getBytes("UTF-8");
 		MessageDigest sha = MessageDigest.getInstance("SHA-256");
 		key = sha.digest(key);
-		// nur die ersten 128 bit nutzen
 		key = Arrays.copyOf(key, 16); 
 		SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
 		
 		return secretKeySpec;
 	}
 
-	public static Spiel readSpielFromFile(File file)
+	public static Game getGameFromFile(File file)
 	{
-		Spiel spiel = null;
+		Game game = null;
 		
 		try {
 			FileInputStream fs = new FileInputStream(file.getPath());
 			GZIPInputStream zipin = new GZIPInputStream (fs);
 			ObjectInputStream is = new ObjectInputStream(zipin);
-			String jsonString = (String)is.readObject();
+			String gameJson = (String)is.readObject();
 			is.close();
 			
-			spiel = new Gson().fromJson(jsonString, Spiel.class);
+			game = new Gson().fromJson(gameJson, Game.class);
 		} catch (Exception e) {
 		}		
 		
-		return spiel;
+		return game;
 	}
 
-	public static String writeSpielToFile(Spiel spiel, File file)
+	public static String writeGameToFile(Game game, File file)
 	{
-		String jsonString = new Gson().toJson(spiel);
+		String gameJson = new Gson().toJson(game);
 		
 		String errorText = null;
 		
@@ -418,7 +411,7 @@ public class Utils
 			FileOutputStream fs = new FileOutputStream(file.getPath());
 			GZIPOutputStream zipout = new GZIPOutputStream(fs);
 			ObjectOutputStream os = new ObjectOutputStream(zipout);
-			os.writeObject(jsonString);
+			os.writeObject(gameJson);
 			os.close();
 		} catch (Exception e) {
 			errorText = e.toString();

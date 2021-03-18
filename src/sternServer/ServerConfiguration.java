@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -53,11 +53,11 @@ class ServerConfiguration
 	static ServerConfiguration fromJson(String json) throws Exception
 	{
 		Gson gson = new Gson();
-		ServerConfiguration sc = gson.fromJson(json, ServerConfiguration.class);
+		ServerConfiguration serverConfiguration = gson.fromJson(json, ServerConfiguration.class);
 		
-		sc.serverPrivateKeyObject = CryptoLib.decodePrivateKeyFromBase64(sc.serverPrivateKey);
+		serverConfiguration.serverPrivateKeyObject = CryptoLib.decodePrivateKeyFromBase64(serverConfiguration.serverPrivateKey);
 		
-		return sc;
+		return serverConfiguration;
 	}
 	
 }

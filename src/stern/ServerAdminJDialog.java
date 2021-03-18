@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -77,7 +77,8 @@ import commonUi.PasswordFieldDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial") class ServerAdminJDialog extends JDialog 
+@SuppressWarnings("serial")
+class ServerAdminJDialog extends JDialog 
 			implements ChangeListener, ActionListener, ListSelectionListener, IIntegerTextFieldDarkCallback
 {
 	private ButtonDark butClose;
@@ -136,7 +137,6 @@ import commonUi.TextFieldDark;
 			this.authPortBefore = this.cuc.port;
 		}
 		
-		// Font laden
 		font = DialogFontHelper.getFont();
 		
 		this.setLayout(new BorderLayout());
@@ -386,7 +386,7 @@ import commonUi.TextFieldDark;
 		if (this.cuc == null)
 			tabpane.setSelectedComponent(panAuthOuter);
 		
-		this.tfAuthPort.enableCheckInput(); // macht auch setControlsEnabled() mit
+		this.tfAuthPort.enableCheckInput();
 		
 		this.pack();
 		this.setLocationRelativeTo(parent);	
@@ -648,7 +648,6 @@ import commonUi.TextFieldDark;
 	{
 		Mode mode = this.panUsersDetailsInner.mode;
 		
-		// Passwort prüfen
 		String password1 = null; 
 				
 		if (mode == Mode.NewUser || mode == Mode.RenewCredentials)
@@ -707,7 +706,7 @@ import commonUi.TextFieldDark;
 				    SternResources.ServerAdminSpieler(false));
 		}
 		else
-			return; // Da ist was falsch implementiert 
+			return; 
 			
 		
 		if (dialogResult != DialogWindowResult.OK)
@@ -721,7 +720,6 @@ import commonUi.TextFieldDark;
 		
 		if (!respMsg.error)
 		{
-			// Userliste aktualisieren
 			this.butRefreshUserList.doClick();
 			
 			ResponseMessageChangeUser msgResponseNewUser = 
@@ -729,7 +727,6 @@ import commonUi.TextFieldDark;
 			
 			if (reqMsgChangeUser.renewCredentials)
 			{
-				// Einfach nur eine Erfolgsnachricht bringen
 				DialogWindow.showInformation(
 						this, 
 						SternResources.ServerAdminUserCreated(false, reqMsgChangeUser.userId), 
@@ -750,7 +747,6 @@ import commonUi.TextFieldDark;
 			}
 			else
 			{
-				// Einfach nur eine Erfolgsnachricht bringen
 				DialogWindow.showInformation(
 						this, 
 						SternResources.ServerAdminUserErfolg(false, reqMsgChangeUser.userId), 
@@ -790,7 +786,6 @@ import commonUi.TextFieldDark;
 		
 		if (!respMsg.error)
 		{
-			// Userliste aktualisieren
 			this.butRefreshUserList.doClick();
 			
 			DialogWindow.showInformation(
@@ -817,7 +812,7 @@ import commonUi.TextFieldDark;
 			}
 			
 			this.tfServerBuild.setText(respMsgPayload.build);
-			this.tfServerStartDate.setText(Utils.dateStringFormat(Utils.millisecondsToString(respMsgPayload.serverStartDate)));
+			this.tfServerStartDate.setText(Utils.formatDateString(Utils.convertMillisecondsToString(respMsgPayload.serverStartDate)));
 			this.tfServerLogSize.setText(respMsgPayload.logSizeBytes + " Bytes");
 			this.comboServerLogLevel.setSelectedItem(respMsgPayload.logLevel.toString());
 		}

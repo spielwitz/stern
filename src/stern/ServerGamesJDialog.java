@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -55,8 +55,8 @@ import com.google.gson.Gson;
 
 import common.Colors;
 import common.Constants;
-import common.Spiel;
-import common.Spiel.PlanetenInfo;
+import common.Game;
+import common.Game.PlanetInfo;
 import commonServer.ClientUserCredentials;
 import commonServer.RequestMessage;
 import commonServer.RequestMessageGameHostDeleteGame;
@@ -73,49 +73,50 @@ import commonUi.LabelDark;
 import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
-import common.SpielInfo;
-import common.SpielOptionen;
-import common.Spieler;
+import common.GameInfo;
+import common.GameOptions;
+import common.Player;
 import common.SternResources;
 import common.Utils;
 
-@SuppressWarnings("serial") class ServerGamesJDialog extends JDialog implements ActionListener, IColorChooserCallback
+@SuppressWarnings("serial")
+class ServerGamesJDialog extends JDialog implements ActionListener, IColorChooserCallback
 {
 	private JTabbedPane tabpane;
 	private PanelDark panNewGame;
 	
 	private ButtonDark butClose;
-	private ButtonDark butNewGameNeuesSpielfeld;
+	private ButtonDark butNewGamenewBoard;
 	private ButtonDark butNewGameSubmit;
 	
-	private SpielfeldDisplay panSpielfeldDisplay;
+	private BoardDisplay panBoardDisplay;
 	
-	private ComboBoxDark<String>[] comboSpielerArray;
-	private PanelDark[] panSpieler;
-	private SpielerFarbenCanvas[] canvasSpielerFarben;
-	private ArrayList<Spieler> spieler;
+	private ComboBoxDark<String>[] comboPlayersArray;
+	private PanelDark[] panPlayers;
+	private CanvasPlayerColors[] canvasPlayersColors;
+	private ArrayList<Player> players;
 	private CheckBoxDark[] cbBot;
-	private HashSet<SpielOptionen> optionen;
+	private HashSet<GameOptions> options;
 	
-	private Hashtable<SpielOptionen,CheckBoxDark> cbOptionen;
-	private ComboBoxDark<String> comboLetztesJahr;
-	private ComboBoxDark<String> comboSpieler;
-	private ComboBoxDark<String> comboPlaneten;
-	private TextFieldDark tfSpielName;
+	private Hashtable<GameOptions,CheckBoxDark> cbOptions;
+	private ComboBoxDark<String> comboYearLast;
+	private ComboBoxDark<String> comboPlayers;
+	private ComboBoxDark<String> comboPlanets;
+	private TextFieldDark tfGameName;
 	
-	Spiel spielGeladen;
+	Game gameLoaded;
 	
 	private ClientUserCredentials cuc;
 	
 	private ResponseMessageGamesAndUsers gamesAndUsers;
 	
-	private Spiel spiel;
+	private Game game;
 	
 	private Stern parent;
 	
 	private static Font font;
 	
-	private final static String MAX_JAHRE_UNENDLICH = SternResources.SpielparameterJDialogUnendlich(false);
+	private final static String ENDLESS_GAME_STRING = SternResources.SpielparameterJDialogUnendlich(false);
 	
 	ServerGamesJDialog(
 			Stern parent,
@@ -130,7 +131,6 @@ import common.Utils;
 		this.cuc = cuc;
 		this.gamesAndUsers = gamesAndUsers;
 		
-		// Font laden
 		font = DialogFontHelper.getFont();
 		
 		this.setLayout(new BorderLayout());
@@ -145,35 +145,35 @@ import common.Utils;
 	            (JTabbedPane.TOP,JTabbedPane.SCROLL_TAB_LAYOUT );
 				
 		// ---------------
-		if (this.gamesAndUsers.gamesZugeingabe.size() > 0)
+		if (this.gamesAndUsers.gamesWaitingForEnterMoves.size() > 0)
 		{
-			PanelSpielSelector panZugeingabe = new PanelSpielSelector(
-					this.gamesAndUsers.gamesZugeingabe, false, currentGameId);
-			tabpane.add(SternResources.ServerGamesSpielerWarten(false), panZugeingabe);
+			PanelGameSelector panWaitingForEnterMoves = new PanelGameSelector(
+					this.gamesAndUsers.gamesWaitingForEnterMoves, false, currentGameId);
+			tabpane.add(SternResources.ServerGamesSpielerWarten(false), panWaitingForEnterMoves);
 		}
 		
 		// ---------------
-		if (this.gamesAndUsers.gamesWarten.size() > 0)
+		if (this.gamesAndUsers.gamesWaitingForOtherPlayers.size() > 0)
 		{
-			PanelSpielSelector panWarten = new PanelSpielSelector(
-					this.gamesAndUsers.gamesWarten, false, currentGameId);
-			tabpane.add(SternResources.ServerGamesIchWarte(false), panWarten);
+			PanelGameSelector panWaitingForOtherPlayers = new PanelGameSelector(
+					this.gamesAndUsers.gamesWaitingForOtherPlayers, false, currentGameId);
+			tabpane.add(SternResources.ServerGamesIchWarte(false), panWaitingForOtherPlayers);
 		}
 		
 		// ---------------
-		if (this.gamesAndUsers.gamesBeendet.size() > 0)
+		if (this.gamesAndUsers.gamesFinalized.size() > 0)
 		{
-			PanelSpielSelector panBeendet = new PanelSpielSelector(
-					this.gamesAndUsers.gamesBeendet, false, currentGameId);
-			tabpane.add(SternResources.ServerGamesBeendeteSpiele(false), panBeendet);
+			PanelGameSelector panGamesFinalized = new PanelGameSelector(
+					this.gamesAndUsers.gamesFinalized, false, currentGameId);
+			tabpane.add(SternResources.ServerGamesBeendeteSpiele(false), panGamesFinalized);
 		}
 		
 		// ---------------
-		if (this.gamesAndUsers.gamesSpielleiter.size() > 0)
+		if (this.gamesAndUsers.gamesGameHost.size() > 0)
 		{
-			PanelSpielSelector panSpielleiter = new PanelSpielSelector(
-					this.gamesAndUsers.gamesSpielleiter, true, currentGameId);
-			tabpane.add(SternResources.ServerGamesSpielleiteraktionen(false), panSpielleiter);
+			PanelGameSelector panGamesHost = new PanelGameSelector(
+					this.gamesAndUsers.gamesGameHost, true, currentGameId);
+			tabpane.add(SternResources.ServerGamesSpielleiteraktionen(false), panGamesHost);
 		}
 
 		// ---------------
@@ -228,35 +228,34 @@ import common.Utils;
 		if (source == this.butClose || source == this.getRootPane())
 			this.close();
 		else if (source == this.butNewGameSubmit)
-			this.submitSpiel();
-		else if (source == this.comboSpieler)
+			this.submitGame();
+		else if (source == this.comboPlayers)
 		{
-			int anzSp = Integer.parseInt((String)this.comboSpieler.getSelectedItem());
+			int playersCount = Integer.parseInt((String)this.comboPlayers.getSelectedItem());
 			
-			// Planetenzahl anpassen
-			int anzPl = Utils.round(anzSp * ( 
-					(double)Constants.ANZAHL_PLANETEN_MAX / (double)Constants.ANZAHL_SPIELER_MAX));
+			int planetsCount = Utils.round(playersCount * ( 
+					(double)Constants.PLANETS_COUNT_MAX / (double)Constants.PLAYERS_COUNT_MAX));
 			
-			this.comboPlaneten.removeActionListener(this);
-			this.comboPlaneten.setSelectedItem(Integer.toString(anzPl));
-			this.updateSpiel();
-			this.comboPlaneten.addActionListener(this);
+			this.comboPlanets.removeActionListener(this);
+			this.comboPlanets.setSelectedItem(Integer.toString(planetsCount));
+			this.updateGame();
+			this.comboPlanets.addActionListener(this);
 		}
-		else if (source == this.comboPlaneten || 
-				source == this.cbOptionen.get(SpielOptionen.SIMPEL) ||
-				source == this.butNewGameNeuesSpielfeld)
-			this.updateSpiel();
+		else if (source == this.comboPlanets || 
+				source == this.cbOptions.get(GameOptions.SIMPLE) ||
+				source == this.butNewGamenewBoard)
+			this.updateGame();
 		else if (source.getClass() == CheckBoxDark.class)
 		{
-			for (int i = 0; i < Constants.ANZAHL_SPIELER_MAX; i++)
+			for (int playerIndex = 0; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
 			{
-				if (source == this.cbBot[i])
+				if (source == this.cbBot[playerIndex])
 				{
-					this.comboSpielerArray[i].setEnabled(!this.cbBot[i].isSelected());
+					this.comboPlayersArray[playerIndex].setEnabled(!this.cbBot[playerIndex].isSelected());
 					
-					if (this.cbBot[i].isSelected())
+					if (this.cbBot[playerIndex].isSelected())
 					{
-						this.comboSpielerArray[i].setSelectedIndex(0);
+						this.comboPlayersArray[playerIndex].setSelectedIndex(0);
 					}
 					break;
 				}
@@ -264,23 +263,22 @@ import common.Utils;
 		}
 		else if (source.getClass() == ComboBoxDark.class)
 		{
-			for (int i = 1; i < Constants.ANZAHL_SPIELER_MAX; i++)
+			for (int playerIndex = 1; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
 			{
-				if (source == this.comboSpielerArray[i])
+				if (source == this.comboPlayersArray[playerIndex])
 				{
-					String selectedUser = (String)this.comboSpielerArray[i].getSelectedItem();
+					String selectedUser = (String)this.comboPlayersArray[playerIndex].getSelectedItem();
 					if (selectedUser.equals(""))
 						continue;
 					
-					// Pruefen, ob in anderen Boxen derselbe Name steht. Wenn ja, diese durch "" ersetzen
-					for (int j = 1; j < Constants.ANZAHL_SPIELER_MAX; j++)
+					for (int playerIndex2 = 1; playerIndex2 < Constants.PLAYERS_COUNT_MAX; playerIndex2++)
 					{
-						int otherIndex = (i + j) % Constants.ANZAHL_SPIELER_MAX;
-						String otherSelectedUser = 
-								(String)this.comboSpielerArray[otherIndex].getSelectedItem();
+						int otherPlayerIndex = (playerIndex + playerIndex2) % Constants.PLAYERS_COUNT_MAX;
+						String otherPlayerName = 
+								(String)this.comboPlayersArray[otherPlayerIndex].getSelectedItem();
 						
-						if (otherSelectedUser.equals(selectedUser))
-							this.comboSpielerArray[otherIndex].setSelectedItem("");
+						if (otherPlayerName.equals(selectedUser))
+							this.comboPlayersArray[otherPlayerIndex].setSelectedItem("");
 					}
 					break;
 				}
@@ -305,7 +303,6 @@ import common.Utils;
 	
 	private void selectGame(String gameId)
 	{
-		// Spiel vom Server laden
 		RequestMessage msg = new RequestMessage(RequestMessageType.GET_GAME);
 		
 		msg.payloadSerialized = gameId;
@@ -314,9 +311,8 @@ import common.Utils;
 		
 		if (!respMsg.error)
 		{
-			// Jetzt das Spiel wie ein E-Mail-Spiel laden.
 			Gson gson = new Gson();
-			this.spielGeladen = gson.fromJson(respMsg.payloadSerialized, Spiel.class); 
+			this.gameLoaded = gson.fromJson(respMsg.payloadSerialized, Game.class); 
 			this.close();
 		}
 	}
@@ -344,13 +340,11 @@ import common.Utils;
 		
 		if (!respMsg.error)
 		{
-			// Erfolgmeldung
 			DialogWindow.showInformation(
 					this, 
 					SternResources.ServerGamesGameDeleted(false, gameId), 
 					SternResources.ServerGamesLoeschen(false));
 			
-			// Dialog schließen
 			this.close();
 		}
 	}
@@ -378,13 +372,11 @@ import common.Utils;
 		
 		if (!respMsg.error)
 		{
-			// Erfolgmeldung
 			DialogWindow.showInformation(
 					this, 
 					SternResources.ServerGamesGameFinalized(false, gameId), 
 					SternResources.ServerGamesBeenden(false));
 			
-			// Dialog schließen
 			this.close();
 		}
 	}
@@ -398,14 +390,14 @@ import common.Utils;
 	@SuppressWarnings("unchecked")
 	private PanelDark getPanelNewGame()
 	{
-		this.spieler = Spiel.getDefaultSpieler();
-		this.optionen = Spiel.getDefaultSpielOptionen();
+		this.players = Game.getPlayersDefault();
+		this.options = Game.getOptionsDefault();
 		
-		this.panSpieler = new PanelDark[Constants.ANZAHL_SPIELER_MAX];
-		this.comboSpielerArray = new ComboBoxDark[Constants.ANZAHL_SPIELER_MAX];
-		this.cbBot = new CheckBoxDark[Constants.ANZAHL_SPIELER_MAX];
-		this.canvasSpielerFarben = new SpielerFarbenCanvas[Constants.ANZAHL_SPIELER_MAX];
-		this.cbOptionen = new Hashtable<SpielOptionen,CheckBoxDark>();		
+		this.panPlayers = new PanelDark[Constants.PLAYERS_COUNT_MAX];
+		this.comboPlayersArray = new ComboBoxDark[Constants.PLAYERS_COUNT_MAX];
+		this.cbBot = new CheckBoxDark[Constants.PLAYERS_COUNT_MAX];
+		this.canvasPlayersColors = new CanvasPlayerColors[Constants.PLAYERS_COUNT_MAX];
+		this.cbOptions = new Hashtable<GameOptions,CheckBoxDark>();		
 		
 		//
 		PanelDark panShell = new PanelDark(new SpringLayout());
@@ -414,56 +406,56 @@ import common.Utils;
 		
 		PanelDark panMain = new PanelDark(new GridLayout(6, 2, 20, 0));
 		
-		panMain.add(add(this.getSpielerPanel(0)));
+		panMain.add(add(this.getPlayerPanel(0)));
 		
-		PanelDark panPlanetenSub1 = new PanelDark(new FlowLayout(FlowLayout.LEFT));
-		panPlanetenSub1.add(new LabelDark(SternResources.Spieler(false), font));
-		String[] spieler = new String[Constants.ANZAHL_SPIELER_MAX - Constants.ANZAHL_SPIELER_MIN + 1];
-		for (int i = Constants.ANZAHL_SPIELER_MIN; i <= Constants.ANZAHL_SPIELER_MAX; i++)
-			spieler[i-Constants.ANZAHL_SPIELER_MIN] = Integer.toString(i);
-		this.comboSpieler = new ComboBoxDark<String>(spieler, font);
-		panPlanetenSub1.add(this.comboSpieler);
+		PanelDark panPlanetsSub1 = new PanelDark(new FlowLayout(FlowLayout.LEFT));
+		panPlanetsSub1.add(new LabelDark(SternResources.Spieler(false), font));
+		String[] players = new String[Constants.PLAYERS_COUNT_MAX - Constants.PLAYERS_COUNT_MIN + 1];
+		for (int playerIndex = Constants.PLAYERS_COUNT_MIN; playerIndex <= Constants.PLAYERS_COUNT_MAX; playerIndex++)
+			players[playerIndex-Constants.PLAYERS_COUNT_MIN] = Integer.toString(playerIndex);
+		this.comboPlayers = new ComboBoxDark<String>(players, font);
+		panPlanetsSub1.add(this.comboPlayers);
 		
-		panPlanetenSub1.add(new JSeparator());
+		panPlanetsSub1.add(new JSeparator());
 		
-		panPlanetenSub1.add(new LabelDark(SternResources.Planeten(false), font));
-		String[] planeten = new String[Constants.ANZAHL_PLANETEN_MAX - Constants.ANZAHL_SPIELER_MAX + 1];
-		for (int i = Constants.ANZAHL_SPIELER_MAX; i <= Constants.ANZAHL_PLANETEN_MAX; i++)
-			planeten[i-Constants.ANZAHL_SPIELER_MAX] = Integer.toString(i);
-		this.comboPlaneten = new ComboBoxDark<String>(planeten, font);
-		panPlanetenSub1.add(this.comboPlaneten);
+		panPlanetsSub1.add(new LabelDark(SternResources.Planeten(false), font));
+		String[] planets = new String[Constants.PLANETS_COUNT_MAX - Constants.PLAYERS_COUNT_MAX + 1];
+		for (int planetIndex = Constants.PLAYERS_COUNT_MAX; planetIndex <= Constants.PLANETS_COUNT_MAX; planetIndex++)
+			planets[planetIndex-Constants.PLAYERS_COUNT_MAX] = Integer.toString(planetIndex);
+		this.comboPlanets = new ComboBoxDark<String>(planets, font);
+		panPlanetsSub1.add(this.comboPlanets);
 		
-		panMain.add(panPlanetenSub1);
+		panMain.add(panPlanetsSub1);
 		
-		panMain.add(add(this.getSpielerPanel(1)));
+		panMain.add(add(this.getPlayerPanel(1)));
 		
-		PanelDark panBisJahr = new PanelDark(new FlowLayout(FlowLayout.LEFT));
-		panBisJahr.add(new LabelDark(SternResources.SpielparameterJDialogSpieleBisJahr(false)+" ", font));
-		String[] jahre = { MAX_JAHRE_UNENDLICH, "15", "20", "30", "40", "50", "75", "100", "150", "200" };
-		this.comboLetztesJahr = new ComboBoxDark<String>(jahre, font);
-		panBisJahr.add(this.comboLetztesJahr);
-		panMain.add(panBisJahr);
+		PanelDark panYearMax = new PanelDark(new FlowLayout(FlowLayout.LEFT));
+		panYearMax.add(new LabelDark(SternResources.SpielparameterJDialogSpieleBisJahr(false)+" ", font));
+		String[] years = { ENDLESS_GAME_STRING, "15", "20", "30", "40", "50", "75", "100", "150", "200" };
+		this.comboYearLast = new ComboBoxDark<String>(years, font);
+		panYearMax.add(this.comboYearLast);
+		panMain.add(panYearMax);
 		
-		panMain.add(add(this.getSpielerPanel(2)));
+		panMain.add(add(this.getPlayerPanel(2)));
 		
-		CheckBoxDark cbSimpel = new CheckBoxDark(SternResources.SpielparameterJDialogSimpelStern(false), true, font);
-		this.cbOptionen.put(SpielOptionen.SIMPEL, cbSimpel);
-		this.cbOptionen.get(SpielOptionen.SIMPEL).addActionListener(this);
-		panMain.add(cbSimpel);
+		CheckBoxDark cbSimple = new CheckBoxDark(SternResources.SpielparameterJDialogSimpelStern(false), true, font);
+		this.cbOptions.put(GameOptions.SIMPLE, cbSimple);
+		this.cbOptions.get(GameOptions.SIMPLE).addActionListener(this);
+		panMain.add(cbSimple);
 		
-		panMain.add(add(this.getSpielerPanel(3)));
+		panMain.add(add(this.getPlayerPanel(3)));
 		
-		PanelDark panSpielName = new PanelDark(new FlowLayout(FlowLayout.LEFT));
-		panSpielName.add(new LabelDark(SternResources.ServerGamesSpielname(false), font));
-		this.tfSpielName = new TextFieldDark(font, 18);
-		panSpielName.add(this.tfSpielName);
-		panMain.add(panSpielName);
+		PanelDark panGameName = new PanelDark(new FlowLayout(FlowLayout.LEFT));
+		panGameName.add(new LabelDark(SternResources.ServerGamesSpielname(false), font));
+		this.tfGameName = new TextFieldDark(font, 18);
+		panGameName.add(this.tfGameName);
+		panMain.add(panGameName);
 		
-		panMain.add(add(this.getSpielerPanel(4)));
+		panMain.add(add(this.getPlayerPanel(4)));
 		
 		panMain.add(new LabelDark(font));
 		
-		panMain.add(add(this.getSpielerPanel(5)));
+		panMain.add(add(this.getPlayerPanel(5)));
 		
 		panMain.add(new LabelDark(font));
 
@@ -472,44 +464,43 @@ import common.Utils;
 		panBase.add(panMain, BorderLayout.CENTER);
 		
 		// ----
-		PanelDark panSpielfeld = new PanelDark(new BorderLayout(10, 10));
+		PanelDark panBoard = new PanelDark(new BorderLayout(10, 10));
 		
-		this.panSpielfeldDisplay = new SpielfeldDisplay(false);
-		panSpielfeld.add(this.panSpielfeldDisplay, BorderLayout.CENTER);
+		this.panBoardDisplay = new BoardDisplay(false);
+		panBoard.add(this.panBoardDisplay, BorderLayout.CENTER);
 						
-		panBase.add(panSpielfeld, BorderLayout.EAST);
+		panBase.add(panBoard, BorderLayout.EAST);
 		
 		// ----
 		PanelDark panButtons = new PanelDark(new FlowLayout(FlowLayout.RIGHT));
 		
-		this.butNewGameNeuesSpielfeld = new ButtonDark(this, SternResources.ServerGamesNeuesSpielfeld(false), font);
-		panButtons.add(this.butNewGameNeuesSpielfeld);
+		this.butNewGamenewBoard = new ButtonDark(this, SternResources.ServerGamesNeuesSpielfeld(false), font);
+		panButtons.add(this.butNewGamenewBoard);
 		
 		this.butNewGameSubmit = new ButtonDark(this, SternResources.ServerGamesSubmit(false), font);
 		panButtons.add(this.butNewGameSubmit);
 		
 		panBase.add(panButtons, BorderLayout.SOUTH);
 		
-		// ---- Voreinstellungen
-		this.comboSpielerArray[0].setSelectedItem(this.cuc.userId);
-		this.comboSpielerArray[0].setEnabled(false);
+		this.comboPlayersArray[0].setSelectedItem(this.cuc.userId);
+		this.comboPlayersArray[0].setEnabled(false);
 		this.cbBot[0].setEnabled(false);
 		
-		for (SpielOptionen option: this.cbOptionen.keySet())
-			this.cbOptionen.get(option).setSelected(this.optionen.contains(option));
+		for (GameOptions option: this.cbOptions.keySet())
+			this.cbOptions.get(option).setSelected(this.options.contains(option));
 		
-		if (this.optionen.contains(SpielOptionen.KEIN_ENDLOSSPIEL))
-			this.comboLetztesJahr.setSelectedItem(Integer.toString(Constants.DEFAULT_MAX_JAHRE));
+		if (this.options.contains(GameOptions.LIMITED_NUMBER_OF_YEARS))
+			this.comboYearLast.setSelectedItem(Integer.toString(Constants.YEARS_COUNT_MAX_DEFAULT));
 		else
-			this.comboLetztesJahr.setSelectedItem(MAX_JAHRE_UNENDLICH);
+			this.comboYearLast.setSelectedItem(ENDLESS_GAME_STRING);
 		
-		this.comboSpieler.setSelectedItem(Integer.toString(Constants.ANZAHL_SPIELER_MAX));
-		this.comboPlaneten.setSelectedItem(Integer.toString(Constants.ANZAHL_PLANETEN_MAX));
+		this.comboPlayers.setSelectedItem(Integer.toString(Constants.PLAYERS_COUNT_MAX));
+		this.comboPlanets.setSelectedItem(Integer.toString(Constants.PLANETS_COUNT_MAX));
 		
-		this.updateSpiel();
+		this.updateGame();
 		
-		this.comboSpieler.addActionListener(this);
-		this.comboPlaneten.addActionListener(this);
+		this.comboPlayers.addActionListener(this);
+		this.comboPlanets.addActionListener(this);
 		
 		panShell.add(panBase);
 		
@@ -522,11 +513,11 @@ import common.Utils;
 	}
 
 	@Override
-	public void colorChanged(int sp, byte newColorIndex, byte oldColorIndex) 
+	public void colorChanged(int playerIndex, byte newColorIndex, byte oldColorIndex) 
 	{
-		for (SpielerFarbenCanvas c: this.canvasSpielerFarben)
+		for (CanvasPlayerColors c: this.canvasPlayersColors)
 		{
-			if (c.spieler != sp && c.colIndex == newColorIndex)
+			if (c.playerIndex != playerIndex && c.colorIndex == newColorIndex)
 			{
 				c.setColor(oldColorIndex);
 				break;
@@ -534,82 +525,80 @@ import common.Utils;
 		}
 	}	
 	
-	private PanelDark getSpielerPanel(int spIndex)
+	private PanelDark getPlayerPanel(int playerIndex)
 	{
-		this.panSpieler[spIndex] = new PanelDark(new FlowLayout(FlowLayout.LEFT));
+		this.panPlayers[playerIndex] = new PanelDark(new FlowLayout(FlowLayout.LEFT));
 		
-		canvasSpielerFarben[spIndex] = new SpielerFarbenCanvas(
+		canvasPlayersColors[playerIndex] = new CanvasPlayerColors(
 				this, 
 				this,
-				spIndex, 
-				this.spieler.get(spIndex).getColIndex(),
+				playerIndex, 
+				this.players.get(playerIndex).getColorIndex(),
 				font);
-		canvasSpielerFarben[spIndex].setPreferredSize(new Dimension(14,14));
-		this.panSpieler[spIndex].add(canvasSpielerFarben[spIndex]);
+		canvasPlayersColors[playerIndex].setPreferredSize(new Dimension(14,14));
+		this.panPlayers[playerIndex].add(canvasPlayersColors[playerIndex]);
 		
-		String[] spieler = null;
+		String[] playerNames = null;
 		
-		if (spIndex == 0)
-			spieler = new String[] {this.cuc.userId};
+		if (playerIndex == 0)
+			playerNames = new String[] {this.cuc.userId};
 		else
 		{
-			spieler = new String[this.gamesAndUsers.users.size()];
-			spieler[0] = "";
+			playerNames = new String[this.gamesAndUsers.users.size()];
+			playerNames[0] = "";
 			
 			int counter = 1;
 			for (String userId: this.gamesAndUsers.users.keySet())
 			{
 				if (!userId.equals(this.cuc.userId))
 				{
-					spieler[counter] = userId; 
+					playerNames[counter] = userId; 
 					counter++;
 				}
 			}
 		}
 
-		this.comboSpielerArray[spIndex] = new ComboBoxDark<String>(spieler, font);
-		this.comboSpielerArray[spIndex].setPrototypeDisplayValue("WWWWWWWWWWWWWW");
+		this.comboPlayersArray[playerIndex] = new ComboBoxDark<String>(playerNames, font);
+		this.comboPlayersArray[playerIndex].setPrototypeDisplayValue("WWWWWWWWWWWWWW");
 		
-		if (spIndex != 0)
-			this.comboSpielerArray[spIndex].addActionListener(this);
+		if (playerIndex != 0)
+			this.comboPlayersArray[playerIndex].addActionListener(this);
 			
-		//this.tfSpieler[spIndex].setText(this.spieler.get(spIndex).getName());
+		this.panPlayers[playerIndex].add(this.comboPlayersArray[playerIndex]);
 		
-		this.panSpieler[spIndex].add(this.comboSpielerArray[spIndex]);
-		
-		this.cbBot[spIndex] = new CheckBoxDark(
+		this.cbBot[playerIndex] = new CheckBoxDark(
 				SternResources.SpielparameterJDialogBot(false), 
-				this.spieler.get(spIndex).istComputer(), 
+				this.players.get(playerIndex).isBot(), 
 				font);
 		
-		this.cbBot[spIndex].addActionListener(this);
-		this.panSpieler[spIndex].add(this.cbBot[spIndex]);
+		this.cbBot[playerIndex].addActionListener(this);
+		this.panPlayers[playerIndex].add(this.cbBot[playerIndex]);
 		
-		return this.panSpieler[spIndex];
+		return this.panPlayers[playerIndex];
 	}
 		
 	// ================================================
 	
-	private class SpielfeldDisplay extends JPanel
+	private class BoardDisplay extends JPanel
 	{
-		private static final int PIXEL_PRO_FELD = 10;
-		private ArrayList<PlanetenInfo> plInfo;
-		private boolean zeigeBesitzer;
+		private static final int PIXEL_PER_SECTOR = 10;
+		private ArrayList<PlanetInfo> planetInfo;
+		private boolean showOwners;
 		
-		public SpielfeldDisplay(boolean zeigeBesitzer)
+		public BoardDisplay(boolean showOwners)
 		{
 			super();
 			
-			this.zeigeBesitzer = zeigeBesitzer;
+			this.showOwners = showOwners;
 			
 			this.setPreferredSize(new Dimension(
-					(Constants.FELD_MAX_X +1) * PIXEL_PRO_FELD, 
-					(Constants.FELD_MAX_Y +1) * PIXEL_PRO_FELD));
+					(Constants.BOARD_MAX_X +1) * PIXEL_PER_SECTOR, 
+					(Constants.BOARD_MAX_Y +1) * PIXEL_PER_SECTOR));
 		}
 		
-		public void refresh(ArrayList<PlanetenInfo> plInfo)
+		public void refresh(ArrayList<PlanetInfo> planetInfo)
 		{
-			this.plInfo = plInfo;
+			this.planetInfo = planetInfo;
 			this.repaint();
 		}
 		
@@ -626,91 +615,90 @@ import common.Utils;
 			g.drawLine(dim.width-1, 0, dim.width-1, dim.height-1);
 			g.drawLine(0, dim.height-1, dim.width, dim.height-1);
 			
-			if (this.plInfo == null)
+			if (this.planetInfo == null)
 				return;
 			
-			int offset = PIXEL_PRO_FELD / 2;
+			int offset = PIXEL_PER_SECTOR / 2;
 			
-			for (Spiel.PlanetenInfo plInfo: this.plInfo)
+			for (Game.PlanetInfo plInfo: this.planetInfo)
 			{
-				if (this.zeigeBesitzer)					
-					g.setColor(Colors.get(plInfo.col));
+				if (this.showOwners)					
+					g.setColor(Colors.get(plInfo.colorIndex));
 				else
-					g.setColor(plInfo.col == Colors.INDEX_NEUTRAL ? 
-							Colors.get(Colors.INDEX_NEUTRAL) : 
+					g.setColor(plInfo.colorIndex == Colors.NEUTRAL ? 
+							Colors.get(Colors.NEUTRAL) : 
 							Color.white);
 				
-				int x = Utils.round(offset + plInfo.x * PIXEL_PRO_FELD);
-				int y = Utils.round(offset + plInfo.y * PIXEL_PRO_FELD);
+				int x = Utils.round(offset + plInfo.positionX * PIXEL_PER_SECTOR);
+				int y = Utils.round(offset + plInfo.positionY * PIXEL_PER_SECTOR);
 				
-				g.fillOval(x, y, PIXEL_PRO_FELD, PIXEL_PRO_FELD);
+				g.fillOval(x, y, PIXEL_PER_SECTOR, PIXEL_PER_SECTOR);
 			}
 		}
 
 	}
 	
-	private void updateSpiel()
+	private void updateGame()
 	{
-		int anzSp = Integer.parseInt((String)this.comboSpieler.getSelectedItem());
-		int anzPl = Integer.parseInt((String)this.comboPlaneten.getSelectedItem());
+		int playersCount = Integer.parseInt((String)this.comboPlayers.getSelectedItem());
+		int planetsCount = Integer.parseInt((String)this.comboPlanets.getSelectedItem());
 		
-		for (SpielOptionen option: this.cbOptionen.keySet())
+		for (GameOptions option: this.cbOptions.keySet())
 		{
-			if (this.cbOptionen.get(option).isSelected())
-				this.optionen.add(option);
+			if (this.cbOptions.get(option).isSelected())
+				this.options.add(option);
 			else
-				this.optionen.remove(option);
+				this.options.remove(option);
 		}
 
-		for (int i = 0; i < Constants.ANZAHL_SPIELER_MAX; i++)
+		for (int playerIndex = 0; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
 		{
-			this.panSpieler[i].setVisible(i < anzSp);
+			this.panPlayers[playerIndex].setVisible(playerIndex < playersCount);
 			
-			if (!this.optionen.contains(SpielOptionen.SIMPEL))
-				this.cbBot[i].setSelected(false);
+			if (!this.options.contains(GameOptions.SIMPLE))
+				this.cbBot[playerIndex].setSelected(false);
 			
-			this.cbBot[i].setEnabled(i > 0 && this.optionen.contains(SpielOptionen.SIMPEL));
+			this.cbBot[playerIndex].setEnabled(playerIndex > 0 && this.options.contains(GameOptions.SIMPLE));
 		}
 		
-		this.spiel = Spiel.getSpiel(this.optionen,
-				this.getSpieler(anzSp),
-				this.gamesAndUsers.emailAdresseSpielleiter,
-				anzPl,
-				30); // Wird spaeter noch angepasst
+		this.game = Game.create(
+				this.options,
+				this.getPlayers(playersCount),
+				this.gamesAndUsers.emailGameHost,
+				planetsCount,
+				30);
 		
-		this.panSpielfeldDisplay.refresh(this.spiel.getPlanetenInfo());
+		this.panBoardDisplay.refresh(this.game.getPlanetInfo());
 	}
 	
-	private void submitSpiel()
+	private void submitGame()
 	{
-		// Ist ein Spielname gewaehlt?
-		String spielName = this.tfSpielName.getText().trim();
-		this.tfSpielName.setText(spielName);
+		String gameName = this.tfGameName.getText().trim();
+		this.tfGameName.setText(gameName);
 		
-		if (spielName.length() < Constants.SPIEL_NAME_SERVER_MIN_LAENGE ||
-			spielName.length() > Constants.SPIEL_NAME_SERVER_MAX_LAENGE ||
-			!Pattern.matches(Constants.SPIELER_REGEX_PATTERN, spielName))
+		if (gameName.length() < Constants.GAME_NAME_LENGTH_MIN ||
+			gameName.length() > Constants.GAME_NAME_LENGTH_MAX ||
+			!Pattern.matches(Constants.PLAYER_NAME_REGEX_PATTERN, gameName))
 		{
 			DialogWindow.showError(
 					this,
 					SternResources.ServerGamesSubmitSpielname(
 							false, 
-							spielName, 
-							Integer.toString(Constants.SPIEL_NAME_SERVER_MIN_LAENGE), 
-							Integer.toString(Constants.SPIEL_NAME_SERVER_MAX_LAENGE)),
+							gameName, 
+							Integer.toString(Constants.GAME_NAME_LENGTH_MIN), 
+							Integer.toString(Constants.GAME_NAME_LENGTH_MAX)),
 					SternResources.Fehler(false));
 			return;
 		}
 		
-		this.spiel.setName(spielName);
+		this.game.setName(gameName);
 		
-		// Pruefen, ob alle Spieler zugewiesen sind.
-		Spieler[] alleSpieler = this.getSpieler(this.spiel.getAnzSp());
+		Player[] players = this.getPlayers(this.game.getPlayersCount());
 		
-		for (int i = 0; i < alleSpieler.length; i++)
+		for (int playerIndex = 0; playerIndex < players.length; playerIndex++)
 		{
-			Spieler spieler = alleSpieler[i];
-			if (spieler.getName().equals("") && !spieler.istComputer())
+			Player player = players[playerIndex];
+			if (player.getName().equals("") && !player.isBot())
 			{
 				DialogWindow.showError(
 						this,
@@ -719,84 +707,80 @@ import common.Utils;
 				return;
 			}
 			
-			// Wenn Bot, dann Namen korrigieren
-			if (spieler.istComputer())
-				spieler.setName("_" + SternResources.SpielparameterJDialogBot(false)+ (i+1)+"_");
+			if (player.isBot())
+				player.setName("_" + SternResources.SpielparameterJDialogBot(false)+ (playerIndex+1)+"_");
 			else
 			{
-				ResponseMessageGamesAndUsers.UserInfo userInfo = this.gamesAndUsers.users.get(spieler.getName());
-				spieler.setEmailAdresse(userInfo.email);
+				ResponseMessageGamesAndUsers.UserInfo userInfo = this.gamesAndUsers.users.get(player.getName());
+				player.setEmail(userInfo.email);
 			}
 		}
 		
 		DialogWindowResult dialogResult = DialogWindow.showOkCancel(
 				this,
-				SternResources.ServerGamesSubmitFrage(false, spiel.getName()),
+				SternResources.ServerGamesSubmitFrage(false, game.getName()),
 				SternResources.ServerGamesSubmit(false));
 		
 		if (dialogResult != DialogWindowResult.OK)
 			return;
 		
-		this.spiel.setSpieler(alleSpieler);
+		this.game.setPlayers(players);
 		
-		HashSet<SpielOptionen> optionen = this.spiel.getOptionen();
-		String maxJahreString = (String)this.comboLetztesJahr.getSelectedItem();
+		HashSet<GameOptions> options = this.game.getOptions();
+		String yearsMaxString = (String)this.comboYearLast.getSelectedItem();
 		
-		// Spieloptionen
-		if (optionen.contains(SpielOptionen.SIMPEL))
+		if (options.contains(GameOptions.SIMPLE))
 		{
-			optionen.remove(SpielOptionen.FESTUNGEN);
-			optionen.remove(SpielOptionen.KOMMANDOZENTRALEN);
-			optionen.remove(SpielOptionen.KOMMANDOZENTRALEN_UNBEWEGLICH);
+			options.remove(GameOptions.DEFENCE_SHIELDS);
+			options.remove(GameOptions.COMMAND_ROOMS);
+			options.remove(GameOptions.COMMAND_ROOMS_STATIC);
 		}
 		else
 		{
-			optionen.add(SpielOptionen.FESTUNGEN);
-			optionen.add(SpielOptionen.KOMMANDOZENTRALEN);
+			options.add(GameOptions.DEFENCE_SHIELDS);
+			options.add(GameOptions.COMMAND_ROOMS);
 		}
 		
-		optionen.remove(SpielOptionen.AUTO_SAVE);
-		optionen.remove(SpielOptionen.EMAIL);
-		optionen.add(SpielOptionen.SERVER_BASIERT);
+		options.remove(GameOptions.AUTO_SAVE);
+		options.remove(GameOptions.EMAIL_BASED);
+		options.add(GameOptions.SERVER_BASED);
 		
-		if (maxJahreString.equals(MAX_JAHRE_UNENDLICH))
+		if (yearsMaxString.equals(ENDLESS_GAME_STRING))
 		{
-			this.spiel.setMaxJahre(0);
-			optionen.remove(SpielOptionen.KEIN_ENDLOSSPIEL);
+			this.game.setYearMax(0);
+			options.remove(GameOptions.LIMITED_NUMBER_OF_YEARS);
 		}
 		else
 		{
-			this.spiel.setMaxJahre(Integer.parseInt(maxJahreString));
-			this.optionen.add(SpielOptionen.KEIN_ENDLOSSPIEL);
+			this.game.setYearMax(Integer.parseInt(yearsMaxString));
+			this.options.add(GameOptions.LIMITED_NUMBER_OF_YEARS);
 		}
 		
-		this.spiel.setOptionen(optionen);
+		this.game.setOptions(options);
 		
-		// Preise, Spielzug-Codes, etc. vorbelegen
-		this.spiel.jahrVorbereiten();
+		this.game.prepareYear();
 		
-		// Spiel an den Server schicken
 		RequestMessage msg = new RequestMessage(RequestMessageType.POST_NEW_GAME);
 		
 		Gson gson = new Gson();
-		msg.payloadSerialized = gson.toJson(this.spiel); 
+		msg.payloadSerialized = gson.toJson(this.game); 
 		
 		ResponseMessage respMsg = this.sendAndReceive(this.cuc, msg);
 		
 		if (!respMsg.error)
 		{
-			ArrayList<Spieler> spielerEmail = new ArrayList<Spieler>();
+			ArrayList<Player> playersForEmail = new ArrayList<Player>();
 			
-			for (Spieler spieler: alleSpieler)
+			for (Player spieler: players)
 			{
 				if (spieler.getName().equals(this.cuc.userId) ||
-					spieler.istComputer())
+					spieler.isBot())
 					continue;
 				
-				spielerEmail.add(spieler);
+				playersForEmail.add(spieler);
 			}
 			
-			if (spielerEmail.size() > 0)
+			if (playersForEmail.size() > 0)
 			{
 				DialogWindow.showInformation(
 						this, 
@@ -805,17 +789,17 @@ import common.Utils;
 				
 				EmailCreatorJDialog dlg = new EmailCreatorJDialog(
 						this, 
-						spiel.getSpieler(),
+						game.getPlayers(),
 						null,
 						parent.emailSeparator,
 						SternResources.EmailSubjectEingeladen(
 								false, 
 								this.cuc.userId, 
-								this.spiel.getName()), 
+								this.game.getName()), 
 						SternResources.EmailBodyEingeladen(
 								false, 
 								this.cuc.userId, 
-								this.spiel.getName(), 
+								this.game.getName(), 
 								this.cuc.url, 
 								Integer.toString(this.cuc.port)));
 				
@@ -833,53 +817,53 @@ import common.Utils;
 						SternResources.ServerGamesSubmitAngelegt(false, respMsg.payloadSerialized), 
 						SternResources.ServerGamesSubmit(false));
 			
-			// Spiel laden
-			this.selectGame(this.spiel.getName());
+			this.selectGame(this.game.getName());
 		}
 	}
 	
-	private Spieler[] getSpieler(int anzSp)
+	private Player[] getPlayers(int playersCount)
 	{
-		Spieler[] spielerArray = new Spieler[anzSp];
-		for (int i = 0; i < spielerArray.length; i++)
-			spielerArray[i] = new Spieler(
-					(String)this.comboSpielerArray[i].getSelectedItem(),
+		Player[] players = new Player[playersCount];
+		
+		for (int playerIndex = 0; playerIndex < players.length; playerIndex++)
+			players[playerIndex] = new Player(
+					(String)this.comboPlayersArray[playerIndex].getSelectedItem(),
 					"", 
-					this.canvasSpielerFarben[i].colIndex, 
-					this.cbBot[i].isSelected(),
+					this.canvasPlayersColors[playerIndex].colorIndex, 
+					this.cbBot[playerIndex].isSelected(),
 					false);
 		
-		return spielerArray;
+		return players;
 	}
 	
-	private class PanelSpielSelector extends PanelDark implements 
+	private class PanelGameSelector extends PanelDark implements 
 			ActionListener,
 			ListSelectionListener,
 			MouseListener
 	{
 		private ButtonDark butOk;
-		private ButtonDark butSpielLoeschen;
-		private ButtonDark butSpielBeenden;
+		private ButtonDark butGameDelete;
+		private ButtonDark butGameFinalize;
 		
-		private SpielfeldDisplay spielfeld;
+		private BoardDisplay board;
 		
 		private JList<String> listGames;
 		
-		private Hashtable<String,SpielInfo> gamesDict;
+		private Hashtable<String,GameInfo> gamesDict;
 		
-		private SpielerPanel[] spielerPanels;
+		private PanelPlayer[] panelsPlayers;
 		
-		private SpielInfo selectedGame;
+		private GameInfo selectedGame;
 
-		private LabelDark labSpielerUndPlaneten;
-		private LabelDark labJahr;
-		private LabelDark labStartDatum;
-		private LabelDark labLetztesUpdate;
+		private LabelDark labPlayersAndPlanets;
+		private LabelDark labYear;
+		private LabelDark labDateStart;
+		private LabelDark labUpdateLast;
 		private CheckBoxDark cbSimple;
 		
-		public PanelSpielSelector(
-				ArrayList<SpielInfo> games, 
-				boolean spielleiterAktionen,
+		public PanelGameSelector(
+				ArrayList<GameInfo> games, 
+				boolean allowGameHostActions,
 				String currentGameId)
 		{
 			super();
@@ -890,12 +874,12 @@ import common.Utils;
 			
 			PanelDark panMain = new PanelDark(new BorderLayout(20, 10));
 			
-			this.gamesDict = new Hashtable<String,SpielInfo>();
+			this.gamesDict = new Hashtable<String,GameInfo>();
 			DefaultListModel<String> lm = new DefaultListModel<String>();
 			
 			int selectedIndex = -1;
 			
-			for (SpielInfo info: games)
+			for (GameInfo info: games)
 			{
 				lm.addElement(info.name);
 				this.gamesDict.put(info.name, info);
@@ -925,34 +909,34 @@ import common.Utils;
 			
 			PanelDark panGrid = new PanelDark(new GridLayout(6, 2, 0, 0));
 			
-			this.spielerPanels = new SpielerPanel[Constants.ANZAHL_SPIELER_MAX];
+			this.panelsPlayers = new PanelPlayer[Constants.PLAYERS_COUNT_MAX];
 			
-			this.spielerPanels[0] = new SpielerPanel();
-			panGrid.add(this.spielerPanels[0]);
+			this.panelsPlayers[0] = new PanelPlayer();
+			panGrid.add(this.panelsPlayers[0]);
 			
-			this.labSpielerUndPlaneten = new LabelDark("6 Spieler, 42 Planeten", font);
-			panGrid.add(this.labSpielerUndPlaneten);
+			this.labPlayersAndPlanets = new LabelDark("6 players, 42 planets", font);
+			panGrid.add(this.labPlayersAndPlanets);
 			
-			this.spielerPanels[1] = new SpielerPanel();
-			panGrid.add(this.spielerPanels[1]);
+			this.panelsPlayers[1] = new PanelPlayer();
+			panGrid.add(this.panelsPlayers[1]);
 			
-			this.labJahr = new LabelDark("Jahr 1 von 30", font);
-			panGrid.add(this.labJahr);
+			this.labYear = new LabelDark("Year 1 of 30", font);
+			panGrid.add(this.labYear);
 			
-			this.spielerPanels[2] = new SpielerPanel();
-			panGrid.add(this.spielerPanels[2]);
+			this.panelsPlayers[2] = new PanelPlayer();
+			panGrid.add(this.panelsPlayers[2]);
 			
-			this.labStartDatum = new LabelDark("Begonnen am 24.04.2019 00:00", font);
-			panGrid.add(this.labStartDatum);
+			this.labDateStart = new LabelDark("Started on 04/24/2019 00:00", font);
+			panGrid.add(this.labDateStart);
 			
-			this.spielerPanels[3] = new SpielerPanel();
-			panGrid.add(this.spielerPanels[3]);
+			this.panelsPlayers[3] = new PanelPlayer();
+			panGrid.add(this.panelsPlayers[3]);
 			
-			this.labLetztesUpdate = new LabelDark("Letzte Aktivität 24.04.2019", font);
-			panGrid.add(this.labLetztesUpdate);
+			this.labUpdateLast = new LabelDark("Last activity 04/24/2019", font);
+			panGrid.add(this.labUpdateLast);
 			
-			this.spielerPanels[4] = new SpielerPanel();
-			panGrid.add(this.spielerPanels[4]);
+			this.panelsPlayers[4] = new PanelPlayer();
+			panGrid.add(this.panelsPlayers[4]);
 			
 			this.cbSimple = new CheckBoxDark(
 					SternResources.SpielparameterJDialogSimpelStern(false), 
@@ -960,8 +944,8 @@ import common.Utils;
 			this.cbSimple.setEnabled(false);
 			panGrid.add(this.cbSimple);
 			
-			this.spielerPanels[5] = new SpielerPanel();
-			panGrid.add(this.spielerPanels[5]);
+			this.panelsPlayers[5] = new PanelPlayer();
+			panGrid.add(this.panelsPlayers[5]);
 			
 			panGrid.add(new LabelDark("", font));
 			
@@ -969,21 +953,20 @@ import common.Utils;
 			
 			// ----
 			
-			// Spielfeld
-			this.spielfeld = new SpielfeldDisplay(true);
-			panMain.add(this.spielfeld, BorderLayout.EAST);
+			this.board = new BoardDisplay(true);
+			panMain.add(this.board, BorderLayout.EAST);
 			
 			panShell.add(panMain, BorderLayout.CENTER);
 			// ----
 			PanelDark panButtons = new PanelDark(new FlowLayout(FlowLayout.RIGHT));
 			
-			if (spielleiterAktionen)
+			if (allowGameHostActions)
 			{
-				this.butSpielBeenden = new ButtonDark(this, SternResources.ServerGamesBeenden(false), font);
-				panButtons.add(this.butSpielBeenden);
+				this.butGameFinalize = new ButtonDark(this, SternResources.ServerGamesBeenden(false), font);
+				panButtons.add(this.butGameFinalize);
 				
-				this.butSpielLoeschen = new ButtonDark(this, SternResources.ServerGamesLoeschen(false), font);
-				panButtons.add(this.butSpielLoeschen);
+				this.butGameDelete = new ButtonDark(this, SternResources.ServerGamesLoeschen(false), font);
+				panButtons.add(this.butGameDelete);
 			}
 
 			this.butOk = new ButtonDark(this, SternResources.ServerGamesLaden(false), font);
@@ -1016,11 +999,11 @@ import common.Utils;
 				{
 					selectGame(this.selectedGame.name);
 				}
-				else if (e.getSource() == this.butSpielLoeschen)
+				else if (e.getSource() == this.butGameDelete)
 				{
 					deleteGame(this.selectedGame.name);
 				}
-				else if (e.getSource() == this.butSpielBeenden)
+				else if (e.getSource() == this.butGameFinalize)
 				{
 					finalizeGame(this.selectedGame.name);
 				}
@@ -1041,88 +1024,87 @@ import common.Utils;
 		
 		private void setValues()
 		{
-			for (int sp = 0; sp < Constants.ANZAHL_SPIELER_MAX; sp++)
+			for (int playerIndex = 0; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
 			{
 				boolean visible = this.selectedGame != null && 
-						this.selectedGame.spieler.length -1 >= sp;
-				this.spielerPanels[sp].setVisible(visible);
+						this.selectedGame.players.length -1 >= playerIndex;
+				this.panelsPlayers[playerIndex].setVisible(visible);
 				
 				if (!visible)
 					continue;
 				
-				Spieler spieler = this.selectedGame.spieler[sp];
+				Player player = this.selectedGame.players[playerIndex];
 				
-				this.spielerPanels[sp].cbBot.setSelected(spieler.istComputer());
-				this.spielerPanels[sp].cbZugeingabeFertig.setSelected(
-						this.selectedGame.zugeingabeBeendet.contains(spieler.getName()));
-				this.spielerPanels[sp].tfName.setText(spieler.getName());
-				this.spielerPanels[sp].tfName.setForeground(
-						Colors.get(spieler.getColIndex()));
+				this.panelsPlayers[playerIndex].cbBot.setSelected(player.isBot());
+				this.panelsPlayers[playerIndex].cbEnterMovesFinished.setSelected(
+						this.selectedGame.moveEnteringFinalized.contains(player.getName()));
+				this.panelsPlayers[playerIndex].tfPlayerName.setText(player.getName());
+				this.panelsPlayers[playerIndex].tfPlayerName.setForeground(
+						Colors.get(player.getColorIndex()));
 			}
 			
-			this.spielfeld.refresh(this.selectedGame == null ? null : this.selectedGame.planetenInfo);
+			this.board.refresh(this.selectedGame == null ? null : this.selectedGame.planetInfo);
 			
-			this.labJahr.setVisible(this.selectedGame != null);
-			this.labSpielerUndPlaneten.setVisible(this.selectedGame != null);
-			//this.labSpieler.setVisible(this.selectedGame != null);
-			this.labStartDatum.setVisible(this.selectedGame != null);
+			this.labYear.setVisible(this.selectedGame != null);
+			this.labPlayersAndPlanets.setVisible(this.selectedGame != null);
+			this.labDateStart.setVisible(this.selectedGame != null);
 			this.cbSimple.setVisible(this.selectedGame != null);
 			
 			if (this.selectedGame != null)
 			{
-				if (this.selectedGame.maxJahre == 0)
-					this.labJahr.setText(
+				if (this.selectedGame.yearMax == 0)
+					this.labYear.setText(
 							SternResources.InventurJahr1(
 									false, 
-									Integer.toString(this.selectedGame.jahr + 1)));
+									Integer.toString(this.selectedGame.year + 1)));
 				else
-					this.labJahr.setText(
+					this.labYear.setText(
 							SternResources.InventurJahr2(
 									false,
-									Integer.toString(this.selectedGame.jahr + 1),
-									Integer.toString(this.selectedGame.maxJahre)));
+									Integer.toString(this.selectedGame.year + 1),
+									Integer.toString(this.selectedGame.yearMax)));
 				
-				this.labSpielerUndPlaneten.setText(
+				this.labPlayersAndPlanets.setText(
 						SternResources.ServerGamesSpielerPlaneten(
 								false, 
-								Integer.toString(this.selectedGame.spieler.length),
-								Integer.toString(this.selectedGame.planetenInfo.size())));
+								Integer.toString(this.selectedGame.players.length),
+								Integer.toString(this.selectedGame.planetInfo.size())));
 				
-				this.labLetztesUpdate.setText(
+				this.labUpdateLast.setText(
 						SternResources.ServerGamesLetzteAktivitaet(
 								false, 
-								Utils.dateStringFormat(
-										Utils.millisecondsToString(this.selectedGame.letztesUpdate))));
+								Utils.formatDateString(
+										Utils.convertMillisecondsToString(this.selectedGame.dateUpdate))));
 				
-				this.labStartDatum.setText(
+				this.labDateStart.setText(
 						SternResources.ServerGamesBegonnen(
 								false, 
-								Utils.dateStringFormat(
-										Utils.millisecondsToString(this.selectedGame.startDatum))));
+								Utils.formatDateString(
+										Utils.convertMillisecondsToString(this.selectedGame.dateStart))));
 				
-				this.cbSimple.setSelected(this.selectedGame.simpleStern);
+				this.cbSimple.setSelected(this.selectedGame.simple);
 			}
 			
-			this.spielfeld.repaint();
+			this.board.repaint();
 		}
 		
-		private class SpielerPanel extends PanelDark
+		private class PanelPlayer extends PanelDark
 		{
-			public CheckBoxDark cbZugeingabeFertig;
-			public TextFieldDark tfName;
+			public CheckBoxDark cbEnterMovesFinished;
+			public TextFieldDark tfPlayerName;
 			public CheckBoxDark cbBot;
 			
-			public SpielerPanel()
+			public PanelPlayer()
 			{
 				this.setLayout(new FlowLayout(FlowLayout.LEFT));
 				
-				this.cbZugeingabeFertig = new CheckBoxDark("", false, font);
-				this.cbZugeingabeFertig.setEnabled(false);
-				this.add(cbZugeingabeFertig);
+				this.cbEnterMovesFinished = new CheckBoxDark("", false, font);
+				this.cbEnterMovesFinished.setEnabled(false);
+				this.add(cbEnterMovesFinished);
 				
-				this.tfName = new TextFieldDark(font, 12);
-				this.tfName.setEditable(false);
-				this.add(this.tfName);
+				this.tfPlayerName = new TextFieldDark(font, 12);
+				this.tfPlayerName.setEditable(false);
+				this.add(this.tfPlayerName);
 				
 				this.cbBot = new CheckBoxDark(SternResources.SpielparameterJDialogBot(false), false, font);
 				this.cbBot.setEnabled(false);
@@ -1137,7 +1119,6 @@ import common.Utils;
 			JList<String> list = (JList<String>)evt.getSource();
 	        if (evt.getClickCount() == 2)
 	        {
-	            // Double-click detected
 	            int index = list.locationToIndex(evt.getPoint());
 	            
 	            if (index >= 0)
@@ -1148,31 +1129,22 @@ import common.Utils;
 	            	selectGame(this.selectedGame.name);
 	            }
 	        }
-			
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
-			
 		}
 	}
 }

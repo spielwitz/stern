@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -65,7 +65,6 @@ public class CryptoLib
 		for (int i = 0; i < CODES.length(); i++)
 			codeIndices.put(CODES.charAt(i), i);
 		
-		// Einmal zu Beginn aufrufen, dann gehe alle spaeteren Verschluesselungen schneller
 		try {
 			Cipher.getInstance(ALGORITHM_RSA);
 		} catch (Exception e) {}
@@ -251,8 +250,6 @@ public class CryptoLib
 			String text, 
 			PublicKey key) throws Exception
 	{
-		// System.out.println("Sending string: " + text);
-		
 		byte[] bytesStringEncrypted = CryptoLib.encryptRsa(text, key);
 	    
 		byte[] byteStringLength = CryptoLib.convertIntToByteArray(bytesStringEncrypted.length);
@@ -281,8 +278,6 @@ public class CryptoLib
 			String text,
 			Cipher encryptCipher) throws Exception
 	{
-		// System.out.println("Sending string (AES): " + text);
-		
         byte[] ciphertext = encryptCipher.doFinal(
         		compress(text.getBytes(STRING_ENCODING)));
 		

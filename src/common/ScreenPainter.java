@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -28,258 +28,245 @@ import java.util.ArrayList;
 
 public class ScreenPainter
 {	
-	public static final int			SCREEN_SIZE_W = 650;
-	public static final int			SCREEN_SIZE_H = 480;
+	public static final int			SCREEN_WIDTH = 650;
+	public static final int			SCREEN_HEIGHT = 480;
 	
-	private static final int		SPIELFELD_XOFF = 10;
-	private static final int		SPIELFELD_YOFF = 10;
-	public static final int			SPIELFELD_DX = 18;
+	private static final int		BOARD_OFFSET_X = 10;
+	private static final int		BOARD_OFFSET_Y = 10;
+	public static final int			BOARD_DX = 18;
 	
-	private static final double		LINIE_OBJEKT_GROESSE = 0.5;
-	private static final double		OBJEKT_GROESSE = 0.75;
-	private static final int		OBJEKT_MIN_PIXEL = 2;
+	private static final double		LINE_SIZE = 0.5;
+	private static final double		SHIP_SIZE = 0.75;
+	private static final int		SHIP_SIZE_PIXEL_MIN = 2;
 	
-	private static final int 		sp1 = 5; // Objekttyp
-	private static final int 		sp2 = 46; //Kaufpreis
-	private static final int 		sp3 = 64; // Verkaufspreis
-
+	private static final int 		PLANET_EDITOR_COLUMN1 = 5;
+	private static final int 		PLANET_EDITOR_COLUMN2 = 46;
+	private static final int 		PLANET_EDITOR_COLUMN3 = 64;
 	
-	private static final String 	CURSOR = "_";
+	private static final String 	CURSOR_CHARACTER = "_";
 	
-	private static final int 		PLANETENLISTE_XOFF = 2 * SPIELFELD_XOFF + Constants.FELD_MAX_X * SPIELFELD_DX;
-	private static final int 		PLANETENLISTE_YOFF = SPIELFELD_YOFF;
-	private static final int 		PLANETENLISTE_W = SCREEN_SIZE_W - PLANETENLISTE_XOFF - SPIELFELD_XOFF;
-	private static final int 		PLANETENLISTE_H = Constants.FELD_MAX_Y * SPIELFELD_DX;
-	private static final int			PLANETENLISTE_ACHSE_X =Utils.round((double)PLANETENLISTE_W / 2. + (double)PLANETENLISTE_XOFF);
-	private static final int			PLANETENLISTE_ACHSABSTAND = Utils.round((double)PLANETENLISTE_W / 3.);
+	private static final int 		PLANETLIST_OFFSET_X = 2 * BOARD_OFFSET_X + Constants.BOARD_MAX_X * BOARD_DX;
+	private static final int 		PLANETLIST_OFFSET_Y = BOARD_OFFSET_Y;
+	private static final int 		PLANETLIST_WIDTH = SCREEN_WIDTH - PLANETLIST_OFFSET_X - BOARD_OFFSET_X;
+	private static final int 		PLANETLIST_HEIGHT = Constants.BOARD_MAX_Y * BOARD_DX;
+	private static final int		PLANETLIST_AXIS_X =Utils.round((double)PLANETLIST_WIDTH / 2. + (double)PLANETLIST_OFFSET_X);
+	private static final int		PLANETLIST_AXIS_DISTANCE = Utils.round((double)PLANETLIST_WIDTH / 3.);
 	
-	private static final int			CONSOLE_LINES = Console.MAX_LINES + 3; // + 1;
-	private static final int			CONSOLE_ZEILENHOEHE = 16;
-	private static final int			CONSOLE_HOEHE = CONSOLE_LINES * CONSOLE_ZEILENHOEHE;
+	private static final int		CONSOLE_LINES_COUNT = Console.TEXT_LINES_COUNT_MAX + 3;
+	private static final int		CONSOLE_LINE_HEIGHT = 16;
+	private static final int		CONSOLE_HEIGHT = CONSOLE_LINES_COUNT * CONSOLE_LINE_HEIGHT;
 	
-	private static final int	    PROGRESS_BAR_RAND = 2;
+	private static final int	    PROGRESS_BAR_BORDER = 2;
 	
 	private double factor;
 	
 	private Graphics2D dbGraphics;
-	static ArrayList<String> titelBildTextLines;
+	static ArrayList<String> titleLinesCount;
 		
-	private Font fontPlaneten, fontMinen, fontFelder;
-	private FontMetrics fmPlaneten, fmMinen, fmFelder;
+	private Font fontPlanets, fontMines, fontSectors;
+	private FontMetrics fmPlanets, fmMines, fmSectors;
 	
-	private ScreenDisplayContent cont;
+	private ScreenContent screenContent;
 	private boolean inputEnabled;
 	static {
-		// ASCII-Art lesen
-		titelBildTextLines = new ArrayList<String>();
+		titleLinesCount = new ArrayList<String>();
 		
-		titelBildTextLines.add("STERN            `     `    `    `      `    `    `    `  `   `             ");
-		titelBildTextLines.add(" `   `    `     `           `           `         `          jj.wwg@#@4k.  `");
-		titelBildTextLines.add("                  `    `         `           `         .,;!'` Qyxsj#@Qm     ");
-		titelBildTextLines.add("`     `    `   `                             `     .j!''`.` `..Q@$h$$@`     ");
-		titelBildTextLines.add("     `    `     ` `    `    `    `      `     `..!|:. jJ\"^s, `..7@$$Qk     ");
-		titelBildTextLines.add(" `                                           .z|`.``..b.jaoud,..j.7Qk   `   ");
-		titelBildTextLines.add("               `  `    `    `    `        ..T;::..``..pJ$Xoooa :!xgk   `    ");
-		titelBildTextLines.add("`    `    `      `                .jj,  .jl:``````````3yqSooo3.vzwt         ");
-		titelBildTextLines.add("      `                  `    ..g@@@@@ggl:''`'`''`'''`'.=&gwZvoa2`          ");
-		titelBildTextLines.add(" `         `   `  `    `    j2@@###$#$g@.:::'`'':'':'`:':::jxogP            ");
-		titelBildTextLines.add("     `    `     `       ` .@@@X$$$$@g8l:;''':''::''`'':::!uxq@l             ");
-		titelBildTextLines.add("`                `      j2@@$$qg#@gMu:::'::':':!''`':`::jxqpl            `  ");
-		titelBildTextLines.add("     `     `   `       .@@QgpP`  .k||!:::::':':::`:.::jxq2n  `          `   ");
-		titelBildTextLines.add(" `        `       `  .2@@@P`    jCv|,,,!::::::```:.jxzwH`      `   `        ");
-		titelBildTextLines.add("     `         `  ` .@@@l      Jn||i!,,!!:`:`.::j|agZF                      ");
-		titelBildTextLines.add("`                  .@R        jox||i,,::;:::!j2@#@E    `                    ");
-		titelBildTextLines.add("     `    `    ` ` = ..jjjj, jpvxxx\"xvvxxcsj@@$$pQI `                      ");
-		titelBildTextLines.add(" `         ` ``  j.qgpRsjuz|Yg.5paojaagpA^@@$XX#g@t   `                     ");
-		titelBildTextLines.add("     ` `       .q#Q8xzgpT     4.3PT='    .@$h#$@@t     `                 `  ");
-		titelBildTextLines.add("`          ` .@@@@sJo2l      .im       .@$$#$@@P         `                  ");
-		titelBildTextLines.add("     ` `   .@$@gE.nuF     ..5!jk     .@###p@@l   `     `            `       ");
-		titelBildTextLines.add(" `      ` .@@$qFjv2`   ..Zn;:j@   ..@$pg@PT       `           `         `   ");
-		titelBildTextLines.add("     `  .@$eKqk.iZ ..!n!|'ujQm  .@@@pPT                `                    ");
-		titelBildTextLines.add("`  `   .@@$Xgm.|;:!:|':jz@p@F .@MP`     `  ` `    `    `  `                 ");
-		titelBildTextLines.add("  `   .@@##Qm `:jjjwW$#pgpP                  `    `                         ");
-		titelBildTextLines.add("  `  .@@kh###D#VyyppogpP`   `           `              `  `                 ");
-		titelBildTextLines.add("`   .@$kh#opV#pppgpHT`      `    `      `                `         `        ");
-		titelBildTextLines.add("   .@$#k3f#gg#H='                `           `    `      (c) 1989-2021      ");
-		titelBildTextLines.add("   @@$@8PT'           `     `    `      `              Michael Schweitzer   ");
-		titelBildTextLines.add("`              `  `    `                     `    `        Build " + ReleaseGetter.getRelease() + "  ");
+		titleLinesCount.add("STERN            `     `    `    `      `    `    `    `  `   `             ");
+		titleLinesCount.add(" `   `    `     `           `           `         `          jj.wwg@#@4k.  `");
+		titleLinesCount.add("                  `    `         `           `         .,;!'` Qyxsj#@Qm     ");
+		titleLinesCount.add("`     `    `   `                             `     .j!''`.` `..Q@$h$$@`     ");
+		titleLinesCount.add("     `    `     ` `    `    `    `      `     `..!|:. jJ\"^s, `..7@$$Qk     ");
+		titleLinesCount.add(" `                                           .z|`.``..b.jaoud,..j.7Qk   `   ");
+		titleLinesCount.add("               `  `    `    `    `        ..T;::..``..pJ$Xoooa :!xgk   `    ");
+		titleLinesCount.add("`    `    `      `                .jj,  .jl:``````````3yqSooo3.vzwt         ");
+		titleLinesCount.add("      `                  `    ..g@@@@@ggl:''`'`''`'''`'.=&gwZvoa2`          ");
+		titleLinesCount.add(" `         `   `  `    `    j2@@###$#$g@.:::'`'':'':'`:':::jxogP            ");
+		titleLinesCount.add("     `    `     `       ` .@@@X$$$$@g8l:;''':''::''`'':::!uxq@l             ");
+		titleLinesCount.add("`                `      j2@@$$qg#@gMu:::'::':':!''`':`::jxqpl            `  ");
+		titleLinesCount.add("     `     `   `       .@@QgpP`  .k||!:::::':':::`:.::jxq2n  `          `   ");
+		titleLinesCount.add(" `        `       `  .2@@@P`    jCv|,,,!::::::```:.jxzwH`      `   `        ");
+		titleLinesCount.add("     `         `  ` .@@@l      Jn||i!,,!!:`:`.::j|agZF                      ");
+		titleLinesCount.add("`                  .@R        jox||i,,::;:::!j2@#@E    `                    ");
+		titleLinesCount.add("     `    `    ` ` = ..jjjj, jpvxxx\"xvvxxcsj@@$$pQI `                      ");
+		titleLinesCount.add(" `         ` ``  j.qgpRsjuz|Yg.5paojaagpA^@@$XX#g@t   `                     ");
+		titleLinesCount.add("     ` `       .q#Q8xzgpT     4.3PT='    .@$h#$@@t     `                 `  ");
+		titleLinesCount.add("`          ` .@@@@sJo2l      .im       .@$$#$@@P         `                  ");
+		titleLinesCount.add("     ` `   .@$@gE.nuF     ..5!jk     .@###p@@l   `     `            `       ");
+		titleLinesCount.add(" `      ` .@@$qFjv2`   ..Zn;:j@   ..@$pg@PT       `           `         `   ");
+		titleLinesCount.add("     `  .@$eKqk.iZ ..!n!|'ujQm  .@@@pPT                `                    ");
+		titleLinesCount.add("`  `   .@@$Xgm.|;:!:|':jz@p@F .@MP`     `  ` `    `    `  `                 ");
+		titleLinesCount.add("  `   .@@##Qm `:jjjwW$#pgpP                  `    `                         ");
+		titleLinesCount.add("  `  .@@kh###D#VyyppogpP`   `           `              `  `                 ");
+		titleLinesCount.add("`   .@$kh#opV#pppgpHT`      `    `      `                `         `        ");
+		titleLinesCount.add("   .@$#k3f#gg#H='                `           `    `      (c) 1989-2021      ");
+		titleLinesCount.add("   @@$@8PT'           `     `    `      `              Michael Schweitzer   ");
+		titleLinesCount.add("`              `  `    `                     `    `        Build " + ReleaseGetter.getRelease() + "  ");
 
 	}
 	
 	public ScreenPainter(
-			ScreenDisplayContent cont, 
+			ScreenContent screenContent, 
 			boolean inputEnabled,
 			Graphics2D dbGraphics, 
-			Font fontPlaneten, 
-			Font fontMinen, 
-			Font fontFelder,
+			Font fontPlanets, 
+			Font fontMines, 
+			Font fontSector,
 			double factor)
 	{
-		this.cont = cont;
+		this.screenContent = screenContent;
 		this.inputEnabled = inputEnabled;
 		this.dbGraphics = dbGraphics;
-		this.fontPlaneten = fontPlaneten;
-		this.fontMinen = fontMinen;
-		this.fontFelder = fontFelder;
+		this.fontPlanets = fontPlanets;
+		this.fontMines = fontMines;
+		this.fontSectors = fontSector;
 		this.factor = factor;
 		
 		this.dbGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		this.setColor(
-				this.cont != null && this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE ?
+				this.screenContent != null && this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX ?
 						Color.WHITE:
 						Color.BLACK);
-		this.fillRect(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H);
+		this.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		
-		// Fonts
-		this.fmPlaneten = this.dbGraphics.getFontMetrics(this.fontPlaneten);
+		this.fmPlanets = this.dbGraphics.getFontMetrics(this.fontPlanets);
 					
-		// Inhalte zeichnen
-		if (this.cont != null)
+		if (this.screenContent != null)
 		{
-			this.fmFelder = this.dbGraphics.getFontMetrics(this.fontFelder);
-			this.fmMinen = this.dbGraphics.getFontMetrics(this.fontMinen);
+			this.fmSectors = this.dbGraphics.getFontMetrics(this.fontSectors);
+			this.fmMines = this.dbGraphics.getFontMetrics(this.fontMines);
 			
 			this.drawConsole();
 			
-			if (this.cont.getModus() == ScreenDisplayContent.MODUS_SPIELFELD)
+			if (this.screenContent.getMode() == ScreenContent.MODE_BOARD)
 			{
-				this.drawSpielfeld();
-				this.drawPlanetenliste();
+				this.drawBoard();
+				this.drawPlanetList();
 			}
-			else if (this.cont.getModus() == ScreenDisplayContent.MODUS_STATISTIK)
-				this.drawStatistik();
-			else if (this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE)
-				this.drawSpielfeld();
+			else if (this.screenContent.getMode() == ScreenContent.MODE_STATISTICS)
+				this.drawStatistics();
+			else if (this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX)
+				this.drawBoard();
 			else
-				this.drawEditor();
+				this.drawPlanetEditor();
 			
-			// Input disabled?
 			if (!this.inputEnabled)
 				this.drawLockSymbol();
 		}
 		else
-			// Testbild zeigen
-			this.drawTitelbild();
+			this.drawTitle();
 	}
 	
 	private void drawConsole()
 	{
-		if (this.cont == null)
+		if (this.screenContent == null)
 			return;
 		
-		ConsoleDisplayContent cdc = this.cont.getCons();
-		if (cdc == null)
+		ScreenContentConsole screenContentConsole = this.screenContent.getConsole();
+		if (screenContentConsole == null)
 			return;
-		
-		// Rahmen
+
 		this.setColor(new Color(50, 50, 50));
 
-		int x0 = SPIELFELD_XOFF;
-		int y0 = 2 * SPIELFELD_YOFF + Constants.FELD_MAX_Y * SPIELFELD_DX;
-		int w = SCREEN_SIZE_W - 2 * SPIELFELD_XOFF;
+		int x0 = BOARD_OFFSET_X;
+		int y0 = 2 * BOARD_OFFSET_Y + Constants.BOARD_MAX_Y * BOARD_DX;
+		int w = SCREEN_WIDTH - 2 * BOARD_OFFSET_X;
 		
-		this.drawRect(x0, y0, w, CONSOLE_HOEHE);
-		this.drawRect(x0, y0, w, CONSOLE_ZEILENHOEHE);
+		this.drawRect(x0, y0, w, CONSOLE_HEIGHT);
+		this.drawRect(x0, y0, w, CONSOLE_LINE_HEIGHT);
 		
-		// --------------
-		// Console-Inhalt
-		// --------------
-		if (cdc.getProgressBarDay() >= 0)
+		if (screenContentConsole.getProgressBarDay() >= 0)
 		{
-			int pbX = x0 + w/2;
-			int pbY = y0 + PROGRESS_BAR_RAND;
-			int pbW = w/2 - PROGRESS_BAR_RAND;
-			int pbH = Math.max(1, CONSOLE_ZEILENHOEHE - 2 * PROGRESS_BAR_RAND) + 1;
+			int progressBarX = x0 + w/2;
+			int progressBarY = y0 + PROGRESS_BAR_BORDER;
+			int progressBarWidth = w/2 - PROGRESS_BAR_BORDER;
+			int progressBarHeight = Math.max(1, CONSOLE_LINE_HEIGHT - 2 * PROGRESS_BAR_BORDER) + 1;
 			
-			int wpb = 0;
+			int progressActual = 0;
 			String text = "";
 			
-			if (cdc.getProgressBarDay() == 0)
+			if (screenContentConsole.getProgressBarDay() == 0)
 			{
-				wpb = 0;
+				progressActual = 0;
 				text = SternResources.AuswertungEreignisJahresbeginn2(false);
 			}
-			else if (cdc.getProgressBarDay() == Constants.ANZ_TAGE_JAHR)
+			else if (screenContentConsole.getProgressBarDay() == Constants.DAYS_OF_YEAR_COUNT)
 			{
-				wpb = pbW;
+				progressActual = progressBarWidth;
 				text = SternResources.AuswertungEreignisJahresende2(false);
 			}
 			else
 			{
-				wpb = Utils.round(
-						(double) pbW * (double)cdc.getProgressBarDay() / 
-						(double)Constants.ANZ_TAGE_JAHR);
+				progressActual = Utils.round(
+						(double) progressBarWidth * (double)screenContentConsole.getProgressBarDay() / 
+						(double)Constants.DAYS_OF_YEAR_COUNT);
 				text = SternResources.AuswertungEreignisTag2(
 						false,
-						Integer.toString(cdc.getProgressBarDay()),
-						Integer.toString(Constants.ANZ_TAGE_JAHR));
+						Integer.toString(screenContentConsole.getProgressBarDay()),
+						Integer.toString(Constants.DAYS_OF_YEAR_COUNT));
 			}
 			
-			this.drawRect(pbX, pbY, pbW, pbH);
-			this.fillRect(pbX, pbY, wpb, pbH);
+			this.drawRect(progressBarX, progressBarY, progressBarWidth, progressBarHeight);
+			this.fillRect(progressBarX, progressBarY, progressActual, progressBarHeight);
 			
-			this.setColor(Colors.get(cdc.getHeaderCol()));
+			this.setColor(Colors.get(screenContentConsole.getHeaderCol()));
 			
-			this.dbGraphics.setFont(this.fontFelder);
+			this.dbGraphics.setFont(this.fontSectors);
 			
-			int textWidth = fmFelder.stringWidth(text);
-			int textHeight = this.fmFelder.getAscent() - this.fmFelder.getDescent();
+			int textWidth = fmSectors.stringWidth(text);
+			int textHeight = this.fmSectors.getAscent() - this.fmSectors.getDescent();
 			int textX = Utils.round(
-					this.factor * (pbX + (pbW - textWidth) / 2));
+					this.factor * (progressBarX + (progressBarWidth - textWidth) / 2));
 			int textY = this.consoleGetY(0, y0, textHeight);
 			this.dbGraphics.drawString(text, textX, textY);
 		}
 		
-		// Header
-		this.dbGraphics.setFont(this.fontPlaneten);
-		int fontHeight = this.fmPlaneten.getAscent() - this.fmPlaneten.getDescent();
-		int charWidth = this.fmPlaneten.charWidth('H');
+		this.dbGraphics.setFont(this.fontPlanets);
+		int fontHeight = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
+		int charWidth = this.fmPlanets.charWidth('H');
 		
-		this.setColor(Colors.get(cdc.getHeaderCol()));
+		this.setColor(Colors.get(screenContentConsole.getHeaderCol()));
 		
 		int x = Utils.round(this.factor * (double)x0) + charWidth;
 		int y = this.consoleGetY(0, y0, fontHeight);
 		
-		if (cdc.getHeaderText() != null)
-			this.dbGraphics.drawString(SternResources.getString(cdc.getHeaderText()), x, y);
+		if (screenContentConsole.getHeaderText() != null)
+			this.dbGraphics.drawString(SternResources.getString(screenContentConsole.getHeaderText()), x, y);
 		
-		// Textzeilen
-		for (int i = 0; i < Console.MAX_LINES; i++)
+		for (int i = 0; i < Console.TEXT_LINES_COUNT_MAX; i++)
 		{
-			this.setColor(Colors.get(cdc.getTextCol()[Console.MAX_LINES-i-1]));
+			this.setColor(Colors.get(screenContentConsole.getLineColors()[Console.TEXT_LINES_COUNT_MAX-i-1]));
 		
 			y = this.consoleGetY(i+1, y0, fontHeight);
 			
-			if (cdc.isWaitingForInput() && (Console.MAX_LINES-i-1) == cdc.getOutputLine())
+			if (screenContentConsole.isWaitingForInput() && (Console.TEXT_LINES_COUNT_MAX-i-1) == screenContentConsole.getOutputLine())
 				this.dbGraphics.drawString(
 						SternResources.getString(
-						cdc.getText()[Console.MAX_LINES-i-1]) + CURSOR, x, y);
+						screenContentConsole.getTextLines()[Console.TEXT_LINES_COUNT_MAX-i-1]) + CURSOR_CHARACTER, x, y);
 			else
 				this.dbGraphics.drawString(
 						SternResources.getString(
-						cdc.getText()[Console.MAX_LINES-i-1]), x, y);
+						screenContentConsole.getTextLines()[Console.TEXT_LINES_COUNT_MAX-i-1]), x, y);
 		}
 		
-		// Keys-Anzeige (neu)
-		if (cdc.getKeys() != null)
+		if (screenContentConsole.getAllowedKeys() != null)
 		{
-			int spaltenCounter = 0;
+			int column = 0;
 			
-			for (int counter = 0; counter < cdc.getKeys().size(); counter += 2)
+			for (int counter = 0; counter < screenContentConsole.getAllowedKeys().size(); counter += 2)
 			{
-				ConsoleKey key1 = cdc.getKeys().get(counter);
-				ConsoleKey key2 = counter+1 < cdc.getKeys().size() ? 
-										cdc.getKeys().get(counter+1) :
+				ConsoleKey key1 = screenContentConsole.getAllowedKeys().get(counter);
+				ConsoleKey key2 = counter+1 < screenContentConsole.getAllowedKeys().size() ? 
+										screenContentConsole.getAllowedKeys().get(counter+1) :
 										null;
 				
 				int maxKeyLength = ConsoleKey.getMaxKeyLength(key1, key2);
 				int maxTextLength = ConsoleKey.getMaxTextLength(key1, key2);
 				
-				int xKey = this.consoleGetX(spaltenCounter, x0, charWidth);
-				int xText = this.consoleGetX(spaltenCounter + maxKeyLength + 1, x0, charWidth);
+				int xKey = this.consoleGetX(column, x0, charWidth);
+				int xText = this.consoleGetX(column + maxKeyLength + 1, x0, charWidth);
 				
-				if (cdc.getKeys().size() == 1)
+				if (screenContentConsole.getAllowedKeys().size() == 1)
 					this.writeConsoleKey(key1, xKey, xText, maxKeyLength, y0, 0, charWidth, fontHeight);
 				else
 				{
@@ -287,416 +274,391 @@ public class ScreenPainter
 					this.writeConsoleKey(key2, xKey, xText, maxKeyLength, y0, 0, charWidth, fontHeight);
 				}
 				
-				spaltenCounter += (maxKeyLength + 1 + maxTextLength + 2);
+				column += (maxKeyLength + 1 + maxTextLength + 2);
 			}
 		}		
 	}
 	
-	private void writeConsoleKey(ConsoleKey key, int xKey, int xText, int maxKeyLength, int y0, int zeile, int charWidth, int fontHeight)
+	private void writeConsoleKey(ConsoleKey key, int xKey, int xText, int maxKeyLength, int y0, int line, int charWidth, int fontHeight)
 	{
 		if (key == null)
 			return;
 		
-		this.setColor(Colors.get(Colors.INDEX_NEUTRAL));
+		this.setColor(Colors.get(Colors.NEUTRAL));
 		
-		// Key mit einem Rechteck hinterlegen
 		this.dbGraphics.fillRect(
 				xKey + (maxKeyLength - key.getKey().length()) * charWidth,
-				Utils.round(this.factor * (double)(y0 + (CONSOLE_LINES-1-zeile) * CONSOLE_ZEILENHOEHE)),
+				Utils.round(this.factor * (double)(y0 + (CONSOLE_LINES_COUNT-1-line) * CONSOLE_LINE_HEIGHT)),
 				key.getKey().length() * charWidth,
-				Utils.round((double)CONSOLE_ZEILENHOEHE * this.factor));
+				Utils.round((double)CONSOLE_LINE_HEIGHT * this.factor));
 		
 		this.setColor(Color.black);
-		this.dbGraphics.drawString(Utils.padString(key.getKey(), maxKeyLength), xKey, this.consoleGetY(CONSOLE_LINES-1-zeile, y0, fontHeight));
+		this.dbGraphics.drawString(Utils.padString(key.getKey(), maxKeyLength), xKey, this.consoleGetY(CONSOLE_LINES_COUNT-1-line, y0, fontHeight));
 		
-		this.setColor(Colors.get(Colors.INDEX_NEUTRAL));
+		this.setColor(Colors.get(Colors.NEUTRAL));
 		this.dbGraphics.drawString(
 				key.getText(),
 				xText,
-				this.consoleGetY(CONSOLE_LINES-1-zeile, y0, fontHeight));
+				this.consoleGetY(CONSOLE_LINES_COUNT-1-line, y0, fontHeight));
 	}
 	
-	private int consoleGetX(int spalte, int xOff, int charWidth)
+	private int consoleGetX(int column, int xOff, int charWidth)
 	{
-		return Utils.round(this.factor * (double)xOff) + charWidth * (spalte+1);
+		return Utils.round(this.factor * (double)xOff) + charWidth * (column+1);
 	}
-	private int consoleGetY(int zeile, int yOff, int fontHeight)
+	private int consoleGetY(int line, int yOff, int fontHeight)
 	{
-		return Utils.round(this.factor * (double)(yOff + (zeile + 0.5) * CONSOLE_ZEILENHOEHE) + (double)fontHeight/2.);
+		return Utils.round(this.factor * (double)(yOff + (line + 0.5) * CONSOLE_LINE_HEIGHT) + (double)fontHeight/2.);
 	}
-	private void drawSpielfeld()
+	private void drawBoard()
 	{
-		if (this.cont == null)
+		if (this.screenContent == null)
 			return;
 		
-		SpielfeldDisplayContent sdc = this.cont.getSpielfeld();
-		if (sdc == null)
+		ScreenContentBoard screenContentBoard = this.screenContent.getBoard();
+		if (screenContentBoard == null)
 			return;
 		
-		// Gitter
 		this.setColor(new Color(50, 50, 50));
 		
-		for (int senkrecht = 0; senkrecht <= Constants.FELD_MAX_X; senkrecht++)
+		for (int x = 0; x <= Constants.BOARD_MAX_X; x++)
 			this.drawLine(
-					SPIELFELD_XOFF + senkrecht * SPIELFELD_DX, 
-					SPIELFELD_YOFF, 
-					SPIELFELD_XOFF + senkrecht * SPIELFELD_DX,
-					SPIELFELD_YOFF + Constants.FELD_MAX_Y * SPIELFELD_DX);
+					BOARD_OFFSET_X + x * BOARD_DX, 
+					BOARD_OFFSET_Y, 
+					BOARD_OFFSET_X + x * BOARD_DX,
+					BOARD_OFFSET_Y + Constants.BOARD_MAX_Y * BOARD_DX);
 		
-		for (int waagrecht = 0; waagrecht <= Constants.FELD_MAX_Y; waagrecht++)
+		for (int y = 0; y <= Constants.BOARD_MAX_Y; y++)
 			this.drawLine(
-					SPIELFELD_XOFF, 
-					SPIELFELD_YOFF + waagrecht * SPIELFELD_DX, 
-					SPIELFELD_XOFF + Constants.FELD_MAX_X * SPIELFELD_DX,
-					SPIELFELD_YOFF + waagrecht * SPIELFELD_DX);
+					BOARD_OFFSET_X, 
+					BOARD_OFFSET_Y + y * BOARD_DX, 
+					BOARD_OFFSET_X + Constants.BOARD_MAX_X * BOARD_DX,
+					BOARD_OFFSET_Y + y * BOARD_DX);
 		
-		// Linien
-		this.zeichneLinien(sdc.getLines());
+		this.drawBoardLines(screenContentBoard.getLines());
 		
-		// Namen der Sektoren
-		for (int y = 0; y < Constants.FELD_MAX_Y; y++)
+		for (int y = 0; y < Constants.BOARD_MAX_Y; y++)
 		{
-			for (int x = 0; x < Constants.FELD_MAX_X; x++)
+			for (int x = 0; x < Constants.BOARD_MAX_X; x++)
 			{
 				Point pt = new Point(x,y);
-				this.drawCTextSpielfeld(
+				this.drawTextCenteredBoard(
 						pt, 
-						Spiel.getSectorNameFromPoint(pt),
+						Game.getSectorNameFromPositionStatic(pt),
 						new Color(60, 60, 60),
-						this.fontFelder,
-						this.fmFelder);
+						this.fontSectors,
+						this.fmSectors);
 			}
 		}
 		
-		// Planeten
-		if (sdc.getPlanets() != null)
+		if (screenContentBoard.getPlanets() != null)
 		{
-			for (SpielfeldPlanetDisplayContent pl: sdc.getPlanets())
+			for (ScreenContentBoardPlanet screenContentBoardPlanet: screenContentBoard.getPlanets())
 			{
-				this.fillCircleSpielfeld(pl.getPos(), 1.2, 
-						this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE ?
+				this.fillCircleBoard(screenContentBoardPlanet.getPosition(), 1.2, 
+						this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX ?
 								Color.white :
-								Colors.getColorDarker2(Colors.get(pl.getCol())));
+								Colors.getColorDarker2(Colors.get(screenContentBoardPlanet.getColorIndex())));
 				
-				if (this.cont.getModus() == ScreenDisplayContent.MODUS_ENTFERUNGSTABELLE)
-	                this.drawCircleSpielfeld(pl.getPos(), 1.2, Colors.get(pl.getCol())); 
+				if (this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX)
+	                this.drawCircleBoard(screenContentBoardPlanet.getPosition(), 1.2, Colors.get(screenContentBoardPlanet.getColorIndex())); 
 				
-				this.drawCTextSpielfeld(pl.getPos(), pl.getName(),Colors.get(pl.getCol()), this.fontPlaneten, this.fmPlaneten);
+				this.drawTextCenteredBoard(screenContentBoardPlanet.getPosition(), screenContentBoardPlanet.getName(),Colors.get(screenContentBoardPlanet.getColorIndex()), this.fontPlanets, this.fmPlanets);
 				
-				this.zeichneRahmenUmPlanet(pl);
+				this.drawPlanetFrames(screenContentBoardPlanet);
 			}
 		}
 		
-		// Minen
-		this.zeichneMinenfelder(sdc.getMinen());
+		this.drawBoardMines(screenContentBoard.getMines());
 		
-		// Radarbeobachtungskreis
-		this.zeichneRadarkreis(sdc.getRadar());
+		this.drawBoardRadarCircles(screenContentBoard.getRadarCircle());
 		
-		// Markierte Felder
-		this.markiereFelder(sdc.getMarkedFields());		
+		this.drawPositionsMarked(screenContentBoard.getPositionsMarked());		
 		
-		// Linien mit Objekten
-		this.zeichneLinienObjekte(sdc.getLines());		
+		this.drawBoardLinesWithShips(screenContentBoard.getLines());		
 		
-		// Punkte
-		this.zeichnePunkte(sdc.getPoints());
+		this.drawBoardPositions(screenContentBoard.getPositions());
 	}
 
-	private void drawPlanetenliste()
+	private void drawPlanetList()
 	{
-		if (this.cont == null)
+		if (this.screenContent == null)
 			return;
 		
-		PlanetenlisteDisplayContent pdc = this.cont.getPlaneten();
-		if (pdc == null)
+		ScreenContentPlanets screenContentPlanets = this.screenContent.getPlanets();
+		if (screenContentPlanets == null)
 			return;
 		
-		// Rahmen
 		this.setColor(new Color(50, 50, 50));
 		
-		this.drawRect(PLANETENLISTE_XOFF, PLANETENLISTE_YOFF, PLANETENLISTE_W, PLANETENLISTE_H);
+		this.drawRect(PLANETLIST_OFFSET_X, PLANETLIST_OFFSET_Y, PLANETLIST_WIDTH, PLANETLIST_HEIGHT);
 		
 		int counter = 0;
-		int zeilenCounter = 0;
-		byte lastColor = -1;
+		int lineCounter = 0;
+		byte lastColorIndex = -1;
 
-		this.dbGraphics.setFont(this.fontPlaneten);
-		int height = this.fmPlaneten.getAscent() - this.fmPlaneten.getDescent();
+		this.dbGraphics.setFont(this.fontPlanets);
+		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
 
-		for (String text: pdc.getText())
+		for (String text: screenContentPlanets.getText())
 		{
-			int width = this.fmPlaneten.stringWidth(text);
+			int width = this.fmPlanets.stringWidth(text);
 			
-			byte color = pdc.getTextCol().get(counter);
-			this.setColor(Colors.get(color));
+			byte colorIndex = screenContentPlanets.getTextColorIndices().get(counter);
+			this.setColor(Colors.get(colorIndex));
 			
-			int zeile = zeilenCounter % Constants.FELD_MAX_Y;
-			int spalte = zeilenCounter / Constants.FELD_MAX_Y;
+			int line = lineCounter % Constants.BOARD_MAX_Y;
+			int column = lineCounter / Constants.BOARD_MAX_Y;
 			
-			if (counter > 0 && zeile == Constants.FELD_MAX_Y-1 && color != lastColor)
+			if (counter > 0 && line == Constants.BOARD_MAX_Y-1 && colorIndex != lastColorIndex)
 			{
-				zeilenCounter++;
-				zeile = zeilenCounter % Constants.FELD_MAX_Y;
-				spalte = zeilenCounter / Constants.FELD_MAX_Y;
+				lineCounter++;
+				line = lineCounter % Constants.BOARD_MAX_Y;
+				column = lineCounter / Constants.BOARD_MAX_Y;
 			}
 			
-			int dx = (spalte-1) * PLANETENLISTE_ACHSABSTAND + PLANETENLISTE_ACHSE_X;
+			int dx = (column-1) * PLANETLIST_AXIS_DISTANCE + PLANETLIST_AXIS_X;
 			
 			int x = Utils.round(this.factor * (double)dx - (double)width/2.);
-			int y = Utils.round(this.factor * ((double)SPIELFELD_YOFF + ((double)zeile+0.5) * (double)SPIELFELD_DX) + (double)height/2.);
+			int y = Utils.round(this.factor * ((double)BOARD_OFFSET_Y + ((double)line+0.5) * (double)BOARD_DX) + (double)height/2.);
 			
 			this.dbGraphics.drawString(text, x, y);
 			
 			counter++;
-			zeilenCounter++;
+			lineCounter++;
 			
-			lastColor = color;
+			lastColorIndex = colorIndex;
 		}
 	}
 	
-	private void drawEditor()
+	private void drawPlanetEditor()
 	{
-		if (this.cont == null)
+		if (this.screenContent == null)
 			return;
 		
-		PlanetenEditorDisplayContent pedc = this.cont.getPlEdit();
-		if (pedc == null)
+		ScreenContentPlanetEditor screenContentPlanetEditor = this.screenContent.getPlanetEditor();
+		if (screenContentPlanetEditor == null)
 			return;
 		
-		// Rahmen
 		this.setColor(new Color(50, 50, 50));
 		this.drawRect(
-				SPIELFELD_XOFF,
-				SPIELFELD_YOFF,
-				SCREEN_SIZE_W - 2 * SPIELFELD_XOFF,
-				Constants.FELD_MAX_Y * SPIELFELD_DX);
+				BOARD_OFFSET_X,
+				BOARD_OFFSET_Y,
+				SCREEN_WIDTH - 2 * BOARD_OFFSET_X,
+				Constants.BOARD_MAX_Y * BOARD_DX);
 		
-		// Text
-		this.drawLTextEditor(Utils.padString(pedc.getEvorrat(),4), sp1, 1, Colors.get(pedc.getFarbeSpieler()));
-		this.drawLTextEditor(SternResources.PlEditEeEnergievorrat(false), sp1+5, 1, Colors.get(Colors.INDEX_NEUTRAL));
+		this.drawTextLeftEditor(Utils.padString(screenContentPlanetEditor.getMoneySupply(),4), PLANET_EDITOR_COLUMN1, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
+		this.drawTextLeftEditor(SternResources.PlEditEeEnergievorrat(false), PLANET_EDITOR_COLUMN1+5, 1, Colors.get(Colors.NEUTRAL));
 		
-		if (pedc.isKommandozentrale())
-			this.drawLTextEditor(SternResources.Kommandozentrale(false), sp2+8, 1, Colors.get(pedc.getFarbeSpieler()));
+		if (screenContentPlanetEditor.hasCommandRoom())
+			this.drawTextLeftEditor(SternResources.Kommandozentrale(false), PLANET_EDITOR_COLUMN2+8, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
 		
-		this.drawLTextEditor(SternResources.PlEditKaufpreis(false), sp2+2, 2, Colors.get(Colors.INDEX_NEUTRAL));
-		this.drawLTextEditor(SternResources.PlEditVerkaufspreis(false), sp3, 2, Colors.get(Colors.INDEX_NEUTRAL));
+		this.drawTextLeftEditor(SternResources.PlEditKaufpreis(false), PLANET_EDITOR_COLUMN2+2, 2, Colors.get(Colors.NEUTRAL));
+		this.drawTextLeftEditor(SternResources.PlEditVerkaufspreis(false), PLANET_EDITOR_COLUMN3, 2, Colors.get(Colors.NEUTRAL));
 		
-		this.editorZeile(ObjektTyp.EPROD, pedc, SternResources.PlEditEprodPlus4(false), 3);
-		this.editorZeile(ObjektTyp.ERAUM, pedc, SternResources.PlEditRaumerProd(false), 4);
-		this.editorZeile(ObjektTyp.FESTUNG, pedc, SternResources.PlEditFestungen(false), 5);
-		this.editorZeile(ObjektTyp.FESTUNG_REPARATUR, pedc, 
-				SternResources.PlEditFestungRaumer(false, Integer.toString(Constants.FESTUNG_REPARATUR_ANZ_RAUMER)), 6);
+		this.drawPlanetEditorLine(ShipType.MONEY_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditEprodPlus4(false), 3);
+		this.drawPlanetEditorLine(ShipType.FIGHTER_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditRaumerProd(false), 4);
+		this.drawPlanetEditorLine(ShipType.DEFENCE_SHIELD, screenContentPlanetEditor, SternResources.PlEditFestungen(false), 5);
+		this.drawPlanetEditorLine(ShipType.DEFENCE_SHIELD_REPAIR, screenContentPlanetEditor, 
+				SternResources.PlEditFestungRaumer(false, Integer.toString(Constants.DEFENSE_SHIELD_REPAIR_FIGHTERS_COUNT)), 6);
 		
-		this.editorZeile(ObjektTyp.AUFKLAERER, pedc, SternResources.AufklaererPlural(false), 8);
-		this.editorZeile(ObjektTyp.TRANSPORTER, pedc, SternResources.TransporterPlural(false), 9);
-		this.editorZeile(ObjektTyp.PATROUILLE, pedc, SternResources.PatrouillePlural(false), 10);
-		this.editorZeile(ObjektTyp.MINENRAEUMER, pedc, SternResources.MinenraeumerPlural(false), 11);
+		this.drawPlanetEditorLine(ShipType.SCOUT, screenContentPlanetEditor, SternResources.AufklaererPlural(false), 8);
+		this.drawPlanetEditorLine(ShipType.TRANSPORT, screenContentPlanetEditor, SternResources.TransporterPlural(false), 9);
+		this.drawPlanetEditorLine(ShipType.PATROL, screenContentPlanetEditor, SternResources.PatrouillePlural(false), 10);
+		this.drawPlanetEditorLine(ShipType.MINESWEEPER, screenContentPlanetEditor, SternResources.MinenraeumerPlural(false), 11);
 		
-		this.editorZeile(ObjektTyp.MINE50, pedc, SternResources.Mine50Plural(false), 13);
-		this.editorZeile(ObjektTyp.MINE100, pedc, SternResources.Mine100Plural(false), 14);
-		this.editorZeile(ObjektTyp.MINE250, pedc, SternResources.Mine250Plural(false), 15);
-		this.editorZeile(ObjektTyp.MINE500, pedc, SternResources.Mine500Plural(false), 16);
+		this.drawPlanetEditorLine(ShipType.MINE50, screenContentPlanetEditor, SternResources.Mine50Plural(false), 13);
+		this.drawPlanetEditorLine(ShipType.MINE100, screenContentPlanetEditor, SternResources.Mine100Plural(false), 14);
+		this.drawPlanetEditorLine(ShipType.MINE250, screenContentPlanetEditor, SternResources.Mine250Plural(false), 15);
+		this.drawPlanetEditorLine(ShipType.MINE500, screenContentPlanetEditor, SternResources.Mine500Plural(false), 16);
 	}
 	
-	private void editorZeile(ObjektTyp typ, PlanetenEditorDisplayContent pedc, String name, int zeile)
+	private void drawPlanetEditorLine(ShipType type, ScreenContentPlanetEditor screenContentPlanetEditor, String name, int line)
 	{
-		this.drawLTextEditor(Utils.padString(pedc.getAnzahl().get(typ),4), sp1, zeile, Colors.get(pedc.getFarbeSpieler()));
-		this.drawLTextEditor(name, sp1+5, zeile, 
-				!pedc.isReadOnly() && pedc.getTypMarkiert() == typ ?
+		this.drawTextLeftEditor(Utils.padString(screenContentPlanetEditor.getCount().get(type),4), PLANET_EDITOR_COLUMN1, line, Colors.get(screenContentPlanetEditor.getColorIndex()));
+		this.drawTextLeftEditor(name, PLANET_EDITOR_COLUMN1+5, line, 
+				!screenContentPlanetEditor.isReadOnly() && screenContentPlanetEditor.getTypeHighlighted() == type ?
 						Color.white :
-						Colors.get(Colors.INDEX_NEUTRAL));
+						Colors.get(Colors.NEUTRAL));
 		
-		// Zeilen-Marker
-		if (!pedc.isReadOnly() && pedc.getTypMarkiert() == typ)
-			this.drawLTextEditor(">>>>", 0, zeile, Color.white);
+		if (!screenContentPlanetEditor.isReadOnly() && screenContentPlanetEditor.getTypeHighlighted() == type)
+			this.drawTextLeftEditor(">>>>", 0, line, Color.white);
 
-		if (typ == ObjektTyp.ERAUM)
+		if (type == ShipType.FIGHTER_PRODUCTION)
 			return;
 		
-		// Kaufpreis
-		byte farbe = pedc.getFarbeSpieler();
-		if (pedc.getKaufNichtMoeglich().contains(typ))
-			farbe = Colors.INDEX_NEUTRAL;
+		byte colorIndex = screenContentPlanetEditor.getColorIndex();
+		if (screenContentPlanetEditor.getBuyImpossible().contains(type))
+			colorIndex = Colors.NEUTRAL;
 				
-		this.drawLTextEditor(Utils.padString(Spiel.editorPreiseKauf.get(typ),2), sp2 + 4, zeile, Colors.get(farbe));
-		this.drawLTextEditor(SternResources.PlEditEe(false), sp2+7, zeile, Colors.get(farbe));
+		this.drawTextLeftEditor(Utils.padString(Game.editorPricesBuy.get(type),2), PLANET_EDITOR_COLUMN2 + 4, line, Colors.get(colorIndex));
+		this.drawTextLeftEditor(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN2+7, line, Colors.get(colorIndex));
 		
-		// Verkaufspreis
-		if (typ == ObjektTyp.EPROD || typ == ObjektTyp.FESTUNG_REPARATUR)
+		if (type == ShipType.MONEY_PRODUCTION || type == ShipType.DEFENCE_SHIELD_REPAIR)
 			return;
 		
-		farbe = pedc.getFarbeSpieler();
-		if (pedc.getVerkaufNichtMoeglich().contains(typ))
-			farbe = Colors.INDEX_NEUTRAL;
+		colorIndex = screenContentPlanetEditor.getColorIndex();
+		if (screenContentPlanetEditor.getSellImpossible().contains(type))
+			colorIndex = Colors.NEUTRAL;
 		
-		this.drawLTextEditor(Utils.padString(Spiel.editorPreiseVerkauf.get(typ),2), sp3 + 4, zeile, Colors.get(farbe));
-		this.drawLTextEditor(SternResources.PlEditEe(false), sp3+7, zeile, Colors.get(farbe));
+		this.drawTextLeftEditor(Utils.padString(Game.editorPricesSell.get(type),2), PLANET_EDITOR_COLUMN3 + 4, line, Colors.get(colorIndex));
+		this.drawTextLeftEditor(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN3+7, line, Colors.get(colorIndex));
 	}
 	
-	private void drawLTextEditor(String text, int spalte, int zeile, Color col)
+	private void drawTextLeftEditor(String text, int column, int line, Color color)
 	{
-		int charWidth = this.fmPlaneten.charWidth('H');
-		int height = this.fmPlaneten.getAscent() - this.fmPlaneten.getDescent();
+		int charWidth = this.fmPlanets.charWidth('H');
+		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
 		
-		this.dbGraphics.setColor(col);
+		this.dbGraphics.setColor(color);
 		
 		this.dbGraphics.drawString(
 				text,
-				Utils.round((double)charWidth + this.factor * (double)SPIELFELD_XOFF + (double)(spalte* charWidth)),
-				Utils.round((double)height/2. + this.factor * ((double)SPIELFELD_YOFF + ((double)zeile+0.5) * (double)SPIELFELD_DX)));
+				Utils.round((double)charWidth + this.factor * (double)BOARD_OFFSET_X + (double)(column* charWidth)),
+				Utils.round((double)height/2. + this.factor * ((double)BOARD_OFFSET_Y + ((double)line+0.5) * (double)BOARD_DX)));
 	}
 		
-	private void drawStatistik()
+	private void drawStatistics()
 	{
-		if (this.cont == null)
+		if (this.screenContent == null)
 			return;
 		
-		StatistikDisplayContent sdc = this.cont.getStatistik();
-		if (sdc == null)
+		ScreenContentStatistics screenContentStatistics = this.screenContent.getStatistics();
+		if (screenContentStatistics == null)
 			return;
 		
-		// Rahmen
 		this.setColor(new Color(50, 50, 50));
-		this.drawRect(SPIELFELD_XOFF, SPIELFELD_YOFF, SCREEN_SIZE_W - 2 * SPIELFELD_XOFF, Constants.FELD_MAX_Y * SPIELFELD_DX);
+		this.drawRect(BOARD_OFFSET_X, BOARD_OFFSET_Y, SCREEN_WIDTH - 2 * BOARD_OFFSET_X, Constants.BOARD_MAX_Y * BOARD_DX);
 		
-		String titel = "";
-		String jahrString = Integer.toString(sdc.getMarkiertesJahrIndex() + 1);
-		char m = sdc.getTitel().charAt(0);
+		String title = "";
+		String yearString = Integer.toString(screenContentStatistics.getSelectedYearIndex() + 1);
+		char mode = screenContentStatistics.getTitle().charAt(0);
 		
-		switch (m)
+		switch (mode)
 		{
-		case Constants.STATISTIK_MODUS_PUNKTE: // Punkte
-			titel = SternResources.StatistikTitelPunkte(
+		case Constants.STATISTICS_MODE_SCORE:
+			title = SternResources.StatistikTitelPunkte(
 					false,
-					jahrString);
+					yearString);
 			break;
 			
-		case Constants.STATISTIK_MODUS_RAUMER: // Raumer
-			titel = SternResources.StatistikTitelRaumer(
+		case Constants.STATISTICS_MODE_FIGHTERS:
+			title = SternResources.StatistikTitelRaumer(
 					false,
-					jahrString);
+					yearString);
 			break;
 			
-		case Constants.STATISTIK_MODUS_PLANETEN: // Planeten
-			titel = SternResources.StatistikTitelPlaneten(
+		case Constants.STATISTICS_MODE_PLANETS:
+			title = SternResources.StatistikTitelPlaneten(
 					false,
-					jahrString);
+					yearString);
 			break;
 			
-		case Constants.STATISTIK_MODUS_PRODUKTION: // Produktion
-			titel = SternResources.StatistikTitelEnergieproduktion(
+		case Constants.STATISTICS_MODE_MONEY_PRODUCTION:
+			title = SternResources.StatistikTitelEnergieproduktion(
 					false,
-					jahrString);
+					yearString);
 			break;
 		}
 
 		
-		this.drawLTextEditor(
-				titel,
+		this.drawTextLeftEditor(
+				title,
 				0,
 				0,
 				Color.white);
 		
-		int wertSpielerJahr[] = sdc.getWerte()[sdc.getMarkiertesJahrIndex()];
-		int seq[] = Utils.listeSortieren(wertSpielerJahr, true);
+		int valuePerPlayer[] = screenContentStatistics.getValues()[screenContentStatistics.getSelectedYearIndex()];
+		int playerListSequence[] = Utils.sortValues(valuePerPlayer, true);
 		
-		// Detailansicht
-		for (int i = 0; i < seq.length; i++)
+		for (int i = 0; i < playerListSequence.length; i++)
 		{
-			int sp = seq[i];
-			Spieler spieler = sdc.getSpieler()[sp];
+			int playerIndex = playerListSequence[i];
+			Player player = screenContentStatistics.getPlayers()[playerIndex];
 		
-			this.drawLTextEditor(sdc.getSpieler()[sp].getName(), 0, 2 + i, Colors.get(spieler.getColIndex()));
+			this.drawTextLeftEditor(screenContentStatistics.getPlayers()[playerIndex].getName(), 0, 2 + i, Colors.get(player.getColorIndex()));
 			
-			this.drawLTextEditor(Utils.padString(Integer.toString(wertSpielerJahr[sp]), 7), 14, 2 + i, Colors.get(spieler.getColIndex()));
+			this.drawTextLeftEditor(Utils.padString(Integer.toString(valuePerPlayer[playerIndex]), 7), 14, 2 + i, Colors.get(player.getColorIndex()));
 		}
 		
-		// Spieldaten
-		this.drawLTextEditor(SternResources.StatistikSpielBegonnen(false), 0, 16, Color.white);
+		this.drawTextLeftEditor(SternResources.StatistikSpielBegonnen(false), 0, 16, Color.white);
 		
-		this.drawLTextEditor(Utils.dateToString(sdc.getStartDatum()), 0, 17, Color.white);
+		this.drawTextLeftEditor(Utils.convertDateToString(screenContentStatistics.getDateStart()), 0, 17, Color.white);
 		
-		// Min und Max
-		this.drawLTextEditor(
+		this.drawTextLeftEditor(
 				SternResources.StatistikMax(
 						false, 
-						Integer.toString(sdc.getMaxWert()), 
-						Integer.toString(sdc.getMaxWertJahr()+1)),
+						Integer.toString(screenContentStatistics.getValueMax()), 
+						Integer.toString(screenContentStatistics.getValueMaxYear()+1)),
 				25,
 				0,
-				Colors.get(sdc.getSpieler()[sdc.getMaxWertSpieler()].getColIndex()));
+				Colors.get(screenContentStatistics.getPlayers()[screenContentStatistics.getMaxValuePlayerIndex()].getColorIndex()));
 		
-		this.drawLTextEditor(
+		this.drawTextLeftEditor(
 				SternResources.StatistikMin(false,
-						Integer.toString(sdc.getMinWert()),
-						Integer.toString(sdc.getMinWertJahr()+1)),
+						Integer.toString(screenContentStatistics.getValueMin()),
+						Integer.toString(screenContentStatistics.getValueMinYear()+1)),
 				50,
 				0,
-				Colors.get(sdc.getSpieler()[sdc.getMinWertSpieler()].getColIndex()));
+				Colors.get(screenContentStatistics.getPlayers()[screenContentStatistics.getMinValuePlayerIndex()].getColorIndex()));
 		
-		// Grafik
-		int charWidth = this.fmPlaneten.charWidth('H');
-		int height = this.fmPlaneten.getAscent() - this.fmPlaneten.getDescent();
+		int charWidth = this.fmPlanets.charWidth('H');
+		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
 		
-		int spalteGrafik = 25;
-		int zeileGrafik0 = 1;
-		int zeileGrafik1 = 17;
+		int columnGraphic = 25;
+		int columnGraphic0 = 1;
+		int columnGraphic1 = 17;
 		
-		int x0 = Utils.round((double)charWidth + this.factor * (double)SPIELFELD_XOFF + (double)(spalteGrafik* charWidth));
-		int y0 = Utils.round((double)height/2. + this.factor * ((double)SPIELFELD_YOFF + ((double)zeileGrafik0+0.5) * (double)SPIELFELD_DX));
+		int x0 = Utils.round((double)charWidth + this.factor * (double)BOARD_OFFSET_X + (double)(columnGraphic* charWidth));
+		int y0 = Utils.round((double)height/2. + this.factor * ((double)BOARD_OFFSET_Y + ((double)columnGraphic0+0.5) * (double)BOARD_DX));
 		
-		int rahmenY = Utils.round((double)(Constants.FELD_MAX_Y * SPIELFELD_DX) * this.factor);
-		int y1 = Utils.round((double)height/2. + this.factor * ((double)SPIELFELD_YOFF + ((double)zeileGrafik1+0.5) * (double)SPIELFELD_DX));
+		int frameY = Utils.round((double)(Constants.BOARD_MAX_Y * BOARD_DX) * this.factor);
+		int y1 = Utils.round((double)height/2. + this.factor * ((double)BOARD_OFFSET_Y + ((double)columnGraphic1+0.5) * (double)BOARD_DX));
 		
-		int x1 = Utils.round((double)(SCREEN_SIZE_W - SPIELFELD_XOFF) * this.factor + (rahmenY - y1));
+		int x1 = Utils.round((double)(SCREEN_WIDTH - BOARD_OFFSET_X) * this.factor + (frameY - y1));
 		
 		y1 -= 2 * height;
 		
-		// Koordinatensystem
 		this.setColor(Color.gray);
 		this.dbGraphics.drawLine(x0, y0, x0, y1);
 		this.dbGraphics.drawLine(x0, y1, x1, y1);
 		this.dbGraphics.drawLine(x1, y0, x1, y1);
 		
-		// Kurven
 		int yMax = y0 + height;
 		
-		// Max-Linie und Min-Linie
 		Graphics2D g2d = (Graphics2D) this.dbGraphics.create();
 		Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{12}, 0);
         g2d.setStroke(dashed);		
         g2d.drawLine(
         		x0,
-        		this.getStatistikY(sdc.getMaxWert(), sdc.getMaxWert(), yMax, y1),
-        		x1, this.getStatistikY(sdc.getMaxWert(), sdc.getMaxWert(), yMax, y1));
+        		this.getStatisticsY(screenContentStatistics.getValueMax(), screenContentStatistics.getValueMax(), yMax, y1),
+        		x1, this.getStatisticsY(screenContentStatistics.getValueMax(), screenContentStatistics.getValueMax(), yMax, y1));
         
         g2d.drawLine(
         		x0,
-        		this.getStatistikY(sdc.getMinWert(), sdc.getMaxWert(), yMax, y1),
-        		x1, this.getStatistikY(sdc.getMinWert(), sdc.getMaxWert(), yMax, y1));
+        		this.getStatisticsY(screenContentStatistics.getValueMin(), screenContentStatistics.getValueMax(), yMax, y1),
+        		x1, this.getStatisticsY(screenContentStatistics.getValueMin(), screenContentStatistics.getValueMax(), yMax, y1));
         
 		g2d.dispose();
 		
-		double dx = (double)(x1 - x0) / (double)(sdc.getJahre() - 1);
+		double dx = (double)(x1 - x0) / (double)(screenContentStatistics.getYears() - 1);
 		
-		for (int jahr = 0; jahr < sdc.getJahre(); jahr++)
+		for (int year = 0; year < screenContentStatistics.getYears(); year++)
 		{
-			int xx0 = x0 + Utils.round((double)jahr * dx);
-			int xx1 = x0 + Utils.round((double)(jahr+1) * dx);
+			int xx0 = x0 + Utils.round((double)year * dx);
+			int xx1 = x0 + Utils.round((double)(year+1) * dx);
 			
-			// Champions im Jahr
 			int x0champ = Math.max(x0, xx0 - Utils.round(dx / 2.));
 			
-			int anzChamps = sdc.getChampionsJahr()[jahr].length;
-			int dy = Utils.round((2 * height -1 ) / anzChamps);
+			int champsCount = screenContentStatistics.getChampionsPerYear()[year].length;
+			int dy = Utils.round((2 * height -1 ) / champsCount);
 			
-			for (int champ = 0; champ < anzChamps; champ++)
+			for (int champ = 0; champ < champsCount; champ++)
 			{
-				int colChamp = sdc.getChampionsJahr()[jahr][champ];
+				int colChamp = screenContentStatistics.getChampionsPerYear()[year][champ];
 				
 				this.dbGraphics.setColor(
-						Colors.get(sdc.getSpieler()[colChamp].getColIndex()));
+						Colors.get(screenContentStatistics.getPlayers()[colChamp].getColorIndex()));
 				
 				int y = y1+1 + (champ * dy);
 				int h = (y1 + 2 * height - 1) - y;
@@ -704,53 +666,52 @@ public class ScreenPainter
 				this.dbGraphics.fillRect(
 						x0champ, 
 						y, 
-						(jahr < sdc.getJahre() - 1) ? xx1-xx0 : Utils.round(dx / 2.), 
+						(year < screenContentStatistics.getYears() - 1) ? xx1-xx0 : Utils.round(dx / 2.), 
 						h);
 			}
 			
-			if (jahr < sdc.getJahre() - 1)
+			if (year < screenContentStatistics.getYears() - 1)
 			{
-				for (int spieler = 0; spieler < seq.length; spieler++)
+				for (int playerIndex = 0; playerIndex < playerListSequence.length; playerIndex++)
 				{
-					this.dbGraphics.setColor(Colors.get(sdc.getSpieler()[spieler].getColIndex()));
+					this.dbGraphics.setColor(Colors.get(screenContentStatistics.getPlayers()[playerIndex].getColorIndex()));
 					
 					this.dbGraphics.drawLine(
 							xx0,
-							this.getStatistikY(sdc.getWerte()[jahr][spieler], sdc.getMaxWert(), yMax, y1),
+							this.getStatisticsY(screenContentStatistics.getValues()[year][playerIndex], screenContentStatistics.getValueMax(), yMax, y1),
 							xx1,
-							this.getStatistikY(sdc.getWerte()[jahr+1][spieler], sdc.getMaxWert(), yMax, y1));
+							this.getStatisticsY(screenContentStatistics.getValues()[year+1][playerIndex], screenContentStatistics.getValueMax(), yMax, y1));
 				}
 			}
 		}
 		
-		// Markiertes Jahr
 		this.dbGraphics.setColor(Color.white);
-		int xx0 = x0 + Utils.round((double)sdc.getMarkiertesJahrIndex() * dx);
+		int xx0 = x0 + Utils.round((double)screenContentStatistics.getSelectedYearIndex() * dx);
 		this.dbGraphics.drawLine(xx0, y0, xx0, y1 + 2 * height - 1);		
 	}
 	
-	private int getStatistikY(int value, int maxValue, int yMax, int y1)
+	private int getStatisticsY(int value, int valueMax, int yMax, int y1)
 	{
-		double ratio = (double)value / (double)maxValue;
+		double ratio = (double)value / (double)valueMax;
 		return Utils.round((double)y1 - ratio * (double)(y1 - yMax));
 	}
 	
-	private void drawRect(int x, int y, int w, int h)
+	private void drawRect(int x, int y, int width, int height)
 	{
 		this.dbGraphics.drawRect(
 				   Utils.round((double)x * factor),
 				   Utils.round((double)y * factor),
-				   Utils.round((double)w * this.factor),
-				   Utils.round((double)h * this.factor));
+				   Utils.round((double)width * this.factor),
+				   Utils.round((double)height * this.factor));
 	}
 	
-	private void fillRect(int x, int y, int w, int h)
+	private void fillRect(int x, int y, int width, int height)
 	{
 		this.dbGraphics.fillRect(
 				   Utils.round((double)x * factor),
 				   Utils.round((double)y * factor),
-				   Utils.round((double)w * this.factor),
-				   Utils.round((double)h * this.factor));
+				   Utils.round((double)width * this.factor),
+				   Utils.round((double)height * this.factor));
 	}
 	
 	private void drawLine(int x1, int y1, int x2, int y2)
@@ -773,14 +734,14 @@ public class ScreenPainter
 		this.dbGraphics.drawLine(xx1, yy1, xx2, yy2);
 	}
 	
-	private void drawCircleSpielfeld(Point pos, double r, Color col)
+	private void drawCircleBoard(Point position, double radius, Color color)
 	{
-		this.setColor(col);
+		this.setColor(color);
 		
-		double rr = r * (double)SPIELFELD_DX;
+		double rr = radius * (double)BOARD_DX;
 		
-		double x = (double)(SPIELFELD_XOFF + pos.getX() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
-		double y = (double)(SPIELFELD_XOFF + pos.getY() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
+		double x = (double)(BOARD_OFFSET_X + position.getX() * BOARD_DX) + ((double)BOARD_DX - rr) / 2.;
+		double y = (double)(BOARD_OFFSET_X + position.getY() * BOARD_DX) + ((double)BOARD_DX - rr) / 2.;
 		
 		this.dbGraphics.drawOval(
 				Utils.round(this.factor * x),
@@ -789,14 +750,14 @@ public class ScreenPainter
 				Utils.round(this.factor * rr));
 	}
 	
-	private void fillCircleSpielfeld(Point pos, double r, Color fillCol)
+	private void fillCircleBoard(Point position, double radius, Color color)
 	{
-		this.setColor(fillCol);
+		this.setColor(color);
 		
-		double rr = r * (double)SPIELFELD_DX;
+		double rr = radius * (double)BOARD_DX;
 		
-		double x = (double)(SPIELFELD_XOFF + pos.getX() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
-		double y = (double)(SPIELFELD_XOFF + pos.getY() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
+		double x = (double)(BOARD_OFFSET_X + position.getX() * BOARD_DX) + ((double)BOARD_DX - rr) / 2.;
+		double y = (double)(BOARD_OFFSET_X + position.getY() * BOARD_DX) + ((double)BOARD_DX - rr) / 2.;
 		
 		this.dbGraphics.fillOval(
 				Utils.round(this.factor * x),
@@ -807,135 +768,132 @@ public class ScreenPainter
 	}
 	
 	
-	private void fillRauteSpielfeld(Point pos, Color col)
+	private void fillDiamondBoard(Point position, Color color)
 	{
-		this.setColor(col);
+		this.setColor(color);
 		
 		int[] x = new int[4];
 		int[] y = new int[4];
 		
-		x[0] = Utils.round((double)((double)SPIELFELD_XOFF + pos.getX() * (double)SPIELFELD_DX) * this.factor);
-		y[0] = Utils.round((double)((double)SPIELFELD_YOFF + (pos.getY() + 0.5) * (double)SPIELFELD_DX) * this.factor);
+		x[0] = Utils.round((double)((double)BOARD_OFFSET_X + position.getX() * (double)BOARD_DX) * this.factor);
+		y[0] = Utils.round((double)((double)BOARD_OFFSET_Y + (position.getY() + 0.5) * (double)BOARD_DX) * this.factor);
 		
-		x[1] = Utils.round((double)((double)SPIELFELD_XOFF + (pos.getX() + 0.5) * (double)SPIELFELD_DX) * this.factor);
-		y[1] = Utils.round((double)((double)SPIELFELD_YOFF + pos.getY() * (double)SPIELFELD_DX) * this.factor);
+		x[1] = Utils.round((double)((double)BOARD_OFFSET_X + (position.getX() + 0.5) * (double)BOARD_DX) * this.factor);
+		y[1] = Utils.round((double)((double)BOARD_OFFSET_Y + position.getY() * (double)BOARD_DX) * this.factor);
 		
-		x[2] = Utils.round((double)((double)SPIELFELD_XOFF + (pos.getX()+1.) * (double)SPIELFELD_DX) * this.factor);
-		y[2] = Utils.round((double)((double)SPIELFELD_YOFF + (pos.getY() + 0.5) * (double)SPIELFELD_DX) * this.factor);
+		x[2] = Utils.round((double)((double)BOARD_OFFSET_X + (position.getX()+1.) * (double)BOARD_DX) * this.factor);
+		y[2] = Utils.round((double)((double)BOARD_OFFSET_Y + (position.getY() + 0.5) * (double)BOARD_DX) * this.factor);
 		
-		x[3] = Utils.round((double)((double)SPIELFELD_XOFF + ((double)pos.getX() + 0.5) * (double)SPIELFELD_DX) * this.factor);
-		y[3] = Utils.round((double)((double)SPIELFELD_YOFF + ((double)pos.getY()+1.) * (double)SPIELFELD_DX) * this.factor);
+		x[3] = Utils.round((double)((double)BOARD_OFFSET_X + ((double)position.getX() + 0.5) * (double)BOARD_DX) * this.factor);
+		y[3] = Utils.round((double)((double)BOARD_OFFSET_Y + ((double)position.getY()+1.) * (double)BOARD_DX) * this.factor);
 		
 		this.dbGraphics.fillPolygon(x, y, 4);
 	}
 	
-	private void drawCTextSpielfeld(Point pos, String text, Color col, Font font, FontMetrics fm)
+	private void drawTextCenteredBoard(Point position, String text, Color color, Font font, FontMetrics fm)
 	{
 		this.dbGraphics.setFont(font);
 		
 		int width = fm.stringWidth(text);
 		int height = fm.getAscent() - fm.getDescent();
 		
-		this.setColor(col);
+		this.setColor(color);
 		
-		int x = Utils.round(this.factor * ((double)SPIELFELD_XOFF + (pos.getX()+0.5) * (double)SPIELFELD_DX) - (double)width/2.);
-		int y = Utils.round(this.factor * ((double)SPIELFELD_YOFF + (pos.getY()+0.5) * (double)SPIELFELD_DX) + (double)height/2.);
+		int x = Utils.round(this.factor * ((double)BOARD_OFFSET_X + (position.getX()+0.5) * (double)BOARD_DX) - (double)width/2.);
+		int y = Utils.round(this.factor * ((double)BOARD_OFFSET_Y + (position.getY()+0.5) * (double)BOARD_DX) + (double)height/2.);
 		
 		this.dbGraphics.drawString(text, x, y);
 	}
 		
-	private void setColor(Color col)
+	private void setColor(Color color)
 	{
-		this.dbGraphics.setColor(col);
+		this.dbGraphics.setColor(color);
 	}
 	
-	private void zeichneRahmenUmPlanet (SpielfeldPlanetDisplayContent pl)
+	private void drawPlanetFrames (ScreenContentBoardPlanet screenContentBoardPlanet)
 	{
-		if (pl.getFrameCols() == null || pl.getFrameCols().size() == 0)
+		if (screenContentBoardPlanet.getFrameColors() == null || screenContentBoardPlanet.getFrameColors().size() == 0)
 			return;
 
-		for (int i = 0; i < pl.getFrameCols().size(); i++)
+		for (int i = 0; i < screenContentBoardPlanet.getFrameColors().size(); i++)
 		{
-			int x = (int)((SPIELFELD_XOFF + pl.getPos().getX() * SPIELFELD_DX) - (i+1)*2);
-			int y = (int)((SPIELFELD_YOFF + pl.getPos().getY() * SPIELFELD_DX) - (i+1)*2);
+			int x = (int)((BOARD_OFFSET_X + screenContentBoardPlanet.getPosition().getX() * BOARD_DX) - (i+1)*2);
+			int y = (int)((BOARD_OFFSET_Y + screenContentBoardPlanet.getPosition().getY() * BOARD_DX) - (i+1)*2);
 			
-			this.setColor(Colors.get(pl.getFrameCols().get(i)));
+			this.setColor(Colors.get(screenContentBoardPlanet.getFrameColors().get(i)));
 			this.drawRect(
 					x,
 					y,
-					SPIELFELD_DX + 4 * (i+1),
-					SPIELFELD_DX + 4 * (i+1));
+					BOARD_DX + 4 * (i+1),
+					BOARD_DX + 4 * (i+1));
 		}
 	}
 	
-	private void markiereFelder (ArrayList<Point> points)
+	private void drawPositionsMarked (ArrayList<Point> positions)
 	{
-		if (points == null)
+		if (positions == null)
 			return;
 		
-		for (Point point: points)
+		for (Point position: positions)
 		{
-			this.drawCircleSpielfeld(point, 0.8, Color.white);
+			this.drawCircleBoard(position, 0.8, Color.white);
 			
 			this.setColor(Color.white);
 			
-			double x1 = (double)SPIELFELD_XOFF + point.getX() * (double)SPIELFELD_DX;
-			double y1 = Utils.round((double)SPIELFELD_YOFF + ((double)point.getY()+0.5) * (double)SPIELFELD_DX);
-			double x2 = (double)SPIELFELD_XOFF + (point.getX()+(double)1) * (double)SPIELFELD_DX;
+			double x1 = (double)BOARD_OFFSET_X + position.getX() * (double)BOARD_DX;
+			double y1 = Utils.round((double)BOARD_OFFSET_Y + ((double)position.getY()+0.5) * (double)BOARD_DX);
+			double x2 = (double)BOARD_OFFSET_X + (position.getX()+(double)1) * (double)BOARD_DX;
 			
 			this.drawLine(x1, y1, x2, y1);
 			
-			x1 = Utils.round((double)SPIELFELD_XOFF + ((double)point.getX()+0.5) * (double)SPIELFELD_DX);
-			y1 = (double)SPIELFELD_YOFF + point.getY() * (double)SPIELFELD_DX;
-			double y2 = (double)SPIELFELD_YOFF + (point.getY()+1) * (double)SPIELFELD_DX;
+			x1 = Utils.round((double)BOARD_OFFSET_X + ((double)position.getX()+0.5) * (double)BOARD_DX);
+			y1 = (double)BOARD_OFFSET_Y + position.getY() * (double)BOARD_DX;
+			double y2 = (double)BOARD_OFFSET_Y + (position.getY()+1) * (double)BOARD_DX;
 			
 			this.drawLine(x1, y1, x1, y2);
 		}
 	}
 	
-	private void zeichneMinenfelder (ArrayList<MinenfeldDisplayContent> minen)
+	private void drawBoardMines (ArrayList<ScreenContentBoardMine> screenContentBoardMine)
 	{
-		if (minen == null || minen.size() == 0)
+		if (screenContentBoardMine == null || screenContentBoardMine.size() == 0)
 			return;
 
-		for (MinenfeldDisplayContent mine: minen)
+		for (ScreenContentBoardMine mine: screenContentBoardMine)
 		{
-			// Raute zeichnen
-			Point pos = new Point(mine.getX(), mine.getY()); 
+			Point position = new Point(mine.getPositionX(), mine.getPositionY()); 
 			
-			this.fillRauteSpielfeld(
-					pos,
+			this.fillDiamondBoard(
+					position,
 					Color.darkGray);
 		
-			// Text zeichnen
-			this.drawCTextSpielfeld(
-					pos,
-					Integer.toString(mine.getStaerke()),
-					Colors.get(Colors.INDEX_NEUTRAL), this.fontMinen, this.fmMinen);
+			this.drawTextCenteredBoard(
+					position,
+					Integer.toString(mine.getStrength()),
+					Colors.get(Colors.NEUTRAL), this.fontMines, this.fmMines);
 		}
 	}
 	
-	
-	private void zeichneLinien(ArrayList<SpielfeldLineDisplayContent> lines)
+	private void drawBoardLines(ArrayList<ScreenContentBoardLine> lines)
 	{
 		if (lines == null)
 			return;
 		
-		for (SpielfeldLineDisplayContent line: lines)
+		for (ScreenContentBoardLine line: lines)
 		{
-			if (line.getStart() == null || line.getEnd() == null)
+			if (line.getPositionStart() == null || line.getPositionDestination() == null)
 				continue;
 			
-			this.setColor(Colors.get(line.getCol()));
+			this.setColor(Colors.get(line.getColorIndex()));
 			
-			Point p1 = this.convertSpielfeld2Zeichenkoord(line.getStart());
-			Point p2 = this.convertSpielfeld2Zeichenkoord(line.getEnd());
+			Point p1 = this.getScreenPosition(line.getPositionStart());
+			Point p2 = this.getScreenPosition(line.getPositionDestination());
 			
 			this.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
 		}
 	}
 	
-	private void zeichneLinienObjekte(ArrayList<SpielfeldLineDisplayContent> lines)
+	private void drawBoardLinesWithShips(ArrayList<ScreenContentBoardLine> lines)
 	{
 		if (lines == null)
 			return;
@@ -944,212 +902,204 @@ public class ScreenPainter
 		int[] yPoints = new int[4];
 		
 		int size = Math.max(
-				Utils.round(4 * OBJEKT_GROESSE * this.factor),
-				OBJEKT_MIN_PIXEL); 
+				Utils.round(4 * SHIP_SIZE * this.factor),
+				SHIP_SIZE_PIXEL_MIN); 
 		
-		for (SpielfeldLineDisplayContent line: lines)
+		for (ScreenContentBoardLine line: lines)
 		{
-			if (line.getPos() == null)
+			if (line.getPosition() == null)
 			{
 				continue;
 			}
 			
-			// Zeichne Richtungspfeil
-			double dx = (double)(line.getEnd().getX() - line.getStart().getX());
-			double dy = (double)(line.getEnd().getY() - line.getStart().getY());
+			double dx = (double)(line.getPositionDestination().getX() - line.getPositionStart().getX());
+			double dy = (double)(line.getPositionDestination().getY() - line.getPositionStart().getY());
 			
-			double dist = line.getStart().dist(line.getEnd());
+			double dist = line.getPositionStart().distance(line.getPositionDestination());
 			
 			double w = (dy >= 0) ? 
 					Math.acos(dx/dist) : 
 					2.*Math.PI - Math.acos(dx/dist);
 			
-			double xPos = this.factor * ((double)SPIELFELD_XOFF + ((double)line.getPos().x + 0.5) * (double)SPIELFELD_DX);
-			double yPos = this.factor * ((double)SPIELFELD_YOFF + ((double)line.getPos().y + 0.5) * (double)SPIELFELD_DX);
+			double xPos = this.factor * ((double)BOARD_OFFSET_X + ((double)line.getPosition().x + 0.5) * (double)BOARD_DX);
+			double yPos = this.factor * ((double)BOARD_OFFSET_Y + ((double)line.getPosition().y + 0.5) * (double)BOARD_DX);
 						
-			double groesse = this.factor * (double)SPIELFELD_DX * LINIE_OBJEKT_GROESSE;
+			double size2 = this.factor * (double)BOARD_DX * LINE_SIZE;
 			
 			xPoints[0] = Utils.round(xPos);
 			yPoints[0] = Utils.round(yPos);
 			
-			xPoints[1] = Utils.round(Math.cos(w)*(xPos-1.*groesse)-Math.sin(w)*(yPos+0.3*groesse)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
-			yPoints[1] = Utils.round(Math.sin(w)*(xPos-1.*groesse)+Math.cos(w)*(yPos+0.3*groesse)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
+			xPoints[1] = Utils.round(Math.cos(w)*(xPos-1.*size2)-Math.sin(w)*(yPos+0.3*size2)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
+			yPoints[1] = Utils.round(Math.sin(w)*(xPos-1.*size2)+Math.cos(w)*(yPos+0.3*size2)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
 			
-			xPoints[2] = Utils.round(Math.cos(w)*(xPos-0.8*groesse)-Math.sin(w)*yPos-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
-			yPoints[2] = Utils.round(Math.sin(w)*(xPos-0.8*groesse)+Math.cos(w)*yPos-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
+			xPoints[2] = Utils.round(Math.cos(w)*(xPos-0.8*size2)-Math.sin(w)*yPos-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
+			yPoints[2] = Utils.round(Math.sin(w)*(xPos-0.8*size2)+Math.cos(w)*yPos-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
 			
-			xPoints[3] = Utils.round(Math.cos(w)*(xPos-1.*groesse)-Math.sin(w)*(yPos-0.3*groesse)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
-			yPoints[3] = Utils.round(Math.sin(w)*(xPos-1.*groesse)+Math.cos(w)*(yPos-0.3*groesse)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
+			xPoints[3] = Utils.round(Math.cos(w)*(xPos-1.*size2)-Math.sin(w)*(yPos-0.3*size2)-Math.cos(w)*xPos+Math.sin(w)*yPos+xPos);
+			yPoints[3] = Utils.round(Math.sin(w)*(xPos-1.*size2)+Math.cos(w)*(yPos-0.3*size2)-Math.sin(w)*xPos-Math.cos(w)*yPos+yPos);
 			
-			this.setColor(Colors.get(line.getCol()));
+			this.setColor(Colors.get(line.getColorIndex()));
 			this.dbGraphics.fillPolygon(xPoints, yPoints, 4);
 			
-			// Zeichne Flugobjekt
-			this.zeichneFlugobjektSymbol(line.getPos(), size, line.getCol(), line.getSymbol());
+			this.drawBoardShipSymbol(line.getPosition(), size, line.getColorIndex(), line.getSymbol());
 		}
 	}
 	
-	private void zeichnePunkte(ArrayList<SpielfeldPointDisplayContent> points)
+	private void drawBoardPositions(ArrayList<ScreenContentBoardPosition> positions)
 	{
-		if (points == null || points.size() == 0)
+		if (positions == null || positions.size() == 0)
 			return;
 
 		int size = Math.max(
-				Utils.round(4 * OBJEKT_GROESSE * this.factor),
-				OBJEKT_MIN_PIXEL);
+				Utils.round(4 * SHIP_SIZE * this.factor),
+				SHIP_SIZE_PIXEL_MIN);
 		
-		for (SpielfeldPointDisplayContent point: points)
+		for (ScreenContentBoardPosition position: positions)
 		{
-			Point pt = point.getPos();
+			Point pt = position.getPosition();
 			
-			this.zeichneFlugobjektSymbol(pt, size, point.getCol(), point.getSymbol());
+			this.drawBoardShipSymbol(pt, size, position.getColorIndex(), position.getSymbol());
 		}
 	}
 	
-	private void zeichneFlugobjektSymbol(Point pt, int size, byte col, byte symbol)
+	private void drawBoardShipSymbol(Point position, int size, byte colorIndex, byte symbol)
 	{
-		this.setColor(Colors.get(col));
+		this.setColor(Colors.get(colorIndex));
 		
 		switch (symbol)
 		{
-		case 1: // Raumer
-			// Sanduhr (90 Grad)
+		case 1: // Fighter
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) - size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) + size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) - size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) + size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) - size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) - size,
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) + size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) - size,
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) + size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) - size);
 			break;
-		case 2: // Aufklaerer
-			// +
+		case 2: // Scout
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y),
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y));
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y),
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y));
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) - size);
 			break;
-		case 3: // Patrouille
-			// Stern
+		case 3: // Patrol
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) - size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) + size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) - size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) + size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) - size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y),
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y));
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y),
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y));
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) - size);
 			break;
-		case 4: // Transporter
-			// Rechteck
+		case 4: // Transport
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) - size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) - size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) - size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) - size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) + size);
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) - size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) + size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) + size);
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) + size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) - size);
 			break;
 					
-		case 5: // Minenleger
-			// Raute
+		case 5: // Minelayer
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) - size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y));
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) - size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y));
 			
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y),
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) + size);
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y),
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) + size);
 			
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y));
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y));
 			
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y),
-					getPtSpielfeldX(pt.x),
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y),
+					getBoardPositionX(position.x),
+					getBoardPositionY(position.y) - size);
 			
 			break;
-		case 6: // Minenraeumer
-			// X
+		case 6: // Minesweeper
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) - size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) + size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) - size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) + size);
 			this.dbGraphics.drawLine(
-					getPtSpielfeldX(pt.x) - size,
-					getPtSpielfeldY(pt.y) + size,
-					getPtSpielfeldX(pt.x) + size,
-					getPtSpielfeldY(pt.y) - size);
+					getBoardPositionX(position.x) - size,
+					getBoardPositionY(position.y) + size,
+					getBoardPositionX(position.x) + size,
+					getBoardPositionY(position.y) - size);
 
 			break;
 		}
 	}
 	
-	private void zeichneRadarkreis(SpielfeldPointRadarDisplayContent radar)
+	private void drawBoardRadarCircles(ScreenContentBoardRadar screenContentBoardRadar)
 	{
-		if (radar == null)
+		if (screenContentBoardRadar == null)
 			return;
 				
-		double rr = 2 * (double)Constants.PATROUILLE_BEOBACHTUNGSRADIUS * (double)SPIELFELD_DX;
+		double rr = 2 * (double)Constants.PATROL_RADAR_RANGE * (double)BOARD_DX;
 		
-		double x = (double)(SPIELFELD_XOFF + radar.getPos().getX() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
-		double y = (double)(SPIELFELD_XOFF + radar.getPos().getY() * SPIELFELD_DX) + ((double)SPIELFELD_DX - rr) / 2.;
+		double x = (double)(BOARD_OFFSET_X + screenContentBoardRadar.getPosition().getX() * BOARD_DX) + ((double)BOARD_DX - rr) / 2.;
+		double y = (double)(BOARD_OFFSET_X + screenContentBoardRadar.getPosition().getY() * BOARD_DX) + ((double)BOARD_DX - rr) / 2.;
 		
-		this.setColor(Colors.get(radar.getCol()));
+		this.setColor(Colors.get(screenContentBoardRadar.getColorIndex()));
 		
 		AlphaComposite compositeBefore = (AlphaComposite) this.dbGraphics.getComposite();
 		float alpha = 0.3f;
@@ -1172,77 +1122,74 @@ public class ScreenPainter
 				Utils.round(this.factor * rr));
 	}
 
-	private int getPtSpielfeldX(double ptX)
+	private int getBoardPositionX(double ptX)
 	{
-		return  Utils.round(((double)SPIELFELD_XOFF + (ptX + 0.5) * (double)SPIELFELD_DX) * this.factor);
+		return  Utils.round(((double)BOARD_OFFSET_X + (ptX + 0.5) * (double)BOARD_DX) * this.factor);
 	}
 	
-	private int getPtSpielfeldY(double ptY)
+	private int getBoardPositionY(double ptY)
 	{
-		return  Utils.round(((double)SPIELFELD_YOFF + (ptY + 0.5)* (double)SPIELFELD_DX) * this.factor);
+		return  Utils.round(((double)BOARD_OFFSET_Y + (ptY + 0.5)* (double)BOARD_DX) * this.factor);
 	}
 	
-	private void drawTitelbild()
+	private void drawTitle()
 	{
-		this.dbGraphics.setFont(this.fontPlaneten);
+		this.dbGraphics.setFont(this.fontPlanets);
 		this.dbGraphics.setColor(Colors.get((byte)8));
 		
-		int lineH = this.fmPlaneten.getHeight();
+		int lineHeight = this.fmPlanets.getHeight();
 		
-		int maxLineW = 0;
+		int maxLineWidth = 0;
 		
-		for (String line: titelBildTextLines)
+		for (String line: titleLinesCount)
 		{
-			int lineW = this.fmPlaneten.stringWidth(line);
-			if (lineW > maxLineW)
-				maxLineW = lineW;
+			int lineWidth = this.fmPlanets.stringWidth(line);
+			if (lineWidth > maxLineWidth)
+				maxLineWidth = lineWidth;
 		}
 		
-		int maxTotalH = titelBildTextLines.size() * lineH;
+		int maxTotalHeight = titleLinesCount.size() * lineHeight;
 		
-		int x = Utils.round(((double)SCREEN_SIZE_W * this.factor - (double)maxLineW) / 2.);
-		int yOff = Utils.round(((double)(SCREEN_SIZE_H * this.factor) - (double)maxTotalH) / 2.) +
-				this.fmPlaneten.getAscent(); 
+		int x = Utils.round(((double)SCREEN_WIDTH * this.factor - (double)maxLineWidth) / 2.);
+		int yOff = Utils.round(((double)(SCREEN_HEIGHT * this.factor) - (double)maxTotalHeight) / 2.) +
+				this.fmPlanets.getAscent(); 
 		
-		for (int i = 0; i < titelBildTextLines.size(); i++)
+		for (int i = 0; i < titleLinesCount.size(); i++)
 		{
-			String line = titelBildTextLines.get(i);
-			
-			
-			this.dbGraphics.drawString(line, x, yOff + i * lineH);
+			String line = titleLinesCount.get(i);
+			this.dbGraphics.drawString(line, x, yOff + i * lineHeight);
 		}		
 	}
 	
 	private void drawLockSymbol()
 	{
-		this.dbGraphics.setFont(this.fontPlaneten);
+		this.dbGraphics.setFont(this.fontPlanets);
 		
 		String text = SternResources.EingabeGesperrt(false);
 		
-		int lineH = this.fmPlaneten.getHeight();
-		int lineW = this.fmPlaneten.stringWidth(text);
+		int lineHeight = this.fmPlanets.getHeight();
+		int lineWidth = this.fmPlanets.stringWidth(text);
 		
 		this.dbGraphics.setColor(Color.DARK_GRAY);
 		
-		int x0 = Utils.round(((double)SCREEN_SIZE_W * this.factor - (double)lineW) / 2.);
-		int y0 = Utils.round(((double)SCREEN_SIZE_H * this.factor - (double)lineH) / 2.);
+		int x0 = Utils.round(((double)SCREEN_WIDTH * this.factor - (double)lineWidth) / 2.);
+		int y0 = Utils.round(((double)SCREEN_HEIGHT * this.factor - (double)lineHeight) / 2.);
 		
 		this.dbGraphics.fillRect(
-				   x0 - lineH,
-				   y0 - lineH,
-				   lineW + 2 * lineH,
-				   lineH + 2 * lineH);
+				   x0 - lineHeight,
+				   y0 - lineHeight,
+				   lineWidth + 2 * lineHeight,
+				   lineHeight + 2 * lineHeight);
 		
 		this.dbGraphics.setColor(Color.WHITE);
 		
-		this.dbGraphics.drawString(text, x0, y0 + fmPlaneten.getAscent());
+		this.dbGraphics.drawString(text, x0, y0 + fmPlanets.getAscent());
 	}
 	
-	private Point convertSpielfeld2Zeichenkoord(Point pt)
+	private Point getScreenPosition(Point boardPosition)
 	{
-		// Konvertiere eine Spielfeldkoordinate (Mittelpunkt) in Zeichenkoordinaten
-		int x = Utils.round(SPIELFELD_XOFF + (0.5 + pt.getX()) * (double)SPIELFELD_DX); 
-		int y = Utils.round(SPIELFELD_YOFF + (0.5 + pt.getY()) * (double)SPIELFELD_DX);
+		int x = Utils.round(BOARD_OFFSET_X + (0.5 + boardPosition.getX()) * (double)BOARD_DX); 
+		int y = Utils.round(BOARD_OFFSET_Y + (0.5 + boardPosition.getY()) * (double)BOARD_DX);
 		
 		return new Point(x,y);
 	}

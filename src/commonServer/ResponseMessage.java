@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,6 @@ public class ResponseMessage
 		Gson gson = new Gson();
 		ResponseMessage msg = gson.fromJson(json, ResponseMessage.class);
 		
-		// Symbol-Meldungen entschluesseln
 		msg.errorMsg = SternResources.getString(msg.errorMsg);
 		
 		return msg;

@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,9 @@ import java.util.ArrayList;
 
 class Console
 {
-	// Das Datenmodell der Text-Console
-	private String[] text; // Text, der in der Konsole angezeigt wird. Jedes Element ist eine Zeile
-	private byte[] textCol; // Textfarbenindex
-	private ArrayList<ConsoleKey> keys; // Zeigt an, welche Keys gedrueckt werden koennen, z.B. [R]aumer
+	private String[] textLines;
+	private byte[] lineColors;
+	private ArrayList<ConsoleKey> allowedKeys;
 	private String headerText;
 	private byte headerCol;
 	private ConsoleModus mode;
@@ -34,23 +33,23 @@ class Console
 	
 	private boolean background;
 	
-	private Spiel parent;
+	private Game parent;
 		
-	static final int MAX_LINES = 5;
+	static final int TEXT_LINES_COUNT_MAX = 5;
 	private static final char HIDDEN_CHAR = '-';
 	
 	static final String KEY_YES = "1";
 	
-	Console(Spiel spiel, boolean background)
+	Console(Game game, boolean background)
 	{
-		// Zeile 0 ist immer die aktuelle Zeile
-		this.text = new String[MAX_LINES];
-		this.textCol = new byte[MAX_LINES];
+		// Line 0 is current line
+		this.textLines = new String[TEXT_LINES_COUNT_MAX];
+		this.lineColors = new byte[TEXT_LINES_COUNT_MAX];
 		
 		this.mode = ConsoleModus.TEXT_INPUT;
 		
 		this.background = background;
-		this.parent = spiel;
+		this.parent = game;
 		this.progressBarDay = -1;
 		
 		this.clear();
@@ -67,120 +66,121 @@ class Console
 	
 	void lineBreak()
 	{
-		byte currentCol = this.textCol[this.outputLine];
+		byte currentCol = this.lineColors[this.outputLine];
 		
 		if (this.outputLine > 0)
 			this.outputLine--;
 		else
 		{
-			for (int line = MAX_LINES - 1; line > 0; line--)
+			for (int line = TEXT_LINES_COUNT_MAX - 1; line > 0; line--)
 			{
-				this.text[line] = this.text[line-1];
-				this.textCol[line] = this.textCol[line-1];
+				this.textLines[line] = this.textLines[line-1];
+				this.lineColors[line] = this.lineColors[line-1];
 			}
 		}
 		
-		this.text[outputLine] = "";
-		this.textCol[outputLine] = currentCol; 		
+		this.textLines[outputLine] = "";
+		this.lineColors[outputLine] = currentCol; 		
 	}
 	
 	public void deleteLine()
 	{
-		this.text[outputLine] = "";
+		this.textLines[outputLine] = "";
 	}
 	
-	@SuppressWarnings("unchecked") ConsoleInput waitForKeyPressed(
+	@SuppressWarnings("unchecked") 
+	ConsoleInput waitForKeyPressed(
 			ArrayList<ConsoleKey> allowedKeys, 
 			boolean hidden)
 	{
-		this.keys = (ArrayList<ConsoleKey>)Utils.klon(allowedKeys);
+		this.allowedKeys = (ArrayList<ConsoleKey>)Utils.klon(allowedKeys);
 		return this.keyInput(1, hidden, false, "");
 	}
 	
 	ConsoleInput waitForKeyPressedYesNo(
 			boolean hidden)
 	{
-		this.keys = new ArrayList<ConsoleKey>();
+		this.allowedKeys = new ArrayList<ConsoleKey>();
 		
-		this.keys.add(new ConsoleKey(KEY_YES, SternResources.Ja(true)));
-		this.keys.add(new ConsoleKey(SternResources.AndereTaste(true), SternResources.Nein(true)));
+		this.allowedKeys.add(new ConsoleKey(KEY_YES, SternResources.Ja(true)));
+		this.allowedKeys.add(new ConsoleKey(SternResources.AndereTaste(true), SternResources.Nein(true)));
 		
 		return this.keyInput(1, hidden, false, "");
 	}
 	
 	ConsoleInput waitForTextEntered(
-			int maxLength,
+			int textLengthMax,
 			ArrayList<ConsoleKey> allowedKeys,
 			boolean hidden,
 			boolean appendStandardKeys)
 	{
-		return this.waitForTextEntered(maxLength, allowedKeys, hidden, appendStandardKeys, "");
+		return this.waitForTextEntered(textLengthMax, allowedKeys, hidden, appendStandardKeys, "");
 	}
 	
 	@SuppressWarnings("unchecked")
 	private ConsoleInput waitForTextEntered(
-			int maxLength,
+			int textLengthMax,
 			ArrayList<ConsoleKey> allowedKeys,
 			boolean hidden,
 			boolean appendStandardKeys,
 			String presetText)
 	{
-		this.keys = (ArrayList<ConsoleKey>)Utils.klon(allowedKeys);
+		this.allowedKeys = (ArrayList<ConsoleKey>)Utils.klon(allowedKeys);
 		
 		if (appendStandardKeys)
-			this.keys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
+			this.allowedKeys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 
-		return this.keyInput(maxLength, hidden, false, presetText);
+		return this.keyInput(textLengthMax, hidden, false, presetText);
 	}
 	
-	void waitForTaste()
+	void waitForKeyPressed()
 	{
-		this.keys = new ArrayList<ConsoleKey>();
-		this.keys.add(new ConsoleKey("TAB", SternResources.Weiter(true)));
+		this.allowedKeys = new ArrayList<ConsoleKey>();
+		this.allowedKeys.add(new ConsoleKey("TAB", SternResources.Weiter(true)));
 		
 		if (this.isBackground())
-			this.keys.add(new ConsoleKey("ESC", SternResources.Abbrechen(true)));
+			this.allowedKeys.add(new ConsoleKey("ESC", SternResources.Abbrechen(true)));
 		
 		this.keyInput(1, false, true, "");
 	}
 	
 	public void pause(int milliseconds)
 	{
-		this.keys = new ArrayList<ConsoleKey>();
+		this.allowedKeys = new ArrayList<ConsoleKey>();
 		this.updateScreen(true);
 		
 		this.parent.pause(milliseconds);
 	}
 	
-	boolean waitForTasteReplay()
+	boolean waitForKeyPressedReplay()
 	{
 		KeyEventExtended keyEvent = this.parent.waitForKeyInput(); 	
 		
-		return (keyEvent.keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE); // Return true, wenn ESC gedrueckt wurde
+		return (keyEvent.keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE);
 	}
 	
-	public void setModus(ConsoleModus mode)
+	public void setMode(ConsoleModus mode)
 	{
 		this.mode = mode;
 	}
 	
 	public void setLineColor(byte col)
 	{
-		this.textCol[this.outputLine] = col;
+		this.lineColors[this.outputLine] = col;
 	}
 	
 	void clear()
 	{
-		this.outputLine = MAX_LINES - 1;
+		this.outputLine = TEXT_LINES_COUNT_MAX - 1;
 		
-		for (int line = 0; line < MAX_LINES; line++)
+		for (int line = 0; line < TEXT_LINES_COUNT_MAX; line++)
 		{
-			this.text[line] = "";
-			this.textCol[line] = Colors.INDEX_WEISS;
+			this.textLines[line] = "";
+			this.lineColors[line] = Colors.WHITE;
 		}
 	}
 	
-	private ConsoleInput keyInput(int maxLength, boolean hidden, boolean noDisplay, String presetText)
+	private ConsoleInput keyInput(int textLengthMax, boolean hidden, boolean noDisplay, String presetText)
 	{
 		if (!noDisplay)
 			this.appendText(">" + presetText);
@@ -207,12 +207,12 @@ class Console
 			{
 				break;
 			}
-			else if (keyCode == KeyEvent.VK_TAB && maxLength == 1)
+			else if (keyCode == KeyEvent.VK_TAB && textLengthMax == 1)
 			{
 				inputText.append('\t');
 				break;
 			}
-			else if (this.mode == ConsoleModus.PLANETEN_EDITOR)
+			else if (this.mode == ConsoleModus.PLANET_EDITOR)
 			{
 				if (keyCode == KeyEvent.VK_UP || 
 					keyCode == KeyEvent.VK_DOWN ||
@@ -226,7 +226,7 @@ class Console
 					break;
 				}
 			}
-			else if (this.mode == ConsoleModus.STATISTIK)
+			else if (this.mode == ConsoleModus.STATISTICS)
 			{
 				if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)
 					break;
@@ -241,7 +241,7 @@ class Console
 				if (inputText.length() > 0)
 				{
 					inputText.deleteCharAt(inputText.length()-1);
-					this.text[this.outputLine] = this.text[this.outputLine].substring(0, this.text[this.outputLine].length()-1);
+					this.textLines[this.outputLine] = this.textLines[this.outputLine].substring(0, this.textLines[this.outputLine].length()-1);
 					
 					this.updateScreen(noDisplay);
 				}
@@ -250,11 +250,6 @@ class Console
 			{
 				char c = keyEvent.keyEvent.getKeyChar();
 				
-				// Lasse nur Tasten zu, die zur Eingabe von Planeten,
-				// Zahlenwerten und E-Mail-Adressen erforderlich sind
-				
-				// Erlaubte Tasten sind:
-				// A-Za-z0-9.!#$%&'*+-/=?^_`{|}~ und die TAB-Taste
 				if (
 					(c >= 'A' && c <= 'Z') ||
 					(c >= 'a' && c <= 'z') ||
@@ -287,14 +282,14 @@ class Console
 					if (!noDisplay)
 					{
 						if (hidden)
-							this.text[this.outputLine] = this.text[this.outputLine] + HIDDEN_CHAR;
+							this.textLines[this.outputLine] = this.textLines[this.outputLine] + HIDDEN_CHAR;
 						else
-							this.text[this.outputLine] = this.text[this.outputLine] + c;
+							this.textLines[this.outputLine] = this.textLines[this.outputLine] + c;
 					}
 					
 					inputText.append(c);
 					
-					if (inputText.length() >= maxLength)
+					if (inputText.length() >= textLengthMax)
 						break;
 					else
 						this.updateScreen(noDisplay);
@@ -302,13 +297,12 @@ class Console
 			}
 		} while (true);
 
-		// Ende der Eingabe
 		if (this.mode == ConsoleModus.TEXT_INPUT)
 			this.lineBreak();
-		else if (this.mode == ConsoleModus.AUSWERTUNG)
+		else if (this.mode == ConsoleModus.EVALUATION)
 		{
 			this.lineBreak();
-			this.setLineColor(Colors.INDEX_WEISS);
+			this.setLineColor(Colors.WHITE);
 		}
 		else
 			this.clear();
@@ -318,7 +312,7 @@ class Console
 	
 	void appendText(String text)
 	{
-		this.text[this.outputLine] = this.text[this.outputLine] + text;
+		this.textLines[this.outputLine] = this.textLines[this.outputLine] + text;
 	}
 	
 	void setHeaderText(String text, byte col)
@@ -329,26 +323,26 @@ class Console
 	
 	private void updateScreen(boolean noCursor)
 	{
-		this.parent.updateConsoleDisplay(
-				new ConsoleDisplayContent(
-						this.text,
-						this.textCol,
-						this.keys,
+		this.parent.updateConsole(
+				new ScreenContentConsole(
+						this.textLines,
+						this.lineColors,
+						this.allowedKeys,
 						this.headerText,
 						this.headerCol,
 						this.outputLine,
-						(!noCursor && this.mode != ConsoleModus.AUSWERTUNG),
+						(!noCursor && this.mode != ConsoleModus.EVALUATION),
 						this.progressBarDay),
 				this.isBackground());
 	}
 	
-	void outAbbruch()
+	void outAbort()
 	{
 		this.appendText(SternResources.AktionAbgebrochen(true));
 		this.lineBreak();
 	}
 	
-	void outUngueltigeEingabe()
+	void outInvalidInput()
 	{
 		this.appendText(SternResources.UngueltigeEingabe(true));
 		this.lineBreak();
@@ -370,9 +364,9 @@ class Console
 	enum ConsoleModus
 	{
 		TEXT_INPUT,
-		PLANETEN_EDITOR,
-		AUSWERTUNG,
-		STATISTIK
+		PLANET_EDITOR,
+		EVALUATION,
+		STATISTICS
 	}
 }
 

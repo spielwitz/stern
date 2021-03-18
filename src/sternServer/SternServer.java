@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -45,9 +45,9 @@ import com.google.gson.Gson;
 import common.Constants;
 import common.PostMovesResult;
 import common.ReleaseGetter;
-import common.Spiel;
-import common.SpielInfo;
-import common.Spieler;
+import common.Game;
+import common.GameInfo;
+import common.Player;
 import common.SternResources;
 import common.Utils;
 import commonServer.Ciphers;
@@ -79,15 +79,15 @@ public class SternServer // NO_UCD (unused code)
 	private static ServerConfiguration serverConfig;
 	
 	private final static String FOLDER_NAME_DATA = "ServerData";
-	private final static String FOLDER_NAME_LOG = "Logs";
-	private final static String FOLDER_NAME_USER = "Users";
-	private final static String FOLDER_NAME_GAME = "Games";
+	private final static String FOLDER_NAME_LOGS = "Logs";
+	private final static String FOLDER_NAME_USERS = "Users";
+	private final static String FOLDER_NAME_GAMES = "Games";
 	private final static String homeDir;
 	
 	private Path logFilePath;
 	
 	private Hashtable<String,UserServer> users;
-	private Hashtable<String,SpielInfo> games;
+	private Hashtable<String,GameInfo> games;
 	private Hashtable<String, Ciphers> ciphersPerSession;
 	private boolean shutdown = false;
 	private boolean adminCreated;
@@ -102,10 +102,10 @@ public class SternServer // NO_UCD (unused code)
 	
 	public static void main(String[] args)
 	{
-		SternServer vs = new SternServer();
+		SternServer server = new SternServer();
 		
 		try {
-			vs.run();
+			server.run();
 		} catch (Exception e)
 		{
 			System.out.println(e.getMessage());
@@ -116,11 +116,9 @@ public class SternServer // NO_UCD (unused code)
 	{
 		System.out.println(SternResources.ServerStarting(false));
 		
-		// Init server
 		this.lockObjects = new Hashtable<String, Object>();
 		this.ciphersPerSession = new Hashtable<String, Ciphers>();
 		
-		// Initialisierung der Serverdaten
 		this.initCreateDataFolders();
 		this.initServerConfig();
 		this.initReadAllUsers();
@@ -178,7 +176,7 @@ public class SternServer // NO_UCD (unused code)
 			    	break;
 			    }
 			    
-			    ServerThread st = new ServerThread(clientSocket);
+			    ServerThread serverThread = new ServerThread(clientSocket);
 			    
 			    logMessage(
 						LogEventId.M5,
@@ -186,9 +184,9 @@ public class SternServer // NO_UCD (unused code)
 						SternResources.ServerIncomingConnection(
 								false, 
 								clientSocket.getInetAddress().toString(),
-								Long.toString(st.getId())));
+								Long.toString(serverThread.getId())));
 
-			    st.start();			    
+			    serverThread.start();			    
 			}
 			catch (Exception x)
 			{
@@ -214,9 +212,9 @@ public class SternServer // NO_UCD (unused code)
 	private void initCreateDataFolders()
 	{
 		this.createFolder(new File(homeDir, FOLDER_NAME_DATA));
-		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_LOG).toFile());
-		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER).toFile());
-		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME).toFile());
+		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_LOGS).toFile());
+		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USERS).toFile());
+		this.createFolder(Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAMES).toFile());
 	}
 	
 	private void createFolder(File dir)
@@ -251,16 +249,15 @@ public class SternServer // NO_UCD (unused code)
 			adminUser.userPublicKey = 
 					CryptoLib.encodePublicKeyToBase64(userKeyPair.getPublic());
 			
-			this.userUpdate(adminUser);
+			this.updateUser(adminUser);
 			
-			// Die Anmeldedaten für den Client in eine Datei schreiben.
-			ClientUserCredentials aca = new ClientUserCredentials();
-			aca.userId = user;
-			aca.userPrivateKey = CryptoLib.encodePrivateKeyToBase64(userKeyPair.getPrivate());
+			ClientUserCredentials clientUserCredentialsAdmin = new ClientUserCredentials();
+			clientUserCredentialsAdmin.userId = user;
+			clientUserCredentialsAdmin.userPrivateKey = CryptoLib.encodePrivateKeyToBase64(userKeyPair.getPrivate());
 			
-			aca.serverPublicKey = serverConfig.serverPublicKey;
-			aca.url = serverConfig.url;
-			aca.port = serverConfig.port;
+			clientUserCredentialsAdmin.serverPublicKey = serverConfig.serverPublicKey;
+			clientUserCredentialsAdmin.url = serverConfig.url;
+			clientUserCredentialsAdmin.port = serverConfig.port;
 			
 			File fileClientInfo = Paths.get(
 					homeDir, 
@@ -272,8 +269,7 @@ public class SternServer // NO_UCD (unused code)
 			
 			try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileClientInfo.getAbsoluteFile())))
 			{
-				String text = aca.toJson();
-				bw.write(text);
+				bw.write(clientUserCredentialsAdmin.toJson());
 				
 				System.out.println(
 						SternResources.ServerIDateiAngelegt(
@@ -295,11 +291,9 @@ public class SternServer // NO_UCD (unused code)
 		{
 			System.out.println(SternResources.ServerConfigLaden(false));
 			
-			// lesen
 			try (BufferedReader br = new BufferedReader(new FileReader(fileServerCredentials.getAbsoluteFile())))
 			{
-				String json = br.readLine();
-				serverConfig = ServerConfiguration.fromJson(json); 
+				serverConfig = ServerConfiguration.fromJson(br.readLine()); 
 				
 			} catch (Exception e)
 			{
@@ -311,18 +305,16 @@ public class SternServer // NO_UCD (unused code)
 		}
 		else
 		{
-			// neu anlegen
 			String serverUrl = null;
 			int port = 0;
 			String adminEmail = null;
 			String locale = null;
 			
-			// Ein paar Fragen beantworten
 			while (true)
 			{
 				System.out.println("Deutsch [de] / English [en]: ");
 				
-				String language = this.getInput();
+				String language = this.getKeyInput();
 				
 				if (language.toLowerCase().equals("de"))
 				{
@@ -341,28 +333,28 @@ public class SternServer // NO_UCD (unused code)
 			System.out.println("\n"+SternResources.ServerWillkommen(false)+"\n");
 
 			System.out.print(SternResources.ServerAdminUrl(false)+ " ("+SternResources.ServerVoreingestellt(false)+": "+ServerConstants.SERVER_HOSTNAME+"): ");
-		    serverUrl = this.getInput();
+		    serverUrl = this.getKeyInput();
 		    
 		    serverUrl = serverUrl.length() == 0 ?
 		    				ServerConstants.SERVER_HOSTNAME :
 		    				serverUrl;
 			
 		    System.out.print(SternResources.ServerAdminPort(false ) + " ("+SternResources.ServerVoreingestellt(false)+": "+ServerConstants.SERVER_PORT+"): ");
-		    String serverPort = this.getInput();
+		    String serverPort = this.getKeyInput();
 		    
 		    port = serverPort.length() == 0 ? 
 		    		ServerConstants.SERVER_PORT :
 		    		Integer.parseInt(serverPort);
 		    
 		    System.out.print(SternResources.ServerEmailAdmin(false)+": ");
-		    adminEmail = this.getInput();
+		    adminEmail = this.getKeyInput();
 		    
 		    System.out.println("\n"+SternResources.ServerAdminUrl(false)+": " + serverUrl);
 		    System.out.println(SternResources.ServerAdminPort(false )+": " + port);
 		    System.out.println(SternResources.ServerEmailAdmin(false)+": " + adminEmail);
 		    
 		    System.out.print("\n"+SternResources.ServerInitConfirm(false)+": ");
-		    String ok = this.getInput();
+		    String ok = this.getKeyInput();
 		    		    
 		    if (!ok.equals("1"))
 		    {
@@ -370,7 +362,6 @@ public class SternServer // NO_UCD (unused code)
 		    	 System.exit(0);
 		    }
 			
-			// Jetzt Objekte anlegen
 			KeyPair keyPairRequest = CryptoLib.getNewKeyPair();
 			
 			serverConfig = new ServerConfiguration();
@@ -392,41 +383,39 @@ public class SternServer // NO_UCD (unused code)
 	
 	private void initReadAllUsers()
 	{
-		// Alle User in den Puffer lesen
 		this.users = new Hashtable<String, UserServer>();
 		this.adminCreated = false;
 		
-		File dirUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER).toFile();
-		for (String filename: dirUser.list())
+		File directoryUsers = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USERS).toFile();
+		for (String fileName: directoryUsers.list())
 		{
-			if (filename.equals(ServerConstants.ADMIN_USER) || Pattern.matches(Constants.SPIELER_REGEX_PATTERN, filename))
+			if (fileName.equals(ServerConstants.ADMIN_USER) || Pattern.matches(Constants.PLAYER_NAME_REGEX_PATTERN, fileName))
 			{
-				System.out.println(SternResources.ServerUserLesen(false, filename));
-				this.userRead(filename);
+				System.out.println(SternResources.ServerUserLesen(false, fileName));
+				this.readUser(fileName);
 			}
 		}
 	}
 	
 	private void initReadAllGames()
 	{
-		File dirGame = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME).toFile();
-		this.games = new Hashtable<String, SpielInfo>();
+		File directoryGames = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAMES).toFile();
+		this.games = new Hashtable<String, GameInfo>();
 		
-		for (String filename: dirGame.list())
+		for (String fileName: directoryGames.list())
 		{
-			System.out.println(SternResources.ServerSpielLesen(false, filename));
-			Spiel spiel = this.gameRead(filename);
+			System.out.println(SternResources.ServerSpielLesen(false, fileName));
+			Game game = this.readGame(fileName);
 			
-			if (spiel == null)
+			if (game == null)
 				continue;
 			
-			this.games.put(spiel.getName(), spiel.getSpielInfo());
+			this.games.put(game.getName(), game.getGameInfo());
 			
-			// Durch die Spielerliste gehen und den Spielern das Spiel zuordnen
-			for (Spieler spieler: spiel.getSpieler())
+			for (Player player: game.getPlayers())
 			{
-				if (this.users.containsKey(spieler.getName()))
-					this.users.get(spieler.getName()).games.add(spiel.getName());
+				if (this.users.containsKey(player.getName()))
+					this.users.get(player.getName()).games.add(game.getName());
 			}
 		}		
 	}
@@ -469,7 +458,7 @@ public class SternServer // NO_UCD (unused code)
 			sb.append(SternResources.ServerILogMeldung(false) + "\n\n");
 		}
 		
-		sb.append(Utils.currentTimeToLocalizedString());
+		sb.append(Utils.getLocalizedDateString());
 		sb.append("\t");
 		
 		sb.append(eventId);
@@ -492,7 +481,7 @@ public class SternServer // NO_UCD (unused code)
 		
 		if (this.logFilePath == null)
 		{
-			this.logFilePath = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_LOG, new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + ".csv");
+			this.logFilePath = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_LOGS, new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + ".csv");
 			
 			try {
 			    Files.write(this.logFilePath, sb.toString().getBytes("UTF-8"), StandardOpenOption.CREATE);
@@ -531,7 +520,6 @@ public class SternServer // NO_UCD (unused code)
 			    in = new DataInputStream(this.socket.getInputStream());
 			    out = this.socket.getOutputStream();
 			    
-			    // Empfange die User ID
 			    RequestMessageUserId msgRequest = (RequestMessageUserId)
 			    		RequestMessageUserId.fromJson(
 			    				CryptoLib.receiveStringRsaEncrypted(in, 
@@ -541,8 +529,8 @@ public class SternServer // NO_UCD (unused code)
 			    userId = msgRequest.userId;
 			    sessionId = msgRequest.sessionId;
 			    
-			    if (userId.length() < Constants.SPIELER_NAME_MIN_LAENGE || 
-				    userId.length() > Constants.SPIELER_NAME_MAX_LAENGE)
+			    if (userId.length() < Constants.PLAYER_NAME_LENGTH_MIN || 
+				    userId.length() > Constants.PLAYER_NAME_LENGTH_MAX)
 				{
 				    	logMessage(
 								LogEventId.M21,
@@ -564,7 +552,6 @@ public class SternServer // NO_UCD (unused code)
 						sessionId,
 						SternResources.ServerBenutzer(false, userId));
 			    
-			    // Pruefen, ob es den user gibt. Wenn nicht, dann sofort aussteigen.
 			    if (!userId.equals(ServerConstants.ACTIVATION_USER) && !users.containsKey(userId))
 				{
 				    	logMessage(
@@ -580,7 +567,6 @@ public class SternServer // NO_UCD (unused code)
 			}
 			catch (Exception x)
 			{
-				// Im Fehlerfall den Socket schliessen
 				logMessage(
 						LogEventId.M9,
 						this.getId(),
@@ -594,11 +580,10 @@ public class SternServer // NO_UCD (unused code)
 			
 			UserServer user = userId.equals(ServerConstants.ACTIVATION_USER) ?
 					null :
-					userRead(userId);
+					readUser(userId);
 			
 			if (user != null && !user.active)
 			{
-				// Der Benutzer ist inaktiv
 				logMessage(
 						LogEventId.M24,
 						this.getId(),
@@ -615,8 +600,6 @@ public class SternServer // NO_UCD (unused code)
 							CryptoLib.NULL_UUID :
 							UUID.randomUUID().toString();
 			
-			// User schickt eine Session ID mit. Pruefen, ob die Session-ID
-			// noch gueltig ist. Wenn ja, eine zufaellige UUID  mit RSA zurueckschicken.
 			Ciphers ciphers = getCiphers(sessionId);
 			
 			try
@@ -653,7 +636,6 @@ public class SternServer // NO_UCD (unused code)
 			}
 			catch (Exception x)
 			{
-				// CIphers konnten nicht ausgetauscht werden
 				logMessage(
 						LogEventId.M25,
 						this.getId(),
@@ -665,22 +647,19 @@ public class SternServer // NO_UCD (unused code)
 				return;
 			}
 
-			// Jetzt kommt die eigentliche Payload-Nachricht, mit AES verschluesselt
-			RequestMessage msg = null;
+			RequestMessage requestMessage = null;
 			
 			try
 			{
-				msg = (RequestMessage)RequestMessage.fromJson(
+				requestMessage = (RequestMessage)RequestMessage.fromJson(
 						CryptoLib.receiveStringAesEncrypted(in, ciphers.cipherDecrypt),
 						RequestMessage.class);
 			    
-			    // Stimmt der Token?
-			    if (token!= null && !token.equals(msg.token))
+			    if (token!= null && !token.equals(requestMessage.token))
 			    	throw new Exception (SternResources.ServerErrorNichtAuthorisiert(false));
 			}
 			catch (Exception x)
 			{
-				// Im Fehlerfall den Socket schliessen
 				logMessage(
 						LogEventId.M10,
 						this.getId(),
@@ -692,19 +671,17 @@ public class SternServer // NO_UCD (unused code)
 				return;
 			}
 			
-			// Vergleiche die Build-Version des Clients mit der vom Server mindestens
-			// vorausgesetzten Build-Version.
-			boolean falscherBuild = false;
+			boolean buildNotSuitable = false;
 			
-			String serverBuild = ReleaseGetter.getRelease();
+			String buildServer = ReleaseGetter.getRelease();
 			
-			if (!serverBuild.equals(Constants.BUILD_NO_INFO)) // Wenn der Server aus Eclipse heraus gestartet wird
+			if (!buildServer.equals(Constants.BUILD_NO_INFO))
 			{
-				 if (!(msg.build != null && msg.build.equals(Constants.BUILD_NO_INFO)))
+				 if (!(requestMessage.build != null && requestMessage.build.equals(Constants.BUILD_NO_INFO)))
 				 {
-					 if (msg.build == null || msg.build.compareTo(Constants.BUILD_COMPATIBLE) < 0)
+					 if (requestMessage.build == null || requestMessage.build.compareTo(Constants.BUILD_COMPATIBLE) < 0)
 					 {
-						falscherBuild = true;
+						buildNotSuitable = true;
 					 }
 				 }
 			}
@@ -714,18 +691,18 @@ public class SternServer // NO_UCD (unused code)
 					this.getId(),
 					LogEventType.Information,
 					sessionId,
-					SternResources.ServerInfoMessageType(false, msg.type.toString(), userId));
+					SternResources.ServerInfoMessageType(false, requestMessage.type.toString(), userId));
 			
-		    ResponseMessage resp = null;
+		    ResponseMessage responseMessage = null;
 		    
-		    if (falscherBuild)
+		    if (buildNotSuitable)
 		    {
-		    	resp = new ResponseMessage();
-		    	resp.error = true;
-		    	resp.errorMsg = SternResources.ServerBuildFalsch(
+		    	responseMessage = new ResponseMessage();
+		    	responseMessage.error = true;
+		    	responseMessage.errorMsg = SternResources.ServerBuildFalsch(
 						true,
 						Constants.BUILD_COMPATIBLE,
-						msg.build == null ? "" : msg.build);
+						requestMessage.build == null ? "" : requestMessage.build);
 		    }
 		    else
 		    {
@@ -733,108 +710,106 @@ public class SternServer // NO_UCD (unused code)
 		    	{
 				    if (userId.equals(ServerConstants.ADMIN_USER))
 				    {
-					    switch (msg.type)
+					    switch (requestMessage.type)
 					    {
 						case ADMIN_CHANGE_USER:
-							resp = processRequestAdminChangeUser(
+							responseMessage = processRequestAdminChangeUser(
 									userId, 
 									this.getId(), 
 									sessionId,
 									(RequestMessageChangeUser)RequestMessageChangeUser.fromJson(
-											msg.payloadSerialized, RequestMessageChangeUser.class));
+											requestMessage.payloadSerialized, RequestMessageChangeUser.class));
 							break;
 						case ADMIN_DELETE_USER:
-							resp = processRequestAdminDeleteUser(msg.payloadSerialized);
+							responseMessage = processRequestAdminDeleteUser(requestMessage.payloadSerialized);
 							break;
 						case ADMIN_PING:
-							resp = new ResponseMessage();
+							responseMessage = new ResponseMessage();
 							break;
 						case ADMIN_SERVER_SHUTDOWN:
 							shutdown = true;
-							// Wird dann beim naechsten Verbindungsversuch heruntergefahren
-							resp = new ResponseMessage();
+							responseMessage = new ResponseMessage();
 							break;
 						case ADMIN_GET_USERS:
-							resp = processRequestAdminGetUsers();
+							responseMessage = processRequestAdminGetUsers();
 							break;
 						case ADMIN_GET_SERVER_STATUS:
-							resp = processRequestAdminGetServerStatus();
+							responseMessage = processRequestAdminGetServerStatus();
 							break;
 						case ADMIN_GET_LOG:
-							resp = processRequestAdminGetLog();
+							responseMessage = processRequestAdminGetLog();
 							break;
 						case ADMIN_SET_LOG_LEVEL:
-							resp = processRequestAdminSetLogLevel(
+							responseMessage = processRequestAdminSetLogLevel(
 									(RequestMessageSetLogLevel)RequestMessageSetLogLevel.fromJson(
-											msg.payloadSerialized, RequestMessageSetLogLevel.class));
+											requestMessage.payloadSerialized, RequestMessageSetLogLevel.class));
 							break;
 							
 						default:
-							resp = this.notAuthorized(userId);
+							responseMessage = this.getResponseMessageNotAuthorized(userId);
 							break;
 					    }
 				    }
 				    else if (userId.equals(ServerConstants.ACTIVATION_USER))
 				    {
-					    switch (msg.type)
+					    switch (requestMessage.type)
 					    {
 						case ACTIVATE_USER:
-							RequestMessageActivateUser activateUser = (RequestMessageActivateUser)
-								RequestMessageActivateUser.fromJson(msg.payloadSerialized, RequestMessageActivateUser.class);
+							RequestMessageActivateUser requestMessageActivateUser = (RequestMessageActivateUser)
+								RequestMessageActivateUser.fromJson(requestMessage.payloadSerialized, RequestMessageActivateUser.class);
 							
-							resp = processRequestActivateUser(
+							responseMessage = processRequestActivateUser(
 									this.getId(), 
-									activateUser);	
+									requestMessageActivateUser);	
 							
-							if (resp != null)
-								user = userRead(activateUser.userId);
+							if (responseMessage != null)
+								user = readUser(requestMessageActivateUser.userId);
 							break;
 						default:
-							resp = this.notAuthorized(userId);
+							responseMessage = this.getResponseMessageNotAuthorized(userId);
 							break;
 					    }
 				    }
 				    else
 				    {
-				    	// Gewöhnliche Benutzer
-					    switch (msg.type)
+					    switch (requestMessage.type)
 					    {
 					    case GET_GAME:
-					    	resp = processRequestGetGame(userId, msg.payloadSerialized);
+					    	responseMessage = processRequestGetGame(userId, requestMessage.payloadSerialized);
 					    	break;
 					    case GET_GAMES_AND_USERS:
-					    	resp = processRequestGetGamesAndUsers(userId);
+					    	responseMessage = processRequestGetGamesAndUsers(userId);
 					    	break;
 						case PING:
-							resp = new ResponseMessage();
+							responseMessage = new ResponseMessage();
 							break;
 						case POST_NEW_GAME:
-							resp = processRequestPostNewGame(user.userId, msg);
+							responseMessage = processRequestPostNewGame(user.userId, requestMessage);
 							break;
 						case POST_MOVES:
-							resp = processRequestPostMoves(
+							responseMessage = processRequestPostMoves(
 									user.userId, 
 									(RequestMessagePostMoves)RequestMessagePostMoves.fromJson(
-											msg.payloadSerialized, RequestMessagePostMoves.class));
+											requestMessage.payloadSerialized, RequestMessagePostMoves.class));
 							break;
 						case GET_STATUS:
-							resp = processRequestGetStatus(
+							responseMessage = processRequestGetStatus(
 									userId,
 									(RequestMessageGetStatus)RequestMessageGetStatus.fromJson(
-											msg.payloadSerialized, RequestMessageGetStatus.class));
+											requestMessage.payloadSerialized, RequestMessageGetStatus.class));
 					    	break;
 						case GAME_HOST_DELETE_GAME:
-							resp = processRequestGameHostDeleteGame(
+							responseMessage = processRequestGameHostDeleteGame(
 									(RequestMessageGameHostDeleteGame)RequestMessageGameHostDeleteGame.fromJson(
-											msg.payloadSerialized, RequestMessageGameHostDeleteGame.class));
+											requestMessage.payloadSerialized, RequestMessageGameHostDeleteGame.class));
 							break;
 						case GAME_HOST_FINALIZE_GAME:
-							resp = processRequestGameHostFinalizeGame(
+							responseMessage = processRequestGameHostFinalizeGame(
 									(RequestMessageGameHostFinalizeGame)RequestMessageGameHostFinalizeGame.fromJson(
-											msg.payloadSerialized, RequestMessageGameHostFinalizeGame.class));
+											requestMessage.payloadSerialized, RequestMessageGameHostFinalizeGame.class));
 							break;
 						default:
-							resp = this.notAuthorized(userId);
+							responseMessage = this.getResponseMessageNotAuthorized(userId);
 							break;
 					    }
 				    }
@@ -846,16 +821,16 @@ public class SternServer // NO_UCD (unused code)
 		    		sb.append(x.toString());
 		    		sb.append('\n');
 		    		
-		    		for (StackTraceElement ste: x.getStackTrace())
+		    		for (StackTraceElement stackTraceElement: x.getStackTrace())
 		    		{
-		    			sb.append(ste.toString());
+		    			sb.append(stackTraceElement.toString());
 		    			sb.append('\n');
 		    		}
 		    		
-		    		resp = new ResponseMessage();
+		    		responseMessage = new ResponseMessage();
 					
-					resp.error = true;
-					resp.errorMsg = 
+					responseMessage.error = true;
+					responseMessage.errorMsg = 
 							SternResources.ServerAnwendungsfehler(
 									true,
 									sb.toString());
@@ -869,24 +844,20 @@ public class SternServer // NO_UCD (unused code)
 		    	}
 		    }
 		    
-		    if (resp == null)
+		    if (responseMessage == null)
 		    {
-		    	// Unberechtigter Zugriff oder irgendein anderer Grund, keine Antwort zu schicken
 		    	this.closeSocket(sessionId);
 		    	return;
 		    }
 		    
-		    // Set build in response message
-		    resp.build = ReleaseGetter.getRelease();
+		    responseMessage.build = ReleaseGetter.getRelease();
 		    
-		    // Send response message
 			try
 			{
-				 CryptoLib.sendStringAesEncrypted(out, resp.toJson(), ciphers.cipherEncrypt);
+				 CryptoLib.sendStringAesEncrypted(out, responseMessage.toJson(), ciphers.cipherEncrypt);
 			}
 			catch (Exception x)
 			{
-				// Im Fehlerfall den Socket schliessen
 				logMessage(
 						LogEventId.M11,
 						this.getId(),
@@ -898,7 +869,6 @@ public class SternServer // NO_UCD (unused code)
 				return;
 			}
 			
-		    // Socket schliessen
 			this.closeSocket(sessionId);
 		}
 		
@@ -931,7 +901,7 @@ public class SternServer // NO_UCD (unused code)
 					SternResources.ServerThreadClosing(false));
 		}
 		
-		private ResponseMessage notAuthorized(String userId)
+		private ResponseMessage getResponseMessageNotAuthorized(String userId)
 		{
 			ResponseMessage respMessage = new ResponseMessage();
 			
@@ -945,136 +915,131 @@ public class SternServer // NO_UCD (unused code)
 	
 	private ResponseMessage processRequestGetGame(String userId, String gameId)
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 		
 		synchronized(this.getLockObject(gameId))
 		{
-			Spiel spiel = this.gameRead(gameId);
+			Game game = this.readGame(gameId);
 			
-			if (spiel != null)
+			if (game != null)
 			{
-				int spIndex = -1;
+				int playerIndex = -1;
 				
-				for (int i = 0; i < spiel.getSpieler().length; i++)
+				for (int i = 0; i < game.getPlayers().length; i++)
 				{
-					Spieler sp = spiel.getSpieler()[i];
+					Player player = game.getPlayers()[i];
 					
-					if (sp.getName().equals(userId))
+					if (player.getName().equals(userId))
 					{
-						spIndex = i;
+						playerIndex = i;
 						break;
 					}
 				}
 				
-				if (spIndex >= 0)
+				if (playerIndex >= 0)
 				{
-					// Nur Auswertung des letzten Jahres mitgeben.
-					// Fruehere Auswertungen werden bei Bedarf nachgeladen
-					Spiel spielKopie = spiel.copyWithReducedInfo(spIndex, true);
+					Game gameCopy = game.createCopyForPlayer(playerIndex);
 					Gson gson = new Gson();
-					msgResponse.payloadSerialized = gson.toJson(spielKopie);
+					responseMessage.payloadSerialized = gson.toJson(gameCopy);
 				}
 				else
 				{
-					msgResponse.error = true;
-					msgResponse.errorMsg = 
+					responseMessage.error = true;
+					responseMessage.errorMsg = 
 							SternResources.ServerErrorSpielerNimmNichtTeil(true, userId);
 				}
 			}
 			else
 			{
-				msgResponse.error = true;
-				msgResponse.errorMsg = 
+				responseMessage.error = true;
+				responseMessage.errorMsg = 
 						SternResources.ServerErrorSpielExistiertNicht(true, gameId);
 			}
 			
 		}
 
-		return msgResponse;
+		return responseMessage;
 	}
 	
-	private ResponseMessage processRequestGameHostDeleteGame(RequestMessageGameHostDeleteGame msg)
+	private ResponseMessage processRequestGameHostDeleteGame(
+			RequestMessageGameHostDeleteGame requestMessage)
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 		
 		synchronized(this.users)
 		{		
-			synchronized(this.getLockObject(msg.gameId))
+			synchronized(this.getLockObject(requestMessage.gameId))
 			{
-				Spiel spiel = this.gameRead(msg.gameId);
+				Game game = this.readGame(requestMessage.gameId);
 				
-				if (spiel == null)
+				if (game == null)
 				{
-					msgResponse.error = true;
-					msgResponse.errorMsg = SternResources.ServerErrorSpielExistiertNicht(true, msg.gameId);
+					responseMessage.error = true;
+					responseMessage.errorMsg = SternResources.ServerErrorSpielExistiertNicht(true, requestMessage.gameId);
 				}
 				else
 				{
-					// Ist der User der Spielleiter?
-					if (msg.gameHostUserId.equals(spiel.getSpieler()[0].getName()))
+					if (requestMessage.gameHostUserId.equals(game.getPlayers()[0].getName()))
 					{
-						this.gameDelete(spiel);
-						msgResponse.error = false;
+						this.deleteGame(game);
+						responseMessage.error = false;
 					}
 					else
 					{
-						msgResponse.error = true;
-						msgResponse.errorMsg = SternResources.ServerErrorKeinSpielleiter(true, msg.gameId);
+						responseMessage.error = true;
+						responseMessage.errorMsg = SternResources.ServerErrorKeinSpielleiter(true, requestMessage.gameId);
 					}
 				}
 			}
 		}
 
-		return msgResponse;
+		return responseMessage;
 	}
 	
-	private ResponseMessage processRequestGameHostFinalizeGame(RequestMessageGameHostFinalizeGame msg)
+	private ResponseMessage processRequestGameHostFinalizeGame(
+			RequestMessageGameHostFinalizeGame requestMessage)
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 		
-		synchronized(this.getLockObject(msg.gameId))
+		synchronized(this.getLockObject(requestMessage.gameId))
 		{
-			Spiel spiel = this.gameRead(msg.gameId);
+			Game game = this.readGame(requestMessage.gameId);
 			
-			if (spiel == null)
+			if (game == null)
 			{
-				msgResponse.error = true;
-				msgResponse.errorMsg = SternResources.ServerErrorSpielExistiertNicht(true, msg.gameId);
+				responseMessage.error = true;
+				responseMessage.errorMsg = SternResources.ServerErrorSpielExistiertNicht(true, requestMessage.gameId);
 			}
 			else
 			{
-				if (spiel.getAbgeschlossen())
+				if (game.isFinalized())
 				{
-					msgResponse.error = true;
-					msgResponse.errorMsg = 
+					responseMessage.error = true;
+					responseMessage.errorMsg = 
 							SternResources.ServerGamesAbgeschlossen(true);
 				}
 				else
 				{
-					// Ist der User der Spielleiter?
-					if (msg.gameHostUserId.equals(spiel.getSpieler()[0].getName()))
+					if (requestMessage.gameHostUserId.equals(game.getPlayers()[0].getName()))
 					{
-						spiel.abschliessenServer();
-						this.gameUpdate(spiel, false);
-						msgResponse.error = false;
+						game.finalizeGameServer();
+						this.updateGame(game, false);
+						responseMessage.error = false;
 					}
 					else
 					{
-						msgResponse.error = true;
-						msgResponse.errorMsg = SternResources.ServerErrorKeinSpielleiter(true, msg.gameId);
+						responseMessage.error = true;
+						responseMessage.errorMsg = SternResources.ServerErrorKeinSpielleiter(true, requestMessage.gameId);
 					}
 				}
 			}
 		}
 
-		return msgResponse;
+		return responseMessage;
 	}
-
-
 	
 	private Object getLockObject(String uuid)
 	{
-		// Ist egal, ob uuid ein Spiel oder einen Spieler darstellt
 		if (this.lockObjects.containsKey(uuid))
 			return this.lockObjects.get(uuid);
 		else
@@ -1089,17 +1054,17 @@ public class SternServer // NO_UCD (unused code)
 			String adminUserId, 
 			long threadId,
 			String sessionId,
-			RequestMessageChangeUser msgNeuerSpieler)
+			RequestMessageChangeUser requestMessage)
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 		
-		if (msgNeuerSpieler == null ||
-				msgNeuerSpieler.userId == null || msgNeuerSpieler.userId.length() == 0 ||
-				msgNeuerSpieler.email == null  || msgNeuerSpieler.email.length() == 0 ||
-				msgNeuerSpieler.name == null   || msgNeuerSpieler.name.length() == 0)
+		if (requestMessage == null ||
+				requestMessage.userId == null || requestMessage.userId.length() == 0 ||
+				requestMessage.email == null  || requestMessage.email.length() == 0 ||
+				requestMessage.name == null   || requestMessage.name.length() == 0)
 		{
-			msgResponse.error = true;
-			msgResponse.errorMsg = SternResources.ServerErrorAdminNeuerUser(true);
+			responseMessage.error = true;
+			responseMessage.errorMsg = SternResources.ServerErrorAdminNeuerUser(true);
 			
 			logMessage(
 					LogEventId.M14,
@@ -1108,46 +1073,45 @@ public class SternServer // NO_UCD (unused code)
 					sessionId,
 					SternResources.ServerErrorAdminNeuerUser(false));
 
-			return msgResponse;
+			return responseMessage;
 		}
 		
-		// Pruefen, ob der gewuenschte Alias frei ist
 		boolean isAllowed =
-				msgNeuerSpieler.create ?
-						this.isUserNameAllowed(msgNeuerSpieler.userId) :
-						this.userExists(msgNeuerSpieler.userId);
+				requestMessage.create ?
+						this.isUserIdAllowed(requestMessage.userId) :
+						this.userExists(requestMessage.userId);
 		
 		if (!isAllowed)
 		{
-			msgResponse.error = true;
+			responseMessage.error = true;
 			
-			if (msgNeuerSpieler.create)				
-				msgResponse.errorMsg = 
+			if (requestMessage.create)				
+				responseMessage.errorMsg = 
 						SternResources.ServerErrorAdminUserUnzulaessig(true, 
-								msgNeuerSpieler.userId, 
-								Integer.toString(Constants.SPIELER_NAME_MIN_LAENGE), 
-								Integer.toString(Constants.SPIELER_NAME_MAX_LAENGE));
+								requestMessage.userId, 
+								Integer.toString(Constants.PLAYER_NAME_LENGTH_MIN), 
+								Integer.toString(Constants.PLAYER_NAME_LENGTH_MAX));
 			else
-				msgResponse.errorMsg = 
-						SternResources.ServerErrorAdminUserExistiertNicht(true, msgNeuerSpieler.userId);
+				responseMessage.errorMsg = 
+						SternResources.ServerErrorAdminUserExistiertNicht(true, requestMessage.userId);
 		}
 		else
 		{
-			UserServer user = 
-					msgNeuerSpieler.create ?
-							new UserServer(msgNeuerSpieler.userId) :
-							this.users.get(msgNeuerSpieler.userId);
+			UserServer userServer = 
+					requestMessage.create ?
+							new UserServer(requestMessage.userId) :
+							this.users.get(requestMessage.userId);
 
-			user.email = msgNeuerSpieler.email.trim();
-			user.name = msgNeuerSpieler.name.trim();
+			userServer.email = requestMessage.email.trim();
+			userServer.name = requestMessage.name.trim();
 			
-			if (msgNeuerSpieler.renewCredentials)
+			if (requestMessage.renewCredentials)
 			{
-				user.userPublicKey = null;
-				user.userPublicKeyObject = null;
+				userServer.userPublicKey = null;
+				userServer.userPublicKeyObject = null;
 				
-				user.active = false; // Benutzer muss spaeter noch vom Benutzer aktiviert werden
-				user.activationCode = UUID.randomUUID().toString();
+				userServer.active = false;
+				userServer.activationCode = UUID.randomUUID().toString();
 			}
 
 			logMessage(
@@ -1155,43 +1119,42 @@ public class SternServer // NO_UCD (unused code)
 					threadId,
 					LogEventType.Information,
 					sessionId,
-					SternResources.ServerInfoInaktiverBenutzerAngelegt(false, user.userId));
+					SternResources.ServerInfoInaktiverBenutzerAngelegt(false, userServer.userId));
 			
-			this.userUpdate(user);
+			this.updateUser(userServer);
 			
-			// E-Mail-Adressen in den Spielen ersetzen, an denen der Spieler beteiligt ist
-			for (String gameId: user.games)
+			for (String gameId: userServer.games)
 			{
 				synchronized(this.getLockObject(gameId))
 				{
-					Spiel spiel = this.gameRead(gameId);
+					Game game = this.readGame(gameId);
 					
-					spiel.setSpielerEmailAdresse(user.userId, user.email);
+					game.setPlayerEmailAddress(userServer.userId, userServer.email);
 					
-					this.gameUpdate(spiel, false);
+					this.updateGame(game, false);
 				}
 			}
 			
-			msgResponse.error = false;
+			responseMessage.error = false;
 			
-			ResponseMessageChangeUser msgResponseNewUser = new ResponseMessageChangeUser();
+			ResponseMessageChangeUser responseMessageNewUser = new ResponseMessageChangeUser();
 
-			msgResponseNewUser.activationCode = user.activationCode;
-			msgResponseNewUser.adminEmail = serverConfig.adminEmail;
-			msgResponseNewUser.serverPort = serverConfig.port;
-			msgResponseNewUser.serverPublicKey = serverConfig.serverPublicKey;
-			msgResponseNewUser.serverUrl = serverConfig.url;
-			msgResponseNewUser.userId = msgNeuerSpieler.userId;
+			responseMessageNewUser.activationCode = userServer.activationCode;
+			responseMessageNewUser.adminEmail = serverConfig.adminEmail;
+			responseMessageNewUser.serverPort = serverConfig.port;
+			responseMessageNewUser.serverPublicKey = serverConfig.serverPublicKey;
+			responseMessageNewUser.serverUrl = serverConfig.url;
+			responseMessageNewUser.userId = requestMessage.userId;
 			
-			msgResponse.payloadSerialized = msgResponseNewUser.toJson();
+			responseMessage.payloadSerialized = responseMessageNewUser.toJson();
 		}
 
-		return msgResponse;
+		return responseMessage;
 	}
 	
 	private ResponseMessage processRequestAdminDeleteUser(String userId)
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 		
 		synchronized(this.users)
 		{
@@ -1199,47 +1162,45 @@ public class SternServer // NO_UCD (unused code)
 			
 			if (user == null)
 			{
-				msgResponse.error = true;
-				msgResponse.errorMsg = SternResources.ServerErrorAdminUserExistiertNicht(true, userId);
+				responseMessage.error = true;
+				responseMessage.errorMsg = SternResources.ServerErrorAdminUserExistiertNicht(true, userId);
 				
-				return msgResponse;
+				return responseMessage;
 			}
 			
-			// Ueber alle Spiele des Users gehen und Spieler aus dem Spiel entfernen
 			for (String gameId: user.games)
 			{
 				synchronized(this.getLockObject(gameId))
 				{
-					Spiel spiel = this.gameRead(gameId);
+					Game game = this.readGame(gameId);
 					
-					spiel.spielerEntfernen(userId);
+					game.removePlayerFromServerGame(userId);
 					
-					this.gameUpdate(spiel, false);
+					this.updateGame(game, false);
 				}
 			}
 			
-			// Jetzt den Spieler vom Server loeschen
-			this.userDelete(userId);
+			this.deleteUser(userId);
 		}
 		
-		return msgResponse;
+		return responseMessage;
 	}
 	
 	
 	private ResponseMessage processRequestAdminGetUsers()
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 					
-		ResponseMessageGetUsers msgResponseGetUsers = new ResponseMessageGetUsers();
+		ResponseMessageGetUsers responseMessageGetUsers = new ResponseMessageGetUsers();
 		
-		msgResponseGetUsers.users = new ArrayList<ResponseMessageGetUsers.UserInfo>();
+		responseMessageGetUsers.users = new ArrayList<ResponseMessageGetUsers.UserInfo>();
 		
 		synchronized(this.users)
 		{
 			for (UserServer user: this.users.values())
 			{
 				if (!user.userId.equals(ServerConstants.ADMIN_USER))
-					msgResponseGetUsers.addUserInfo(
+					responseMessageGetUsers.addUserInfo(
 							user.userId, 
 							user.name, 
 							user.email,
@@ -1247,62 +1208,61 @@ public class SternServer // NO_UCD (unused code)
 			}
 		}
 		
-		msgResponse.payloadSerialized = msgResponseGetUsers.toJson();
+		responseMessage.payloadSerialized = responseMessageGetUsers.toJson();
 
-		return msgResponse;
+		return responseMessage;
 	}
 	
 	private ResponseMessage processRequestAdminGetServerStatus()
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 					
-		ResponseMessageGetServerStatus msgResponsePayload = new ResponseMessageGetServerStatus();
+		ResponseMessageGetServerStatus responseMessageGetServerStatus = new ResponseMessageGetServerStatus();
 		
-		msgResponsePayload.logLevel = serverConfig.logLevel;
-		msgResponsePayload.build = ReleaseGetter.getRelease();
-		msgResponsePayload.serverStartDate = this.serverStartDate;
+		responseMessageGetServerStatus.logLevel = serverConfig.logLevel;
+		responseMessageGetServerStatus.build = ReleaseGetter.getRelease();
+		responseMessageGetServerStatus.serverStartDate = this.serverStartDate;
 		
 		if (this.logFilePath != null)
 		{
-			msgResponsePayload.logSizeBytes = new File(this.logFilePath.toString()).length();
+			responseMessageGetServerStatus.logSizeBytes = new File(this.logFilePath.toString()).length();
 		}
 				
-		msgResponse.payloadSerialized = msgResponsePayload.toJson();
+		responseMessage.payloadSerialized = responseMessageGetServerStatus.toJson();
 
-		return msgResponse;
+		return responseMessage;
 	}
 	
 	private ResponseMessage processRequestAdminGetLog()
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 		
-		ResponseMessageGetLog msgResponsePayload = new ResponseMessageGetLog();
+		ResponseMessageGetLog responseMessageGetLog = new ResponseMessageGetLog();
 		
 		if (this.logFilePath != null)
 		{
 			try
 	        {
 				File file = new File(this.logFilePath.toString());
-				msgResponsePayload.fileName = file.getName();
-				msgResponsePayload.logCsv = new String ( Files.readAllBytes( this.logFilePath ) );
+				responseMessageGetLog.fileName = file.getName();
+				responseMessageGetLog.logCsv = new String ( Files.readAllBytes( this.logFilePath ) );
 	        } 
 	        catch (Exception e) 
 	        {
-	        	msgResponse.error = true;
-	        	msgResponse.errorMsg = e.getMessage();
+	        	responseMessage.error = true;
+	        	responseMessage.errorMsg = e.getMessage();
 	        }
 		}
 		
-		msgResponse.payloadSerialized = msgResponsePayload.toJson();
+		responseMessage.payloadSerialized = responseMessageGetLog.toJson();
 
-		return msgResponse;
+		return responseMessage;
 	}
 	
-	private ResponseMessage processRequestAdminSetLogLevel(RequestMessageSetLogLevel requestMsg)
+	private ResponseMessage processRequestAdminSetLogLevel(RequestMessageSetLogLevel requestMessage)
 	{
-		serverConfig.logLevel = requestMsg.logLevel;
+		serverConfig.logLevel = requestMessage.logLevel;
 		
-		// Server-Konfiguration anpassen
 		File fileServerCredentials = Paths.get(homeDir, FOLDER_NAME_DATA, ServerConstants.SERVER_CONFIG_FILE).toFile();
 		this.updateServerConfig(fileServerCredentials, false);
 		
@@ -1311,49 +1271,45 @@ public class SternServer // NO_UCD (unused code)
 	
 	private ResponseMessage processRequestActivateUser(
 			long threadId, 
-			RequestMessageActivateUser msg)
+			RequestMessageActivateUser requestMessage)
 	{
-		ResponseMessage respMsg = new ResponseMessage();
-		respMsg.error = true;
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.error = true;
 		
-		UserServer user = this.userRead(msg.userId);
+		UserServer user = this.readUser(requestMessage.userId);
 		
 		if (user == null)
 		{
-			// Benutzer ist nicht erlaubt. Einfach Socketverbindung schließen.
-			// Die Rückantwort kann ohnehin nicht verschlüsselt werden.
 			return null;
 		}
 		
-		if (!msg.activationCode.equals(user.activationCode))
+		if (!requestMessage.activationCode.equals(user.activationCode))
 		{
-			// Wir haben noch keinen Public Key zum Verschluesseln der Antwort,
-			// deshalb einfach aussteigen
 			return null;
 		}
 		
 		if (user.active)
 		{
-			respMsg.errorMsg = 
-					SternResources.ServerErrorBenutzerBereitsAktiviert(true, msg.userId);
-			return respMsg;
+			responseMessage.errorMsg = 
+					SternResources.ServerErrorBenutzerBereitsAktiviert(true, requestMessage.userId);
+			return responseMessage;
 		}
 				
 		user.activationCode = "";
 		user.active = true;
-		user.userPublicKey = msg.userPublicKey;
+		user.userPublicKey = requestMessage.userPublicKey;
 		
-		this.userUpdate(user);
+		this.updateUser(user);
 		
-		respMsg.error = false;
-		return respMsg;
+		responseMessage.error = false;
+		return responseMessage;
 	}
 	
-	private void userUpdate(UserServer user)
+	private void updateUser(UserServer user)
 	{
 		synchronized(this.users)
 		{
-			File fileUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER, user.userId).toFile();
+			File fileUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USERS, user.userId).toFile();
 			
 			try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileUser.getAbsoluteFile())))
 			{
@@ -1376,7 +1332,7 @@ public class SternServer // NO_UCD (unused code)
 		}
 	}
 	
-	private UserServer userRead(String userId)
+	private UserServer readUser(String userId)
 	{
 		synchronized(this.users)
 		{
@@ -1385,7 +1341,7 @@ public class SternServer // NO_UCD (unused code)
 
 			UserServer user = null;
 			
-			File fileUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER, userId).toFile();
+			File fileUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USERS, userId).toFile();
 			
 			if (!fileUser.exists())
 				return null;
@@ -1410,9 +1366,9 @@ public class SternServer // NO_UCD (unused code)
 		}
 	}
 	
-	private void userDelete(String userId)
+	private void deleteUser(String userId)
 	{
-		File fileUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USER, userId).toFile();
+		File fileUser = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_USERS, userId).toFile();
 		
 		try
 		{
@@ -1427,29 +1383,27 @@ public class SternServer // NO_UCD (unused code)
 		this.users.remove(userId);		
 	}
 	
-	private Spiel gameRead(String gameId)
+	private Game readGame(String gameId)
 	{
-		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME, gameId).toFile();
+		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAMES, gameId).toFile();
 		
-		Spiel spiel = Utils.readSpielFromFile(file);
+		Game game = Utils.getGameFromFile(file);
 		
-		if (spiel != null)
+		if (game != null)
 		{
-			// Alte Spiele ggf. migrieren
-			spiel.migrieren();
-			spiel.updateSaveBuild();
+			game.migrate();
+			game.updateSaveBuild();
 		}
 		
-		return spiel;
+		return game;
 	}
 	
-	private String gameUpdate(Spiel spiel, boolean create)
+	private String updateGame(Game game, boolean create)
 	{
-		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME, spiel.getName()).toFile();
+		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAMES, game.getName()).toFile();
 		
 		if (create && file.exists())
 		{
-			// Name ist schon belegt. Hänge eine Zahl an den Namen.
 			int count = 1;
 			
 			do
@@ -1457,56 +1411,56 @@ public class SternServer // NO_UCD (unused code)
 				file = Paths.get(
 						homeDir, 
 						FOLDER_NAME_DATA, 
-						FOLDER_NAME_GAME, 
-						spiel.getName() + count).toFile();
+						FOLDER_NAME_GAMES, 
+						game.getName() + count).toFile();
 				
 				count++;
 			} while (file.exists());
 			
-			spiel.setName(file.getName());
+			game.setName(file.getName());
 		}
 		
-		spiel.setLetztesUpdate();
-		Utils.writeSpielToFile(spiel, file);
+		game.setDateUpdate();
+		Utils.writeGameToFile(game, file);
 		
-		this.games.put(spiel.getName(), spiel.getSpielInfo());
+		this.games.put(game.getName(), game.getGameInfo());
 		
-		return spiel.getName();
+		return game.getName();
 	}
 	
-	private void gameDelete(Spiel spiel)
+	private void deleteGame(Game game)
 	{
-		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAME, spiel.getName()).toFile();
+		File file = Paths.get(homeDir, FOLDER_NAME_DATA, FOLDER_NAME_GAMES, game.getName()).toFile();
 		
 		if (file.exists())
 			file.delete();
 		
-		this.games.remove(spiel.getName());
+		this.games.remove(game.getName());
 		
 		for (UserServer user: this.users.values())
 		{
-			user.games.remove(spiel.getName());
+			user.games.remove(game.getName());
 		}
 	}
 	
-	private boolean isUserNameAllowed(String userId)
+	private boolean isUserIdAllowed(String userId)
 	{
-		boolean userNameAllowed = true;
+		boolean userIdAllowed = true;
 		
-		if (userId.length() >= Constants.SPIELER_NAME_MIN_LAENGE &&
-			userId.length() <= Constants.SPIELER_NAME_MAX_LAENGE &&
+		if (userId.length() >= Constants.PLAYER_NAME_LENGTH_MIN &&
+			userId.length() <= Constants.PLAYER_NAME_LENGTH_MAX &&
 			!userId.toLowerCase().equals(ServerConstants.ADMIN_USER.toLowerCase()) &&
-			Pattern.matches(Constants.SPIELER_REGEX_PATTERN, userId)
+			Pattern.matches(Constants.PLAYER_NAME_REGEX_PATTERN, userId)
 			)
 		{
-			userNameAllowed = !this.userExists(userId);
+			userIdAllowed = !this.userExists(userId);
 		}
 		else
 		{
-			userNameAllowed = false;
+			userIdAllowed = false;
 		}
 				
-		return userNameAllowed;
+		return userIdAllowed;
 	}
 	
 	private boolean userExists(String userId)
@@ -1528,7 +1482,7 @@ public class SternServer // NO_UCD (unused code)
 		return exists;
 	}
 	
-	private String getInput()
+	private String getKeyInput()
 	{
 		String line = "";
 		System.out.print(">");
@@ -1545,106 +1499,102 @@ public class SternServer // NO_UCD (unused code)
 		return line;
 	}
 
-	private ResponseMessage processRequestPostNewGame(String userId, RequestMessage msg)
+	private ResponseMessage processRequestPostNewGame(String userId, RequestMessage requestMessage)
 	{
-		ResponseMessage msgResponse = new ResponseMessage();
+		ResponseMessage responseMessage = new ResponseMessage();
 		
 		synchronized(this.users)
 		{
 			Gson gson = new Gson();
-			Spiel spiel = gson.fromJson(msg.payloadSerialized, Spiel.class);
+			Game game = gson.fromJson(requestMessage.payloadSerialized, Game.class);
 			
-			// Ist der Spielname schon vergeben?
-			if (this.games.containsKey(spiel.getName()))
+			if (this.games.containsKey(game.getName()))
 			{
-				msgResponse.error = true;
-				msgResponse.errorMsg = 
+				responseMessage.error = true;
+				responseMessage.errorMsg = 
 						SternResources.ServerErrorSpielExistiert(true);
 				
-				return msgResponse;
+				return responseMessage;
 			}
 			
-			for (Spieler spieler: spiel.getSpieler())
+			for (Player player: game.getPlayers())
 			{
-				if (!spieler.istComputer())
+				if (!player.isBot())
 				{
-					UserServer user = this.users.get(spieler.getName());
+					UserServer user = this.users.get(player.getName());
 					
 					if (user == null)
 					{
-						msgResponse.error = true;
-						msgResponse.errorMsg = 
-								SternResources.ServerErrorAdminUserExistiertNicht(true, spieler.getName());
+						responseMessage.error = true;
+						responseMessage.errorMsg = 
+								SternResources.ServerErrorAdminUserExistiertNicht(true, player.getName());
 						
-						return msgResponse;
+						return responseMessage;
 					}
 					else
-						user.games.add(spiel.getName());
+						user.games.add(game.getName());
 				}
 			}
 			
-			String newName = this.gameUpdate(spiel, true);
+			String gameNameNew = this.updateGame(game, true);
 			
-			msgResponse.payloadSerialized = newName;
+			responseMessage.payloadSerialized = gameNameNew;
 		}
 			
-		return msgResponse;
+		return responseMessage;
 	}
 	
-	private ResponseMessage processRequestPostMoves(String userId, RequestMessagePostMoves msg )
+	private ResponseMessage processRequestPostMoves(String userId, RequestMessagePostMoves requestMessage )
 	{
-		synchronized(this.getLockObject(msg.gameId))
+		synchronized(this.getLockObject(requestMessage.gameId))
 		{
-			ResponseMessage msgResponse = new ResponseMessage();
-			msgResponse.payloadSerialized = PostMovesResult.FEHLER.toString();
+			ResponseMessage responseMessage = new ResponseMessage();
+			responseMessage.payloadSerialized = PostMovesResult.ERROR.toString();
 			
-			Spiel spiel = this.gameRead(msg.gameId);
+			Game game = this.readGame(requestMessage.gameId);
 			
-			boolean auswertungVerfuegbar = false;
+			boolean allPlayersHaveEnteredMoves = false;
 			
-			if (spiel == null)
+			if (game == null)
 			{
-				msgResponse.error = true;
-				msgResponse.errorMsg = 
-						SternResources.ServerErrorSpielExistiertNicht(true, msg.gameId);
+				responseMessage.error = true;
+				responseMessage.errorMsg = 
+						SternResources.ServerErrorSpielExistiertNicht(true, requestMessage.gameId);
 			}
 			else
 			{
-				if (spiel.getAbgeschlossen())
+				if (game.isFinalized())
 				{
-					msgResponse.error = true;
-					msgResponse.errorMsg = 
+					responseMessage.error = true;
+					responseMessage.errorMsg = 
 							SternResources.ServerGamesAbgeschlossen(true);
 				}
 				else
 				{
-					int spIndex = spiel.spielzuegeEinfuegen(msg.zuege);
+					int playerIndex = game.importMovesFromEmail(requestMessage.moves);
 					
-					if (spIndex >= 0)
+					if (playerIndex >= 0)
 					{
-						// Haben alle Spieler ihre Spielzuege eingegeben?
-						// Wenn ja, Auswertung machen
-						auswertungVerfuegbar = spiel.starteAuswertungServer();
+						allPlayersHaveEnteredMoves = game.startEvaluationServer();
 						
-						// Spiel abspeichern
-						this.gameUpdate(spiel, false);
+						this.updateGame(game, false);
 						
-						msgResponse.payloadSerialized =
-								auswertungVerfuegbar ?
-										PostMovesResult.AUSWERTUNG_VERFUEGBAR.toString() :
-										PostMovesResult.WARTE.toString();
+						responseMessage.payloadSerialized =
+								allPlayersHaveEnteredMoves ?
+										PostMovesResult.EVALUATION_AVAILABLE.toString() :
+										PostMovesResult.WAIT_FOR_EVAULATION.toString();
 								
 					}
 					else
 					{
-						msgResponse.error = true;
-						msgResponse.errorMsg = 
+						responseMessage.error = true;
+						responseMessage.errorMsg = 
 								SternResources.ServerErrorJahrVorbei(true);
 					}
 				}
 			}
 			
-			return msgResponse;
+			return responseMessage;
 		}
 	}
 
@@ -1652,89 +1602,85 @@ public class SternServer // NO_UCD (unused code)
 	{
 		synchronized(this.users)
 		{
-			// Besorge alle User und alle Spiele eines bestimmten Spielers
-			ResponseMessageGamesAndUsers msgResponse = new ResponseMessageGamesAndUsers();
+			ResponseMessageGamesAndUsers responseMessageGamesAndUsers = new ResponseMessageGamesAndUsers();
 			
-			msgResponse.users = new Hashtable<String, ResponseMessageGamesAndUsers.UserInfo>();
-			msgResponse.gamesZugeingabe = new ArrayList<SpielInfo>();
-			msgResponse.gamesWarten = new ArrayList<SpielInfo>();
-			msgResponse.gamesBeendet = new ArrayList<SpielInfo>();
-			msgResponse.gamesSpielleiter = new ArrayList<SpielInfo>();
+			responseMessageGamesAndUsers.users = new Hashtable<String, ResponseMessageGamesAndUsers.UserInfo>();
+			responseMessageGamesAndUsers.gamesWaitingForEnterMoves = new ArrayList<GameInfo>();
+			responseMessageGamesAndUsers.gamesWaitingForOtherPlayers = new ArrayList<GameInfo>();
+			responseMessageGamesAndUsers.gamesFinalized = new ArrayList<GameInfo>();
+			responseMessageGamesAndUsers.gamesGameHost = new ArrayList<GameInfo>();
 			
-			msgResponse.emailAdresseSpielleiter = SternServer.serverConfig.adminEmail;
+			responseMessageGamesAndUsers.emailGameHost = SternServer.serverConfig.adminEmail;
 			
-			// Alle aktiven user mitgeben
 			for (UserServer user: this.users.values())
 				if (!user.userId.equals(ServerConstants.ADMIN_USER) && user.active)
-					msgResponse.users.put(user.userId, msgResponse.new UserInfo(user.email));		
+					responseMessageGamesAndUsers.users.put(user.userId, responseMessageGamesAndUsers.new UserInfo(user.email));		
 			
-			// Alle Spiele des Spielers mitgeben
 			UserServer user = this.users.get(userId);
 			
 			for (String gameId: user.games)
 			{
-				SpielInfo spielInfo = this.games.get(gameId);
+				GameInfo spielInfo = this.games.get(gameId);
 				
-				if (spielInfo.abgeschlossen)
-					msgResponse.gamesBeendet.add(spielInfo);
+				if (spielInfo.finalized)
+					responseMessageGamesAndUsers.gamesFinalized.add(spielInfo);
 				else
 				{
-					if (spielInfo.zugeingabeBeendet.contains(userId))
-						msgResponse.gamesWarten.add(spielInfo);
+					if (spielInfo.moveEnteringFinalized.contains(userId))
+						responseMessageGamesAndUsers.gamesWaitingForOtherPlayers.add(spielInfo);
 					else
-						msgResponse.gamesZugeingabe.add(spielInfo);
+						responseMessageGamesAndUsers.gamesWaitingForEnterMoves.add(spielInfo);
 				}
 				
-				if (spielInfo.spieler[0].getName().equals(userId))
-					msgResponse.gamesSpielleiter.add(spielInfo);
+				if (spielInfo.players[0].getName().equals(userId))
+					responseMessageGamesAndUsers.gamesGameHost.add(spielInfo);
 			}
 			
-			ResponseMessage msg = new ResponseMessage(); 
+			ResponseMessage responseMessage = new ResponseMessage(); 
 			
-			msg.payloadSerialized = msgResponse.toJson();
+			responseMessage.payloadSerialized = responseMessageGamesAndUsers.toJson();
 		
-			return msg;
+			return responseMessage;
 		}
 	}
 	
 	private ResponseMessage processRequestGetStatus(
 			String userId,
-			RequestMessageGetStatus msg) 
+			RequestMessageGetStatus requestMessage) 
 	{
 		synchronized(this.users)
 		{
-			// Zaehle Spiele eines Spielers, die auf Zugeingabe warten.
-			ResponseMessageGetStatus msgPayload = new ResponseMessageGetStatus();
+			ResponseMessageGetStatus responseMessageGetStatus = new ResponseMessageGetStatus();
 			
-			boolean currentGameProvided = msg.currentGameId != null && msg.currentGameId.length() > 0;
+			boolean currentGameProvided = requestMessage.currentGameId != null && requestMessage.currentGameId.length() > 0;
 			
 			UserServer user = this.users.get(userId);
 			
 			for (String gameId: user.games)
 			{
-				SpielInfo spielInfo = this.games.get(gameId);
+				GameInfo spielInfo = this.games.get(gameId);
 				
 				if (currentGameProvided &&
-					msg.currentGameId.equals(gameId))
+					requestMessage.currentGameId.equals(gameId))
 				{
-					msgPayload.currentGameNextYear = spielInfo.jahr > msg.currentGameJahr;
+					responseMessageGetStatus.currentGameNextYear = spielInfo.year > requestMessage.currentGameYear;
 				}
 				
-				if (!spielInfo.abgeschlossen && 
-						 !spielInfo.zugeingabeBeendet.contains(userId))
+				if (!spielInfo.finalized && 
+						 !spielInfo.moveEnteringFinalized.contains(userId))
 				{
-					msgPayload.gamesWaitingForInput = true;
+					responseMessageGetStatus.gamesWaitingForInput = true;
 				}
 				
-				if (msgPayload.currentGameNextYear && msgPayload.gamesWaitingForInput)
+				if (responseMessageGetStatus.currentGameNextYear && responseMessageGetStatus.gamesWaitingForInput)
 					break;
 			}
 			
-			ResponseMessage respMsg = new ResponseMessage(); 
+			ResponseMessage responseMessage = new ResponseMessage(); 
 			
-			respMsg.payloadSerialized = msgPayload.toJson();
+			responseMessage.payloadSerialized = responseMessageGetStatus.toJson();
 		
-			return respMsg;
+			return responseMessage;
 		}
 	}
 
@@ -1780,13 +1726,11 @@ public class SternServer // NO_UCD (unused code)
 			
 			if (timeNow - ciphers.lastUsed > CryptoLib.CIPHERS_MAX_INACTIVITY_MILLISECONDS)
 			{
-				// Inaktivitaet
 				return null;
 			}				
 			
 			if (timeNow - ciphers.created > CryptoLib.CIPHERS_MAX_VALIDITY_MILLISECONDS)
 			{
-				// Maximale Haltbarkeit
 				return null;
 			}
 			

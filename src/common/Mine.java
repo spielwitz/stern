@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -20,36 +20,36 @@ import java.io.Serializable;
 
 @SuppressWarnings("serial") class Mine implements Serializable
 {
-	private int x;
-	private int y;
-	private int staerke; // Momentane Staerke
+	private int positionX;
+	private int positionY;
+	private int strength;
 
-	Mine(int x, int y, int staerke) {
+	Mine(int positionX, int positionY, int strength) {
 		super();
-		this.x = x;
-		this.y = y;
-		this.staerke = staerke;
+		this.positionX = positionX;
+		this.positionY = positionY;
+		this.strength = strength;
 	}
 
-	public int getStaerke() {
-		return staerke;
+	public int getStrength() {
+		return strength;
 	}
 	
-	public void setStaerke(int staerke) {
-		this.staerke = staerke;
+	public void setStrength(int strength) {
+		this.strength = strength;
 	}
 	
-	void add(int staerke)
+	void addToStrength(int strength)
 	{
-		this.staerke += staerke;
+		this.strength += strength;
 	}
 
-	public int getX() {
-		return x;
+	public int getPositionX() {
+		return positionX;
 	}
 
-	public int getY() {
-		return y;
+	public int getPositionY() {
+		return positionY;
 	}
 	
 	

@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import commonUi.SpringUtilities;
 @SuppressWarnings("serial")
 public class ResourceBundleUtility extends Frame implements ActionListener, WindowListener // NO_UCD (unused code)
 {
-	private Properties props;
+	private Properties properties;
 	
 	private String propertiesFile = "";
 	private String outputPackageName = "";
@@ -92,37 +92,36 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 	{
 		super("Resource Bundle Utility (c) M. Schweitzer");
 		
-		// Properties lesen
-		this.props = this.getProperties();
+		this.properties = this.getProperties();
 		
 		this.addWindowListener(this);
-		this.setFocusable(true); // Achtung, das Panel hat den KeyListener!
+		this.setFocusable(true);
 		this.setLayout(new BorderLayout(10, 10));
 		
 		// -----
 		Panel panMain = new Panel(new SpringLayout());
 		
-		panMain.add(new Label("Properties-Datei"));
+		panMain.add(new Label("Properties File"));
 		this.tfPropertiesFile = new TextField(this.propertiesFile, 50);
 		panMain.add(this.tfPropertiesFile);
-		this.butBrowsePropertiesFile = new Button("Suchen...");
+		this.butBrowsePropertiesFile = new Button("Browse...");
 		this.butBrowsePropertiesFile.addActionListener(this);
 		panMain.add(this.butBrowsePropertiesFile);
 		
-		panMain.add(new Label("Paket der erzeugten Klasse"));
+		panMain.add(new Label("Package"));
 		this.tfOutputPackageName = new TextField(this.outputPackageName, 50);
 		panMain.add(this.tfOutputPackageName);
 		panMain.add(new Label(" "));
 		
-		panMain.add(new Label("Name der erzeugten Klasse"));
+		panMain.add(new Label("Class Name"));
 		this.tfOutputClassName = new TextField(this.outputClassName, 50);
 		panMain.add(this.tfOutputClassName);
 		panMain.add(new Label(" "));
 		
-		panMain.add(new Label("Ausgabepfad"));
+		panMain.add(new Label("Output Path"));
 		this.tfOutputClassPath = new TextField(this.outputClassPath, 50);
 		panMain.add(this.tfOutputClassPath);
-		this.butBrowseOutputClassPath = new Button("Suchen...");
+		this.butBrowseOutputClassPath = new Button("Browse...");
 		this.butBrowseOutputClassPath.addActionListener(this);
 		panMain.add(this.butBrowseOutputClassPath);
 		
@@ -136,11 +135,11 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		// -----
 		Panel panButtons = new Panel(new FlowLayout(FlowLayout.RIGHT));
 		
-		this.butCancel = new Button("Beenden");
+		this.butCancel = new Button("Quit");
 		this.butCancel.addActionListener(this);
 		panButtons.add(this.butCancel);
 		
-		this.butCreate = new Button("Anlegen");
+		this.butCreate = new Button("Create");
 		this.butCreate.addActionListener(this);
 		panButtons.add(this.butCreate);
 		
@@ -169,7 +168,6 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		  try { reader.close(); } catch ( Exception e ) { }
 		}
 		
-		// Properties den Feldern zuweisen
 		if (prop.containsKey(PROPERTY_NAME_PROPERTIES_FILE))
 			this.propertiesFile = prop.getProperty(PROPERTY_NAME_PROPERTIES_FILE);
 		
@@ -192,7 +190,7 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 			this.close();
 		else if (e.getSource() == this.butBrowsePropertiesFile)
 		{
-			FileDialog fd = new FileDialog(this, "Spiel laden", FileDialog.LOAD);
+			FileDialog fd = new FileDialog(this, "Load", FileDialog.LOAD);
 			
 			if (this.propertiesFile != null)
 				fd.setFile(this.propertiesFile);
@@ -237,13 +235,12 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		if (outputClassName.length() == 0 || outputClassPath.length() == 0 || propertiesFile.length() == 0)
 		{
 			JOptionPane.showMessageDialog(this,
-				    "Bitte alle Textfelder ausfüllen",
-				    "Fehler",
+				    "Please fill out all text fields!",
+				    "Error",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		// Properties-Datei laden
 		File f = null;
 		
 		try
@@ -253,8 +250,8 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		catch (Exception x)
 		{
 			JOptionPane.showMessageDialog(this,
-				    "Die Properties-Datei existiert nicht.",
-				    "Fehler",
+				    "The property file does not exist!",
+				    "Error",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -266,8 +263,8 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		if (i < 0)
 		{
 			JOptionPane.showMessageDialog(this,
-				    "Der Name der Properties-Datei muss dem folgenden Schema entsprechen:\n[Name]_[Sprache]_[Land].properties\nz.B. MyApp_de_DE.properties",
-				    "Fehler",
+				    "The name of the property file has to match the following pattern:\n[Name]_[Language]_[Country].properties\nfor example, MyApp_de_DE.properties",
+				    "Error",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -281,8 +278,8 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		if (parts.length != 3)
 		{
 			JOptionPane.showMessageDialog(this,
-				    "Der Name der Properties-Datei muss dem folgenden Schema entsprechen:\n[Name]_[Sprache]_[Land].properties\nz.B. MyApp_de_DE.properties",
-				    "Fehler",
+				    "The name of the property file has to match the following pattern:\\n[Name]_[Language]_[Country].properties\\nfor example, MyApp_de_DE.properties",
+				    "Error",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -295,19 +292,18 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 
 			list = stream
 					.filter(line -> !line.startsWith("#") && line.length() > 0)
-					//.map(String::toUpperCase)
 					.collect(Collectors.toList());
 
 		} catch (IOException e) 
 		{
 			JOptionPane.showMessageDialog(this,
-				    "Die Properties-Datei kann nicht gelesen werden.",
-				    "Fehler",
+				    "The property file cannot be read!",
+				    "Error",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
-		// Java-Datei aufbauen
+		// Create java code
 		Hashtable<String,String> symbolDict = new Hashtable<String,String>();
 		Hashtable<String,String> textDict = new Hashtable<String,String>();
 		ArrayList<String> symbolList = new ArrayList<String>();
@@ -322,13 +318,13 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		sb.append("import java.util.ResourceBundle;\n\n");
 		
 		sb.append("/**\n");
-		sb.append("   * Diese Klasse wurde mit dem Resource Bundle Utility aus der Ressourcen-Datei\n");
+		sb.append("   * This class was created with the Resource Bundle Utility from the resource file\n");
 		sb.append("   *\n");
 		sb.append("   *   "+propFileName+"\n");
 		sb.append("   *\n");
-		sb.append("   * erzeugt. Die Ressourcen-Datei wird mit dem Eclipse-Plugin ResourceBundle Editor gepflegt.\n");
+		sb.append("   * The resource file is maintained with the Eclipse-Plugin ResourceBundle Editor.\n");
 		sb.append("   */\n");
-		sb.append("public class "+this.outputClassName+"\n{\n");
+		sb.append("public class "+this.outputClassName+" \n{\n");
 				
 		sb.append("\tprivate static Hashtable<String,String> symbolDict;;\n");
 		sb.append("\tprivate static String languageCode;\n");
@@ -357,29 +353,27 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 			String key = line.substring(0, posEquals).trim();
 			String text = line.substring(posEquals + 1).trim();
 						
-			// Dictionary mit Symbol als Schlüssel aufbauen
 			int symbolSep = key.indexOf(SYMBOL_SEPARATOR);
 			
 			if (symbolSep < 0)
 			{
 				JOptionPane.showMessageDialog(this,
-					    "Das Textelement " + key + " enthält keinen Symbolschlüssel,\n"
-					    		+ "der mit "+SYMBOL_SEPARATOR+" vom Schlüssel getrennt ist.",
-					    "Fehler",
+					    "The text element " + key + " does not contain a symbolic key\n"
+					    		+ "that is separated with "+SYMBOL_SEPARATOR+" from the key.",
+					    "Error",
 					    JOptionPane.ERROR_MESSAGE);
 				
 				return;
 			}
 			
-			//String keyReal = key.substring(0, symbolSep);
 			String symbol = key.substring(symbolSep+1, key.length()).trim();
 			
 			if (symbol.length() == 0)
 			{
 				JOptionPane.showMessageDialog(this,
-					    "Das Textelement " + key + " enthält keinen Symbolschlüssel,\n"
-					    		+ "der mit "+SYMBOL_SEPARATOR+" vom Schlüssel getrennt ist.",
-					    "Fehler",
+						"The text element " + key + " does not contain a symbolic key\n"
+					    		+ "that is separated with "+SYMBOL_SEPARATOR+" from the key.",
+					    "Error",
 					    JOptionPane.ERROR_MESSAGE);
 				
 				return;
@@ -388,9 +382,9 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 			if (symbolDict.containsKey(symbol))
 			{
 				JOptionPane.showMessageDialog(this,
-					    "Das Textelement " + key + " verwendet den Symbolschlüssel\n"
-					    		+ symbol +", der mit bereits vergeben ist.",
-					    "Fehler",
+					    "The text element " + key + " uses the symbolic key\n"
+					    		+ symbol +" thst is already used by another text element.",
+					    "Error",
 					    JOptionPane.ERROR_MESSAGE);
 				
 				return;
@@ -401,12 +395,11 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 			symbolList.add(symbol);
 		}
 		
-		// Dictionary anlegen
 		Collections.sort(symbolList);
 		
 		sb.append("\n\tprivate static void fillSymbolDict() {\n");
 		if (symbolList.size() > 0)
-			sb.append("\t\t// Hoechstes vergebenes Symbol: " + symbolList.get(symbolList.size() - 1) + "\n");
+			sb.append("\t\t// Last used symbolic key: " + symbolList.get(symbolList.size() - 1) + "\n");
 		
 		for (String symbol: symbolList)
 		{
@@ -414,11 +407,8 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		}
 		sb.append("\t}\n");
 		
-		// Hilfsmethode
 		createConvertSymbolStringMethod(sb);
-		
-		// Methoden anlegen
-		
+				
 		for (String symbol: symbolList)
 		{
 			String key = symbolDict.get(symbol);
@@ -437,10 +427,8 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		
 		sb.append("}");
 
-		// Ausgabedatei anlegen
 		Path path = Paths.get(this.outputClassPath, this.outputClassName + ".java");
 		 
-		//Use try-with-resource to get auto-closeable writer instance
 		try (BufferedWriter writer = Files.newBufferedWriter(path))
 		{
 		    writer.write(sb.toString());
@@ -448,15 +436,15 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		catch (Exception x)
 		{
 			JOptionPane.showMessageDialog(this,
-				    "Die Datei\n"+path.getFileName()+"\nkonnte nicht geschrieben werden.",
-				    "Fehler",
+				    "The file\n"+path.getFileName()+"\ncould not be written.",
+				    "Error",
 				    JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		JOptionPane.showMessageDialog(this,
-			    "Hat funktioniert!",
-			    "Erfolg",
+			    "Success!",
+			    "Success",
 			    JOptionPane.INFORMATION_MESSAGE);
 	}
 
@@ -492,10 +480,10 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 
 	private void setProperties()
 	{
-		this.props.setProperty(PROPERTY_NAME_OUTPUT_PACKAGE_NAME, this.tfOutputPackageName.getText());
-		this.props.setProperty(PROPERTY_NAME_OUTPUT_CLASS_NAME, this.tfOutputClassName.getText());
-		this.props.setProperty(PROPERTY_NAME_OUTPUT_PATH, this.tfOutputClassPath.getText());
-		this.props.setProperty(PROPERTY_NAME_PROPERTIES_FILE, this.tfPropertiesFile.getText());
+		this.properties.setProperty(PROPERTY_NAME_OUTPUT_PACKAGE_NAME, this.tfOutputPackageName.getText());
+		this.properties.setProperty(PROPERTY_NAME_OUTPUT_CLASS_NAME, this.tfOutputClassName.getText());
+		this.properties.setProperty(PROPERTY_NAME_OUTPUT_PATH, this.tfOutputClassPath.getText());
+		this.properties.setProperty(PROPERTY_NAME_PROPERTIES_FILE, this.tfPropertiesFile.getText());
 		
 		Writer writer = null;
 
@@ -503,7 +491,7 @@ public class ResourceBundleUtility extends Frame implements ActionListener, Wind
 		{
 		  writer = new FileWriter(PROPERTIES_FILE_NAME);
 
-		  props.store( writer, "Resource Bunde Utlity" );
+		  properties.store( writer, "Resource Bunde Utlity" );
 		}
 		catch ( IOException e )
 		{

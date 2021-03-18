@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -19,13 +19,13 @@ package commonUi;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import common.ScreenDisplayContentClient;
+import common.ScreenContentClient;
 
 public interface IServerMethods extends Remote
 {
 	public void rmiKeyPressed(String clientId, String languageCode, int id, long when, int modifiers, int keyCode, char keyChar) throws RemoteException;
 	public String rmiClientConnectionRequest(String clientId, String release, String ip, String code, String clientName) throws RemoteException;
-	public ScreenDisplayContentClient rmiGetCurrentScreenDisplayContent(String clientId) throws RemoteException;
+	public ScreenContentClient rmiGetCurrentScreenDisplayContent(String clientId) throws RemoteException;
 	public void rmiClientLogoff(String clientId) throws RemoteException;
 	public boolean rmiClientCheckRegistration(String clientId) throws RemoteException;
 }

@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -68,22 +68,22 @@ import javax.swing.UIManager;
 
 import com.google.gson.Gson;
 
-import common.Archiv;
+import common.Archive;
 import common.Constants;
 import common.EmailTransportBase;
-import common.ISpielThreadEventListener;
+import common.IGameThreadEventListener;
 import common.KeyEventExtended;
 import common.PostMovesResult;
 import common.ReleaseGetter;
-import common.ScreenDisplayContent;
-import common.ScreenDisplayContentClient;
+import common.ScreenContent;
+import common.ScreenContentClient;
 import common.ScreenUpdateEvent;
-import common.Spiel;
-import common.SpielOptionen;
-import common.SpielThread;
-import common.SpielThreadCommunicationStructure;
-import common.Spieler;
-import common.SpielzuegeEmailTransport;
+import common.Game;
+import common.GameOptions;
+import common.GameThread;
+import common.GameThreadCommunicationStructure;
+import common.Player;
+import common.MovesTransportObject;
 import common.SternResources;
 import common.Utils;
 import commonServer.ClientUserCredentials;
@@ -102,17 +102,17 @@ import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
 import commonUi.LabelDark;
 import commonUi.MessageWithLink;
-import commonUi.PaintPanel;
+import commonUi.PanelScreenContent;
 import commonUi.PanelDark;
-import commonUi.SpracheJDialog;
+import commonUi.LanguageSelectionJDialog;
 import commonUi.SpringUtilities;
 import commonUi.SternAbout;
 
 @SuppressWarnings("serial") 
-public class Stern extends Frame  // NO_UCD (use default)
+public class Stern extends Frame // NO_UCD (use default)
 	implements 
 		WindowListener, 
-		ISpielThreadEventListener, 
+		IGameThreadEventListener, 
 		ActionListener,
 		MouseListener,
 		IServerMethods,
@@ -124,52 +124,51 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	transient private static final String PROPERTIES_FILE_NAME = "SternProperties";
 	transient private static final String HIGHSCORES_FILE_NAME = "SternHighscores";
-	transient private static final String PROPERTY_NAME_LETZTES_VERZEICHNIS = "lastDir";
-	transient private static final String PROPERTY_EMAIL_ADRESSEN = "emailAdressen";
+	transient private static final String PROPERTY_NAME_DIRECTORY_NAME_LAST = "lastDir";
+	transient private static final String PROPERTY_EMAILS = "emails";
 	transient static final String PROPERTY_EMAIL_SEPARATOR = "emailSeparator";
 	transient private static final String PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE = "serverAdminCredentials";
 	transient private static final String PROPERTY_SERVER_USER_CREDENTIAL_FILE = "serverUserCredentials";
 	transient private static final String PROPERTY_SERVER_COMMUNICATION_ENABLED = "serverCommunicationEnabled";
-	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
+	transient private static final String PROPERTY_NAME_LANGUAGE = "language";
 	transient private static final String PROPERTY_MUTE_NOTIFICATION_SOUND = "muteNotificationSound";
-	transient private static final String PROPERTY_MEINE_IP = "ip";
-    transient private static final String PROPERTY_CLIENTS_INACTIVE = "clientsInaktivBeiZugeingabe";
+	transient private static final String PROPERTY_IP_ADDRESS = "myIpAddress";
+    transient private static final String PROPERTY_CLIENTS_INACTIVE = "clientInactiveWhileEnterMoves";
 	
 	
-	static final int HIGHSCORE_NUM_ENTRIES = 20;
+	static final int HIGHSCORE_ENTRIES_COUNT = 20;
 	
-	private SpielThread t;
-	private SpielThreadCommunicationStructure threadCommunicationStructure;
+	private GameThread t;
+	private GameThreadCommunicationStructure threadCommunicationStructure;
 	
-	private Spiel letztesSpielRohdaten;
-	private String letztesFile;
-	private String letztesVerzeichnis;
+	private Game gameLastRawData;
+	private String fileNameLast;
+	private String directoryNameLast;
 	String emailSeparator;
 	
-	private Properties props;
+	private Properties properties;
 	
 	private ServerFunctions serverFunctions;
 	
 	private HighscoreEntries highscoreEntries;
 	
-	private ArrayList<String> emailAdressen = new ArrayList<String>();
+	private ArrayList<String> emails = new ArrayList<String>();
 	
 	private ClientUserCredentials cuc;
 	private String serverAdminCredentialFile;
 	private String serverUserCredentialsFile;
 	private boolean serverCommunicationEnabled;
 	
-	// Menues
-    private MenuItem menuNeuesSpiel;
-    private MenuItem menuLaden;
+    private MenuItem menuNewGame;
+    private MenuItem menuLoad;
     private MenuItem menuEmailClipboard;
-    private MenuItem menuParameter;
-    private MenuItem menuEmail;
-    private MenuItem menuSpeichern;
+    private MenuItem menuParameters;
+    private MenuItem menuEmailSend;
+    private MenuItem menuSave;
     private MenuItem menuServerAdmin;
     private MenuItem menuServerGames;
     private MenuItem menuServerCredentials;
-    private MenuItem menuSprache;
+    private MenuItem menuLanguage;
     private MenuItem menuOutputWindow;
     
     private MenuItem menuServer;
@@ -179,11 +178,10 @@ public class Stern extends Frame  // NO_UCD (use default)
     
     private MenuItem menuQuit;
     
-    private MenuItem menuHilfe;
+    private MenuItem menuHelp;
     private MenuItem menuAbout;
 	
-	// UI components
-	private PaintPanel paintPanel;
+	private PanelScreenContent paintPanel;
 	private OutputWindow outputWindow;
 	private PanelDark panToolbar;
 	private LabelDark labConnectionStatus;
@@ -203,11 +201,11 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	private Timer gameInfoUpdateTimer;
 	
-	private Clip soundClipGlocke;
+	private Clip soundClipNotification;
 	
 	private boolean muteNotificationSound;
-	private boolean clientsInaktivBeiZugeingabe;
-	private String meineIp;
+	private boolean clientsInactiveWhileEnterMoves;
+	private String myIpAddress;
 	
 	private Webserver webserver;
 	
@@ -227,35 +225,31 @@ public class Stern extends Frame  // NO_UCD (use default)
 		            e.printStackTrace();
 		 }
 		
-		// Properties lesen
-		this.props = this.getProperties();
+		this.properties = this.getProperties();
 		
-		// Highscoreliste lesen
-		this.getHighscores();
+		this.loadHighscores();
 		
 		Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 		this.setBounds(0, 0, dim.width, dim.height);
 
 		this.addWindowListener(this);
-		this.setFocusable(true); // Achtung, das Panel hat den KeyListener!
+		this.setFocusable(true);
 		this.setLayout(new BorderLayout());
 		
-		this.setMenuBar(this.getMenubar());
+		this.setMenuBar(this.defineMenuBar());
 		this.setMenuEnabled();
 		
-		this.paintPanel = new PaintPanel(this);
+		this.paintPanel = new PanelScreenContent(this);
 		this.add(this.paintPanel, BorderLayout.CENTER);
 		
-		// Soundclip
 		try
 		{
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(ClassLoader.getSystemResource("ding.au"));
-			this.soundClipGlocke = AudioSystem.getClip();
-			this.soundClipGlocke.open(audioInputStream);
+			this.soundClipNotification = AudioSystem.getClip();
+			this.soundClipNotification.open(audioInputStream);
 		}
 		catch (Exception x) {}
 		
-		// Toolbar
 		this.iconConnected = new ImageIcon (ClassLoader.getSystemResource("ic_cloud_done.png"));
 		this.iconNotConnected = new ImageIcon (ClassLoader.getSystemResource("ic_cloud_off.png"));
 		this.iconWaitingForInput = new ImageIcon (ClassLoader.getSystemResource("ic_assignment_late.png"));
@@ -299,20 +293,16 @@ public class Stern extends Frame  // NO_UCD (use default)
 		
 		this.panToolbar.setVisible(this.serverCommunicationEnabled);
 		
-		// RMI-Server-Objekt anlegen, aber Server noch nicht starten
-		this.serverFunctions = new ServerFunctions(meineIp);
+		this.serverFunctions = new ServerFunctions(myIpAddress);
 						
-		// Muss ganz zum Schluss kommen, damit der Tastaturfokus zieht
 		this.setExtendedState(MAXIMIZED_BOTH);
 		this.setVisible(true);
 		this.updateTitle();
-		this.paintPanel.requestFocusInWindow(); // Muss nach SetVisible kommen!
+		this.paintPanel.requestFocusInWindow();
 		
-		// Timer starten
 		this.gameInfoUpdateTimer = new Timer(30000, this);
 		this.gameInfoUpdateTimer.start();
 		
-		// Verbindungsstatus setzen
 		this.getGameInfoByTimer();
 	}
 	
@@ -355,236 +345,233 @@ public class Stern extends Frame  // NO_UCD (use default)
 	@Override
 	public void windowOpened(WindowEvent arg0) {}
 
-	private Spiel spielImport(String filePath)
+	private Game importGame(String filePath)
 	{
 		byte[] bytes = null;
-		Spiel spiel = null;
+		Game game = null;
 		
 		try {
 			Path path = Paths.get(filePath);
-			String spielName = path.getFileName().toString();
-			if (spielName.contains("."))
-				spielName = spielName.substring(0, spielName.indexOf("."));
+			String gameName = path.getFileName().toString();
+			if (gameName.contains("."))
+				gameName = gameName.substring(0, gameName.indexOf("."));
 			
 			 bytes = Files.readAllBytes(path);
-			 spiel = Spiel.importFromOldVega(spielName, bytes);
+			 game = Game.importFromVega(gameName, bytes);
 		} catch (IOException e)
 		{
-			spiel = null;
+			game = null;
 		}
 		
-		return spiel;
+		return game;
 
 	}
-	private MenuBar getMenubar()
+	private MenuBar defineMenuBar()
 	{
-	    MenuBar menueLeiste = new MenuBar ();
+	    MenuBar menuBar = new MenuBar ();
 	    
-	    Menu stern = new Menu (SternResources.SternTitel(false));
+	    Menu menuStern = new Menu (SternResources.SternTitel(false));
 	    
 	    this.menuAbout = new MenuItem (SternResources.MenuUeberStern(false));
 	    this.menuAbout.addActionListener(this);
-	    stern.add (this.menuAbout);
+	    menuStern.add (this.menuAbout);
 	    
-	    stern.addSeparator();
+	    menuStern.addSeparator();
 	    
-	    Menu settings = new Menu (SternResources.MenuEinstellungen(false));
+	    Menu menuSettings = new Menu (SternResources.MenuEinstellungen(false));
 	    
-	    this.menuSprache = new MenuItem(SternResources.MenuSpracheinstellungen(false));
-	    this.menuSprache.addActionListener(this);
-	    settings.add(this.menuSprache);
+	    this.menuLanguage = new MenuItem(SternResources.MenuSpracheinstellungen(false));
+	    this.menuLanguage.addActionListener(this);
+	    menuSettings.add(this.menuLanguage);
 	    
 	    this.menuServerCredentials = new MenuItem(SternResources.MenuServerCredentials(false));
 	    this.menuServerCredentials.addActionListener(this);
-	    settings.add(this.menuServerCredentials);
+	    menuSettings.add(this.menuServerCredentials);
 	    
 	    this.menuServerAdmin = new MenuItem(SternResources.MenuServerAdmin(false));
 	    this.menuServerAdmin.addActionListener(this);
-	    settings.add(this.menuServerAdmin);
+	    menuSettings.add(this.menuServerAdmin);
 	    
 	    this.menuServer = new MenuItem(SternResources.MenuScreesharing(false));
 	    this.menuServer.addActionListener(this);
-	    settings.add(this.menuServer);
+	    menuSettings.add(this.menuServer);
 	    
 	    this.menuWebserver = new MenuItem(SternResources.MenuWebserverAktivieren(false));
 	    this.menuWebserver.addActionListener(this);
-	    settings.add(this.menuWebserver);
+	    menuSettings.add(this.menuWebserver);
 	    
-	    stern.add(settings);
+	    menuStern.add(menuSettings);
 	    
 	    this.menuOutputWindow = new MenuItem(SternResources.MenuAusgabeFenster(false));
 	    this.menuOutputWindow.addActionListener(this);
-	    stern.add(this.menuOutputWindow);
+	    menuStern.add(this.menuOutputWindow);
 	    
-	    stern.addSeparator();
+	    menuStern.addSeparator();
 	    
 	    this.menuQuit = new MenuItem (SternResources.MenuSternVerlassen(false));
 	    this.menuQuit.addActionListener(this);
-	    stern.add (this.menuQuit);
+	    menuStern.add (this.menuQuit);
 	    
-	    menueLeiste.add(stern);
+	    menuBar.add(menuStern);
 	    
 	    // -----------
 	    
-	    Menu spiel = new Menu (SternResources.MenuDatei(false));
+	    Menu menuGame = new Menu (SternResources.MenuDatei(false));
 
-	    this.menuNeuesSpiel = new MenuItem (SternResources.MenuNeuesSpiel(false));
-	    this.menuNeuesSpiel.addActionListener(this);
-	    spiel.add(this.menuNeuesSpiel);
+	    this.menuNewGame = new MenuItem (SternResources.MenuNeuesSpiel(false));
+	    this.menuNewGame.addActionListener(this);
+	    menuGame.add(this.menuNewGame);
 	    
-	    this.menuLaden = new MenuItem (SternResources.MenuSpielLaden(false));
-	    this.menuLaden.addActionListener(this);
-	    spiel.add (menuLaden);
+	    this.menuLoad = new MenuItem (SternResources.MenuSpielLaden(false));
+	    this.menuLoad.addActionListener(this);
+	    menuGame.add (menuLoad);
 	    
-	    this.menuSpeichern = new MenuItem (SternResources.MenuSpielSpeichernAls(false));
-	    this.menuSpeichern.addActionListener(this);
-	    spiel.add (menuSpeichern);
+	    this.menuSave = new MenuItem (SternResources.MenuSpielSpeichernAls(false));
+	    this.menuSave.addActionListener(this);
+	    menuGame.add (menuSave);
 	    
 	    this.menuHighscore = new MenuItem(SternResources.MenuBestenliste(false));
 	    this.menuHighscore.addActionListener(this);
-	    spiel.add(this.menuHighscore);
+	    menuGame.add(this.menuHighscore);
 
-	    spiel.addSeparator();
+	    menuGame.addSeparator();
 	    
 	    this.menuEmailClipboard = new MenuItem (SternResources.MenuSpielAusZwischenablageLaden(false));
 	    this.menuEmailClipboard.addActionListener(this);
-	    spiel.add (menuEmailClipboard);
+	    menuGame.add (menuEmailClipboard);
 	    
-	    spiel.addSeparator();
+	    menuGame.addSeparator();
 
 	    this.menuServerGames = new MenuItem(SternResources.MenuServerbasierteSpiele(false));
 	    this.menuServerGames.addActionListener(this);
-	    spiel.add(this.menuServerGames);
+	    menuGame.add(this.menuServerGames);
 	    
-	    spiel.addSeparator();
+	    menuGame.addSeparator();
 	    
-	    this.menuEmail = new MenuItem(SternResources.MenuEmail(false));
-	    this.menuEmail.addActionListener(this);
-	    spiel.add(this.menuEmail);
+	    this.menuEmailSend = new MenuItem(SternResources.MenuEmail(false));
+	    this.menuEmailSend.addActionListener(this);
+	    menuGame.add(this.menuEmailSend);
 	    
-	    this.menuParameter = new MenuItem (SternResources.Spielparameter(false));
-	    this.menuParameter.addActionListener(this);
-	    spiel.add (this.menuParameter);
+	    this.menuParameters = new MenuItem (SternResources.Spielparameter(false));
+	    this.menuParameters.addActionListener(this);
+	    menuGame.add (this.menuParameters);
 	    
-	    menueLeiste.add(spiel);
+	    menuBar.add(menuGame);
 	    
 	    // ----
-	    Menu hilfe = new Menu(SternResources.MenuHilfe(false));
+	    Menu menuHelp = new Menu(SternResources.MenuHilfe(false));
 	    
 	    if (Desktop.isDesktopSupported())
 	    {
-		    this.menuHilfe = new MenuItem (SternResources.MenuSpielanleitung(false));
-		    this.menuHilfe.addActionListener(this);
-		    hilfe.add (this.menuHilfe);
+		    this.menuHelp = new MenuItem (SternResources.MenuSpielanleitung(false));
+		    this.menuHelp.addActionListener(this);
+		    menuHelp.add (this.menuHelp);
 	    }
 	    
-	    menueLeiste.add(hilfe);
+	    menuBar.add(menuHelp);
 	    
-	    return menueLeiste;
+	    return menuBar;
 	}
 
 	@Override
-	public void update(ScreenUpdateEvent event)
+	public void updateDisplay(ScreenUpdateEvent event)
 	{
 		if (this.serverFunctions != null && this.serverFunctions.isServerEnabled())
 		{
-			ScreenDisplayContent contentWaehrendZugeingabe = null;
+			ScreenContent screenContent = null;
 			
-			if (this.t != null && this.t.getSpiel() != null)
+			if (this.t != null && this.t.getGame() != null)
 			{
-				contentWaehrendZugeingabe = this.t.getSpiel().getScreenDisplayContentWaehrendZugeingabe();
+				screenContent = this.t.getGame().getScreenContentWhileMovesEntered();
 			}
 			
 			this.serverFunctions.updateClients(
-					event.getContent(), 
-					contentWaehrendZugeingabe, 
+					event.getScreenContent(), 
+					screenContent, 
 					this.inputEnabled);
 		}
 
 		if (this.outputWindow != null && this.outputWindow.isVisible())
 		{
-			ScreenDisplayContent content = null;
-			if (this.t != null && this.t.getSpiel() != null)
-				content = this.t.getSpiel().getScreenDisplayContentWaehrendZugeingabe();
+			ScreenContent screenContent = null;
+			if (this.t != null && this.t.getGame() != null)
+				screenContent = this.t.getGame().getScreenContentWhileMovesEntered();
 			
 			this.outputWindow.redraw(
-					content != null ? content : event.getContent());
+					screenContent != null ? screenContent : event.getScreenContent());
 		}
 
-		this.paintPanel.redraw(event.getContent(), this.inputEnabled, false);
+		this.paintPanel.redraw(event.getScreenContent(), this.inputEnabled, false);
 	}
 	
 	private void redrawScreen ()
 	{
-		this.update(new ScreenUpdateEvent(this, this.paintPanel.getScreenDisplayContent()));
+		this.updateDisplay(new ScreenUpdateEvent(this, this.paintPanel.getScreenContent()));
 	}
 
 	@Override
-	public void speichern(Spiel spiel, boolean autoSave)
+	public void saveGame(Game game, boolean autoSave)
 	{
 		this.inputEnabled = false;
 		this.redrawScreen();
 		
-		String filename ="";
-		String directory = "";
+		String fileName ="";
+		String directoryName = "";
 		
-		if (autoSave && this.letztesFile != null && !this.letztesFile.isEmpty() &&
-				        this.letztesVerzeichnis != null && !this.letztesVerzeichnis.isEmpty())
+		if (autoSave && this.fileNameLast != null && !this.fileNameLast.isEmpty() &&
+				        this.directoryNameLast != null && !this.directoryNameLast.isEmpty())
 		{
-			filename = this.letztesFile;
-			directory = this.letztesVerzeichnis;
+			fileName = this.fileNameLast;
+			directoryName = this.directoryNameLast;
 			
 			try {
-				this.createBackup(new File(directory,filename).getPath());
+				this.createBackup(new File(directoryName,fileName).getPath());
 			} catch (IOException e) {}
 		}
 		else
 		{
-			filename = null;
+			fileName = null;
 			
 			do
 			{
 				FileDialog fd = new FileDialog(this, SternResources.SpielSpeichern(false), FileDialog.SAVE);
 				
-				if (this.letztesVerzeichnis != null && !this.letztesVerzeichnis.isEmpty())
-					fd.setDirectory(this.letztesVerzeichnis);
+				if (this.directoryNameLast != null && !this.directoryNameLast.isEmpty())
+					fd.setDirectory(this.directoryNameLast);
 	
-				fd.setFile(spiel.getName() + FILE_SUFFIX);
+				fd.setFile(game.getName() + FILE_SUFFIX);
 				fd.setVisible(true);
 				
-				filename = fd.getFile();
-				directory = fd.getDirectory();
+				fileName = fd.getFile();
+				directoryName = fd.getDirectory();
 				
-				if (filename == null)
+				if (fileName == null)
 				{
 					break;
 				}
 				
-				// Dateinamen ueberpruefen
-				if (filename.toLowerCase().endsWith(FILE_SUFFIX))
+				if (fileName.toLowerCase().endsWith(FILE_SUFFIX))
 				{
-					filename = filename.substring(0, filename.indexOf(FILE_SUFFIX));
+					fileName = fileName.substring(0, fileName.indexOf(FILE_SUFFIX));
 				}
 				
-				if (filename.length() > 0)
+				if (fileName.length() > 0)
 				{
-					// Dateiname (ohne Suffix) als Spielname übernehmen
-					spiel.setName(filename);
-					filename = filename + FILE_SUFFIX;
+					game.setName(fileName);
+					fileName = fileName + FILE_SUFFIX;
 					break;
 				}
 				
 			} while (true);
 		}
 		
-		if (filename != null)
+		if (fileName != null)
 		{
-			// Mindest-Build-Version setzen
-			spiel.setMinBuild(Constants.BUILD_COMPATIBLE);
+			game.setBuildRequired(Constants.BUILD_COMPATIBLE);
 				
-			File file = new File(directory,filename);
+			File file = new File(directoryName,fileName);
 			
-			String errorText = Utils.writeSpielToFile(spiel, file);
+			String errorText = Utils.writeGameToFile(game, file);
 			
 			if (errorText != null)
 				DialogWindow.showError(
@@ -593,9 +580,9 @@ public class Stern extends Frame  // NO_UCD (use default)
 					    "");
 			else
 			{
-				this.letztesVerzeichnis = directory;
-				this.setProperty(PROPERTY_NAME_LETZTES_VERZEICHNIS, this.letztesVerzeichnis);
-				this.letztesFile = filename;
+				this.directoryNameLast = directoryName;
+				this.setProperty(PROPERTY_NAME_DIRECTORY_NAME_LAST, this.directoryNameLast);
+				this.fileNameLast = fileName;
 			}
 		}
 		
@@ -613,117 +600,115 @@ public class Stern extends Frame  // NO_UCD (use default)
 			return;
 		}
 		
-		MenuItem item = (MenuItem)e.getSource();
+		MenuItem menuItem = (MenuItem)e.getSource();
 		
-		if (item == this.menuLaden)
+		if (menuItem == this.menuLoad)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
 			
-			Spiel spiel = this.laden();
-			if (spiel != null)
-				this.setNeuesSpiel(spiel, false);
+			Game game = this.loadGame();
+			if (game != null)
+				this.setNewGame(game, false);
 						
 			this.inputEnabled = true;
 			this.redrawScreen();
-			//this.updateTitle();
 		}
-		else if (item == this.menuEmailClipboard)
+		else if (menuItem == this.menuEmailClipboard)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
 			
-			ClipboardImportJDialog<Spiel> dlg = 
-					new ClipboardImportJDialog<Spiel>(this, Spiel.class, false);
+			ClipboardImportJDialog<Game> dlg = 
+					new ClipboardImportJDialog<Game>(this, Game.class, false);
 			
 			dlg.setVisible(true);
 			
 			if (dlg.dlgResult == DialogWindowResult.OK)
 			{
-				Spiel spiel = (Spiel)dlg.obj;
+				Game game = (Game)dlg.obj;
 				
-				if (spiel != null)
+				if (game != null)
 				{
-					if (!MinBuildChecker.doCheck(this, spiel.getMinBuild()))
-						spiel = null;
+					if (!RequiredBuildChecker.doCheck(this, game.getBuildRequired()))
+						game = null;
 				}
-				this.setNeuesSpiel(spiel, true);
+				this.setNewGame(game, true);
 			}
 			
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuNeuesSpiel)
+		else if (menuItem == this.menuNewGame)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
 			
-			SpielparameterJDialog dlg = 
-					new SpielparameterJDialog(
+			GameParametersJDialog dlg = 
+					new GameParametersJDialog(
 							this,
 							SternResources.Spielparameter(false),
-							SpielparameterDialogModus.NEUES_SPIEL,
-							this.letztesSpielRohdaten,
-							this.emailAdressen);
+							GameParametersDialogMode.NEW_GAME,
+							this.gameLastRawData,
+							this.emails);
 			
 			dlg.setVisible(true);
-			this.setEmailAdressenProperty();
+			this.setEmailsProperty();
 			
 			if (!dlg.isAbort())
 			{
-				Object[] objectList = dlg.getSpieler().toArray();
-				Spieler[] spielerArray =  Arrays.copyOf(objectList,objectList.length,Spieler[].class);
+				Object[] playersArray = dlg.getPlayers().toArray();
+				Player[] players =  Arrays.copyOf(playersArray,playersArray.length,Player[].class);
 
-				Spiel spiel = new Spiel(dlg.getOptionen(), spielerArray, dlg.getEmailAdresseSpielleiter(), dlg.getAnzPl(), dlg.getMaxJahre());
-				this.letztesSpielRohdaten = (Spiel)Utils.klon(spiel);
-				this.letztesFile = "";
-				this.setNeuesSpiel(spiel, false);
+				Game game = new Game(dlg.getOptions(), players, dlg.getEmailGameHost(), dlg.getPlanetsCount(), dlg.getYearMax());
+				this.gameLastRawData = (Game)Utils.klon(game);
+				this.fileNameLast = "";
+				this.setNewGame(game, false);
 			}
 			
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuParameter && this.t != null)
+		else if (menuItem == this.menuParameters && this.t != null)
 		{
-			// Aenderungen waehrend des Spiels
 			this.inputEnabled = false;
 			this.redrawScreen();
 			
-			Spiel spiel = this.t.getSpiel();
+			Game game = this.t.getGame();
 			
-			SpielparameterJDialog dlg = new SpielparameterJDialog(
+			GameParametersJDialog dlg = new GameParametersJDialog(
 					this, 
 					SternResources.Spielparameter(false),
-					spiel.istSoloSpieler() ?
-							SpielparameterDialogModus.EMAIL_SPIEL :
-							spiel.getAbgeschlossen() ?
-									SpielparameterDialogModus.ABGESCHLOSSENES_SPIEL :
-									SpielparameterDialogModus.LAUFENDES_SPIEL,
-					(Spiel)Utils.klon(spiel),
-					this.emailAdressen);
+					game.isSoloPlayer() ?
+							GameParametersDialogMode.EMAIL_BASED_GAME :
+							game.isFinalized() ?
+									GameParametersDialogMode.FINALIZED_GAME :
+									GameParametersDialogMode.ACTIVE_GAME,
+					(Game)Utils.klon(game),
+					this.emails);
 			
 			dlg.setVisible(true);
-			this.setEmailAdressenProperty();
+			this.setEmailsProperty();
 			
 			if (!dlg.isAbort())
-				spiel.changeSpielData(dlg.getOptionen(), dlg.getMaxJahre(), dlg.getEmailAdresseSpielleiter(), dlg.getSpieler());
+				game.changeParameters(dlg.getOptions(), dlg.getYearMax(), dlg.getEmailGameHost(), dlg.getPlayers());
 			
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuEmail && this.t != null)
+		else if (menuItem == this.menuEmailSend && this.t != null)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
 			
-			Spiel spiel = this.t.getSpiel();
+			Game game = this.t.getGame();
 			
 			EmailCreatorJDialog dlg = new EmailCreatorJDialog(
 					this, 
-					spiel.getSpieler(),
-					spiel.getEmailAdresseSpielleiter(),
+					game.getPlayers(),
+					game.getEmailAddressGameHost(),
 					this.emailSeparator,
-					"[STERN] " + spiel.getName(),
+					"[STERN] " + game.getName(),
 					"");
 			
 			dlg.setVisible(true);
@@ -737,15 +722,15 @@ public class Stern extends Frame  // NO_UCD (use default)
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuSpeichern && this.t != null)
+		else if (menuItem == this.menuSave && this.t != null)
 		{
-			this.speichern(this.t.getSpiel(), false);
+			this.saveGame(this.t.getGame(), false);
 		}
-		else if (item == this.menuQuit)
+		else if (menuItem == this.menuQuit)
 		{
 			this.closeStern();
 		}
-		else if (item == this.menuServer)
+		else if (menuItem == this.menuServer)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
@@ -754,22 +739,22 @@ public class Stern extends Frame  // NO_UCD (use default)
 					new ServerSettingsJDialog(
 							this, 
 							SternResources.Terminalserver(false),
-							this.meineIp,
+							this.myIpAddress,
 							true, 
 							this.serverFunctions);
 
 			dlg.setVisible(true);
 			
-			this.meineIp = dlg.meineIp;
+			this.myIpAddress = dlg.myIpAddress;
 			this.setProperty(
-					Stern.PROPERTY_MEINE_IP, this.meineIp);
+					Stern.PROPERTY_IP_ADDRESS, this.myIpAddress);
 			
 			this.updateTitle();
 			
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuServerAdmin)
+		else if (menuItem == this.menuServerAdmin)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
@@ -786,19 +771,19 @@ public class Stern extends Frame  // NO_UCD (use default)
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuServerCredentials)
+		else if (menuItem == this.menuServerCredentials)
 		{
 			this.openServerCredentialsDialog();
 		}
-		else if (item == this.menuServerGames)
+		else if (menuItem == this.menuServerGames)
 		{
 			this.openServerGamesDialog();
 		}
-		else if (item == this.menuWebserver)
+		else if (menuItem == this.menuWebserver)
 		{
 			this.activateWebServer();
 		}
-		else if (item == this.menuHighscore)
+		else if (menuItem == this.menuHighscore)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
@@ -809,7 +794,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuHilfe)
+		else if (menuItem == this.menuHelp)
 		{
 			Desktop desktop = Desktop.getDesktop();   
 		    InputStream resource = getClass().getResourceAsStream("/SternHelp.pdf");
@@ -840,32 +825,30 @@ public class Stern extends Frame  // NO_UCD (use default)
 		    	catch (Exception xx) {}
 		    }
 		}
-		else if (item == this.menuSprache)
+		else if (menuItem == this.menuLanguage)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
 			
-			SpracheJDialog dlg = new SpracheJDialog(
+			LanguageSelectionJDialog dlg = new LanguageSelectionJDialog(
 					this, 
 					SternResources.getLocale());
 			dlg.setVisible(true);
 			
 			if (dlg.ok)
 			{
-				// Neue Sprache uebernehmen
 				SternResources.setLocale(dlg.languageCode);
 				
-				this.props.setProperty(PROPERTY_NAME_SPRACHE, dlg.languageCode);
-				writeProperties(this.props);
+				this.properties.setProperty(PROPERTY_NAME_LANGUAGE, dlg.languageCode);
+				writeProperties(this.properties);
 				
-				// Anwendung schließen
 				System.exit(0);
 			}
 			
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuAbout)
+		else if (menuItem == this.menuAbout)
 		{
 			this.inputEnabled = false;
 			this.redrawScreen();
@@ -875,14 +858,14 @@ public class Stern extends Frame  // NO_UCD (use default)
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
-		else if (item == this.menuOutputWindow)
+		else if (menuItem == this.menuOutputWindow)
 		{
 			if (this.outputWindow == null || !this.outputWindow.isVisible())
 			{
-				Point pt = this.getLocation();
-				Dimension dim = this.getSize();
+				Point windowLocation = this.getLocation();
+				Dimension windowSize = this.getSize();
 				
-				this.outputWindow = new OutputWindow(pt.x + 20, pt.y + 20, dim.width/2, dim.height/2);
+				this.outputWindow = new OutputWindow(windowLocation.x + 20, windowLocation.y + 20, windowSize.width/2, windowSize.height/2);
 				this.outputWindow.setVisible(true);
 				this.redrawScreen();
 			}
@@ -891,42 +874,41 @@ public class Stern extends Frame  // NO_UCD (use default)
 		this.setMenuEnabled();
 	}
 	
-	private Spiel laden()
+	private Game loadGame()
 	{
-		Spiel spiel = null;
+		Game game = null;
 		
 		FileDialog fd = new FileDialog(this, SternResources.SpielLaden(false), FileDialog.LOAD);
 		
-		if (this.letztesVerzeichnis != null)
-			fd.setDirectory(this.letztesVerzeichnis);
+		if (this.directoryNameLast != null)
+			fd.setDirectory(this.directoryNameLast);
 		
 		fd.setFile("*"+FILE_SUFFIX+";*"+FILE_SUFFIX_BACKUP + ";*" + FILE_SUFFIX_IMPORT);			
 		
 		fd.setVisible(true);
-		String filename = fd.getFile();
-		if (filename != null)
+		String fileName = fd.getFile();
+		if (fileName != null)
 		{
-			File file = new File(fd.getDirectory(),filename);
+			File file = new File(fd.getDirectory(),fileName);
 			if (file.exists())
 			{
 				boolean error = false;
 				String	errorText = "";
-				boolean importVonWindows16 = false;
+				boolean importFromOldVega = false;
 				
-				spiel = Utils.readSpielFromFile(file);
+				game = Utils.getGameFromFile(file);
 				
-				if (spiel == null)
+				if (game == null)
 				{
-					// Versuche, ein Vega-File zu importieren
-					spiel = this.spielImport(file.getPath());
+					game = this.importGame(file.getPath());
 					
-					if (spiel == null)
+					if (game == null)
 					{						
 						errorText = SternResources.DateiNichtGueltig(false);
 						error = true;
 					}
 					else
-						importVonWindows16 = true;
+						importFromOldVega = true;
 				}
 				
 				if (error == true)
@@ -936,23 +918,23 @@ public class Stern extends Frame  // NO_UCD (use default)
 						    errorText,
 						    SternResources.FehlerBeimLaden(false));
 					
-					spiel = null;
+					game = null;
 				}
-				else if (!importVonWindows16)
+				else if (!importFromOldVega)
 				{
-					if (!MinBuildChecker.doCheck(this, spiel.getMinBuild()))
-						spiel = null;
+					if (!RequiredBuildChecker.doCheck(this, game.getBuildRequired()))
+						game = null;
 				}
 				
-				if (spiel != null)
+				if (game != null)
 				{
-					this.letztesVerzeichnis = fd.getDirectory(); 
-					this.setProperty(PROPERTY_NAME_LETZTES_VERZEICHNIS, this.letztesVerzeichnis);
+					this.directoryNameLast = fd.getDirectory(); 
+					this.setProperty(PROPERTY_NAME_DIRECTORY_NAME_LAST, this.directoryNameLast);
 
-					if (!importVonWindows16)
-						this.letztesFile = filename;
+					if (!importFromOldVega)
+						this.fileNameLast = fileName;
 					
-					spiel.getOptionen().remove(SpielOptionen.SERVER_BASIERT);
+					game.getOptions().remove(GameOptions.SERVER_BASED);
 				}
 			}
 			else
@@ -962,27 +944,27 @@ public class Stern extends Frame  // NO_UCD (use default)
 						SternResources.FehlerBeimLaden(false));
 		}
 		
-		return spiel;
+		return game;
 	}
 
-	private void setNeuesSpiel(Spiel spiel, boolean emailSpieler)
+	private void setNewGame(Game game, boolean isSoloPlayer)
 	{
 		this.inputEnabled = true;
-		this.currentGameId = spiel.getName();
+		this.currentGameId = game.getName();
 		
 		if (this.t == null)
 		{
-			this.threadCommunicationStructure = new SpielThreadCommunicationStructure();
-			this.threadCommunicationStructure.istSoloSpieler = emailSpieler;
-			this.t = new SpielThread(this.threadCommunicationStructure, this, spiel);
+			this.threadCommunicationStructure = new GameThreadCommunicationStructure();
+			this.threadCommunicationStructure.isSoloPlayer = isSoloPlayer;
+			this.t = new GameThread(this.threadCommunicationStructure, this, game);
 			this.t.start();
 		}
 		else
 		{
 			synchronized(this.threadCommunicationStructure)
 			{
-				this.threadCommunicationStructure.neuesSpiel = spiel;
-				this.threadCommunicationStructure.istSoloSpieler = emailSpieler;
+				this.threadCommunicationStructure.gameNew = game;
+				this.threadCommunicationStructure.isSoloPlayer = isSoloPlayer;
 				this.threadCommunicationStructure.notify();
 			}
 		}
@@ -990,19 +972,19 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	private void setMenuEnabled()
 	{
-		if (this.t != null && this.t.getSpiel() != null && !this.t.getSpiel().istInitial())
+		if (this.t != null && this.t.getGame() != null && !this.t.getGame().isInitial())
 		{
-			Spiel sp = this.t.getSpiel();
-			this.menuParameter.setEnabled(true);
-			this.menuSpeichern.setEnabled(sp.isParameterChangeEnabled() && !sp.istSoloSpieler());
-			this.menuEmail.setEnabled(sp.getOptionen().contains(SpielOptionen.EMAIL) ||
-					sp.getOptionen().contains(SpielOptionen.SERVER_BASIERT));
+			Game game = this.t.getGame();
+			this.menuParameters.setEnabled(true);
+			this.menuSave.setEnabled(game.isParameterChangeEnabled() && !game.isSoloPlayer());
+			this.menuEmailSend.setEnabled(game.getOptions().contains(GameOptions.EMAIL_BASED) ||
+					game.getOptions().contains(GameOptions.SERVER_BASED));
 		}
 		else
 		{
-			this.menuParameter.setEnabled(false);
-			this.menuSpeichern.setEnabled(false);
-			this.menuEmail.setEnabled(false);
+			this.menuParameters.setEnabled(false);
+			this.menuSave.setEnabled(false);
+			this.menuEmailSend.setEnabled(false);
 		}
 		
 		this.menuServerGames.setEnabled(this.serverCommunicationEnabled);
@@ -1031,13 +1013,13 @@ public class Stern extends Frame  // NO_UCD (use default)
 	private Properties getProperties()
 	{
 		Reader reader = null;
-		Properties prop = new Properties(); 
+		Properties properties = new Properties(); 
 
 		try
 		{
 		  reader = new FileReader(PROPERTIES_FILE_NAME);
 
-		  prop.load( reader );
+		  properties.load( reader );
 		}
 		catch ( Exception e )
 		{
@@ -1047,54 +1029,52 @@ public class Stern extends Frame  // NO_UCD (use default)
 		  try { reader.close(); } catch ( Exception e ) { }
 		}
 		
-		// Properties den Feldern zuweisen
-		if (prop.containsKey(PROPERTY_NAME_LETZTES_VERZEICHNIS))
-			this.letztesVerzeichnis = prop.getProperty(PROPERTY_NAME_LETZTES_VERZEICHNIS);
+		if (properties.containsKey(PROPERTY_NAME_DIRECTORY_NAME_LAST))
+			this.directoryNameLast = properties.getProperty(PROPERTY_NAME_DIRECTORY_NAME_LAST);
 		
-		if (prop.containsKey(PROPERTY_EMAIL_ADRESSEN))
+		if (properties.containsKey(PROPERTY_EMAILS))
 		{
-			String emailBase64 = prop.getProperty(PROPERTY_EMAIL_ADRESSEN);
-			this.emailAdressen = 
-					(ArrayList<String>) Utils.base64ToObject(emailBase64, ArrayList.class, null);
+			String emailBase64 = properties.getProperty(PROPERTY_EMAILS);
+			this.emails = 
+					(ArrayList<String>) Utils.convertFromBase64(emailBase64, ArrayList.class, null);
 		}
 		
-		if (prop.containsKey(PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE))
-			this.serverAdminCredentialFile = prop.getProperty(PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE);
+		if (properties.containsKey(PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE))
+			this.serverAdminCredentialFile = properties.getProperty(PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE);
 		
-		if (prop.containsKey(PROPERTY_SERVER_USER_CREDENTIAL_FILE))
+		if (properties.containsKey(PROPERTY_SERVER_USER_CREDENTIAL_FILE))
 		{
-			this.serverUserCredentialsFile = prop.getProperty(PROPERTY_SERVER_USER_CREDENTIAL_FILE);
+			this.serverUserCredentialsFile = properties.getProperty(PROPERTY_SERVER_USER_CREDENTIAL_FILE);
 			this.cuc = ServerUtils.readClientUserCredentials(this.serverUserCredentialsFile);
 		}
 		
-		if (prop.containsKey(PROPERTY_SERVER_COMMUNICATION_ENABLED))
-			this.serverCommunicationEnabled = Boolean.parseBoolean(prop.getProperty(PROPERTY_SERVER_COMMUNICATION_ENABLED));
+		if (properties.containsKey(PROPERTY_SERVER_COMMUNICATION_ENABLED))
+			this.serverCommunicationEnabled = Boolean.parseBoolean(properties.getProperty(PROPERTY_SERVER_COMMUNICATION_ENABLED));
 		
-		if (prop.containsKey(PROPERTY_NAME_SPRACHE))
+		if (properties.containsKey(PROPERTY_NAME_LANGUAGE))
 		{
-			String languageCode = prop.getProperty(PROPERTY_NAME_SPRACHE);
+			String languageCode = properties.getProperty(PROPERTY_NAME_LANGUAGE);
 			if (languageCode != null)
 				SternResources.setLocale(languageCode);
 		}
 		
-		if (prop.containsKey(PROPERTY_EMAIL_SEPARATOR))
-			this.emailSeparator = prop.getProperty(PROPERTY_EMAIL_SEPARATOR);
+		if (properties.containsKey(PROPERTY_EMAIL_SEPARATOR))
+			this.emailSeparator = properties.getProperty(PROPERTY_EMAIL_SEPARATOR);
 		
-		if (prop.containsKey(PROPERTY_MUTE_NOTIFICATION_SOUND))
-			this.muteNotificationSound = Boolean.parseBoolean(prop.getProperty(PROPERTY_MUTE_NOTIFICATION_SOUND));
+		if (properties.containsKey(PROPERTY_MUTE_NOTIFICATION_SOUND))
+			this.muteNotificationSound = Boolean.parseBoolean(properties.getProperty(PROPERTY_MUTE_NOTIFICATION_SOUND));
 		
-		if (prop.containsKey(PROPERTY_MEINE_IP))
-			this.meineIp = prop.getProperty(PROPERTY_MEINE_IP);
+		if (properties.containsKey(PROPERTY_IP_ADDRESS))
+			this.myIpAddress = properties.getProperty(PROPERTY_IP_ADDRESS);
 		
-		if (prop.containsKey(PROPERTY_CLIENTS_INACTIVE))
-			this.clientsInaktivBeiZugeingabe = 
-				Boolean.parseBoolean(prop.getProperty(PROPERTY_CLIENTS_INACTIVE));
-
+		if (properties.containsKey(PROPERTY_CLIENTS_INACTIVE))
+			this.clientsInactiveWhileEnterMoves = 
+				Boolean.parseBoolean(properties.getProperty(PROPERTY_CLIENTS_INACTIVE));
 		
-		return prop;
+		return properties;
 	}
 	
-	private static void writeProperties(Properties props)
+	private static void writeProperties(Properties properties)
 	{
 		Writer writer = null;
 
@@ -1102,7 +1082,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		{
 		  writer = new FileWriter(PROPERTIES_FILE_NAME);
 
-		  props.store( writer, "Stern-Profil" );
+		  properties.store( writer, "STERN properties" );
 		}
 		catch ( IOException e )
 		{
@@ -1114,30 +1094,30 @@ public class Stern extends Frame  // NO_UCD (use default)
 		}
 	}
 	
-	void setProperty(String propName, String propValue)
+	void setProperty(String propertyName, String propertyValue)
 	{
-		if (propValue == null)
+		if (propertyValue == null)
 			return;
 		
-		this.props.setProperty(propName, propValue);
-		writeProperties(this.props);
+		this.properties.setProperty(propertyName, propertyValue);
+		writeProperties(this.properties);
 	}
 	
-	private void createBackup (String filename) throws IOException
+	private void createBackup (String fileName) throws IOException
 	{
 		InputStream in = null;
 		OutputStream out = null; 
 		
-		if (!new File(filename).exists())
+		if (!new File(fileName).exists())
 			return;
 		
-		String filenameBackup = filename + FILE_SUFFIX_BACKUP;
+		String fileNameBackup = fileName + FILE_SUFFIX_BACKUP;
 		
 		byte[] buffer = new byte[1000000];
 		
 		try {
-			in = new FileInputStream(filename);
-			out = new FileOutputStream(filenameBackup);
+			in = new FileInputStream(fileName);
+			out = new FileOutputStream(fileNameBackup);
 			while (true) {
 				synchronized (buffer) {
 					int amountRead = in.read(buffer);
@@ -1162,7 +1142,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 	{
 		KeyEvent event = new KeyEvent(this.paintPanel, id, when, modifiers, keyCode, keyChart);
 		
-		// Ist der Client registriert?
 		if (this.serverFunctions.isClientRegistered(clientId))
 			this.keyPressed(new KeyEventExtended(event, clientId, languageCode));
 	}
@@ -1182,7 +1161,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 					ip, 
 					clientCode, 
 					clientName, 
-					this.clientsInaktivBeiZugeingabe);
+					this.clientsInactiveWhileEnterMoves);
 		else
 			return SternResources.UnterschiedlicheBuilds(false);
 	}
@@ -1194,14 +1173,13 @@ public class Stern extends Frame  // NO_UCD (use default)
 	}
 
 	@Override
-	public ScreenDisplayContentClient rmiGetCurrentScreenDisplayContent(String clientId)
+	public ScreenContentClient rmiGetCurrentScreenDisplayContent(String clientId)
 			throws RemoteException
 	{
-		//System.out.println("rmiGetCurrentScreenDisplayContent: " + clientId);
 		if (this.serverFunctions.isClientRegistered(clientId))
 		{
-			ScreenDisplayContentClient contentClient = new ScreenDisplayContentClient();
-			contentClient.content = this.paintPanel.getScreenDisplayContent();
+			ScreenContentClient contentClient = new ScreenContentClient();
+			contentClient.screenContent = this.paintPanel.getScreenContent();
 			contentClient.inputEnabled = this.inputEnabled;
 			
 			return contentClient; 
@@ -1213,27 +1191,23 @@ public class Stern extends Frame  // NO_UCD (use default)
 	@Override
 	public void rmiClientLogoff(String clientId) throws RemoteException
 	{
-		//System.out.println("rmiClientLogoff: " + clientId);
 		this.serverFunctions.disconnectClient(clientId);
 	}
 
 	@Override
 	public boolean rmiClientCheckRegistration(String clientId)
 	{
-		//System.out.println("rmiClientCheckRegistration: " + clientId);
 		return this.serverFunctions.isClientRegistered(clientId);
 	}
 
 	@Override
-	public void addToHighscore(Archiv spielstand, Spieler[] spieler)
+	public void addToHighscore(Archive archive, Player[] players)
 	{
-		for (int sp = 0; sp < spieler.length; sp++)
+		for (int playerIndex = 0; playerIndex < players.length; playerIndex++)
 		{
-//			int punkte = Spiel.getPunkteFromPlaneten(
-//					spielstand.getAnzPl()[sp], spieler.length);
-			int punkte = spielstand.getPunkte()[sp]; 
+			int score = archive.getScore()[playerIndex]; 
 			
-			if (punkte <= 0)
+			if (score <= 0)
 				continue;
 			
 			int insertIndex = -1;
@@ -1243,7 +1217,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			{
 				HighscoreEntry entry = this.highscoreEntries.list.get(entryIndex);
 				
-				if (punkte >= entry.punkte)
+				if (score >= entry.score)
 				{
 					insertIndex = entryIndex;
 					
@@ -1251,11 +1225,10 @@ public class Stern extends Frame  // NO_UCD (use default)
 					{
 						HighscoreEntry entry2 = this.highscoreEntries.list.get(entryIndex2);
 						
-						if (entry2.punkte != punkte)
+						if (entry2.score != score)
 							break;
 						
-						// Gibt es schon einen Eintrag mit derselben Punktzahl fuer denselben Spieler?
-						if (spieler[sp].getName().toUpperCase().equals(entry2.name.toUpperCase()))
+						if (players[playerIndex].getName().toUpperCase().equals(entry2.playerName.toUpperCase()))
 						{
 							dontAdd = true;
 							break;
@@ -1271,19 +1244,18 @@ public class Stern extends Frame  // NO_UCD (use default)
 				continue;
 			
 			HighscoreEntry newEntry = new HighscoreEntry();
-			newEntry.name = spieler[sp].getName();
-			newEntry.punkte = punkte;
+			newEntry.playerName = players[playerIndex].getName();
+			newEntry.score = score;
 			
 			if (insertIndex >= 0)
 				this.highscoreEntries.list.add(insertIndex, newEntry);
 			else
 				this.highscoreEntries.list.add(newEntry);
 			
-			while (this.highscoreEntries.list.size() > Stern.HIGHSCORE_NUM_ENTRIES)
-				this.highscoreEntries.list.remove(Stern.HIGHSCORE_NUM_ENTRIES);
+			while (this.highscoreEntries.list.size() > Stern.HIGHSCORE_ENTRIES_COUNT)
+				this.highscoreEntries.list.remove(Stern.HIGHSCORE_ENTRIES_COUNT);
 		}
 		
-		// Highscoreliste abspeichern
 		String jsonString = new Gson().toJson(this.highscoreEntries);
 		
 		try {
@@ -1297,7 +1269,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 		}
 	}
 	
-	private void getHighscores()
+	private void loadHighscores()
 	{
 		boolean error = true;
 		File file = new File(HIGHSCORES_FILE_NAME);
@@ -1323,19 +1295,19 @@ public class Stern extends Frame  // NO_UCD (use default)
 	
 	private void updateTitle()
 	{
-		String filename = (this.t != null && 
-						   this.t.getSpiel() != null && 
-						   this.t.getSpiel().getName() != null &&
-						   this.t.getSpiel().getName().length() > 0) ?
-							" <" + this.t.getSpiel().getName() + ">" :
+		String fileName = (this.t != null && 
+						   this.t.getGame() != null && 
+						   this.t.getGame().getName() != null &&
+						   this.t.getGame().getName().length() > 0) ?
+							" <" + this.t.getGame().getName() + ">" :
 							"";
 		
 		if (this.serverFunctions != null && this.serverFunctions.isServerEnabled())
 			this.setTitle(
 					SternResources.SternTerminalServer(false)+
-					filename);
+					fileName);
 		else
-			this.setTitle(SternResources.SternTitel(false) + filename);
+			this.setTitle(SternResources.SternTitel(false) + fileName);
 	}
 
 	@Override
@@ -1394,14 +1366,14 @@ public class Stern extends Frame  // NO_UCD (use default)
 		this.setMenuEnabled();
 	}
 	
-	private void setEmailAdressenProperty()
+	private void setEmailsProperty()
 	{
-		String base64 = Utils.objectToBase64(this.emailAdressen, null);
-		this.setProperty(PROPERTY_EMAIL_ADRESSEN, base64);
+		String base64 = Utils.convertToBase64(this.emails, null);
+		this.setProperty(PROPERTY_EMAILS, base64);
 	}
 
 	@Override
-	public boolean launchEmail(String recipient, String subject, String bodyText, EmailTransportBase obj)
+	public boolean launchEmailClient(String recipient, String subject, String bodyText, EmailTransportBase obj)
 	{
 		return EmailToolkit.launchEmailClient(
 				this,
@@ -1413,32 +1385,32 @@ public class Stern extends Frame  // NO_UCD (use default)
 	}
 
 	@Override
-	public SpielzuegeEmailTransport importSpielzuegeAusEmail()
+	public MovesTransportObject importMovesFromEmail()
 	{
 		this.inputEnabled = false;
 		this.redrawScreen();
 
 		// ---------
-		ClipboardImportJDialog<SpielzuegeEmailTransport> dlg = 
-				new ClipboardImportJDialog<SpielzuegeEmailTransport>(
-						this, SpielzuegeEmailTransport.class, false);
+		ClipboardImportJDialog<MovesTransportObject> dlg = 
+				new ClipboardImportJDialog<MovesTransportObject>(
+						this, MovesTransportObject.class, false);
 		
 		dlg.setVisible(true);
 		// ---------
 		
-		SpielzuegeEmailTransport set = (SpielzuegeEmailTransport)dlg.obj;
+		MovesTransportObject movesTransportObject = (MovesTransportObject)dlg.obj;
 		
-		if (set != null)
+		if (movesTransportObject != null)
 		{
-			if (!MinBuildChecker.doCheck(this, set.getMinBuild()))
-				set = null;
+			if (!RequiredBuildChecker.doCheck(this, movesTransportObject.getBuildRequired()))
+				movesTransportObject = null;
 		}
 		
 		this.inputEnabled = true;
 		this.redrawScreen();
 		this.updateTitle();
 
-		return set;
+		return movesTransportObject;
 	}
 	
 	private ResponseMessage sendAndReceive(ClientUserCredentials cuc, RequestMessage msg)
@@ -1457,7 +1429,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			respMsg = new ResponseMessage();
 			respMsg.error = true;
 			respMsg.errorMsg = SternResources.ServerKommunikationInaktiv(false);
-			respMsg.payloadSerialized = PostMovesResult.FEHLER.toString();
+			respMsg.payloadSerialized = PostMovesResult.ERROR.toString();
 		}
 		
 		if (respMsg.error)
@@ -1471,17 +1443,16 @@ public class Stern extends Frame  // NO_UCD (use default)
 	}
 
 	@Override
-	public PostMovesResult postMovesToServer(String gameId, String spielerName, SpielzuegeEmailTransport set)
+	public PostMovesResult postMovesToServer(String gameId, String playerName, MovesTransportObject movesTransportObject)
 	{
-		// Ist der Spieler ueberhaupt als solcher angemeldet?
-		if (this.cuc.userId.equals(spielerName))
+		if (this.cuc.userId.equals(playerName))
 		{		
 			RequestMessage msg = new RequestMessage(RequestMessageType.POST_MOVES);
 			
 			RequestMessagePostMoves msgPayload = new RequestMessagePostMoves();
 			
 			msgPayload.gameId = gameId;
-			msgPayload.zuege = set;
+			msgPayload.moves = movesTransportObject;
 			
 			msg.payloadSerialized = msgPayload.toJson();
 			
@@ -1492,7 +1463,7 @@ public class Stern extends Frame  // NO_UCD (use default)
 			return result;
 		}
 		else
-			return PostMovesResult.BENUTZER_NICHT_ANGEMELDET;
+			return PostMovesResult.USER_NOT_CONNECTED;
 	}
 	
 	private void getGameInfoByTimer()
@@ -1510,11 +1481,11 @@ public class Stern extends Frame  // NO_UCD (use default)
 		{
 			RequestMessageGetStatus msgPayload = new RequestMessageGetStatus();
 			
-			if (this.t != null && this.t.getSpiel() != null &&
-				this.t.getSpiel().getOptionen().contains(SpielOptionen.SERVER_BASIERT))
+			if (this.t != null && this.t.getGame() != null &&
+				this.t.getGame().getOptions().contains(GameOptions.SERVER_BASED))
 			{
 				msgPayload.currentGameId = this.currentGameId;
-				msgPayload.currentGameJahr = this.currentGameJahr;
+				msgPayload.currentGameYear = this.currentGameJahr;
 			}
 								
 			RequestMessage msg = new RequestMessage(RequestMessageType.GET_STATUS);
@@ -1583,13 +1554,13 @@ public class Stern extends Frame  // NO_UCD (use default)
 		}
 		
 		if (this.muteNotificationSound == false &&
-				this.soundClipGlocke != null && 
+				this.soundClipNotification != null && 
 				beep)
 		{
-			if (this.soundClipGlocke.isRunning())
-				this.soundClipGlocke.stop();
-			this.soundClipGlocke.setFramePosition(0);
-			this.soundClipGlocke.start();
+			if (this.soundClipNotification.isRunning())
+				this.soundClipNotification.stop();
+			this.soundClipNotification.setFramePosition(0);
+			this.soundClipNotification.start();
 		}
 	}
 
@@ -1698,12 +1669,12 @@ public class Stern extends Frame  // NO_UCD (use default)
 						gamesAndUser);
 				dlg.setVisible(true);
 				
-				if (dlg.spielGeladen != null)
+				if (dlg.gameLoaded != null)
 				{
-					if (MinBuildChecker.doCheck(this, dlg.spielGeladen.getMinBuild()))
+					if (RequiredBuildChecker.doCheck(this, dlg.gameLoaded.getBuildRequired()))
 					{
-						this.currentGameJahr = dlg.spielGeladen.getJahr();
-						this.setNeuesSpiel(dlg.spielGeladen, true);
+						this.currentGameJahr = dlg.gameLoaded.getYear();
+						this.setNewGame(dlg.gameLoaded, true);
 					}
 				}
 				this.getGameInfoByTimer();
@@ -1757,7 +1728,6 @@ public class Stern extends Frame  // NO_UCD (use default)
 		this.inputEnabled = false;
 		this.redrawScreen();
 		
-		// Spiel vom Server laden
 		RequestMessage msg = new RequestMessage(RequestMessageType.GET_GAME);
 		
 		msg.payloadSerialized = this.currentGameId;
@@ -1766,14 +1736,13 @@ public class Stern extends Frame  // NO_UCD (use default)
 		
 		if (!respMsg.error)
 		{
-			// Jetzt das Spiel wie ein E-Mail-Spiel laden.
 			Gson gson = new Gson();
-			Spiel spielGeladen = gson.fromJson(respMsg.payloadSerialized, Spiel.class); 
+			Game game = gson.fromJson(respMsg.payloadSerialized, Game.class); 
 			
-			if (MinBuildChecker.doCheck(this, spielGeladen.getMinBuild()))
+			if (RequiredBuildChecker.doCheck(this, game.getBuildRequired()))
 			{
-				this.currentGameJahr = spielGeladen.getJahr();
-				this.setNeuesSpiel(spielGeladen, true);
+				this.currentGameJahr = game.getYear();
+				this.setNewGame(game, true);
 			}		
 		}
 		
@@ -1784,41 +1753,41 @@ public class Stern extends Frame  // NO_UCD (use default)
 	}
 
 	@Override
-	public void triggerGameInfoUpdate()
+	public void updateGameInfo()
 	{
 		this.getGameInfoByTimer();
 	}
 
-	public boolean getClientsInaktivBeiZugeingabe()
+	public boolean areClientsInactiveWhileEnterMoves() // NO_UCD (use default)
 	{
-		return this.clientsInaktivBeiZugeingabe;
+		return this.clientsInactiveWhileEnterMoves;
 	}
 	
-	public void setClientsInaktivBeiZugeingabe(boolean enabled)
+	public void setClientsInactiveWhileEnterMoves(boolean enabled)
 	{
-		this.clientsInaktivBeiZugeingabe = enabled;
+		this.clientsInactiveWhileEnterMoves = enabled;
 		
-		this.setProperty(PROPERTY_CLIENTS_INACTIVE, Boolean.toString(this.clientsInaktivBeiZugeingabe));
+		this.setProperty(PROPERTY_CLIENTS_INACTIVE, Boolean.toString(this.clientsInactiveWhileEnterMoves));
 	}
 
 	@Override
-	public boolean istZugeingabeOffen() 
+	public boolean isMoveEnteringOpen() 
 	{
-		if ((this.serverFunctions != null && this.serverFunctions.isServerEnabled() && !this.getClientsInaktivBeiZugeingabe()))
+		if ((this.serverFunctions != null && this.serverFunctions.isServerEnabled() && !this.areClientsInactiveWhileEnterMoves()))
 		{
 			return false;
 		}
 		
 		return
 				(this.outputWindow != null && this.outputWindow.isVisible()) ||
-				(this.serverFunctions != null && this.serverFunctions.isServerEnabled() && this.getClientsInaktivBeiZugeingabe());
+				(this.serverFunctions != null && this.serverFunctions.isServerEnabled() && this.areClientsInactiveWhileEnterMoves());
 	}
 	
-	public ScreenDisplayContent getScreenDisplayContentStartOfYear()
+	public ScreenContent getScreenContentStartOfYear()
 	{
-		if (this.t != null && this.t.getSpiel() != null)
+		if (this.t != null && this.t.getGame() != null)
 		{
-			return this.t.getSpiel().getScreenDisplayContentStartOfYear();
+			return this.t.getGame().getScreenContentStartOfYear();
 		}
 		else
 		{

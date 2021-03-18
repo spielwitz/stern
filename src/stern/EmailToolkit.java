@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -53,16 +53,16 @@ class EmailToolkit
 			obj.className = obj.getClass().getName();
 			obj.build = ReleaseGetter.getRelease();
 			
-			String base64 = Utils.objectToBase64(obj, password);
+			String base64 = Utils.convertToBase64(obj, password);
 			
 			uriStr = String.format("mailto:%s?subject=%s&body=%s",
-		            recipient, // use semicolon ";" for Outlook!
+		            recipient,
 		            urlEncode(subject),
 		            urlEncode(bodyText + "\n\n" + BASE64_START + base64 + BASE64_END));
 		}
 		else
 			uriStr = String.format("mailto:%s?subject=%s&body=%s",
-		            recipient, // use semicolon ";" for Outlook!
+		            recipient,
 		            urlEncode(subject),
 		            urlEncode(bodyText));
 		
@@ -84,7 +84,6 @@ class EmailToolkit
 	
 	static <T> EmailTransportBase parseEmail(String body, Class<T> expectedClass, String password)
 	{
-		// Zuerst alle Leerzeichen aus der Mail entfernen
 		body = body.replace(" ", "");
 		
 		int posStart = body.indexOf(BASE64_START);
@@ -101,7 +100,7 @@ class EmailToolkit
 		
 		try
 		{
-			obj = (EmailTransportBase)Utils.base64ToObject(base64, expectedClass, password);
+			obj = (EmailTransportBase)Utils.convertFromBase64(base64, expectedClass, password);
 			
 			if (obj != null && !obj.className.equals(expectedClass.getName()))
 				obj = null;

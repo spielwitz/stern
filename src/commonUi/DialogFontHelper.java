@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import common.Constants;
 public class DialogFontHelper
 {
 	private static Font font;
-	private static Font fontBasis ;
+	private static Font fontBase ;
 	
 	public static Font getFont()
 	{
@@ -35,20 +35,20 @@ public class DialogFontHelper
 		return font;
 	}
 	
-	public static Font getFontBasis()
+	public static Font getFontBase()
 	{
-		if (fontBasis == null)
+		if (fontBase == null)
 			new DialogFontHelper();
 		
-		return fontBasis;
+		return fontBase;
 	}
 	
 	private DialogFontHelper()
 	{
 		try {
-			fontBasis = Font.createFont( Font.TRUETYPE_FONT,
+			fontBase = Font.createFont( Font.TRUETYPE_FONT,
 					getClass().getResourceAsStream(Constants.FONT_NAME));
-			font = fontBasis.deriveFont(Constants.DIALOG_FONT_SIZE);
+			font = fontBase.deriveFont(Constants.FONT_DIALOG_SIZE);
 		} catch (FontFormatException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

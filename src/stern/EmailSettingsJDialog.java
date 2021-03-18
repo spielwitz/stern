@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
 import common.Colors;
-import common.Spieler;
+import common.Player;
 import common.SternResources;
 import common.Utils;
 import commonUi.ButtonDark;
@@ -47,45 +47,46 @@ import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial") class EmailSettingsJDialog extends JDialog implements ActionListener, FocusListener
+@SuppressWarnings("serial") 
+class EmailSettingsJDialog extends JDialog implements ActionListener, FocusListener
 {
 	private final static int COLUMNS_TEXT_FIELS = 40;
 	private final static String EMAIL_SELECT_BUTTON_TEXT = ".";
 	
 	private ButtonDark butOk;
 	private ButtonDark butCancel;
-	String emailAdresseSpielleiter;
-	ArrayList<Spieler> spieler;
+	String emailGameHost;
+	ArrayList<Player> players;
 	
-	private ButtonDark butEmailSpielleiter;
+	private ButtonDark butEmailGameHost;
 	
-	private CheckBoxDark[] cbEmailAktiv;
-	private TextFieldDark[] tfEmailSpieler;
-	private ButtonDark[] butEmailSpieler;
+	private CheckBoxDark[] cbEmailEnabled;
+	private TextFieldDark[] tfEmailPlayer;
+	private ButtonDark[] butEmailPlayer;
 	
-	private TextFieldDark tfEmailSpielleiter;
+	private TextFieldDark tfEmailGameHost;
 		
-	private ArrayList<String> emailAdressen;
+	private ArrayList<String> emailAdresses;
 	
 	private static Font font;
 	
 	public DialogWindowResult dlgResult = DialogWindowResult.CANCEL; // NO_UCD (unused code)
 	
-	@SuppressWarnings("unchecked") EmailSettingsJDialog(
+	@SuppressWarnings("unchecked") 
+	EmailSettingsJDialog(
 			JDialog parent,
-			String emailAdresseSpielleiter,
-			ArrayList<Spieler> spieler,
-			ArrayList<String> emailAdressen,
+			String emailGameHost,
+			ArrayList<Player> players,
+			ArrayList<String> emailAdresses,
 			boolean readOnly)
 	{
 		super (parent, SternResources.EmailSettingsJDialogTitel(false), true);
 		
-		// Font laden
 		font = DialogFontHelper.getFont();
 
-		this.emailAdressen = emailAdressen;
-		this.emailAdresseSpielleiter = (String)Utils.klon(emailAdresseSpielleiter);
-		this.spieler = (ArrayList<Spieler>)Utils.klon(spieler);
+		this.emailAdresses = emailAdresses;
+		this.emailGameHost = (String)Utils.klon(emailGameHost);
+		this.players = (ArrayList<Player>)Utils.klon(players);
 
 		this.setLayout(new BorderLayout());
 		this.setBackground(new Color(30, 30, 30));
@@ -99,62 +100,62 @@ import commonUi.TextFieldDark;
 		panMain.setLayout(new BorderLayout(20,10));
 		
 		// ---------------
-		PanelDark panSpielleiter = new GroupBoxDark(SternResources.Spielleiter(false), font);
-		panSpielleiter.setLayout(new SpringLayout());
+		PanelDark panGameHost = new GroupBoxDark(SternResources.Spielleiter(false), font);
+		panGameHost.setLayout(new SpringLayout());
 		
-		panSpielleiter.add(new LabelDark(SternResources.EMailAdresse(false), font));
+		panGameHost.add(new LabelDark(SternResources.EMailAdresse(false), font));
 		
-		this.tfEmailSpielleiter = new TextFieldDark(this.emailAdresseSpielleiter, font);
-		this.tfEmailSpielleiter.setColumns(COLUMNS_TEXT_FIELS);
-		this.tfEmailSpielleiter.setEditable(!readOnly);
-		this.tfEmailSpielleiter.addFocusListener(this);
+		this.tfEmailGameHost = new TextFieldDark(this.emailGameHost, font);
+		this.tfEmailGameHost.setColumns(COLUMNS_TEXT_FIELS);
+		this.tfEmailGameHost.setEditable(!readOnly);
+		this.tfEmailGameHost.addFocusListener(this);
 		
-		panSpielleiter.add(this.tfEmailSpielleiter);
+		panGameHost.add(this.tfEmailGameHost);
 		
-		this.butEmailSpielleiter = new ButtonDark(this, EMAIL_SELECT_BUTTON_TEXT, font);
-		this.butEmailSpielleiter.setEnabled(!readOnly);
-		panSpielleiter.add(this.butEmailSpielleiter);
+		this.butEmailGameHost = new ButtonDark(this, EMAIL_SELECT_BUTTON_TEXT, font);
+		this.butEmailGameHost.setEnabled(!readOnly);
+		panGameHost.add(this.butEmailGameHost);
 		
-		SpringUtilities.makeCompactGrid(panSpielleiter,
+		SpringUtilities.makeCompactGrid(panGameHost,
                 1, 3, //rows, cols
                 10, 10, //initialX, initialY
                 10, 10);//xPad, yPad
 				
-		panMain.add(panSpielleiter, BorderLayout.NORTH);
+		panMain.add(panGameHost, BorderLayout.NORTH);
 		
-		PanelDark panSpieler = new GroupBoxDark(SternResources.Spieler(false), font);
-		panSpieler.setLayout(new SpringLayout());
+		PanelDark panPlayers = new GroupBoxDark(SternResources.Spieler(false), font);
+		panPlayers.setLayout(new SpringLayout());
 		
-		this.butEmailSpieler = new ButtonDark[spieler.size()];
-		this.cbEmailAktiv = new CheckBoxDark[spieler.size()];
-		this.tfEmailSpieler = new TextFieldDark[spieler.size()];
+		this.butEmailPlayer = new ButtonDark[players.size()];
+		this.cbEmailEnabled = new CheckBoxDark[players.size()];
+		this.tfEmailPlayer = new TextFieldDark[players.size()];
 		
-		for (int spIndex = 0; spIndex < spieler.size(); spIndex++)
+		for (int playerIndex = 0; playerIndex < players.size(); playerIndex++)
 		{
-			Spieler sp = this.spieler.get(spIndex);
+			Player player = this.players.get(playerIndex);
 			
-			this.cbEmailAktiv[spIndex] = new CheckBoxDark(sp.getName(), sp.istEmail(), font);
-			this.cbEmailAktiv[spIndex].setEnabled(!sp.istComputer() && !readOnly);
-			this.cbEmailAktiv[spIndex].setForeground(Colors.get(sp.getColIndex()));
-			panSpieler.add(this.cbEmailAktiv[spIndex]);
+			this.cbEmailEnabled[playerIndex] = new CheckBoxDark(player.getName(), player.isEmailPlayer(), font);
+			this.cbEmailEnabled[playerIndex].setEnabled(!player.isBot() && !readOnly);
+			this.cbEmailEnabled[playerIndex].setForeground(Colors.get(player.getColorIndex()));
+			panPlayers.add(this.cbEmailEnabled[playerIndex]);
 			
-			this.tfEmailSpieler[spIndex] = new TextFieldDark(sp.getEmailAdresse(), font);
-			this.tfEmailSpieler[spIndex].setColumns(COLUMNS_TEXT_FIELS);
-			this.tfEmailSpieler[spIndex].setEditable(!sp.istComputer() && !readOnly);	
-			this.tfEmailSpieler[spIndex].addFocusListener(this);
-			panSpieler.add(this.tfEmailSpieler[spIndex]);
+			this.tfEmailPlayer[playerIndex] = new TextFieldDark(player.getEmail(), font);
+			this.tfEmailPlayer[playerIndex].setColumns(COLUMNS_TEXT_FIELS);
+			this.tfEmailPlayer[playerIndex].setEditable(!player.isBot() && !readOnly);	
+			this.tfEmailPlayer[playerIndex].addFocusListener(this);
+			panPlayers.add(this.tfEmailPlayer[playerIndex]);
 			
-			this.butEmailSpieler[spIndex] = new ButtonDark(this, EMAIL_SELECT_BUTTON_TEXT, font);
-			this.butEmailSpieler[spIndex].setEnabled(!sp.istComputer() && !readOnly);
-			panSpieler.add(this.butEmailSpieler[spIndex]);
+			this.butEmailPlayer[playerIndex] = new ButtonDark(this, EMAIL_SELECT_BUTTON_TEXT, font);
+			this.butEmailPlayer[playerIndex].setEnabled(!player.isBot() && !readOnly);
+			panPlayers.add(this.butEmailPlayer[playerIndex]);
 		}
 		
-		SpringUtilities.makeCompactGrid(panSpieler,
-                spieler.size(), 3, //rows, cols
+		SpringUtilities.makeCompactGrid(panPlayers,
+                players.size(), 3, //rows, cols
                 10, 10, //initialX, initialY
                 10, 10);//xPad, yPad
 				
-		panMain.add(panSpieler, BorderLayout.CENTER);
+		panMain.add(panPlayers, BorderLayout.CENTER);
 				
 		// ----
 		panBase.add(panMain, BorderLayout.CENTER);
@@ -206,25 +207,25 @@ import commonUi.TextFieldDark;
 		
 		if (source == this.butCancel || source == this.getRootPane())
 			this.close();
-		else if (source == this.butEmailSpielleiter)
+		else if (source == this.butEmailGameHost)
 		{
-			EmailAdressenJDialog dlg = new EmailAdressenJDialog(this, emailAdressen);
+			EmailAddressesJDialog dlg = new EmailAddressesJDialog(this, emailAdresses);
 			dlg.setVisible(true);
 			
 			if (dlg.selectedIndex >= 0)
-				this.tfEmailSpielleiter.setText(emailAdressen.get(dlg.selectedIndex));
+				this.tfEmailGameHost.setText(emailAdresses.get(dlg.selectedIndex));
 		}
 		else if (source == this.butOk)
 		{
-			for (int i = 0; i < this.butEmailSpieler.length; i++)
+			for (int i = 0; i < this.butEmailPlayer.length; i++)
 			{
-				this.spieler.get(i).setEmail(this.cbEmailAktiv[i].isSelected());
-				this.spieler.get(i).setEmailAdresse(this.tfEmailSpieler[i].getText().trim());
+				this.players.get(i).setEmailPlayer(this.cbEmailEnabled[i].isSelected());
+				this.players.get(i).setEmail(this.tfEmailPlayer[i].getText().trim());
 			}
 			
-			this.emailAdresseSpielleiter = this.tfEmailSpielleiter.getText().trim();
+			this.emailGameHost = this.tfEmailGameHost.getText().trim();
 			
-			boolean ok = SpielparameterJDialog.checkEmailSettings(this, this.emailAdresseSpielleiter, this.spieler)				;
+			boolean ok = GameParametersJDialog.checkEmailSettings(this, this.emailGameHost, this.players)				;
 			
 			if (ok)
 			{
@@ -236,22 +237,22 @@ import commonUi.TextFieldDark;
 		{
 			int index = -1;
 			
-			for (int i = 0; i < this.butEmailSpieler.length; i++)
+			for (int i = 0; i < this.butEmailPlayer.length; i++)
 			{
-				if (source == this.butEmailSpieler[i])
+				if (source == this.butEmailPlayer[i])
 				{
 					index = i;
 					break;
 				}
 			}
 			
-			EmailAdressenJDialog dlg = new EmailAdressenJDialog(this, emailAdressen);
+			EmailAddressesJDialog dlg = new EmailAddressesJDialog(this, emailAdresses);
 			dlg.setVisible(true);
 			
 			if (dlg.selectedIndex >= 0)
 			{
-				this.tfEmailSpieler[index].setText(emailAdressen.get(dlg.selectedIndex));
-				this.cbEmailAktiv[index].setSelected(true);
+				this.tfEmailPlayer[index].setText(emailAdresses.get(dlg.selectedIndex));
+				this.cbEmailEnabled[index].setSelected(true);
 			}
 		}
 	}
@@ -267,20 +268,20 @@ import commonUi.TextFieldDark;
 	}
 
 	@Override
-	public void focusLost(FocusEvent e) {
-		// Email-Adressen merken
-		String a = this.tfEmailSpielleiter.getText().trim();
+	public void focusLost(FocusEvent e) 
+	{
+		String a = this.tfEmailGameHost.getText().trim();
 		
-		if (a.length() > 0 && !this.emailAdressen.contains(a) && a.contains("@"))
-			this.emailAdressen.add(a);
+		if (a.length() > 0 && !this.emailAdresses.contains(a) && a.contains("@"))
+			this.emailAdresses.add(a);
 		
-		for (int i = 0; i < this.tfEmailSpieler.length; i++)
+		for (int i = 0; i < this.tfEmailPlayer.length; i++)
 		{
-			a = this.tfEmailSpieler[i].getText().trim();
-			if (a.length() > 0 && !this.emailAdressen.contains(a) && a.contains("@"))
-				this.emailAdressen.add(a);
+			a = this.tfEmailPlayer[i].getText().trim();
+			if (a.length() > 0 && !this.emailAdresses.contains(a) && a.contains("@"))
+				this.emailAdresses.add(a);
 		}
 		
-		Collections.sort(this.emailAdressen);
+		Collections.sort(this.emailAdresses);
 	}
 }

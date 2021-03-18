@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,16 @@ import java.util.EventObject;
 @SuppressWarnings("serial")
 public class ScreenUpdateEvent extends EventObject {
 
-	private ScreenDisplayContent content;
+	private ScreenContent screenContent;
 	
-	public ScreenUpdateEvent(Object source, ScreenDisplayContent cont) {
+	public ScreenUpdateEvent(Object source, ScreenContent screenContent)
+	{
 		super(source);
-		this.content = cont;
+		this.screenContent = screenContent;
 	}
 
-	public ScreenDisplayContent getContent() {
-		return content;
+	public ScreenContent getScreenContent()
+	{
+		return screenContent;
 	}
 }

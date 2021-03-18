@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -33,11 +33,11 @@ import java.util.Date;
 import javax.imageio.ImageIO;
 
 import common.Constants;
-import common.ScreenDisplayContent;
+import common.ScreenContent;
 import common.ScreenPainter;
 import common.Utils;
 import commonUi.DialogFontHelper;
-import commonUi.PaintPanel;
+import commonUi.PanelScreenContent;
 
 class Webserver implements Runnable
 {
@@ -74,7 +74,6 @@ class Webserver implements Runnable
 			try {
 				serverSocket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -107,16 +106,14 @@ class Webserver implements Runnable
 					out = new PrintWriter(socket.getOutputStream());
 					dataOut = new BufferedOutputStream(socket.getOutputStream());
 					
-					// Es interessiert nicht, was der Sender schickt. Wir schicken immer dasselbe Bild zurueck.
 					try
 					{
-					while (in.read() != -1)
-					{
-					}
+						while (in.read() != -1)
+						{
+						}
 					}
 					catch (Exception xx) {}
 					
-					// Bild mit dem Spielfeld erzeugen
 					byte[] picData = this.createPicture();
 					
 					out.println("HTTP/1.1 200 OK");
@@ -171,13 +168,13 @@ class Webserver implements Runnable
 	{
 		byte[] bytes = null;
 
-		ScreenDisplayContent sdc = this.callback.getScreenDisplayContentStartOfYear();
+		ScreenContent screenContent = this.callback.getScreenContentStartOfYear();
 		
-		int width = Utils.round((double)ScreenPainter.SCREEN_SIZE_W * FACTOR);
+		int width = Utils.round((double)ScreenPainter.SCREEN_WIDTH * FACTOR);
 		int height =
-				sdc == null ?
-						Utils.round((double)ScreenPainter.SCREEN_SIZE_H * FACTOR) :
-						(int)((double)(Constants.FELD_MAX_Y * ScreenPainter.SPIELFELD_DX+ 2 * PaintPanel.RAND) * FACTOR);
+				screenContent == null ?
+						Utils.round((double)ScreenPainter.SCREEN_HEIGHT * FACTOR) :
+						(int)((double)(Constants.BOARD_MAX_Y * ScreenPainter.BOARD_DX+ 2 * PanelScreenContent.BORDER_SIZE) * FACTOR);
 		
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g2d = (Graphics2D)image.createGraphics();
@@ -185,13 +182,13 @@ class Webserver implements Runnable
 		g2d.setColor(Color.black);
         g2d.fillRect(0, 0, width, height);
         
-        Font fontBasis = DialogFontHelper.getFontBasis();
+        Font fontBasis = DialogFontHelper.getFontBase();
         
-        Font fontPlaneten = fontBasis.deriveFont((float)Utils.round((double)PaintPanel.FONT_SIZE_PLANETEN * FACTOR));
-        Font fontMinen = fontBasis.deriveFont((float)Utils.round((double)PaintPanel.FONT_SIZE_MINEN * FACTOR));
-        Font fontFelder = fontBasis.deriveFont((float)Utils.round((double)PaintPanel.FONT_SIZE_FELDER * FACTOR));
+        Font fontPlanets = fontBasis.deriveFont((float)Utils.round((double)PanelScreenContent.FONT_SIZE_PLANETS * FACTOR));
+        Font fontMines = fontBasis.deriveFont((float)Utils.round((double)PanelScreenContent.FONT_SIZE_MINES * FACTOR));
+        Font fontSectors = fontBasis.deriveFont((float)Utils.round((double)PanelScreenContent.FONT_SIZE_SECTORS * FACTOR));
         
-        new ScreenPainter(sdc, true, g2d, fontPlaneten, fontMinen, fontFelder, FACTOR);
+        new ScreenPainter(screenContent, true, g2d, fontPlanets, fontMines, fontSectors, FACTOR);
         
         g2d.dispose();
 				

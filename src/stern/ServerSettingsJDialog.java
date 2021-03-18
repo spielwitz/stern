@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -49,16 +49,17 @@ import commonUi.PanelDark;
 import commonUi.SpringUtilities;
 import commonUi.TextFieldDark;
 
-@SuppressWarnings("serial") class ServerSettingsJDialog extends JDialog implements ChangeListener, ActionListener
+@SuppressWarnings("serial") 
+class ServerSettingsJDialog extends JDialog implements ChangeListener, ActionListener
 {
 	private ButtonDark butClose;
 	private ButtonDark butRefreshClients;
 	private ButtonDark butGetIp;
 	
-	private TextFieldDark tfIp;
+	private TextFieldDark tfIpAddress;
 	
 	private CheckBoxDark cbServerEnabled;
-    private CheckBoxDark cbInaktivBeiZugeingabe;
+    private CheckBoxDark cbInactiveWhileEnterMoves;
 	private JList<String> listClients;
 	
 	private DefaultListModel<String> listClientsModel;
@@ -69,27 +70,26 @@ import commonUi.TextFieldDark;
 	
 	private static Font font;
 	
-	public String meineIp;
-	private boolean inaktivBeiZugeingabe;
+	public String myIpAddress;
+	private boolean inactiveWhileEnterMoves;
 	
 	ServerSettingsJDialog(
 			Stern parent,
 			String title,
-			String meineIp,
+			String myIpAddress,
 			boolean modal,
 			ServerFunctions serverFunctions)
 	{
 		super (parent, title, modal);
 		
-		this.meineIp = meineIp == null || meineIp.equals("") ?
-				serverFunctions.getMeineIp() : meineIp;
+		this.myIpAddress = myIpAddress == null || myIpAddress.equals("") ?
+				serverFunctions.getMeineIp() : myIpAddress;
 		
-		// Font laden
 		font = DialogFontHelper.getFont();
 		
 		this.serverFunctions = serverFunctions;
 		this.parent = parent;
-		this.inaktivBeiZugeingabe = parent.getClientsInaktivBeiZugeingabe();
+		this.inactiveWhileEnterMoves = parent.areClientsInactiveWhileEnterMoves();
 		
 		this.setLayout(new BorderLayout());
 		this.setBackground(new Color(30, 30, 30));
@@ -108,12 +108,12 @@ import commonUi.TextFieldDark;
 		
 		PanelDark panServerSub = new PanelDark(new GridLayout(2,1));
 		
-		this.cbInaktivBeiZugeingabe = new CheckBoxDark(
+		this.cbInactiveWhileEnterMoves = new CheckBoxDark(
 				SternResources.ServerSettingsJDialogInaktiv(false), 
-				this.inaktivBeiZugeingabe, 
+				this.inactiveWhileEnterMoves, 
 				font);
-		this.cbInaktivBeiZugeingabe.addActionListener(this);
-		panServerSub.add(this.cbInaktivBeiZugeingabe);
+		this.cbInactiveWhileEnterMoves.addActionListener(this);
+		panServerSub.add(this.cbInactiveWhileEnterMoves);
 		
 		this.cbServerEnabled = new CheckBoxDark(SternResources.ServerSettingsJDialogTerminalServerAktiv(false), serverFunctions.isServerEnabled(), font);
 		this.cbServerEnabled.addActionListener(this);
@@ -128,9 +128,9 @@ import commonUi.TextFieldDark;
 		
 		PanelDark panIp = new PanelDark(new GridLayout(1,2, 10, 0));
 		
-		this.tfIp = new TextFieldDark(font, 18);
-		this.tfIp.setText(this.meineIp);
-		panIp.add(this.tfIp);
+		this.tfIpAddress = new TextFieldDark(font, 18);
+		this.tfIpAddress.setText(this.myIpAddress);
+		panIp.add(this.tfIpAddress);
 		
 		this.butGetIp = new ButtonDark(this, SternResources.ClientSettingsJDialogIpErmitteln(false) , font);
 		panIp.add(this.butGetIp);
@@ -238,30 +238,27 @@ import commonUi.TextFieldDark;
 			
 			if (this.cbServerEnabled.isSelected())
 			{
-				this.serverFunctions.setIp(this.tfIp.getText());
-				
-				// Start RMI
+				this.serverFunctions.setIp(this.tfIpAddress.getText());
 				this.serverFunctions.startServer(this.parent);
 			}
 			else
 			{
-				// Stop RMI
 				this.serverFunctions.stopServer(this.parent);
 			}
 			
 			this.setCursor(Cursor.getDefaultCursor());
 			this.setControlsEnabled();
 		}
-		else if (source == this.cbInaktivBeiZugeingabe)
+		else if (source == this.cbInactiveWhileEnterMoves)
 		{
-			this.inaktivBeiZugeingabe = this.cbInaktivBeiZugeingabe.isSelected();
-			this.parent.setClientsInaktivBeiZugeingabe(this.inaktivBeiZugeingabe);
+			this.inactiveWhileEnterMoves = this.cbInactiveWhileEnterMoves.isSelected();
+			this.parent.setClientsInactiveWhileEnterMoves(this.inactiveWhileEnterMoves);
 		}
 		else if (source == this.butRefreshClients)
 			this.updateClientList();
 		else if (source == this.butGetIp)
 		{
-			this.tfIp.setText(Utils.getMyIPAddress());
+			this.tfIpAddress.setText(Utils.getMyIPAddress());
 		}
 	}
 
@@ -271,7 +268,7 @@ import commonUi.TextFieldDark;
 	
 	private void close()
 	{
-		this.meineIp = this.tfIp.getText();
+		this.myIpAddress = this.tfIpAddress.getText();
 		
 		this.setVisible(false);
 		this.dispose();
@@ -297,6 +294,6 @@ import commonUi.TextFieldDark;
 	
 	private void setControlsEnabled()
 	{
-		this.cbInaktivBeiZugeingabe.setEnabled(!this.cbServerEnabled.isSelected());
+		this.cbInactiveWhileEnterMoves.setEnabled(!this.cbServerEnabled.isSelected());
 	}
 }

@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,10 @@ package commonUi;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import common.ScreenDisplayContent;
+import common.ScreenContent;
 
 public interface ISternDisplayMethods extends Remote
 {
-	public void updateScreenDisplayContent(ScreenDisplayContent content, boolean inputEnabled, boolean showInputDisabled) throws RemoteException;
+	public void updateScreen(ScreenContent content, boolean inputEnabled, boolean showInputDisabled) throws RemoteException;
 	public boolean openPdf(byte[] pdfBytes) throws RemoteException;
 }

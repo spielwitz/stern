@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -102,7 +102,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 			this.authPortBefore = this.cuc.port;
 		}
 		
-		// Font laden
 		font = DialogFontHelper.getFont();
 		
 		this.setLayout(new BorderLayout());
@@ -158,7 +157,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 		panAuthInfo.add(this.tfAuthUrl);
 		
 		panAuthInfo.add(new LabelDark(SternResources.ServerAdminPort(false)+":", font));
-		this.tfAuthPort = new IntegerTextFieldDark(this, font); // Erlaube nur bis zu 5 Ziffern
+		this.tfAuthPort = new IntegerTextFieldDark(this, font);
 		panAuthInfo.add(this.tfAuthPort);
 		
 		panAuthInfo.add(new LabelDark(SternResources.UserId(false)+":", font));
@@ -232,7 +231,7 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 		this.getRootPane().registerKeyboardAction(this, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 		getRootPane().setDefaultButton(this.butClose);
 		
-		this.tfAuthPort.enableCheckInput(); // macht auch setControlsEnabled() mit
+		this.tfAuthPort.enableCheckInput();
 		
 		this.pack();
 		this.setLocationRelativeTo(parent);	
@@ -361,7 +360,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 					if (dialogResult != DialogWindowResult.OK)
 						return;
 					
-					// Wohin soll das Credential-File gespeichert werden?
 					String filename = ServerUtils.getCredentialFileName(newUser.userId, newUser.serverUrl, newUser.serverPort);
 					
 					FileDialog fd = new FileDialog(
@@ -380,7 +378,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 					
 					String directory = fd.getDirectory();
 					
-					// Eigenen Key anlegen
 					KeyPair userKeyPair = CryptoLib.getNewKeyPair();
 					
 					RequestMessageActivateUser msg = new RequestMessageActivateUser();
@@ -389,7 +386,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 					msg.activationCode = newUser.activationCode;
 					msg.userPublicKey = CryptoLib.encodePublicKeyToBase64(userKeyPair.getPublic());
 					
-					// Client Credential Objekt anlegen
 					ClientUserCredentials cucTemp = new ClientUserCredentials();
 					
 					cucTemp.userId = ServerConstants.ACTIVATION_USER;
@@ -402,7 +398,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 					cucTemp.serverPublicKeyObject = CryptoLib.decodePublicKeyFromBase64(cucTemp.serverPublicKey);
 					cucTemp.userPrivateKeyObject = CryptoLib.decodePrivateKeyFromBase64(cucTemp.userPrivateKey); 
 					
-					// Aktivieren-Nachricht an den Server schicken
 					RequestMessage reqMsg = new RequestMessage(RequestMessageType.ACTIVATE_USER);
 					reqMsg.payloadSerialized = msg.toJson();
 					
@@ -410,7 +405,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 					
 					if (!respMsg.error)
 					{
-						// Wenn die Antwort vom Server positiv ist, Credential-File abspeichern
 						cucTemp.userId = newUser.userId;
 						
 						File fileClientInfo = new File(directory, filename);
@@ -427,7 +421,6 @@ class ServerCredentialsJDialog extends JDialog implements ActionListener, IInteg
 							this.serverUserCredentialsFile = fileClientInfo.getAbsolutePath();
 							this.cuc = cucTemp;
 							
-							// UI aktuaslisieren
 							this.fillAuthCredentials(this.cuc);
 						}						
 					}

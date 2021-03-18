@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -50,15 +50,15 @@ import javax.swing.UIManager;
 
 import common.Constants;
 import common.PdfLauncher;
-import common.ScreenDisplayContent;
-import common.ScreenDisplayContentClient;
+import common.ScreenContent;
+import common.ScreenContentClient;
 import commonUi.DialogWindow;
 import commonUi.DialogWindowResult;
 import commonUi.ISternDisplayMethods;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
-import commonUi.PaintPanel;
-import commonUi.SpracheJDialog;
+import commonUi.PanelScreenContent;
+import commonUi.LanguageSelectionJDialog;
 import commonUi.SternAbout;
 import common.SternResources;
 import common.Utils;
@@ -73,26 +73,24 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 {
 	boolean connected = false;
 	
-	// UI components
-	private PaintPanel paintPanel;
+	private PanelScreenContent paintPanel;
 	
 	private SternDisplaySettings settings;
 	
-	private Properties props;
+	private Properties properties;
 	
-	// Menues
-    private MenuItem menuVerbindungseinstellungen;  
+    private MenuItem menuConnectionSettings;  
     private MenuItem menuQuit;
     
-    private MenuItem menuHilfe;
+    private MenuItem menuHelp;
     private MenuItem menuAbout;
-    private MenuItem menuSprache;
+    private MenuItem menuLanguage;
     
     transient private static final String PROPERTIES_FILE_NAME = "SternDisplayProperties";
-	transient private static final String PROPERTY_NAME_SERVER_IP = "serverIp";
-	transient private static final String PROPERTY_NAME_MEINE_IP = "ip";
-	transient private static final String PROPERTY_NAME_MEIN_NAME = "meinName";
-	transient private static final String PROPERTY_NAME_SPRACHE = "sprache";
+	transient private static final String PROPERTY_NAME_SERVER_IP_ADDRESS = "serverIpAddress";
+	transient private static final String PROPERTY_NAME_MY_IP_ADDRESS = "myIpAddress";
+	transient private static final String PROPERTY_NAME_MY_NAME = "myName";
+	transient private static final String PROPERTY_NAME_LANGUAGE = "language";
 	
 	public static void main(String[] args)
 	{
@@ -105,19 +103,17 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		
 		this.settings = new SternDisplaySettings();
 		
-		UUID uuid = UUID.randomUUID();
-        settings.clientId = uuid.toString();
+        settings.clientId = UUID.randomUUID().toString();
         settings.clientCode = "";
-        settings.meinName = "";
+        settings.myName = "";
         
-		// Properties lesen
-		this.props = this.getProperties();
+		this.properties = this.getProperties();
 		
-		if (settings.meineIp == null || settings.meineIp.equals(""))
-			settings.meineIp = Utils.getMyIPAddress();
+		if (settings.myIpAddress == null || settings.myIpAddress.equals(""))
+			settings.myIpAddress = Utils.getMyIPAddress();
 		
-		if (settings.serverIp == null || settings.serverIp.equals(""))
-			settings.serverIp = settings.meineIp;
+		if (settings.serverIpAddress == null || settings.serverIpAddress.equals(""))
+			settings.serverIpAddress = settings.myIpAddress;
 		
 		this.setTitle(SternResources.SternClientTitel(false));
         
@@ -131,16 +127,15 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		Dimension dim = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 		this.setBounds(0, 0, dim.width, dim.height);
 
-		this.setMenuBar(this.getMenubar());
+		this.setMenuBar(this.defineMenubar());
 		
 		this.addWindowListener(this);
-		this.setFocusable(true); // Achtung, das Panel hat den KeyListener!
+		this.setFocusable(true);
 		this.setLayout(new BorderLayout());
 		
-		this.paintPanel = new PaintPanel(this);
+		this.paintPanel = new PanelScreenContent(this);
 		this.add(this.paintPanel, BorderLayout.CENTER);
 		
-		// RMI-Server aktivieren
 		try {
 			LocateRegistry.createRegistry( Registry.REGISTRY_PORT    );
 		}
@@ -159,17 +154,16 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 			e.printStackTrace();
 		}
 				
-		// Muss ganz zum Schluss kommen, damit der Tastaturfokus zieht
 		this.setExtendedState(MAXIMIZED_BOTH);
 		this.setVisible(true);
-		this.paintPanel.requestFocusInWindow(); // Muss nach SetVisible kommen!
+		this.paintPanel.requestFocusInWindow();
 		
-		// Gleich nach dem Programmstart die Verbindungseinstellungen aufmachen.
-		// Sonst ist der Client ja sinnlos.
 		ActionEvent e = new ActionEvent(
-				this.menuVerbindungseinstellungen, 
+				this.menuConnectionSettings, 
 				ActionEvent.ACTION_PERFORMED,
-				"Verbindungseinstellungen", System.currentTimeMillis(), 0);
+				"Connection settings", 
+				System.currentTimeMillis(), 
+				0);
 		
 		this.actionPerformed(e);
 	}
@@ -177,13 +171,13 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		MenuItem item = (MenuItem)e.getSource();
+		MenuItem menuItem = (MenuItem)e.getSource();
 		
-		if (item == this.menuQuit)
+		if (menuItem == this.menuQuit)
 		{
 			this.closeSternClient();
 		}
-		else if (item == this.menuVerbindungseinstellungen)
+		else if (menuItem == this.menuConnectionSettings)
 		{
 			SternDisplaySettingsJDialog dlg = new SternDisplaySettingsJDialog(
 												this, 
@@ -195,7 +189,7 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 			
 			this.updateScreenDisplayContent();
 		}
-		else if (item == this.menuHilfe)
+		else if (menuItem == this.menuHelp)
 		{
 			Desktop desktop = Desktop.getDesktop();   
 		    InputStream resource = getClass().getResourceAsStream("/SternHelp.pdf");
@@ -221,34 +215,31 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		    {
 		    	try
 		    	{
-		        resource.close();
+		    		resource.close();
 		    	}
 		    	catch (Exception xx) {}
 		    }
 		}
-		else if (item == this.menuSprache)
+		else if (menuItem == this.menuLanguage)
 		{
-			SpracheJDialog dlg = new SpracheJDialog(
+			LanguageSelectionJDialog dlg = new LanguageSelectionJDialog(
 					this, 
 					SternResources.getLocale());
 			dlg.setVisible(true);
 			
 			if (dlg.ok)
 			{
-				// Neue Sprache uebernehmen
 				SternResources.setLocale(dlg.languageCode);
 				
-				this.props.setProperty(PROPERTY_NAME_SPRACHE, dlg.languageCode);
-				writeProperties(this.props);
+				this.properties.setProperty(PROPERTY_NAME_LANGUAGE, dlg.languageCode);
+				writeProperties(this.properties);
 				
-				// Abmelden vom Server
 				this.logoff();
 				
-				// Anwendung schließen
 				System.exit(0);
 			}
 		}
-		else if (item == this.menuAbout)
+		else if (menuItem == this.menuAbout)
 		{
 			SternAbout.show(this);
 		}
@@ -286,25 +277,25 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 	
 	private void updateScreenDisplayContent()
 	{
-		ScreenDisplayContentClient contentClient = null;
+		ScreenContentClient screenContentClient = null;
 		
 		if (this.connected)
 		{		
 			try {
 				IServerMethods rmiServer;
-				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
-				contentClient = rmiServer.rmiGetCurrentScreenDisplayContent(this.settings.clientId);
+				Registry registry = LocateRegistry.getRegistry(this.settings.serverIpAddress);
+				rmiServer = (IServerMethods) registry.lookup( Constants.RMI_REGISTRATION_NAME_SERVER );
+				screenContentClient = rmiServer.rmiGetCurrentScreenDisplayContent(this.settings.clientId);
 			}
 			catch (Exception e) {
 			}
 		}
 	
-		if (contentClient != null)
+		if (screenContentClient != null)
 			this.paintPanel.redraw(
-					contentClient.content, 
-					contentClient.inputEnabled,
-					contentClient.showInputDisabled);
+					screenContentClient.screenContent, 
+					screenContentClient.inputEnabled,
+					screenContentClient.showInputDisabled);
 		else
 			this.paintPanel.redraw(null, false, true);
 	}
@@ -316,8 +307,8 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		
 		try {
 			IServerMethods rmiServer;
-			Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-			rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
+			Registry registry = LocateRegistry.getRegistry(this.settings.serverIpAddress);
+			rmiServer = (IServerMethods) registry.lookup( Constants.RMI_REGISTRATION_NAME_SERVER );
 			rmiServer.rmiClientLogoff(this.settings.clientId);
 		}
 		catch (Exception e) {}
@@ -331,8 +322,8 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		{
 			try {
 				IServerMethods rmiServer;
-				Registry registry = LocateRegistry.getRegistry(this.settings.serverIp);
-				rmiServer = (IServerMethods) registry.lookup( Constants.REG_NAME_SERVER );
+				Registry registry = LocateRegistry.getRegistry(this.settings.serverIpAddress);
+				rmiServer = (IServerMethods) registry.lookup( Constants.RMI_REGISTRATION_NAME_SERVER );
 				rmiServer.rmiKeyPressed(
 						this.settings.clientId, 
 						languageCode,
@@ -348,13 +339,13 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 	}
 
 	@Override
-	public void updateScreenDisplayContent(
-			ScreenDisplayContent content, 
+	public void updateScreen(
+			ScreenContent screenContent, 
 			boolean inputEnabled,
 			boolean showInputDisabled)
 			throws RemoteException
 	{
-		this.paintPanel.redraw(content, inputEnabled, showInputDisabled);
+		this.paintPanel.redraw(screenContent, inputEnabled, showInputDisabled);
 	}
 	
 	private void closeSternClient()
@@ -366,61 +357,59 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		
 		if (result == DialogWindowResult.YES)
 		{
-			// Abmelden vom Server
 			this.logoff();
-			
 			System.exit(0);
 		}
 	}
 
-	private MenuBar getMenubar()
+	private MenuBar defineMenubar()
 	{
-	    MenuBar menueLeiste = new MenuBar ();
+	    MenuBar menuBar = new MenuBar ();
 	    
-	    Menu hilfe = new Menu (SternResources.SternTitel(false));
+	    Menu menuStern = new Menu (SternResources.SternTitel(false));
 	    
 	    if (Desktop.isDesktopSupported())
 	    {
-		    this.menuHilfe = new MenuItem (SternResources.MenuSpielanleitung(false));
-		    this.menuHilfe.addActionListener(this);
-		    hilfe.add (this.menuHilfe);
+		    this.menuHelp = new MenuItem (SternResources.MenuSpielanleitung(false));
+		    this.menuHelp.addActionListener(this);
+		    menuStern.add (this.menuHelp);
 	    }
 	    
 	    this.menuAbout = new MenuItem (SternResources.MenuUeberStern(false));
 	    this.menuAbout.addActionListener(this);
-	    hilfe.add (this.menuAbout);
+	    menuStern.add (this.menuAbout);
 	    
-	    hilfe.addSeparator();
+	    menuStern.addSeparator();
 	    
-	    this.menuVerbindungseinstellungen = new MenuItem(SternResources.MenuVerbindungseinstellungen(false));
-	    this.menuVerbindungseinstellungen.addActionListener(this);
-	    hilfe.add(this.menuVerbindungseinstellungen);
+	    this.menuConnectionSettings = new MenuItem(SternResources.MenuVerbindungseinstellungen(false));
+	    this.menuConnectionSettings.addActionListener(this);
+	    menuStern.add(this.menuConnectionSettings);
 	    
-	    this.menuSprache = new MenuItem(SternResources.MenuSpracheinstellungen(false));
-	    this.menuSprache.addActionListener(this);
-	    hilfe.add(this.menuSprache);
+	    this.menuLanguage = new MenuItem(SternResources.MenuSpracheinstellungen(false));
+	    this.menuLanguage.addActionListener(this);
+	    menuStern.add(this.menuLanguage);
 	    
-	    hilfe.addSeparator();
+	    menuStern.addSeparator();
 	    
 	    this.menuQuit = new MenuItem (SternResources.MenuSternClientVerlassen(false));
 	    this.menuQuit.addActionListener(this);
-	    hilfe.add (this.menuQuit);
+	    menuStern.add (this.menuQuit);
 	    
-	    menueLeiste.add(hilfe);
+	    menuBar.add(menuStern);
 
-	    return menueLeiste;
+	    return menuBar;
 	}
 	
 	private Properties getProperties()
 	{
 		Reader reader = null;
-		Properties prop = new Properties(); 
+		Properties properties = new Properties(); 
 
 		try
 		{
 		  reader = new FileReader(PROPERTIES_FILE_NAME);
 
-		  prop.load( reader );
+		  properties.load( reader );
 		}
 		catch ( Exception e )
 		{
@@ -430,33 +419,32 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		  try { reader.close(); } catch ( Exception e ) { }
 		}
 		
-		// Properties den Feldern zuweisen
-		if (prop.containsKey(PROPERTY_NAME_SERVER_IP))
-			this.settings.serverIp = prop.getProperty(PROPERTY_NAME_SERVER_IP);
-		if (prop.containsKey(PROPERTY_NAME_SERVER_IP))
-			this.settings.meineIp = prop.getProperty(PROPERTY_NAME_MEINE_IP);
-		if (prop.containsKey(PROPERTY_NAME_MEIN_NAME))
-			this.settings.meinName = prop.getProperty(PROPERTY_NAME_MEIN_NAME);
-		if (prop.containsKey(PROPERTY_NAME_SPRACHE))
+		if (properties.containsKey(PROPERTY_NAME_SERVER_IP_ADDRESS))
+			this.settings.serverIpAddress = properties.getProperty(PROPERTY_NAME_SERVER_IP_ADDRESS);
+		if (properties.containsKey(PROPERTY_NAME_SERVER_IP_ADDRESS))
+			this.settings.myIpAddress = properties.getProperty(PROPERTY_NAME_MY_IP_ADDRESS);
+		if (properties.containsKey(PROPERTY_NAME_MY_NAME))
+			this.settings.myName = properties.getProperty(PROPERTY_NAME_MY_NAME);
+		if (properties.containsKey(PROPERTY_NAME_LANGUAGE))
 		{
-			String languageCode = prop.getProperty(PROPERTY_NAME_SPRACHE);
+			String languageCode = properties.getProperty(PROPERTY_NAME_LANGUAGE);
 			if (languageCode != null)
 				SternResources.setLocale(languageCode);
 		}
 
-		return prop;
+		return properties;
 	}
 	
 	private void setProperties()
 	{
-		this.props.setProperty(PROPERTY_NAME_SERVER_IP, this.settings.serverIp);
-		this.props.setProperty(PROPERTY_NAME_MEINE_IP, this.settings.meineIp);
-		this.props.setProperty(PROPERTY_NAME_MEIN_NAME, this.settings.meinName);
+		this.properties.setProperty(PROPERTY_NAME_SERVER_IP_ADDRESS, this.settings.serverIpAddress);
+		this.properties.setProperty(PROPERTY_NAME_MY_IP_ADDRESS, this.settings.myIpAddress);
+		this.properties.setProperty(PROPERTY_NAME_MY_NAME, this.settings.myName);
 		
-		writeProperties(this.props);
+		writeProperties(this.properties);
 	}
 	
-	private static void writeProperties(Properties props)
+	private static void writeProperties(Properties properties)
 	{
 		Writer writer = null;
 
@@ -464,7 +452,7 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		{
 		  writer = new FileWriter(PROPERTIES_FILE_NAME);
 
-		  props.store( writer, "Stern-Profil" );
+		  properties.store( writer, "STERN Display properties" );
 		}
 		catch ( IOException e )
 		{

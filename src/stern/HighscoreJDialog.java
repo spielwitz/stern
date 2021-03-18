@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,6 @@ import commonUi.SpringUtilities;
 	{
 		super (owner, title, modal);
 		
-		// Font laden
 		font = DialogFontHelper.getFont();
 		
 		this.addWindowListener(new WindowAdapter()
@@ -79,15 +78,14 @@ import commonUi.SpringUtilities;
 		PanelDark panMain = new PanelDark();
 		panMain.setLayout(new SpringLayout());
 		
-		for (int row = 0; row < Stern.HIGHSCORE_NUM_ENTRIES; row++)
+		for (int row = 0; row < Stern.HIGHSCORE_ENTRIES_COUNT; row++)
 		{
-			// Position
 			panMain.add(new LabelDark(Integer.toString(row+1), SwingConstants.RIGHT, font));
 					
 			if (row < highscoreEntries.size())
 			{
-				panMain.add(new LabelDark(highscoreEntries.get(row).name, SwingConstants.LEFT, font));
-				panMain.add(new LabelDark(Integer.toString(highscoreEntries.get(row).punkte), SwingConstants.RIGHT, font));
+				panMain.add(new LabelDark(highscoreEntries.get(row).playerName, SwingConstants.LEFT, font));
+				panMain.add(new LabelDark(Integer.toString(highscoreEntries.get(row).score), SwingConstants.RIGHT, font));
 			}
 			else
 			{
@@ -97,7 +95,7 @@ import commonUi.SpringUtilities;
 		}
 		
 		SpringUtilities.makeGrid(panMain,
-                Stern.HIGHSCORE_NUM_ENTRIES, 3, //rows, cols
+                Stern.HIGHSCORE_ENTRIES_COUNT, 3, //rows, cols
                 5, 5, //initialX, initialY
                 15, 5);//xPad, yPad
 		// ---------------
@@ -136,5 +134,4 @@ import commonUi.SpringUtilities;
 		this.setVisible(false);
 		this.dispose();
 	}
-
 }

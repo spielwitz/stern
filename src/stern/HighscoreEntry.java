@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@ package stern;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial") class HighscoreEntry implements Serializable
+@SuppressWarnings("serial")
+class HighscoreEntry implements Serializable
 {
-	int punkte;
-	String name;
+	int score;
+	String playerName;
 }

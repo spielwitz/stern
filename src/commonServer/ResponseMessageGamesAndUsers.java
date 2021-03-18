@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -19,25 +19,25 @@ package commonServer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import common.SpielInfo;
+import common.GameInfo;
 
 public class ResponseMessageGamesAndUsers extends MessageBase
 {
-	public String emailAdresseSpielleiter;
+	public String emailGameHost;
 	
 	public Hashtable<String, UserInfo> users;
 	
-	public ArrayList<SpielInfo> gamesZugeingabe;
-	public ArrayList<SpielInfo> gamesWarten;
-	public ArrayList<SpielInfo> gamesBeendet;
-	public ArrayList<SpielInfo> gamesSpielleiter;
+	public ArrayList<GameInfo> gamesWaitingForEnterMoves;
+	public ArrayList<GameInfo> gamesWaitingForOtherPlayers;
+	public ArrayList<GameInfo> gamesFinalized;
+	public ArrayList<GameInfo> gamesGameHost;
 	
 	public ResponseMessageGamesAndUsers()
 	{
-		this.gamesBeendet = new ArrayList<SpielInfo>();
-		this.gamesWarten = new ArrayList<SpielInfo>();
-		this.gamesSpielleiter = new ArrayList<SpielInfo>();
-		this.gamesZugeingabe = new ArrayList<SpielInfo>();
+		this.gamesFinalized = new ArrayList<GameInfo>();
+		this.gamesWaitingForOtherPlayers = new ArrayList<GameInfo>();
+		this.gamesGameHost = new ArrayList<GameInfo>();
+		this.gamesWaitingForEnterMoves = new ArrayList<GameInfo>();
 	}
 
 	public class UserInfo

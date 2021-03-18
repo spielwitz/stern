@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ public class ResponseMessageChangeUser extends EmailTransportBase implements Ser
 	public String activationCode;
 	
 	public String serverUrl;
-	public int serverPort;
+	public int 	  serverPort;
 	public String adminEmail;
 	
 	public String serverPublicKey;

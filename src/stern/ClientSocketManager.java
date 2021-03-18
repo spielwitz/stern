@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -65,7 +65,7 @@ class ClientSocketManager
 			ResponseMessage msgResponse = new ResponseMessage();
 	    	
 	    	msgResponse.error = true;
-	    	msgResponse.errorMsg = "Unvollständige Anmeldedaten!";
+	    	msgResponse.errorMsg = SternResources.LogOnDataIncomplete(true);
 	    	
 	    	return msgResponse;
 		}
@@ -76,7 +76,6 @@ class ClientSocketManager
 		Socket kkSocket = null;
 		OutputStream out = null;
 		
-		// Build in Request-Nachricht setzen
 		msg.build = ReleaseGetter.getRelease();
 		
 	    try {
@@ -84,7 +83,6 @@ class ClientSocketManager
 			out = kkSocket.getOutputStream();
 			DataInputStream in = new DataInputStream(kkSocket.getInputStream());
 			
-			// Zuerst User ID an den Server schicken.
 			RequestMessageUserId msgRequest = new RequestMessageUserId();
 			
 			msgRequest.userId = user.userId;
@@ -127,21 +125,16 @@ class ClientSocketManager
 			
 			if (sessionId.equals(CryptoLib.NULL_UUID))
 			{
-				// Ciphers sind nicht mehr gueltig. Neue aushandeln.
 				ciphers = CryptoLib.diffieHellmanKeyAgreementClient(in, out);
 			}
 			
-			// Token mit der eigentlichen Nachricht schicken!
 			msg.token = token;
 			
-			// Jetzt erst die eigentliche Request-Nachricht an den Server schicken.
-			// Die Request-Nachricht enthält das vereinbarte Token.
 			CryptoLib.sendStringAesEncrypted(
 					out, 
 					msg.toJson(), 
 					ciphers.cipherEncrypt);
 			
-			// Warte auf die Response-Nachricht
 			msgResponse = 
 					ResponseMessage.fromJson(
 							CryptoLib.receiveStringAesEncrypted(in, ciphers.cipherDecrypt));
@@ -162,7 +155,7 @@ class ClientSocketManager
 	    	msgResponse = new ResponseMessage();
 	    	
 	    	msgResponse.error = true;
-	    	msgResponse.errorMsg = "Der Server hat die Verbindung beendet. Prüfen Sie Ihre Anmeldedaten oder probieren Sie es nochmal.";
+	    	msgResponse.errorMsg = SternResources.ConnectionClosed(true); 
 	    	
 	    	setBusy(false);
 	    	
@@ -173,14 +166,14 @@ class ClientSocketManager
 	    	msgResponse = new ResponseMessage();
 	    	
 	    	msgResponse.error = true;
-	    	msgResponse.errorMsg = "Keine Verbindung mit dem Server:\n" + e.getMessage();
+	    	msgResponse.errorMsg = SternResources.NoConnectionToServer(true, e.getMessage()); 
 	    	
 	    	setBusy(false);
 	    	
 	    	return msgResponse;
 		}
 	    
-	    if (!ReleaseGetter.getRelease().equals(Constants.BUILD_NO_INFO)) // Wenn Stern aus Eclipse heraus gestartet wird
+	    if (!ReleaseGetter.getRelease().equals(Constants.BUILD_NO_INFO))
 		{
 			 if (!(msgResponse.build != null && msgResponse.build.equals(Constants.BUILD_NO_INFO)))
 			 {

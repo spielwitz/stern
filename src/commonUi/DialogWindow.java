@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import common.SternResources;
 
 public class DialogWindow 
 {
-	public static DialogWindowResult showOkCancel(Component parent, Object text, String titel)
+	public static DialogWindowResult showOkCancel(Component parent, Object text, String title)
 	{
 		String[] buttons = new String[] 
 				{
@@ -35,7 +35,7 @@ public class DialogWindow
 		int result = JOptionPane.showOptionDialog(
 					parent, 
 					text, 
-					titel,
+					title,
 					JOptionPane.DEFAULT_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null, buttons, buttons[0]);
@@ -46,7 +46,7 @@ public class DialogWindow
 			return DialogWindowResult.CANCEL;
 	}
 	
-	public static DialogWindowResult showYesNo(Component parent, Object text, String titel)
+	public static DialogWindowResult showYesNo(Component parent, Object text, String title)
 	{
 		String[] buttons = new String[] 
 				{
@@ -57,7 +57,7 @@ public class DialogWindow
 		int result = JOptionPane.showOptionDialog(
 					parent, 
 					text, 
-					titel,
+					title,
 					JOptionPane.DEFAULT_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null, buttons, buttons[0]);
@@ -68,7 +68,7 @@ public class DialogWindow
 			return DialogWindowResult.NO;
 	}
 	
-	public static DialogWindowResult showYesNoCancel(Component parent, Object text, String titel)
+	public static DialogWindowResult showYesNoCancel(Component parent, Object text, String title)
 	{
 		String[] buttons = new String[] 
 				{
@@ -80,7 +80,7 @@ public class DialogWindow
 		int result = JOptionPane.showOptionDialog(
 					parent, 
 					text, 
-					titel,
+					title,
 					JOptionPane.DEFAULT_OPTION,
 					JOptionPane.QUESTION_MESSAGE,
 					null, buttons, buttons[0]);
@@ -94,7 +94,7 @@ public class DialogWindow
 	}
 
 	
-	public static void showError(Component parent, Object text, String titel)
+	public static void showError(Component parent, Object text, String title)
 	{
 		String[] buttons = new String[] 
 				{
@@ -104,13 +104,13 @@ public class DialogWindow
 		JOptionPane.showOptionDialog(
 				parent, 
 				text, 
-				titel,
+				title,
 				JOptionPane.DEFAULT_OPTION,
 				JOptionPane.ERROR_MESSAGE,
 				null, buttons, buttons[0]);
 	}
 	
-	public static void showInformation(Component parent, Object text, String titel)
+	public static void showInformation(Component parent, Object text, String title)
 	{
 		String[] buttons = new String[] 
 				{
@@ -120,7 +120,7 @@ public class DialogWindow
 		JOptionPane.showOptionDialog(
 				parent, 
 				text, 
-				titel,
+				title,
 				JOptionPane.DEFAULT_OPTION,
 				JOptionPane.INFORMATION_MESSAGE,
 				null, buttons, buttons[0]);

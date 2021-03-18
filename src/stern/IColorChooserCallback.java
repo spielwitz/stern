@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -18,5 +18,5 @@ package stern;
 
 interface IColorChooserCallback 
 {
-	public void colorChanged(int sp, byte newColorIndex, byte oldColorIndex);
+	public void colorChanged(int playerIndex, byte newColorIndex, byte oldColorIndex);
 }

@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,8 @@ public class ClientUserCredentials
 	public String userId;
 	public String url;
 	public int port;
-	public String userPrivateKey; // Persoenlicher privater Schluessel zur Entschluesselung einer Response auf Client-Seite
-	public String serverPublicKey; // Allgemeiner public Key des Servers zur Verschluesselung eines Requests auf Client-Seite
+	public String userPrivateKey;
+	public String serverPublicKey;
 	public String adminEmail;
 	
 	public transient PrivateKey userPrivateKeyObject;

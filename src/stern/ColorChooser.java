@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ import commonUi.SpringUtilities;
 {
 	private ColorPanel[] colorPanels;
 	private ButtonDark butOk;
-	private ButtonDark butAbbruch;
+	private ButtonDark butCancel;
 	boolean abort = false;
 	byte selectedColor;
 	
@@ -64,11 +64,11 @@ import commonUi.SpringUtilities;
 		// --------
 		PanelDark panMain = new PanelDark(new GridLayout(3,2,10,10));
 		
-		this.colorPanels = new ColorPanel[Constants.ANZAHL_SPIELER_MAX];
+		this.colorPanels = new ColorPanel[Constants.PLAYERS_COUNT_MAX];
 		
-		for (int i = 0; i < Constants.ANZAHL_SPIELER_MAX; i++)
+		for (int i = 0; i < Constants.PLAYERS_COUNT_MAX; i++)
 		{
-			this.colorPanels[i] = new ColorPanel(this, (byte)(i+Colors.SPIELER_FARBEN_OFFSET));
+			this.colorPanels[i] = new ColorPanel(this, (byte)(i+Colors.COLOR_OFFSET_PLAYERS));
 			this.colorPanels[i].setPreferredSize(new Dimension(50, 50));
 			panMain.add(this.colorPanels[i]);
 		}
@@ -80,8 +80,8 @@ import commonUi.SpringUtilities;
 		
 		PanelDark panButtons = new PanelDark(new FlowLayout(FlowLayout.RIGHT));
 		
-		this.butAbbruch = new ButtonDark(this, SternResources.Abbrechen(false), font);
-		panButtons.add(this.butAbbruch);
+		this.butCancel = new ButtonDark(this, SternResources.Abbrechen(false), font);
+		panButtons.add(this.butCancel);
 		
 		this.butOk = new ButtonDark(this, SternResources.OK(false), font);
 		panButtons.add(this.butOk);
@@ -126,7 +126,7 @@ import commonUi.SpringUtilities;
 			this.abort = true;
 			this.close();
 		}
-		else if (e.getSource() == this.butAbbruch)
+		else if (e.getSource() == this.butCancel)
 		{
 			this.abort = true;
 			this.close();
@@ -146,7 +146,7 @@ import commonUi.SpringUtilities;
 	
 	private class ColorPanel extends JPanel implements MouseListener
 	{
-		private static final int RAND = 5;
+		private static final int BORDER_SIZE = 5;
 		
 		private boolean selected;
 		private byte colorIndex;
@@ -176,10 +176,10 @@ import commonUi.SpringUtilities;
 				g.fillRect(0, 0, dim.width, dim.height);
 				
 				g.setColor(Colors.get(this.colorIndex));
-				g.fillRect(RAND, RAND, dim.width-2*RAND, dim.height-2*RAND);
+				g.fillRect(BORDER_SIZE, BORDER_SIZE, dim.width-2*BORDER_SIZE, dim.height-2*BORDER_SIZE);
 
 				g.setColor(Color.BLACK);
-				g.drawRect(RAND, RAND, dim.width-2*RAND, dim.height-2*RAND);
+				g.drawRect(BORDER_SIZE, BORDER_SIZE, dim.width-2*BORDER_SIZE, dim.height-2*BORDER_SIZE);
 			}
 			else
 			{

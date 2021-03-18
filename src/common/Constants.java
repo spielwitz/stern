@@ -1,4 +1,4 @@
-/**	STERN, das Strategiespiel.
+/**	STERN - a strategy game
     Copyright (C) 1989-2021 Michael Schweitzer, spielwitz@icloud.com
 
     This program is free software: you can redistribute it and/or modify
@@ -18,110 +18,108 @@ package common;
 
 public class Constants
 {
-	// Mindestens vorausgesetzte Build-Version beim Laden von Spielen oder bei der
-	// Kommunikation mit dem STERN Server, um Inkompatibilitaeten oder Vorteile durch
-	// Programmfehler zu vermeiden.
-	public static final String 	BUILD_COMPATIBLE = "1029";
-	
-	// Empfohlener Build. Wird auf die Webseite kopiert und vom Upgrade Checker benutzt.
-	// Zeigt ein wichtiges Update an
-	public static final String 	BUILD_IMPORTANT_UPDATE = "1029";
-	
-	// Wenn Spiele aus aelteren Builds geladen werden, muss mirgiert werden.
-	static final String 		BUILD_MIGRATION = "1029";
+	// Minimum required build version when reading games or when exchaning data
+	// with the STERN server to avoid incompatibilities and advantages caused
+	// by program errors.
+	public static final String 	BUILD_COMPATIBLE = "1035";
+
+	// Recommended build. Was used by the update checker (suspended) to indicate
+	// an important update.
+	public static final String 	BUILD_IMPORTANT_UPDATE = "1035";
+
+	// Games older than this build have to be migrated.
+	static final String 		BUILD_MIGRATION = "1035";
 	
 	public static final String 	STERN_URL = "https://github.com/spielwitz/stern";
 	public static final String 	BUILD_NO_INFO = "9999";
 	
-	// Spielfeld
-	public static final int FELD_MAX_X = 20;
-	public static final int FELD_MAX_Y = 18;
+	// Game board dimensions 
+	public static final int BOARD_MAX_X = 20;
+	public static final int BOARD_MAX_Y = 18;
 	
-	// Planeten
-	static final int 		BESITZER_NEUTRAL = -1;
-	public static final int ANZAHL_SPIELER_MAX = 6;
-	public static final int ANZAHL_SPIELER_MIN = 2;
-	public static final int ANZAHL_PLANETEN_MAX = 42;
-	static final int 		MAX_ANZ_FESTUNGEN = 2;
-	static final int 		KAUF_EPROD = 4;
-	static final int 		FESTUNG_STAERKE = 375;
-	static final int 		FESTUNG_REPARATUR_ANZ_RAUMER = 2;
-	static final int 		TRANSPORTER_MAX_ENEGER = 30;
-	static final int 		RAUMER_ZU_BEGINN_SPIELER = 375;
-	static final int 		RAUMER_ZU_BEGINN_NEUTRAL = 11;
-	static final int 		EPROD_ZU_BEGINN_SPIELER = 10;
-	static final int 		EVORRAT_ZU_BEGINN_SPIELER = 30;
-	static final int 		EVORRAT_ZU_BEGINN_NEUTRAL_MAX = 5;
-	static final int 		EPROD_ZU_BEGINN_NEUTRAL = 10;
-	static final int 		EPROD_ZU_BEGINN_NEUTRAL_EXTRA = 5;
-	static final int 		EPROD_ZU_BEGINN_NEUTRAL_EXTRA_W1 = 15;
-	static final int 		EPROD_ZU_BEGINN_NEUTRAL_EXTRA_W2 = 200;
-	public static final int SPIELER_NAME_MIN_LAENGE = 3;
-	public static final int SPIELER_NAME_MAX_LAENGE = 10;
-	static final int 		PLANETEN_NAME_MAX_LAENGE = 2;
-	public static final int SPIEL_NAME_SERVER_MIN_LAENGE = 3;
-	public static final int SPIEL_NAME_SERVER_MAX_LAENGE = 18;
-	public static final 	String SPIELER_REGEX_PATTERN = "[0-9a-zA-Z]*";
-	static final int 		EPROD_MAX = 100;
-	static final int 		ANZ_NAHE_PLANETEN_MAX_REISEDAUER_JAHRE = 2;
-	static final int 		ANZ_NAHE_PLANETEN = 4;
-	static final double		VERT_BONUS = 1.25;
+	// Planets
+	static final int 		NEUTRAL = -1;
+	public static final int PLAYERS_COUNT_MAX = 6;
+	public static final int PLAYERS_COUNT_MIN = 2;
+	public static final int PLANETS_COUNT_MAX = 42;
+	static final int 		DEFENSE_SHIELDS_COUNT_MAX = 2;
+	static final int 		MONEY_PRODUCTION_PURCHASE = 4;
+	static final int 		DEFENSE_SHIELD_FIGHTERS = 375;
+	static final int 		DEFENSE_SHIELD_REPAIR_FIGHTERS_COUNT = 2;
+	static final int 		TRANSPORT_MONEY_MAX = 30;
+	static final int 		FIGHTERS_COUNT_INITIAL_PLAYERS = 375;
+	static final int 		FIGHTERS_COUNT_INITIAL_NEUTRAL = 11;
+	static final int 		MONEY_PRODUCTION_INITIAL_PLAYERS = 10;
+	static final int 		MONEY_SUPPLY_INITIAL_PLAYERS = 30;
+	static final int 		MONEY_SUPPLY_INITIAL_NEUTRAL_MAX = 5;
+	static final int 		MONEY_PRODUCTION_INITIAL_NEUTRAL = 10;
+	static final int 		MONEY_PRODUCTION_INITIAL_NEUTRAL_EXTRA = 5;
+	static final int 		MONEY_PRODUCTION_INITIAL_NEUTRAL_EXTRA_W1 = 15;
+	static final int 		MONEY_PRODUCTION_INITIAL_NEUTRAL_EXTRA_W2 = 200;
+	static final int 		MONEY_PRODUCTION_MAX = 100;
+	public static final int PLAYER_NAME_LENGTH_MIN = 3;
+	public static final int PLAYER_NAME_LENGTH_MAX = 10;
+	public static final 	String PLAYER_NAME_REGEX_PATTERN = "[0-9a-zA-Z]*";
+	static final int 		PLANET_NAME_LENGTH_MAX = 2;
+	public static final int GAME_NAME_LENGTH_MIN = 3;
+	public static final int GAME_NAME_LENGTH_MAX = 18;
+	static final int 		GAME_PLANETS_NEARBY_TRAVEL_TIME = 2;
+	static final int 		GAME_PLANETS_NEARBY_COUNT = 4;
+	static final double		DEFENSE_BONUS = 1.25;
 	
-	// Default-Werte bei neuem Spiel
-	public static final int DEFAULT_ANZAHL_PLANETEN = 42;
-	public static final int DEFAULT_ANZAHL_SPIELER = 6;
-	public static final int DEFAULT_MAX_JAHRE = 30;
+	// Default values for a new game
+	public static final int PLANETS_COUNT_DEFAULT = 42;
+	public static final int PLAYERS_COUNT_DEFAULT = 6;
+	public static final int YEARS_COUNT_MAX_DEFAULT = 30;
 	
-	// Flugobjekte
-	static final int 		KEIN_PLANET = -1;
-	static final int 		GESCHWINDIGKEIT_NORMAL = 2;
-	static final int 		GESCHWINDIGKEIT_SCHNELL = 4;
-	static final int 		GESCHWINDIGKEIT_LANGSAM = 1;
-	static final double 	PATROUILLE_BEOBACHTUNGSRADIUS = 1.5;
-	static final int 		PATROUILLE_KAPERT_RAUMER = 5;
+	// Spaceships
+	static final int 		NO_PLANET = -1;
+	static final int 		SPEED_NORMAL = 2;
+	static final int 		SPEED_FAST = 4;
+	static final int 		SPEED_SLOW = 1;
+	static final double 	PATROL_RADAR_RANGE = 1.5;
+	static final int 		PATROL_CAPUTURES_FIGHTERS_COUNT_MAX = 5;
 	
-	// Kaufpreise
-	static final int 		PREIS_AUFKLAERER = 4;
-	static final int 		PREIS_PATROUILLE = 8;
-	static final int 		PREIS_FESTUNG = 75;
-	static final int 		PREIS_FESTUNG_REPARATUR = 1;
-	static final int 		PREIS_EPROD = 75;
-	static final int 		PREIS_ERAUM = 0;
-	static final int 		PREIS_MINE50 = 14;
-	static final int 		PREIS_MINE100 = 22;
-	static final int 		PREIS_MINE250 = 43;
-	static final int 		PREIS_MINE500 = 65;
-	static final int 		PREIS_MINENRAEUMER = 25;
-	static final int 		PREIS_TRANSPORTER= 5;
+	// Prices
+	static final int 		PRICE_SCOUT = 4;
+	static final int 		PRICE_PATROL = 8;
+	static final int 		PRICE_DEFENSE_SHIELD = 75;
+	static final int 		PRICE_DEFENSE_SHIELD_REPAIR = 1;
+	static final int 		PRICE_MONEY_PRODUCTION_INCREASE = 75;
+	static final int 		PRICE_FIGHTER_PRODUCTION = 0;
+	static final int 		PRICE_MINE50 = 14;
+	static final int 		PRICE_MINE100 = 22;
+	static final int 		PRICE_MINE250 = 43;
+	static final int 		PRICE_MINE500 = 65;
+	static final int 		PRICE_MINENSWEEPER = 25;
+	static final int 		PRICE_TRANSPORT= 5;
 	
-	static final double 	PREIS_KAUF_VERKAUF_RATIO = 2./3.;
+	static final double 	PRICE_RATIO_BUY_SELL = 2./3.;
 	
-	// Statistik
-	static final char 		STATISTIK_MODUS_PUNKTE = '1';
-	static final char 		STATISTIK_MODUS_RAUMER = '2';
-	static final char 		STATISTIK_MODUS_PLANETEN = '3';
-	static final char 		STATISTIK_MODUS_PRODUKTION = '4';
+	// Statistics
+	static final char 		STATISTICS_MODE_SCORE = '1';
+	static final char 		STATISTICS_MODE_FIGHTERS = '2';
+	static final char 		STATISTICS_MODE_PLANETS = '3';
+	static final char 		STATISTICS_MODE_MONEY_PRODUCTION = '4';
 	
-	// Kuenstlige Intelligenz
-	static final int 		KI_FAKTOR_DISTANZ 		= 1,
-				 			KI_MIN_RAUMER_NEUTR_PL 	= 10,
-				 			KI_FAKTOR_ANGRIFF_MAX_RND = 30;
-	static final double 	KI_FAKTOR_ANGRIFF 			= 1.5,
-							KI_BEDROHUNG_ERHOEHUNG		= 0.5;
+	// Artificial intelligence
+	static final int 		AI_DISTANCE_FACTOR 		= 1,
+				 			AI_FIGHTERS_NEUTRAL_COUNT_MIN 	= 10,
+				 			AI_ATTACK_FACTOR_RND_MAX = 30;
+	static final double 	AI_ATTACK_FACTOR 			= 1.5,
+							AI_THREAT_FACTOR		= 0.5;
 
-	// Spielkontrolle
+	// Replay and evaluation
 	static final int 		PAUSE_MILLISECS = 1000;
 	static final int 		PAUSE_MILLISECS_ANIMATION = 200;
 	
-	// Sonstiges
-	static int 					ANZ_TAGE_JAHR = 365;
+	// Others
+	static int 					DAYS_OF_YEAR_COUNT = 365;
 	public static final String 	FONT_NAME = "/JetBrainsMono-Regular.ttf";
-	public static final float 	DIALOG_FONT_SIZE = 11F;
-	public static final String 	RELEASE_FILE_NAME = "release.txt";
-	public static final String 	RELEASE_RECOMMENDED_FILE_NAME = "releaseRecommended.txt";
-	static final String 		GELOESCHTER_SPIELER = "_DELETED_";
-	public final static String	REG_NAME_SERVER = "Stern";
+	public static final float 	FONT_DIALOG_SIZE = 11F;
+	public static final String 	FILE_NAME_RELEASE = "release.txt";
+	public static final String 	FILE_NAME_RELEASE_RECOMMENDED = "releaseRecommended.txt";
+	static final String 		PLAYER_DELETED_NAME = "_DELETED_";
+	public final static String	RMI_REGISTRATION_NAME_SERVER = "Stern";
 	static final double 		PRECISION = 0.000001;
-	
-
 }
