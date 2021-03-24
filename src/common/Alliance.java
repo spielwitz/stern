@@ -63,7 +63,7 @@ class Alliance implements Serializable
 		this.members[playerIndex] = true;
 	}
 	
-	void removePlayer(int playerIndex, boolean removeFighters)
+	private void removePlayer(int playerIndex, boolean removeFighters)
 	{
 		this.members[playerIndex] = false;
 		
@@ -194,21 +194,5 @@ class Alliance implements Serializable
 	public boolean[] getMembers()
 	{
 		return this.members;
-	}
-	
-	int[] correct()
-	{
-		int[] reductions = new int[this.getPlayersCount()];
-		
-		for (int playerIndex = 0; playerIndex < this.getPlayersCount(); playerIndex++)
-		{
-			if (!this.members[playerIndex])
-			{
-				reductions[playerIndex] = this.fightersCount[playerIndex];
-				this.fightersCount[playerIndex] = 0;
-			}
-		}
-		
-		return reductions;
-	}
+	}	
 }

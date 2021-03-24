@@ -3335,10 +3335,8 @@ public class Game extends EmailTransportBase implements Serializable
 				
  				planetIndex = input.planetIndex;
  				planet = this.game.planets[planetIndex];
-
- 				if (planet.getOwner() != this.playerIndexNow && 
- 				   !planet.isAllianceMember(this.playerIndexNow) &&
- 				   !planet.hasRadioStation(this.playerIndexNow))
+ 				
+ 				if (planet.getOwner() == Constants.NEUTRAL)
  				{
  					console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
  					console.lineBreak();
@@ -3348,24 +3346,19 @@ public class Game extends EmailTransportBase implements Serializable
  				break;
  			} while (true);
 
- 			if (planet.getOwner() != this.playerIndexNow && 
- 	 				    !planet.isAllianceMember(this.playerIndexNow))
-			{
-				this.printAlliance(planet, planetIndex);
-				this.game.console.waitForKeyPressed();
-				this.game.console.clear();
-				return;
-			}
-
  			allowedKeys = new ArrayList<ConsoleKey>();
 
- 			allowedKeys.add(new ConsoleKey("0",SternResources.ZugeingabeKuendigen(true)));
+ 			if (planet.isAllianceMember(this.playerIndexNow))
+ 			{
+ 				allowedKeys.add(new ConsoleKey("0",SternResources.ZugeingabeKuendigen(true)));
+ 			}
 
  			for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
- 				if (playerIndex != this.playerIndexNow)
- 					allowedKeys.add(new ConsoleKey(
- 							Integer.toString(playerIndex+1), 
- 							this.game.players[playerIndex].getName()));
+ 			{
+				allowedKeys.add(new ConsoleKey(
+						Integer.toString(playerIndex+1), 
+						this.game.players[playerIndex].getName()));
+ 			}
 
  			allowedKeys.add(new ConsoleKey("-", SternResources.ZugeingabeInfo(true)));
 
@@ -3384,6 +3377,15 @@ public class Game extends EmailTransportBase implements Serializable
 
  				if (input.getInputText().toUpperCase().equals("-"))
  				{
+ 	 				if (planet.getOwner() != this.playerIndexNow && 
+ 	 	 				   !planet.isAllianceMember(this.playerIndexNow) &&
+ 	 	 				   !planet.hasRadioStation(this.playerIndexNow))
+ 	 				{
+ 	 					console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
+ 	 					console.lineBreak();
+ 	 					continue;
+ 	 				}
+
  					this.printAlliance(planet, planetIndex);
  					this.game.console.waitForKeyPressed();
  					continue;
@@ -3406,60 +3408,36 @@ public class Game extends EmailTransportBase implements Serializable
  					console.lineBreak();
  					continue;
  				}
-
- 				Planet planetCopy = (Planet)Utils.klon(planet);
+ 				
+ 				int allianceChanges = 0;
 
  				if (input.getInputText().equals("0"))
  				{
  					if (!planet.isAllianceMember(this.playerIndexNow))
- 					{
- 						console.appendText(
- 								SternResources.ZugeingabeKeinBuendnismitglied(true));
- 						console.lineBreak();
- 						break;
- 					}
- 					if (planet.getOwner() != this.playerIndexNow && planet.getFightersCount(this.playerIndexNow) > 0)
- 					{
- 						console.appendText(
- 								SternResources.ZugeingabeZuerstKuendigen(true));
- 						console.lineBreak();
- 						break;
- 					}
+  	 				{
+  	 					console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
+  	 					console.lineBreak();
+  	 					continue;
+  	 				}
  					
- 					planet.cancelAlliance(this.playerIndexNow);
+ 					allianceChanges = 0;
  				}
  				else
  				{
- 					if (this.playerIndexNow != planet.getOwner() && !planet.isAllianceMember(this.playerIndexNow))
- 					{
- 						console.appendText(
- 								SternResources.ZugeingabeKeinBuendnismitglied(true));
- 						console.lineBreak();
- 						break;
- 					}
- 					
- 					if (this.playerIndexNow != planet.getOwner())
- 					{
- 						console.appendText(
- 								SternResources.ZugeingabeAufFremdenPlanetenNurKuendigen(true));
- 						console.lineBreak();
- 						continue;
- 					}
-
- 					BitSet bitSet = new BitSet(this.game.playersCount);
+ 					BitSet concernedPlayers = new BitSet(this.game.playersCount);
  					boolean error = false;
-
+ 					
  					for (int i = 0; i < input.getInputText().length(); i++)
  					{
  						int playerIndex = Integer.parseInt(input.getInputText().substring(i,i+1)) - 1;
 
- 						if (playerIndex < 0 || playerIndex >= this.game.playersCount || playerIndex == this.playerIndexNow)
+ 						if (playerIndex < 0 || playerIndex >= this.game.playersCount)
  						{
  							error = true;
  							break;
  						}
 
- 						bitSet.set(playerIndex);
+ 						concernedPlayers.set(playerIndex);
  					}
 
  					if (error)
@@ -3467,18 +3445,45 @@ public class Game extends EmailTransportBase implements Serializable
  						this.game.console.outInvalidInput();
  						continue;
  					}
-
+ 					
+ 					int playersCount = 0;
+ 					
  					for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
  					{
- 						if (bitSet.get(playerIndex))
- 							planet.addPlayerToAlliance(this.game.playersCount, playerIndex);
+ 						if (concernedPlayers.get(playerIndex))
+ 						{
+ 							allianceChanges += Math.pow(2, playerIndex);
+ 	 						playersCount++;
+ 						}
  						else
- 							planet.cancelAlliance(playerIndex);
+ 						{
+ 							if (playerIndex == planet.getOwner() ||
+ 								playerIndex == this.playerIndexNow ||
+ 								(planet.isAllianceMember(playerIndex)))
+							{
+ 								console.appendText(
+ 		 	 							SternResources.AllianceOwnerNotIncluded(true));
+ 		 	 					console.lineBreak();
+ 								error = true;
+ 								break;
+							}
+ 						}
+ 					}
+ 					
+ 					if (playersCount <= 1)
+ 					{
+ 						this.game.console.outInvalidInput();
+ 						continue;
+ 					}
+ 					
+ 					if (error)
+ 					{
+ 						continue;
  					}
  				}
  				
  				this.game.moves.get(this.playerIndexNow).add(
- 						new Move(planetIndex, planetCopy, planet.getAllianceMembers()));
+ 						new Move(planetIndex, allianceChanges));
 
  				this.game.console.appendText(
  						SternResources.ZugeingabeStartErfolgreich(true));
@@ -4386,8 +4391,6 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			this.addScreenSnapshotToReplay(0);
 			
-			this.cleanAlliances();
-			
 			this.processCapitulations();
 			
 			for (int day = 0; day <= Constants.DAYS_OF_YEAR_COUNT; day++)
@@ -4560,19 +4563,9 @@ public class Game extends EmailTransportBase implements Serializable
   		  					this.game.ships.add(ship);  					
   		  				}
   		  			}
-  		  			else if (move.getAllianceMembers() != null)
+  		  			else if (move.getAllianceChanges() >= 0)
   		  			{
-  		  				if (!this.game.planets[move.getPlanetIndex()].acceptAllianceChange(playerIndex, move.getAllianceMembers()))
-  		  				{
-  		  					this.game.updateBoard(this.game.getSimpleFrameObjekt(playerIndex, Colors.WHITE), 0);
-  							this.game.console.setLineColor(this.game.players[playerIndex].getColorIndex());
-  							
-  							this.game.console.appendText(
-								SternResources.AuswertungBuendnisNichtGeaendert(true,
-										this.game.players[playerIndex].getName(),
-										this.game.getPlanetNameFromIndex(playerIndex)));
-  		 	 				this.waitForKeyPressed();
-  		  				}
+  		  				// Alliance changes will be processed next
   		  			}
   		  			else if (move.getPlanetAfter() != null)
   		  			{
@@ -4581,51 +4574,157 @@ public class Game extends EmailTransportBase implements Serializable
   				}
   			}
   			
+			this.processAllianceChanges();
+  			
   			this.game.moves = new Hashtable<Integer, ArrayList<Move>>();
   		}
   		
-  		private void cleanAlliances()
+  		private void processAllianceChanges()
   		{
+  			Hashtable<Integer, Hashtable<Integer,Integer>> allianceChangesPerPlanet =
+  					new Hashtable<Integer, Hashtable<Integer,Integer>>();
+  			HashSet<Integer> allianceTerminationsPerPlanet = new HashSet<Integer>(); 
+  			
+  			for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
+  			{
+  				ArrayList<Move> moves = this.game.moves.get(playerIndex);
+  				
+  				if (moves == null)
+  				{
+  					continue;
+  				}
+  				
+  				for (Move move: moves)
+  				{
+  					if (move.getAllianceChanges() == 0)
+  					{
+  						allianceTerminationsPerPlanet.add(move.getPlanetIndex());
+  					}
+  					else if (move.getAllianceChanges() > 0)
+  					{
+  						Hashtable<Integer,Integer> allianceChangesPerPlayer = 
+  								allianceChangesPerPlanet.get(move.getPlanetIndex());
+  						
+  						if (allianceChangesPerPlayer == null)
+  						{
+  							allianceChangesPerPlayer = new Hashtable<Integer,Integer>();
+  							allianceChangesPerPlanet.put(move.getPlanetIndex(), allianceChangesPerPlayer);
+  						}
+  						
+  						allianceChangesPerPlayer.put(playerIndex, move.getAllianceChanges());
+  					}
+  				}
+  			}
+  			
   			for (int planetIndex = 0; planetIndex < this.game.planetsCount; planetIndex++)
   			{
   				Planet planet = this.game.planets[planetIndex];
-  				int[] reductions = planet.correctAlliance(this.game.playersCount);
   				
-  				for (int playerIndex = 0; playerIndex < reductions.length; playerIndex++)
+  				if (allianceTerminationsPerPlanet.contains(planetIndex))
   				{
-  					if (playerIndex != planet.getOwner() && reductions[playerIndex] > 0)
+  					if (planet.allianceExists())
   					{
-  						Ship obj = new Ship(
-  								Constants.NO_PLANET,
-  								Constants.NO_PLANET,
-  								this.game.planets[planetIndex].getPosition(),
-  								this.game.planets[planetIndex].getPosition(),
-  								ShipType.FIGHTERS,
-  								reductions[playerIndex],
-  								playerIndex,
-  								false,
-  								false,
-  								null,
-  								null);
-  						
-  						obj.setStopped(true);
+  						for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
+  						{
+  							if (playerIndex == planet.getOwner())
+  							{
+  								continue;
+  							}
+  							
+  							int fightersCount = planet.getFightersCount(playerIndex);
+  							
+  							if (fightersCount > 0)
+  							{
+  								Ship obj = new Ship(
+  		  								Constants.NO_PLANET,
+  		  								Constants.NO_PLANET,
+  		  								this.game.planets[planetIndex].getPosition(),
+  		  								this.game.planets[planetIndex].getPosition(),
+  		  								ShipType.FIGHTERS,
+  		  								fightersCount,
+  		  								playerIndex,
+  		  								false,
+  		  								false,
+  		  								null,
+  		  								null);
+  		  						
+  		  						obj.setStopped(true);
 
-  						this.game.ships.add(obj);
+  		  						this.game.ships.add(obj);
+  		  						
+  		  						this.game.updateBoard(this.game.getSimpleFrameObjekt(planetIndex, Colors.WHITE), 0);
+  		  						
+  		  	 	 				this.game.console.setLineColor(this.game.players[playerIndex].getColorIndex());
+  		  	 	 				
+  		  	 	 				this.game.console.appendText(
+  		  	 	 						SternResources.AuswertungRaumerVertrieben(true,
+  		  	 	 								Integer.toString(obj.getCount()),
+  		  	 	 								this.game.players[playerIndex].getName(),
+  		  	 	 								this.game.getPlanetNameFromIndex(planetIndex)));
+  		  	 	 				this.game.console.lineBreak();
+  		  	 	 				this.game.console.appendText(
+  		  	 	 						SternResources.AuswertungRaumerVertrieben2(true));
+  		  	 	 				this.waitForKeyPressed();
+  							}
+  						}
   						
-  						this.game.updateBoard(this.game.getSimpleFrameObjekt(planetIndex, Colors.WHITE), 0);
-  						
-  	 	 				this.game.console.setLineColor(this.game.players[playerIndex].getColorIndex());
-  	 	 				
-  	 	 				this.game.console.appendText(
-  	 	 						SternResources.AuswertungRaumerVertrieben(true,
-  	 	 								Integer.toString(obj.getCount()),
-  	 	 								this.game.players[playerIndex].getName(),
-  	 	 								this.game.getPlanetNameFromIndex(planetIndex)));
-  	 	 				this.game.console.lineBreak();
-  	 	 				this.game.console.appendText(
-  	 	 						SternResources.AuswertungRaumerVertrieben2(true));
-  	 	 				this.waitForKeyPressed();
+  						planet.dissolveAlliance();
+  						continue;
   					}
+  				}
+  				
+  				Hashtable<Integer,Integer> allianceChangesPerPlayer = 
+							allianceChangesPerPlanet.get(planetIndex);
+  				
+  				if (allianceChangesPerPlayer == null)
+  				{
+  					continue;
+  				}
+  				
+  				int allianceChanges = -1;
+  				boolean allPlayersAgree = true;
+  				
+  				if (!allianceChangesPerPlayer.containsKey(planet.getOwner()))
+  				{
+  					allPlayersAgree = false;
+  				}
+  				else
+  				{  				
+	  				for (int playerIndex: allianceChangesPerPlayer.keySet())
+	  				{
+	  					int allianceChangesOfPlayer = allianceChangesPerPlayer.get(playerIndex);
+	  					
+	  					if (allianceChanges > 0 && allianceChangesOfPlayer != allianceChanges)
+	  					{
+	  						allPlayersAgree = false;
+	  						break;
+	  					}
+	  					
+	  					allianceChanges = allianceChangesOfPlayer;
+	  				}
+  				} 
+  				
+  				if (allPlayersAgree)
+  				{
+  					for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
+  					{
+  						if (playerIndex != planet.getOwner() &&
+  							(allianceChanges & (int)Math.pow(2, playerIndex)) > 0)
+						{
+  							planet.addPlayerToAlliance(this.game.playersCount, playerIndex);
+						}
+  					}
+  				}
+  				else
+  				{
+  					this.game.updateBoard(this.game.getSimpleFrameObjekt(planetIndex, Colors.WHITE), 0);
+					this.game.console.setLineColor(Colors.WHITE);
+					
+					this.game.console.appendText(
+					SternResources.AuswertungBuendnisNichtGeaendert(true,
+							this.game.getPlanetNameFromIndex(planetIndex)));
+ 	 				this.waitForKeyPressed();
+
   				}
   			}
   		}

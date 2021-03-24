@@ -490,27 +490,13 @@ import java.util.Hashtable;
 		this.fighterProduction = this.moneyProduction;
 	}
 	
-	void cancelAlliance(int playerIndex)
+	void dissolveAlliance()
 	{
 		if (!this.allianceExists())
 			return;
 		
-		if (!this.isAllianceMember(playerIndex))
-			return;
-		
-		if (playerIndex == this.owner)
-		{
-			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount(playerIndex));
-			
-			for (int playerIndex2 = 0; playerIndex2 < this.alliance.getPlayersCount(); playerIndex2++)
-				this.alliance.removePlayer(playerIndex2, false);
-			
-		}
-		else
-		{
-			this.alliance.removePlayer(playerIndex, false);
-			this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount());
-		}
+		this.ships.put(ShipType.FIGHTERS, this.alliance.getFightersCount(this.owner));
+		this.alliance = null;
 	}
 	
 	void addPlayerToAlliance(int playersCount, int playerIndex)
@@ -535,19 +521,6 @@ import java.util.Hashtable;
 			return null;
 	}
 
-	int[] correctAlliance(int playersCount)
-	{
-		if (this.alliance == null)
-			return new int[playersCount];
-		
-		int[] reductions = this.alliance.correct();
-
-		if (this.alliance.getMembersCount() <= 1)
-			this.alliance = null;
-		
-		return reductions;
-	}
-	
 	@SuppressWarnings("unchecked") 
 	void acceptPlanetDataChange(Planet planet)
 	{
@@ -565,33 +538,7 @@ import java.util.Hashtable;
 		this.fighterProduction = planet.fighterProduction;
 		this.defenceShield = planet.defenceShield;
 	}
-	
-	boolean acceptAllianceChange(int playerIndex, boolean[] members)
-	{
-		if (playerIndex == this.owner)
-		{
-			for (int playerIndex2 = 0; playerIndex2 < members.length; playerIndex2++)
-			{
-				if (playerIndex2 != this.owner)
-				{
-					if (this.isAllianceMember(playerIndex2) && !members[playerIndex2])
-						this.cancelAlliance(playerIndex2);
-					else
-						this.addPlayerToAlliance(members.length, playerIndex2);
-				}
-			}
-		}
-		else
-		{		
-			if (this.getFightersCount(playerIndex) > 0)
-				return false;
-			
-			this.cancelAlliance(playerIndex);
-		}
 		
-		return true;
-	}
-	
 	Alliance copyAllianceStructure(int[] reductions)
 	{
 		Alliance alliance = this.getAllianceStructure();
