@@ -26,7 +26,7 @@ import java.util.UUID;
 	private int planetIndex;
 	private Planet planetAfter;
 	private Ship ship;
-	private int allianceChanges = -1;
+	private boolean[] allianceChanges;
 	private UUID stopLabel;
 	
 	Move(int planetIndex, Ship ship, Planet planetBefore)
@@ -45,7 +45,7 @@ import java.util.UUID;
 		this.planetAfter = (Planet)Utils.klon(planetAfter);
 	}
 	
-	Move(int planetIndex, int allianceChanges)
+	Move(int planetIndex, boolean[] allianceChanges)
 	{
 		super();
 		this.planetIndex = planetIndex;
@@ -76,7 +76,7 @@ import java.util.UUID;
 		return planetIndex;
 	}	
 	
-	public int getAllianceChanges()
+	public boolean[] getAllianceChanges()
 	{
 		return this.allianceChanges;
 	}

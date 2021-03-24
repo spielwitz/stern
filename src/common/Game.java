@@ -3409,7 +3409,7 @@ public class Game extends EmailTransportBase implements Serializable
  					continue;
  				}
  				
- 				int allianceChanges = 0;
+ 				boolean[] allianceChanges = new boolean[this.game.playersCount];
 
  				if (input.getInputText().equals("0"))
  				{
@@ -3419,12 +3419,9 @@ public class Game extends EmailTransportBase implements Serializable
   	 					console.lineBreak();
   	 					continue;
   	 				}
- 					
- 					allianceChanges = 0;
  				}
  				else
  				{
- 					BitSet concernedPlayers = new BitSet(this.game.playersCount);
  					boolean error = false;
  					
  					for (int i = 0; i < input.getInputText().length(); i++)
@@ -3437,7 +3434,7 @@ public class Game extends EmailTransportBase implements Serializable
  							break;
  						}
 
- 						concernedPlayers.set(playerIndex);
+ 						allianceChanges[playerIndex] = true;
  					}
 
  					if (error)
@@ -3450,9 +3447,8 @@ public class Game extends EmailTransportBase implements Serializable
  					
  					for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
  					{
- 						if (concernedPlayers.get(playerIndex))
+ 						if (allianceChanges[playerIndex])
  						{
- 							allianceChanges += Math.pow(2, playerIndex);
  	 						playersCount++;
  						}
  						else
@@ -4563,7 +4559,7 @@ public class Game extends EmailTransportBase implements Serializable
   		  					this.game.ships.add(ship);  					
   		  				}
   		  			}
-  		  			else if (move.getAllianceChanges() >= 0)
+  		  			else if (move.getAllianceChanges() != null)
   		  			{
   		  				// Alliance changes will be processed next
   		  			}
@@ -4581,8 +4577,8 @@ public class Game extends EmailTransportBase implements Serializable
   		
   		private void processAllianceChanges()
   		{
-  			Hashtable<Integer, Hashtable<Integer,Integer>> allianceChangesPerPlanet =
-  					new Hashtable<Integer, Hashtable<Integer,Integer>>();
+  			Hashtable<Integer, Hashtable<Integer,boolean[]>> allianceChangesPerPlanet =
+  					new Hashtable<Integer, Hashtable<Integer,boolean[]>>();
   			HashSet<Integer> allianceTerminationsPerPlanet = new HashSet<Integer>(); 
   			
   			for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
@@ -4596,18 +4592,34 @@ public class Game extends EmailTransportBase implements Serializable
   				
   				for (Move move: moves)
   				{
-  					if (move.getAllianceChanges() == 0)
+  					if (move.getAllianceChanges() == null)
+  					{
+  						continue;
+  					}
+  					
+  					boolean allianceTermination = true;
+  					
+  					for (int playerIndex2 = 0; playerIndex2 < this.game.playersCount; playerIndex2++)
+  					{
+  						if (move.getAllianceChanges()[playerIndex2])
+  						{
+  							allianceTermination = false;
+  							break;
+  						}
+  					}
+
+  					if (allianceTermination)
   					{
   						allianceTerminationsPerPlanet.add(move.getPlanetIndex());
   					}
-  					else if (move.getAllianceChanges() > 0)
+  					else
   					{
-  						Hashtable<Integer,Integer> allianceChangesPerPlayer = 
+  						Hashtable<Integer,boolean[]> allianceChangesPerPlayer = 
   								allianceChangesPerPlanet.get(move.getPlanetIndex());
   						
   						if (allianceChangesPerPlayer == null)
   						{
-  							allianceChangesPerPlayer = new Hashtable<Integer,Integer>();
+  							allianceChangesPerPlayer = new Hashtable<Integer,boolean[]>();
   							allianceChangesPerPlanet.put(move.getPlanetIndex(), allianceChangesPerPlayer);
   						}
   						
@@ -4673,7 +4685,7 @@ public class Game extends EmailTransportBase implements Serializable
   					}
   				}
   				
-  				Hashtable<Integer,Integer> allianceChangesPerPlayer = 
+  				Hashtable<Integer,boolean[]> allianceChangesPerPlayer = 
 							allianceChangesPerPlanet.get(planetIndex);
   				
   				if (allianceChangesPerPlayer == null)
@@ -4681,35 +4693,51 @@ public class Game extends EmailTransportBase implements Serializable
   					continue;
   				}
   				
-  				int allianceChanges = -1;
   				boolean allPlayersAgree = true;
+  				boolean[] allianceChangesOfPlayer = null;
   				
-  				if (!allianceChangesPerPlayer.containsKey(planet.getOwner()))
+  				for (int playerIndex: allianceChangesPerPlayer.keySet())
   				{
-  					allPlayersAgree = false;
+  					allianceChangesOfPlayer = allianceChangesPerPlayer.get(playerIndex);
+  					int allianceChangesOfPlayerValue = this.processAllianceChangesGetAllianceChangeValue(allianceChangesOfPlayer);
+  					
+  					for (int playerIndex2 = 0; playerIndex2 < this.game.playersCount; playerIndex2++)
+  					{
+  						if (!allianceChangesOfPlayer[playerIndex2])
+						{
+  							continue;
+						}
+  						
+  						boolean[] allianceChangesOfPlayer2 = allianceChangesPerPlayer.get(playerIndex2);
+  						
+  						if (allianceChangesOfPlayer2 != null)
+  						{
+  							if (this.processAllianceChangesGetAllianceChangeValue(allianceChangesOfPlayer2) !=
+  									allianceChangesOfPlayerValue)
+  							{
+  								allPlayersAgree = false;
+  	  							break;
+  							}
+  						}
+  						else
+  						{
+  							allPlayersAgree = false;
+  							break;
+  						}
+  					}
+  					
+  					if (!allPlayersAgree)
+  					{
+  						break;
+  					}
   				}
-  				else
-  				{  				
-	  				for (int playerIndex: allianceChangesPerPlayer.keySet())
-	  				{
-	  					int allianceChangesOfPlayer = allianceChangesPerPlayer.get(playerIndex);
-	  					
-	  					if (allianceChanges > 0 && allianceChangesOfPlayer != allianceChanges)
-	  					{
-	  						allPlayersAgree = false;
-	  						break;
-	  					}
-	  					
-	  					allianceChanges = allianceChangesOfPlayer;
-	  				}
-  				} 
   				
   				if (allPlayersAgree)
   				{
   					for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
   					{
   						if (playerIndex != planet.getOwner() &&
-  							(allianceChanges & (int)Math.pow(2, playerIndex)) > 0)
+  							allianceChangesOfPlayer[playerIndex])
 						{
   							planet.addPlayerToAlliance(this.game.playersCount, playerIndex);
 						}
@@ -4727,6 +4755,21 @@ public class Game extends EmailTransportBase implements Serializable
 
   				}
   			}
+  		}
+  		
+  		private int processAllianceChangesGetAllianceChangeValue(boolean[] allianceChanges)
+  		{
+  			int value = 0;
+  			
+  			for (int i = 0; i < allianceChanges.length; i++)
+  			{
+  				if (allianceChanges[i])
+  				{
+  					value += Math.pow(2, i);
+  				}
+  			}
+  			
+  			return value;
   		}
   		
   		private void processCapitulations()
