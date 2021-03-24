@@ -1435,7 +1435,7 @@ public class Stern extends Frame // NO_UCD (use default)
 		if (respMsg.error)
 			DialogWindow.showError(
 					this,
-				    respMsg.errorMsg,
+				    SternResources.getString(respMsg.errorMsg),
 				    SternResources.Verbindungsfehler(false));
 		
 		return respMsg;

@@ -560,7 +560,7 @@ class ServerAdminJDialog extends JDialog
 		if (respMsg.error && message)
 			DialogWindow.showError(
 					this,
-				    respMsg.errorMsg,
+				    SternResources.getString(respMsg.errorMsg),
 				    SternResources.Verbindungsfehler(false));
 		
 		return respMsg;
@@ -947,7 +947,7 @@ class ServerAdminJDialog extends JDialog
 			this.add(this.cbCredentials);
 			this.cbCredentials.addActionListener(this);
 			this.add(new LabelDark("", font));
-			this.cbUserActive = new CheckBoxDark("Spieler ist aktiv", false, font);
+			this.cbUserActive = new CheckBoxDark(SternResources.ServerAdminUserActive(false), false, font);
 			this.add(this.cbUserActive);
 			
 			SpringUtilities.makeCompactGrid(this,

@@ -3470,14 +3470,14 @@ public class Game extends EmailTransportBase implements Serializable
  						}
  					}
  					
- 					if (playersCount <= 1)
+ 					if (error)
  					{
- 						this.game.console.outInvalidInput();
  						continue;
  					}
  					
- 					if (error)
+ 					if (playersCount <= 1)
  					{
+ 						this.game.console.outInvalidInput();
  						continue;
  					}
  				}

@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Last used symbolic key: JB
+		// Last used symbolic key: JC
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -570,6 +570,7 @@ public class SternResources
 		symbolDict.put("IZ","AddressSeparator_IZ");
 		symbolDict.put("JA","ClientCodeInvalid_JA");
 		symbolDict.put("JB","AllianceOwnerNotIncluded_JB");
+		symbolDict.put("JC","ServerAdminUserActive_JC");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -2349,7 +2350,7 @@ public class SternResources
 	}
 
 	/**
-	   * E-mail addresses used in the past [80]
+	   * Recently used e-mail addresses [80]
 	   */
 	public static String EmailAdressenJDialogTitel(boolean symbol) {
 		return symbol ? "£80£":messages.getString("EmailAdressenJDialogTitel_80");
@@ -2489,7 +2490,7 @@ public class SternResources
 	}
 
 	/**
-	   * Service or transfer? [8L]
+	   * Mission or transfer? [8L]
 	   */
 	public static String ZugeingabeMissionTransferFrage(boolean symbol) {
 		return symbol ? "£8L£":messages.getString("ZugeingabeMissionTransferFrage_8L");
@@ -4327,5 +4328,12 @@ public class SternResources
 	   */
 	public static String AllianceOwnerNotIncluded(boolean symbol) {
 		return symbol ? "£JB£":messages.getString("AllianceOwnerNotIncluded_JB");
+	}
+
+	/**
+	   * User activated [JC]
+	   */
+	public static String ServerAdminUserActive(boolean symbol) {
+		return symbol ? "£JC£":messages.getString("ServerAdminUserActive_JC");
 	}
 }
