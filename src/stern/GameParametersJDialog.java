@@ -496,18 +496,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 						this.options.remove(option);
 				}
 				
-				if (this.options.contains(GameOptions.SIMPLE))
-				{
-					this.options.remove(GameOptions.DEFENCE_SHIELDS);
-					this.options.remove(GameOptions.COMMAND_ROOMS);
-					this.options.remove(GameOptions.COMMAND_ROOMS_STATIC);
-				}
-				else
-				{
-					this.options.add(GameOptions.DEFENCE_SHIELDS);
-					this.options.add(GameOptions.COMMAND_ROOMS);
-				}
-				
 				String yearMaxString = (String)this.comboYearLast.getSelectedItem();
 				
 				if (yearMaxString.equals(ENDLESS_GAME_STRING))

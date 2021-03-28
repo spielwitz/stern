@@ -34,7 +34,6 @@ class Ship implements Serializable
 	private boolean transfer;
 	private boolean startedRecently;
 	private UUID stopLabel;
-	private CommandRoom commandRoom;
 	
 	private Alliance alliance;
 	
@@ -51,8 +50,7 @@ class Ship implements Serializable
 			int count,
 			int owner,
 			boolean transfer,
-			Alliance alliance,
-			CommandRoom commandRoom)
+			Alliance alliance)
 	{
 		this.planetIndexStart = planetIndexStart;
 		this.planetIndexDestination = planetIndexDestination;
@@ -63,7 +61,6 @@ class Ship implements Serializable
 		this.count = count;
 		this.owner = owner;
 		this.transfer = transfer;
-		this.commandRoom = commandRoom;
 		this.toBeDeleted = false;
 		this.alliance = alliance;
 	}
@@ -78,8 +75,7 @@ class Ship implements Serializable
 			int owner, 
 			boolean transfer, 
 			boolean recentlyStarted, 
-			Alliance alliance, 
-			CommandRoom commandRoom)
+			Alliance alliance)
 	{
 		this.planetIndexStart = planetIndexStart;
 		this.planetIndexDestination = planetIndexDestination;
@@ -91,7 +87,6 @@ class Ship implements Serializable
 		this.owner = owner;
 		this.transfer = transfer;
 		this.startedRecently = recentlyStarted;
-		this.commandRoom = commandRoom;
 		this.toBeDeleted = false;
 		this.alliance = alliance;
 	}
@@ -276,10 +271,6 @@ class Ship implements Serializable
 		}
 	}
 	
-	public CommandRoom getCommandRoom() {
-		return commandRoom;
-	}
-	
 	static ShipTravelTime getTravelTime(
 			ShipType type, 
 			boolean transfer, 
@@ -420,35 +411,24 @@ class Ship implements Serializable
 		}
 	}
 	
-	int changeOwner (int ownerBefore, int ownerAfter)
+	void changeOwner (int ownerBefore, int ownerAfter)
 	{
-		int playerIndexOther = Constants.NEUTRAL;
-		
 		if (this.toBeDeleted)
-			return playerIndexOther;
+			return;
 
 		if (this.owner == ownerBefore && this.type == ShipType.CAPITULATION)
 		{
 			this.toBeDeleted = true;
-			return playerIndexOther;
+			return;
 		}
 
 		if (this.owner == ownerBefore && ownerAfter == Constants.NEUTRAL)
 		{
 			this.toBeDeleted = true;
 			
-			if (this.commandRoom != null && this.commandRoom.getOwner() != ownerBefore)
-			{
-				// Transport could have carried the command room of another player
-				playerIndexOther = this.commandRoom.getOwner();
-			}
-
-			return playerIndexOther;
+			return;
 		}
 		
-		if (this.commandRoom != null && this.commandRoom.getOwner() == ownerBefore)
-			this.commandRoom = null;
-			
 		if (this.isAlliance() && this.isPlayerInvolved(ownerBefore))
 		{
 			this.alliance.replacePlayer(this.owner, ownerAfter);
@@ -460,7 +440,7 @@ class Ship implements Serializable
 			if (this.count <= 0)
 			{
 				this.toBeDeleted = true;
-				return playerIndexOther;
+				return;
 			}
 		}
 				
@@ -469,7 +449,7 @@ class Ship implements Serializable
 			this.owner = ownerAfter;
 		}
 		
-		return playerIndexOther;
+		return;
 	}
 	
 	public void setAlliance(Alliance alliance)

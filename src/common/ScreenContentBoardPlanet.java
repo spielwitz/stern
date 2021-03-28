@@ -25,19 +25,21 @@ class ScreenContentBoardPlanet implements Serializable
 	private String n;
 	private Point p;
 	private byte c;
+	private boolean h;
 	private ArrayList<Byte> f;
 	
 	ScreenContentBoardPlanet(
 			String name, 
 			Point position, 
 			byte colorIndex,
-			ArrayList<Byte> 
-			frameColors)
+			boolean isHomePlanet,
+			ArrayList<Byte> frameColors)
 	{
 		super();
 		this.n = name;
 		this.p = position;
 		this.c = colorIndex;
+		this.h = isHomePlanet;
 		this.f = frameColors;
 	}
 
@@ -51,6 +53,11 @@ class ScreenContentBoardPlanet implements Serializable
 
 	public byte getColorIndex() {
 		return c;
+	}
+	
+	public boolean isHomePlanet()
+	{
+		return h;
 	}
 	
 	public ArrayList<Byte> getFrameColors() {

@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Last used symbolic key: JC
+		// Last used symbolic key: JG
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -56,7 +56,6 @@ public class SternResources
 		symbolDict.put("0G","InventurKeinePlaneten_0G");
 		symbolDict.put("0H","InventurKeineRaumer_0H");
 		symbolDict.put("0I","InventurKommandant_0I");
-		symbolDict.put("0J","InventurKommandozentraleKurz_0J");
 		symbolDict.put("0K","InventurMine100Kurz_0K");
 		symbolDict.put("0L","InventurMine250Kurz_0L");
 		symbolDict.put("0M","InventurMine500Kurz_0M");
@@ -97,15 +96,12 @@ public class SternResources
 		symbolDict.put("1R","InventurTyp_1R");
 		symbolDict.put("1S","InventurZiel_1S");
 		symbolDict.put("1T","Ja_1T");
-		symbolDict.put("1U","Kommandozentrale_1U");
 		symbolDict.put("1V","Links_1V");
 		symbolDict.put("1W","Loeschen_1W");
 		symbolDict.put("1X","MenuBestenliste_1X");
 		symbolDict.put("1Z","MenuDatei_1Z");
 		symbolDict.put("20","AuswertungBuendnisNichtGeaendert_20");
 		symbolDict.put("21","AuswertungEnde_21");
-		symbolDict.put("22","AuswertungKommandozentraleErobertNeutral_22");
-		symbolDict.put("23","AuswertungKommandozentraleErobertSpieler_23");
 		symbolDict.put("24","AuswertungMineGelegt_24");
 		symbolDict.put("25","AuswertungMinenfeldGeraeumt_25");
 		symbolDict.put("27","AuswertungMinenlegerAngekommen_27");
@@ -201,9 +197,6 @@ public class SternResources
 		symbolDict.put("58","AuswertungTransporterAngekommen_58");
 		symbolDict.put("59","AuswertungTransporterZerschellt_59");
 		symbolDict.put("5B","SpielinformationenKeinePlanetenMitBuendnissen_5B");
-		symbolDict.put("5C","SpielinformationenKommandozentralen_5C");
-		symbolDict.put("5D","SpielinformationenKommandozentralenTitel_5D");
-		symbolDict.put("5E","SpielinformationenKommandozentralenUnterwegs_5E");
 		symbolDict.put("5H","SpielinformationenPatrouillen_5H");
 		symbolDict.put("5I","SpielinformationenPatrouillenTitel_5I");
 		symbolDict.put("5J","SpielinformationenPlanet_5J");
@@ -286,7 +279,6 @@ public class SternResources
 		symbolDict.put("7V","ZugeingabeInfo_7V");
 		symbolDict.put("7W","ZugeingabeInventur_7W");
 		symbolDict.put("7X","ZugeingabeKeinBuendnis_7X");
-		symbolDict.put("7Z","ZugeingabeKeineKommandozentrale_7Z");
 		symbolDict.put("80","EmailAdressenJDialogTitel_80");
 		symbolDict.put("81","EmailSettingsJDialogTitel_81");
 		symbolDict.put("82","Energieproduktion_82");
@@ -297,7 +289,6 @@ public class SternResources
 		symbolDict.put("87","HighscoreFrage_87");
 		symbolDict.put("88","InventurAnkunft_88");
 		symbolDict.put("8A","ZugeingabeKeineSpielzuege_8A");
-		symbolDict.put("8B","ZugeingabeKommandozentraleVerlegen_8B");
 		symbolDict.put("8C","ZugeingabeKuendigen_8C");
 		symbolDict.put("8D","ZugeingabeMaxAnzahlRaumer_8D");
 		symbolDict.put("8E","ZugeingabeMine_8E");
@@ -513,7 +504,6 @@ public class SternResources
 		symbolDict.put("GN","FlugzeitOutputJahresendeShort_GN");
 		symbolDict.put("GP","ZugeingabeMinenraeumerMission_GP");
 		symbolDict.put("GQ","ZugeingabePatrouilleMission_GQ");
-		symbolDict.put("GT","SpielinformationenKommandozentralenUnterwegs2_GT");
 		symbolDict.put("GV","ServerBuildVeraltet_GV");
 		symbolDict.put("GW","ServerGamesLetzteAktivitaet_GW");
 		symbolDict.put("GY","ServerGamesSpielleiteraktionen_GY");
@@ -571,6 +561,9 @@ public class SternResources
 		symbolDict.put("JA","ClientCodeInvalid_JA");
 		symbolDict.put("JB","AllianceOwnerNotIncluded_JB");
 		symbolDict.put("JC","ServerAdminUserActive_JC");
+		symbolDict.put("JD","EvaluationPlanetsProducing_JD");
+		symbolDict.put("JE","HomePlanet_JE");
+		symbolDict.put("JG","EvaluationHomePlanetConquered_JG");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -733,13 +726,6 @@ public class SternResources
 	}
 
 	/**
-	   * Cr [0J]
-	   */
-	public static String InventurKommandozentraleKurz(boolean symbol) {
-		return symbol ? "£0J£":messages.getString("InventurKommandozentraleKurz_0J");
-	}
-
-	/**
 	   * M100 [0K]
 	   */
 	public static String InventurMine100Kurz(boolean symbol) {
@@ -873,7 +859,7 @@ public class SternResources
 	}
 
 	/**
-	   * Spaceships launching, planets producing. [19]
+	   * The evaluation begins. [19]
 	   */
 	public static String AuswertungBeginnt(boolean symbol) {
 		return symbol ? "£19£":messages.getString("AuswertungBeginnt_19");
@@ -1020,13 +1006,6 @@ public class SternResources
 	}
 
 	/**
-	   * Command room [1U]
-	   */
-	public static String Kommandozentrale(boolean symbol) {
-		return symbol ? "£1U£":messages.getString("Kommandozentrale_1U");
-	}
-
-	/**
 	   * Left [1V]
 	   */
 	public static String Links(boolean symbol) {
@@ -1066,20 +1045,6 @@ public class SternResources
 	   */
 	public static String AuswertungEnde(boolean symbol) {
 		return symbol ? "£21£":messages.getString("AuswertungEnde_21");
-	}
-
-	/**
-	   * 'The neutrals' conquered the control room of {0}! [22]
-	   */
-	public static String AuswertungKommandozentraleErobertNeutral(boolean symbol, String arg0) {
-		return symbol ? "£22§"+arg0+"£":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertNeutral_22"), arg0);
-	}
-
-	/**
-	   * {0} conquered the control room of {1}! [23]
-	   */
-	public static String AuswertungKommandozentraleErobertSpieler(boolean symbol, String arg0, String arg1) {
-		return symbol ? "£23§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungKommandozentraleErobertSpieler_23"), arg0, arg1);
 	}
 
 	/**
@@ -1748,27 +1713,6 @@ public class SternResources
 	}
 
 	/**
-	   * Command rooms [5C]
-	   */
-	public static String SpielinformationenKommandozentralen(boolean symbol) {
-		return symbol ? "£5C£":messages.getString("SpielinformationenKommandozentralen_5C");
-	}
-
-	/**
-	   * Command rooms [5D]
-	   */
-	public static String SpielinformationenKommandozentralenTitel(boolean symbol) {
-		return symbol ? "£5D£":messages.getString("SpielinformationenKommandozentralenTitel_5D");
-	}
-
-	/**
-	   * The command room of {0} is travelling to planet {1}. [5E]
-	   */
-	public static String SpielinformationenKommandozentralenUnterwegs(boolean symbol, String arg0, String arg1) {
-		return symbol ? "£5E§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs_5E"), arg0, arg1);
-	}
-
-	/**
 	   * Patrols [5H]
 	   */
 	public static String SpielinformationenPatrouillen(boolean symbol) {
@@ -2217,7 +2161,7 @@ public class SternResources
 	}
 
 	/**
-	   * Number [7F]
+	   * Count [7F]
 	   */
 	public static String ZugeingabeAnzahl(boolean symbol) {
 		return symbol ? "£7F£":messages.getString("ZugeingabeAnzahl_7F");
@@ -2343,13 +2287,6 @@ public class SternResources
 	}
 
 	/**
-	   * There is no command room on the start planet. [7Z]
-	   */
-	public static String ZugeingabeKeineKommandozentrale(boolean symbol) {
-		return symbol ? "£7Z£":messages.getString("ZugeingabeKeineKommandozentrale_7Z");
-	}
-
-	/**
 	   * Recently used e-mail addresses [80]
 	   */
 	public static String EmailAdressenJDialogTitel(boolean symbol) {
@@ -2417,13 +2354,6 @@ public class SternResources
 	   */
 	public static String ZugeingabeKeineSpielzuege(boolean symbol) {
 		return symbol ? "£8A£":messages.getString("ZugeingabeKeineSpielzuege_8A");
-	}
-
-	/**
-	   * Relocate command room [8B]
-	   */
-	public static String ZugeingabeKommandozentraleVerlegen(boolean symbol) {
-		return symbol ? "£8B£":messages.getString("ZugeingabeKommandozentraleVerlegen_8B");
 	}
 
 	/**
@@ -2588,7 +2518,7 @@ public class SternResources
 	}
 
 	/**
-	   * Number [90]
+	   * Count [90]
 	   */
 	public static String InventurAnzahl(boolean symbol) {
 		return symbol ? "£90£":messages.getString("InventurAnzahl_90");
@@ -3932,13 +3862,6 @@ public class SternResources
 	}
 
 	/**
-	   * Arrival: {0}. [GT]
-	   */
-	public static String SpielinformationenKommandozentralenUnterwegs2(boolean symbol, String arg0) {
-		return symbol ? "£GT§"+arg0+"£":MessageFormat.format(messages.getString("SpielinformationenKommandozentralenUnterwegs2_GT"), arg0);
-	}
-
-	/**
 	   * The server is using build {0}. Your STERN build expects a server build of at least {1}. [GV]
 	   */
 	public static String ServerBuildVeraltet(boolean symbol, String arg0, String arg1) {
@@ -4335,5 +4258,26 @@ public class SternResources
 	   */
 	public static String ServerAdminUserActive(boolean symbol) {
 		return symbol ? "£JC£":messages.getString("ServerAdminUserActive_JC");
+	}
+
+	/**
+	   * Planets produce fighters and $. [JD]
+	   */
+	public static String EvaluationPlanetsProducing(boolean symbol) {
+		return symbol ? "£JD£":messages.getString("EvaluationPlanetsProducing_JD");
+	}
+
+	/**
+	   * Home planet [JE]
+	   */
+	public static String HomePlanet(boolean symbol) {
+		return symbol ? "£JE£":messages.getString("HomePlanet_JE");
+	}
+
+	/**
+	   * {0} has conquered the home planet of {1}! [JG]
+	   */
+	public static String EvaluationHomePlanetConquered(boolean symbol, String arg0, String arg1) {
+		return symbol ? "£JG§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("EvaluationHomePlanetConquered_JG"), arg0, arg1);
 	}
 }

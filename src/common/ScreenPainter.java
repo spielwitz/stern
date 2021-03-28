@@ -58,6 +58,8 @@ public class ScreenPainter
 	
 	private static final int	    PROGRESS_BAR_BORDER = 2;
 	
+	private static final int		HOME_PLANET_POLYCOUNT_EDGES_COUNT = 6;
+	
 	private double factor;
 	
 	private Graphics2D dbGraphics;
@@ -100,7 +102,7 @@ public class ScreenPainter
 		titleLinesCount.add("`   .@$kh#opV#pppgpHT`      `    `      `                `         `        ");
 		titleLinesCount.add("   .@$#k3f#gg#H='                `           `    `      (c) 1989-2021      ");
 		titleLinesCount.add("   @@$@8PT'           `     `    `      `              Michael Schweitzer   ");
-		titleLinesCount.add("`              `  `    `                     `    `        Build " + ReleaseGetter.getRelease() + "  ");
+		titleLinesCount.add("`              `  `    `                     `    `        Build " + ReleaseGetter.getRelease() + "       ");
 
 	}
 	
@@ -355,13 +357,37 @@ public class ScreenPainter
 		{
 			for (ScreenContentBoardPlanet screenContentBoardPlanet: screenContentBoard.getPlanets())
 			{
-				this.drawBoardFillCircle(screenContentBoardPlanet.getPosition(), 1.2, 
-						this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX ?
-								Color.white :
-								Colors.getColorDarker2(Colors.get(screenContentBoardPlanet.getColorIndex())));
+				if (screenContentBoardPlanet.isHomePlanet())
+				{
+					this.drawBoardFillHomePlanet(
+							screenContentBoardPlanet.getPosition(), 1.2,
+							this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX ?
+									Color.white :
+									Colors.getColorDarker2(Colors.get(screenContentBoardPlanet.getColorIndex())));
+				}
+				else
+				{
+					this.drawBoardFillCircle(screenContentBoardPlanet.getPosition(), 1.2, 
+							this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX ?
+									Color.white :
+									Colors.getColorDarker2(Colors.get(screenContentBoardPlanet.getColorIndex())));
+				}
 				
-				if (this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX)
-	                this.drawBoardCircle(screenContentBoardPlanet.getPosition(), 1.2, Colors.get(screenContentBoardPlanet.getColorIndex())); 
+				if (this.screenContent.getMode() == ScreenContent.MODE_DISTANCE_MATRIX ||
+						screenContentBoardPlanet.isHomePlanet())
+					
+				{
+					if (screenContentBoardPlanet.isHomePlanet())
+					{
+						this.drawBoardDrawHomePlanet(
+								screenContentBoardPlanet.getPosition(), 1.2,
+								Colors.get(screenContentBoardPlanet.getColorIndex()));
+					}
+					else
+					{
+						this.drawBoardCircle(screenContentBoardPlanet.getPosition(), 1.2, Colors.get(screenContentBoardPlanet.getColorIndex()));
+					}
+				}
 				
 				this.drawBoardTextCentered(screenContentBoardPlanet.getPosition(), screenContentBoardPlanet.getName(),Colors.get(screenContentBoardPlanet.getColorIndex()), this.fontPlanets, this.fmPlanets);
 				
@@ -450,11 +476,11 @@ public class ScreenPainter
 		this.drawPlanetEditorTextLeft(Utils.padString(screenContentPlanetEditor.getMoneySupply(),4), PLANET_EDITOR_COLUMN1, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
 		this.drawPlanetEditorTextLeft(SternResources.PlEditEeEnergievorrat(false), PLANET_EDITOR_COLUMN1+5, 1, Colors.get(Colors.NEUTRAL));
 		
-		if (screenContentPlanetEditor.hasCommandRoom())
-			this.drawPlanetEditorTextLeft(SternResources.Kommandozentrale(false), PLANET_EDITOR_COLUMN2+8, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
+		if (screenContentPlanetEditor.isHomePlanet())
+			this.drawPlanetEditorTextCentered(SternResources.HomePlanet(false), PLANET_EDITOR_COLUMN2+15, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
 		
-		this.drawPlanetEditorTextLeft(SternResources.PlEditKaufpreis(false), PLANET_EDITOR_COLUMN2+2, 2, Colors.get(Colors.NEUTRAL));
-		this.drawPlanetEditorTextLeft(SternResources.PlEditVerkaufspreis(false), PLANET_EDITOR_COLUMN3, 2, Colors.get(Colors.NEUTRAL));
+		this.drawPlanetEditorTextCentered(SternResources.PlEditKaufpreis(false), PLANET_EDITOR_COLUMN2+6, 2, Colors.get(Colors.NEUTRAL));
+		this.drawPlanetEditorTextCentered(SternResources.PlEditVerkaufspreis(false), PLANET_EDITOR_COLUMN3+6, 2, Colors.get(Colors.NEUTRAL));
 		
 		this.drawPlanetEditorLine(ShipType.MONEY_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditEprodPlus4(false), 3);
 		this.drawPlanetEditorLine(ShipType.FIGHTER_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditRaumerProd(false), 4);
@@ -509,6 +535,21 @@ public class ScreenPainter
 	{
 		int charWidth = this.fmPlanets.charWidth('H');
 		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
+		
+		this.dbGraphics.setColor(color);
+		
+		this.dbGraphics.drawString(
+				text,
+				Utils.round((double)charWidth + this.factor * (double)BOARD_OFFSET_X + (double)(column* charWidth)),
+				Utils.round((double)height/2. + this.factor * ((double)BOARD_OFFSET_Y + ((double)line+0.5) * (double)BOARD_DX)));
+	}
+	
+	private void drawPlanetEditorTextCentered(String text, int columnCenter, int line, Color color)
+	{
+		int charWidth = this.fmPlanets.charWidth('H');
+		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
+		
+		int column = columnCenter - text.length() / 2;
 		
 		this.dbGraphics.setColor(color);
 		
@@ -767,6 +808,50 @@ public class ScreenPainter
 		
 	}
 	
+	private void drawBoardDrawHomePlanet(Point position, double radius, Color color)
+	{
+		this.setColor(color);
+		
+		int[] polyX = new int[HOME_PLANET_POLYCOUNT_EDGES_COUNT];
+		int[] polyY = new int[HOME_PLANET_POLYCOUNT_EDGES_COUNT];
+		
+		double rr = 0.6 * radius * (double)BOARD_DX;
+		
+		for (int i = 0; i < HOME_PLANET_POLYCOUNT_EDGES_COUNT; i++)
+		{
+			double angle = i * 2 * Math.PI / HOME_PLANET_POLYCOUNT_EDGES_COUNT;
+			
+			double x = (double)(BOARD_OFFSET_X + (position.getX() + 0.5) * BOARD_DX) - rr * Math.sin(angle);
+			double y = (double)(BOARD_OFFSET_X + (position.getY() + 0.5) * BOARD_DX) - rr * Math.cos(angle);
+			
+			polyX[i] = Utils.round(this.factor * x);
+			polyY[i] = Utils.round(this.factor * y);
+		}		
+		this.dbGraphics.drawPolygon(polyX, polyY, HOME_PLANET_POLYCOUNT_EDGES_COUNT);
+	}
+	
+	private void drawBoardFillHomePlanet(Point position, double radius, Color color)
+	{
+		this.setColor(color);
+		
+		int[] polyX = new int[HOME_PLANET_POLYCOUNT_EDGES_COUNT];
+		int[] polyY = new int[HOME_PLANET_POLYCOUNT_EDGES_COUNT];
+		
+		double rr = 0.6 * radius * (double)BOARD_DX;
+		
+		for (int i = 0; i < HOME_PLANET_POLYCOUNT_EDGES_COUNT; i++)
+		{
+			double angle = i * 2 * Math.PI / HOME_PLANET_POLYCOUNT_EDGES_COUNT;
+			
+			double x = (double)(BOARD_OFFSET_X + (position.getX() + 0.5) * BOARD_DX) - rr * Math.sin(angle);
+			double y = (double)(BOARD_OFFSET_X + (position.getY() + 0.5) * BOARD_DX) - rr * Math.cos(angle);
+			
+			polyX[i] = Utils.round(this.factor * x);
+			polyY[i] = Utils.round(this.factor * y);
+		}		
+		
+		this.dbGraphics.fillPolygon(polyX, polyY, HOME_PLANET_POLYCOUNT_EDGES_COUNT);
+	}
 	
 	private void drawBoardFillDiamond(Point position, Color color)
 	{

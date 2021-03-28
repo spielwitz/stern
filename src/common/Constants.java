@@ -21,14 +21,14 @@ public class Constants
 	// Minimum required build version when reading games or when exchaning data
 	// with the STERN server to avoid incompatibilities and advantages caused
 	// by program errors.
-	public static final String 	BUILD_COMPATIBLE = "2004";
+	public static final String 	BUILD_COMPATIBLE = "2005";
 
 	// Recommended build. Was used by the update checker (suspended) to indicate
 	// an important update.
-	public static final String 	BUILD_IMPORTANT_UPDATE = "2004";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "2005";
 
 	// Games older than this build have to be migrated.
-	static final String 		BUILD_MIGRATION = "2004";
+	static final String 		BUILD_MIGRATION = "2005";
 	
 	public static final String 	STERN_URL = "https://github.com/spielwitz/stern";
 	public static final String 	BUILD_NO_INFO = "9999";
@@ -44,14 +44,12 @@ public class Constants
 	public static final int PLANETS_COUNT_MAX = 42;
 	static final int 		DEFENSE_SHIELDS_COUNT_MAX = 2;
 	static final int 		MONEY_PRODUCTION_PURCHASE = 4;
-	static final int 		DEFENSE_SHIELD_FIGHTERS = 375;
+	static final int 		DEFENSE_SHIELD_FIGHTERS = 350;
 	static final int 		DEFENSE_SHIELD_REPAIR_FIGHTERS_COUNT = 2;
 	static final int 		TRANSPORT_MONEY_MAX = 30;
-	static final int 		FIGHTERS_COUNT_INITIAL_PLAYERS = 375;
-	static final int 		FIGHTERS_COUNT_INITIAL_NEUTRAL = 11;
+	static final int 		FIGHTERS_COUNT_INITIAL_PLAYERS = 100;
 	static final int 		MONEY_PRODUCTION_INITIAL_PLAYERS = 10;
 	static final int 		MONEY_SUPPLY_INITIAL_PLAYERS = 30;
-	static final int 		MONEY_SUPPLY_INITIAL_NEUTRAL_MAX = 5;
 	static final int 		MONEY_PRODUCTION_INITIAL_NEUTRAL = 10;
 	static final int 		MONEY_PRODUCTION_INITIAL_NEUTRAL_EXTRA = 5;
 	static final int 		MONEY_PRODUCTION_INITIAL_NEUTRAL_EXTRA_W1 = 15;
@@ -104,7 +102,6 @@ public class Constants
 	
 	// Artificial intelligence
 	static final int 		AI_DISTANCE_FACTOR 		= 1,
-				 			AI_FIGHTERS_NEUTRAL_COUNT_MIN 	= 10,
 				 			AI_ATTACK_FACTOR_RND_MAX = 30;
 	static final double 	AI_ATTACK_FACTOR 			= 1.5,
 							AI_THREAT_FACTOR		= 0.5;

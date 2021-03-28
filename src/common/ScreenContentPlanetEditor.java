@@ -31,7 +31,7 @@ class ScreenContentPlanetEditor implements Serializable
 	private boolean readOnly;
 	private byte colorIndex;
 	private int moneySupply;
-	private boolean hasCommandRoom;
+	private boolean isHomePlanet;
 	
 	
 	ScreenContentPlanetEditor(
@@ -41,7 +41,7 @@ class ScreenContentPlanetEditor implements Serializable
 			HashSet<ShipType> sellImpossible,
 			byte colorIndex,
 			int moneySupply,
-			boolean hasCommandRoom,
+			boolean isHomePlanet,
 			boolean readOnly) 
 	{
 		super();
@@ -51,7 +51,7 @@ class ScreenContentPlanetEditor implements Serializable
 		this.sellImpossible = sellImpossible;
 		this.colorIndex = colorIndex;
 		this.moneySupply = moneySupply;
-		this.hasCommandRoom = hasCommandRoom;
+		this.isHomePlanet = isHomePlanet;
 		this.readOnly = readOnly;
 	}
 
@@ -88,7 +88,7 @@ class ScreenContentPlanetEditor implements Serializable
 	}
 
 
-	public boolean hasCommandRoom() {
-		return hasCommandRoom;
+	public boolean isHomePlanet() {
+		return isHomePlanet;
 	}
 }

@@ -30,12 +30,11 @@ import java.util.Hashtable;
 	private int moneySupply;
 	private int moneyProduction;
 	private int fighterProduction;
-	private CommandRoom commandRoom;
 	private HashSet<Integer> radioStationsByPlayer;
 	
 	Planet(Point position, Alliance alliance,
 			Hashtable<ShipType, Integer> ships, int owner, DefenceShield defenceShield,
-			int moneySupply, int moneyProduction, int fighterProduction, CommandRoom commandRoom)
+			int moneySupply, int moneyProduction, int fighterProduction)
 	{
 		super();
 		this.position = position;
@@ -46,7 +45,6 @@ import java.util.Hashtable;
 		this.moneySupply = moneySupply;
 		this.moneyProduction = moneyProduction;
 		this.fighterProduction = fighterProduction;
-		this.commandRoom = commandRoom;
 	}
 	
 	int getShipsCount(ShipType type)
@@ -160,16 +158,6 @@ import java.util.Hashtable;
 			return false;
 		
 		return (this.alliance.getMembersCount() > 1);
-	}
-	
-	boolean hasCommandRoom()
-	{
-		return (this.commandRoom != null);
-	}
-	
-	public CommandRoom getCommandRoom()
-	{
-		return this.commandRoom;
 	}
 	
 	boolean isAllianceMember(int playerIndex)
@@ -324,18 +312,6 @@ import java.util.Hashtable;
 		this.moneySupply += count;
 	}
 	
-	CommandRoom removeCommandRoom()
-	{
-		CommandRoom commandRoom = (CommandRoom)Utils.klon(this.commandRoom);
-		this.commandRoom = null;
-		return commandRoom;
-	}
-	
-	void setCommandRoom(CommandRoom commandRoom)
-	{
-		this.commandRoom = (CommandRoom)Utils.klon(commandRoom);
-	}
-	
 	void incrementShipsCount(ShipType type, int count)
 	{
 		if (this.ships.containsKey(type))
@@ -429,32 +405,22 @@ import java.util.Hashtable;
 		this.defenceShield = null;
 	}
 	
-	CommandRoom conquer(int playersCount, int newOwner, Ship ship)
+	void conquer(int playersCount, int newOwner, Ship ship)
 	{
-		CommandRoom commandRoom = null;
-		if (this.hasCommandRoom())
-			commandRoom = (CommandRoom)Utils.klon(this.commandRoom);
-		
 		this.ships.remove(ShipType.FIGHTERS);
 		this.alliance = null;
 		this.defenceShield = null;
 		
-		this.commandRoom = null;
-
 		this.owner = newOwner;
 		
 		if (ship != null)
 			this.mergeFighters(playersCount, ship);
-		
-		return commandRoom;
 	}
 	
 	void changeOwner(int playerIndexBefore, int playerIndexAfter)
 	{
 		if (this.owner == playerIndexBefore)
 		{
-			this.commandRoom = null;
-			
 			if (playerIndexAfter == Constants.NEUTRAL)
 			{
 				if (this.allianceExists())
@@ -590,7 +556,6 @@ import java.util.Hashtable;
 		plClone.fighterProduction = 0;
 		plClone.moneySupply = 0;
 		plClone.defenceShield = null;
-		plClone.commandRoom = null;
 		plClone.radioStationsByPlayer = null;
 		
 		return plClone;

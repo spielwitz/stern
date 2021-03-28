@@ -729,18 +729,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		HashSet<GameOptions> options = this.game.getOptions();
 		String yearsMaxString = (String)this.comboYearLast.getSelectedItem();
 		
-		if (options.contains(GameOptions.SIMPLE))
-		{
-			options.remove(GameOptions.DEFENCE_SHIELDS);
-			options.remove(GameOptions.COMMAND_ROOMS);
-			options.remove(GameOptions.COMMAND_ROOMS_STATIC);
-		}
-		else
-		{
-			options.add(GameOptions.DEFENCE_SHIELDS);
-			options.add(GameOptions.COMMAND_ROOMS);
-		}
-		
 		options.remove(GameOptions.AUTO_SAVE);
 		options.remove(GameOptions.EMAIL_BASED);
 		options.add(GameOptions.SERVER_BASED);
