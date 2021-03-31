@@ -48,13 +48,18 @@ import com.google.gson.Gson;
 public class Utils
 {
 	private static SecureRandom secRandom;
-		
-	public static int getRandomInteger(int valueMax)
+	
+	public static double getRandom()
 	{
 		if (Utils.secRandom == null)
 			Utils.secRandom = new SecureRandom();
 		
-		return (int) (Utils.secRandom.nextDouble() * valueMax);
+		return Utils.secRandom.nextDouble();
+	}
+		
+	public static int getRandomInteger(int valueMax)
+	{
+		return (int) (Utils.getRandom() * valueMax);
 	}
 	
 	public static Object klon(Object obj)

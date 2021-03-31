@@ -73,7 +73,6 @@ public class Game extends EmailTransportBase implements Serializable
 	transient private Hashtable<String,Integer> mapPlanetNameToIndex;
 	transient private Hashtable<String,Integer> planetsByPosition;
 	transient private int[] planetIndicesSorted;
-	transient static private ArrayList<Point> sectorsAroundHomePlanet;
 	transient static Hashtable<ShipType, Integer> editorPricesBuy;
 	transient static Hashtable<ShipType, Integer> editorPricesSell;
 	
@@ -564,97 +563,95 @@ public class Game extends EmailTransportBase implements Serializable
 			planetsNearbyCount = (int)Math.floor((double)(planetsCount - playersCount) / (double)playersCount);
 		}
 		
-		Point[] positions = new Point[planetsCount];
+		double boardCenterX = (double)(this.boardWidth-1) / 2;
+		double boardCenterY = (double)(this.boardHeight-1) / 2;
+		double boardMinSize = Math.min(boardCenterX, boardCenterY);
+		double seedAngleDegrees = Utils.getRandomInteger(360);
 		
 		int[] sequencePlayers = Utils.getRandomList(playersCount);
 		
-		for (int i = 0; i < playersCount; i++)
+		boolean newHomePlanets = true;
+		
+		Point[] positions = null;
+				
+		while (newHomePlanets)
 		{
-			int planetIndexHome = sequencePlayers[i];
+			positions = new Point[planetsCount];
 			
-			Point planetPositionHome;
+			boolean ok = true;
 			
-			boolean ok = false;
-			
-			while(!ok)
+			for (int i = 0; i < this.playersCount; i++)
 			{
-				planetPositionHome = new Point(Utils.getRandomInteger(this.boardWidth), Utils.getRandomInteger(this.boardHeight));
+				double startAngleDegrees = seedAngleDegrees + (double)(i * 360) / (double)this.playersCount;
 				
-				if (isTooClose(planetPositionHome, positions))
-					continue;
+				Point position = this.getRandomPlanetPositionPolar(
+						boardCenterX, 
+						boardCenterY, 
+						startAngleDegrees, 
+						boardMinSize * 0.25,
+						boardMinSize * 1.1, 
+						positions,
+						20);
 				
-				positions[planetIndexHome] = planetPositionHome;
-				
-				if (planetsNearbyCount == 0)
+				if (position == null)
 				{
-					ok = true;
-					continue;
+					ok = false;
+					break;
 				}
 				
-				ArrayList<Point> potentialNearbyPositions = getPotentialNearbyPositions(positions, planetPositionHome);
-				
-				if (potentialNearbyPositions.size() < planetsNearbyCount)
-					continue;
-				
-				int sequencePotentialNearbyPositions[] = Utils.getRandomList(potentialNearbyPositions.size());
-				
-				int planetIndexStart = playersCount + planetIndexHome * planetsNearbyCount;
-				int planetIndex = planetIndexStart;
-				
-				for (int j = 0; j < sequencePotentialNearbyPositions.length; j++)
-				{
-					Point planetPosition = potentialNearbyPositions.get(sequencePotentialNearbyPositions[j]);
-					
-					if (isTooClose(planetPosition, positions))
-						continue;
-					
-					positions[planetIndex] = planetPosition;
-					planetIndex++;
-					
-					if (planetIndex - planetIndexStart >= planetsNearbyCount)
-						break;
-				}
-				
-				if (planetIndex - planetIndexStart  < planetsNearbyCount)
-				{
-					for (int index = planetIndexStart; index < planetIndex; index++)
-						positions[index] = null;
-				}
-				else
-					ok = true;
+				positions[sequencePlayers[i]] = position;
 			}
+			
+			if (!ok)
+			{
+				continue;
+			}
+			
+			ok = true;
+			
+			for (int i = 0; i < playersCount * planetsNearbyCount; i++)
+			{
+				int homePlanetIndex = i % playersCount;
+				
+				Point position = this.getRandomPlanetPositionPolar(
+						positions[homePlanetIndex].x,
+						positions[homePlanetIndex].y,
+						-1,
+						2,
+						4,
+						positions,
+						30);
+				
+				if (position == null)
+				{
+					ok = false;
+					break;
+				}
+				
+				positions[this.playersCount + i] = position;
+			}
+			
+			if (!ok)
+			{
+				continue;
+			}
+			
+			newHomePlanets = false;
 		}
 		
-		for (int planetIndex = playersCount + playersCount * planetsNearbyCount; planetIndex < planetsCount; planetIndex++)
+		for (int planetIndex = this.playersCount + playersCount * planetsNearbyCount; planetIndex < this.planetsCount; planetIndex++)
 		{
-			boolean ok = false;
-			Point planetPosition = null;
+			Point position = null;
 			
-			while(!ok)
+			do
 			{
-				planetPosition = new Point(Utils.getRandomInteger(this.boardWidth), Utils.getRandomInteger(this.boardHeight));
+				position = new Point(
+						Utils.getRandomInteger(this.boardWidth),
+						Utils.getRandomInteger(this.boardHeight));
 				
-				if (isTooClose(planetPosition, positions))
-					continue;
-				
-				ok = true;
-				
-				if (planetsNearbyCount <= 1)
-					continue;
-				
-				for (int planetIndexHome = 0; planetIndexHome < playersCount; planetIndexHome++)
-				{
-					double dist = planetPosition.distance(positions[planetIndexHome]);
-					
-					if (dist <= Constants.SPEED_NORMAL * Constants.GAME_PLANETS_NEARBY_TRAVEL_TIME)
-					{
-						ok = false;
-						break;
-					}
-				}
-			}
+			} while (this.isPlanetPositionInvalid(position, positions));
 			
-			positions[planetIndex] = planetPosition;
+			positions[planetIndex] = position;
 		}
 		
 		for (int planetIndex = 0; planetIndex < this.planetsCount; planetIndex++)
@@ -726,12 +723,12 @@ public class Game extends EmailTransportBase implements Serializable
 						ok = true;
 				}
 				
-				int planetIndex = this.playersCount + planetsNearbyCount * planetIndexHome;
-				
 				for (int i = 0; i < planetsNearbyCount; i++)
 				{
-					this.planets[planetIndex + i].setMoneyProduction(moneyProductions[i]);
-					this.planets[planetIndex + i].setFighterProduction(moneyProductions[i]);
+					int planetIndex = this.playersCount + planetIndexHome + i * this.playersCount;
+					
+					this.planets[planetIndex].setMoneyProduction(moneyProductions[i]);
+					this.planets[planetIndex].setFighterProduction(moneyProductions[i]);
 				}
 			}
 		}
@@ -740,9 +737,58 @@ public class Game extends EmailTransportBase implements Serializable
 		this.calculateScores();	
 	}
 	
-	private boolean isTooClose (Point position, Point[] positions)
+	private Point getRandomPlanetPositionPolar(
+				double boardCenterX,
+				double boardCenterY,
+				double startAngleDegrees,
+				double minDist,
+				double maxDist,
+				Point[] positions,
+				int maxTriesCount)
+	{
+		Point pos = null;
+		Point posCenter = new Point(boardCenterX, boardCenterY); 
+		int triesCount = 0;
+		
+		do
+		{
+			if (triesCount >= maxTriesCount)
+			{
+				return null;
+			}
+
+			double angleRadiants =
+					startAngleDegrees >= 0 ?
+							Math.PI * (startAngleDegrees + Utils.getRandomInteger(20) - 10) / (double)180 :
+							Math.PI * Utils.getRandomInteger(360) / (double)180;
+					
+			double dist = minDist + Utils.getRandom() * (maxDist - minDist);
+			
+			pos = new Point(
+					Math.round(boardCenterX + dist * Math.cos(angleRadiants)),
+					Math.round(boardCenterY + dist * Math.sin(angleRadiants)));
+			
+			triesCount++;
+					
+		} while (
+				pos.distance(posCenter) < minDist ||
+				pos.distance(posCenter) > maxDist ||
+				this.isPlanetPositionInvalid(pos, positions));
+		
+		return pos;
+	}
+	
+	private boolean isPlanetPositionInvalid (Point position, Point[] positions)
 	{
 		boolean retval = false;
+		
+		if (position.x < 0 ||
+			position.x >= this.boardWidth ||
+			position.y < 0 ||
+			position.y >= this.boardHeight)
+		{
+			return true;
+		}
 		
 		for (int i = 0; i < positions.length; i++)
 		{
@@ -757,53 +803,6 @@ public class Game extends EmailTransportBase implements Serializable
 		}
 		
 		return retval;
-	}
-	
-	private ArrayList<Point> getPotentialNearbyPositions(Point[] positions, Point planetPositionHome)
-	{
-		if (sectorsAroundHomePlanet == null)
-		{
-			sectorsAroundHomePlanet = new ArrayList<Point>();
-			
-			for (int dx = -Constants.SPEED_NORMAL * Constants.GAME_PLANETS_NEARBY_TRAVEL_TIME;
-					 dx < +Constants.SPEED_NORMAL * Constants.GAME_PLANETS_NEARBY_TRAVEL_TIME;
-				     dx++)
-			{
-				for (int dy = -Constants.SPEED_NORMAL * Constants.GAME_PLANETS_NEARBY_TRAVEL_TIME;
-						 dy < +Constants.SPEED_NORMAL * Constants.GAME_PLANETS_NEARBY_TRAVEL_TIME;
-					     dy++)
-				{
-					if (Math.abs(dx) < 2 && Math.abs(dy) < 2)
-						continue;
-					
-					double dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)); 
-					if (dist > Constants.SPEED_NORMAL * Constants.GAME_PLANETS_NEARBY_TRAVEL_TIME)
-						continue;
-					
-					sectorsAroundHomePlanet.add(new Point(dx, dy));
-				}
-			}
-		}
-		
-		ArrayList<Point> positionsPotential = new ArrayList<Point>();
-		
-		for (int i = 0; i < sectorsAroundHomePlanet.size(); i++)
-		{
-			int x = (int)(planetPositionHome.getX() + sectorsAroundHomePlanet.get(i).getX());
-			int y = (int)(planetPositionHome.getY() + sectorsAroundHomePlanet.get(i).getY());
-			
-			if (x < 0 || x >= this.boardWidth || y < 0 || y >= this.boardHeight)
-				continue;
-			
-			Point position = new Point(x, y);
-			
-			if (isTooClose(position, positions))
-				continue;
-			
-			positionsPotential.add(position);
-		}
-				
-		return positionsPotential;
 	}
 	
 	private void mainLoop()
@@ -1134,14 +1133,14 @@ public class Game extends EmailTransportBase implements Serializable
 		{
 			if (this.planets[planetIndex].isNeutral())
 				plData.add(new ScreenContentBoardPlanet(
-						"?",
+						this.getPlanetNameFromIndex(planetIndex),
 						this.planets[planetIndex].getPosition(),
 						Colors.NEUTRAL,
 						false,
 						null));
 			else
 				plData.add(new ScreenContentBoardPlanet(
-						"??",
+						this.getPlanetNameFromIndex(planetIndex),
 						this.planets[planetIndex].getPosition(),
 						Colors.WHITE,
 						true,
