@@ -3743,6 +3743,13 @@ public class Game extends EmailTransportBase implements Serializable
 
 			if (planetIndex < 0)
 				return;
+			
+			if (game.isMoveEnteringOpen())
+			{
+				this.game.console.setHeaderText(
+						this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.Zugeingabe(true)+" " + this.game.players[this.playerIndexNow].getName() + " -> " + SternResources.EnterMovesPlanet(true, this.game.getPlanetNameFromIndex(planetIndex)),
+						this.game.players[this.playerIndexNow].getColorIndex());
+			}
 
 			new PlanetEditor(
 					this.game,
