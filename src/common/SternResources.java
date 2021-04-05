@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Last used symbolic key: JH
+		// Last used symbolic key: JI
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -565,6 +565,7 @@ public class SternResources
 		symbolDict.put("JE","HomePlanet_JE");
 		symbolDict.put("JG","EvaluationHomePlanetConquered_JG");
 		symbolDict.put("JH","EnterMovesPlanet_JH");
+		symbolDict.put("JI","Players_JI");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4287,5 +4288,12 @@ public class SternResources
 	   */
 	public static String EnterMovesPlanet(boolean symbol, String arg0) {
 		return symbol ? "£JH§"+arg0+"£":MessageFormat.format(messages.getString("EnterMovesPlanet_JH"), arg0);
+	}
+
+	/**
+	   * Players [JI]
+	   */
+	public static String Players(boolean symbol) {
+		return symbol ? "£JI£":messages.getString("Players_JI");
 	}
 }

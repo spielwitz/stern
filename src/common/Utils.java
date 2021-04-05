@@ -49,7 +49,7 @@ public class Utils
 {
 	private static SecureRandom secRandom;
 	
-	public static double getRandom()
+	static double getRandom()
 	{
 		if (Utils.secRandom == null)
 			Utils.secRandom = new SecureRandom();
