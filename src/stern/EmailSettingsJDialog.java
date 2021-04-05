@@ -123,7 +123,7 @@ class EmailSettingsJDialog extends JDialog implements ActionListener, FocusListe
 				
 		panMain.add(panGameHost, BorderLayout.NORTH);
 		
-		PanelDark panPlayers = new GroupBoxDark(SternResources.Spieler(false), font);
+		PanelDark panPlayers = new GroupBoxDark(SternResources.Players(false), font);
 		panPlayers.setLayout(new SpringLayout());
 		
 		this.butEmailPlayer = new ButtonDark[players.size()];

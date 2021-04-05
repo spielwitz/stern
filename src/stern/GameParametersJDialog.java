@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
@@ -63,7 +62,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 {
 	private ArrayList<Player> players;
 	private String emailGameHost;
-	private int planetsCount;
 	private int playersCount;
 	private int yearMax;
 	private HashSet<GameOptions> options;
@@ -78,7 +76,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 	private Hashtable<GameOptions,CheckBoxDark> cbOptions;
 	private ComboBoxDark<String> comboYearLast;
 	private ComboBoxDark<String> comboPlayers;
-	private ComboBoxDark<String> comboPlanets;
 	private ButtonDark butOk;
 	private ButtonDark butCancel;
 	private ButtonDark butEmailConfiguration;
@@ -131,7 +128,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		panMain.add(add(this.getPlayerPanel(0)));
 		
 		PanelDark panPlanetsSub1 = new PanelDark(new FlowLayout(FlowLayout.LEFT));
-		panPlanetsSub1.add(new LabelDark(SternResources.Spieler(false), font));
 		String[] players = new String[Constants.PLAYERS_COUNT_MAX - Constants.PLAYERS_COUNT_MIN + 1];
 		for (int playerIndex = Constants.PLAYERS_COUNT_MIN; playerIndex <= Constants.PLAYERS_COUNT_MAX; playerIndex++)
 			players[playerIndex-Constants.PLAYERS_COUNT_MIN] = Integer.toString(playerIndex);
@@ -139,17 +135,7 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		this.comboPlayers.setSelectedItem(Integer.toString(this.playersCount));
 		this.comboPlayers.addActionListener(this);
 		panPlanetsSub1.add(this.comboPlayers);
-		
-		panPlanetsSub1.add(new JSeparator());
-		
-		panPlanetsSub1.add(new LabelDark(SternResources.Planeten(false), font));
-		String[] planets = new String[Constants.PLANETS_COUNT_MAX - Constants.PLAYERS_COUNT_MAX + 1];
-		for (int planetIndex = Constants.PLAYERS_COUNT_MAX; planetIndex <= Constants.PLANETS_COUNT_MAX; planetIndex++)
-			planets[planetIndex-Constants.PLAYERS_COUNT_MAX] = Integer.toString(planetIndex);
-		this.comboPlanets = new ComboBoxDark<String>(planets, font);
-		this.comboPlanets.setSelectedItem(Integer.toString(this.planetsCount));
-		this.comboPlanets.addActionListener(this);
-		panPlanetsSub1.add(this.comboPlanets);
+		panPlanetsSub1.add(new LabelDark(SternResources.Players(false), font));
 		
 		panMain.add(panPlanetsSub1);
 		
@@ -236,13 +222,11 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 			
 			this.emailGameHost = "";
 			
-			this.planetsCount = Constants.PLANETS_COUNT_DEFAULT;
 			this.playersCount = Constants.PLAYERS_COUNT_DEFAULT;
 			this.yearMax = Constants.YEARS_COUNT_MAX_DEFAULT;
 		}
 		else
 		{
-			this.planetsCount = game.getPlanetsCount();
 			this.playersCount = game.getPlayersCount();
 			
 			this.emailGameHost = game.getEmailAddressGameHost();
@@ -318,7 +302,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		this.comboYearLast.setEnabled(
 				this.mode != GameParametersDialogMode.FINALIZED_GAME &&
 				this.mode != GameParametersDialogMode.EMAIL_BASED_GAME);
-		this.comboPlanets.setEnabled(this.mode == GameParametersDialogMode.NEW_GAME);
 		this.comboPlayers.setEnabled(this.mode == GameParametersDialogMode.NEW_GAME);
 		
 		for (int playerIndex = 0; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
@@ -378,10 +361,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		return players;
 	}
 
-	public int getPlanetsCount() {
-		return planetsCount;
-	}
-
 	public int getYearMax() {
 		return yearMax;
 	}
@@ -415,18 +394,8 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		{
 			this.playersCount = Integer.parseInt((String)this.comboPlayers.getSelectedItem());
 			
-			this.planetsCount = Utils.round(this.playersCount * ( 
-					(double)Constants.PLANETS_COUNT_MAX / (double)Constants.PLAYERS_COUNT_MAX));
-			
-			this.comboPlanets.setSelectedItem(Integer.toString(this.planetsCount));
-			
 			this.setControlsEnabled();
 		}
-		else if (e.getSource() == this.comboPlanets)
-		{
-			this.planetsCount = Integer.parseInt((String)this.comboPlanets.getSelectedItem());
-		}
-
 		else if (e.getSource().getClass() == CheckBoxDark.class)
 		{
 			for (int i = 0; i < Constants.PLAYERS_COUNT_MAX; i++)
@@ -484,7 +453,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 				boolean ok = true;
 				
 				this.playersCount = Integer.parseInt((String)this.comboPlayers.getSelectedItem());
-				this.planetsCount = Integer.parseInt((String)this.comboPlanets.getSelectedItem());
 				
 				ok = this.getPlayersFromControls(this.players, this.playersCount);
 				

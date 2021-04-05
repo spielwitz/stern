@@ -21,11 +21,11 @@ public class Constants
 	// Minimum required build version when reading games or when exchaning data
 	// with the STERN server to avoid incompatibilities and advantages caused
 	// by program errors.
-	public static final String 	BUILD_COMPATIBLE = "2005";
+	public static final String 	BUILD_COMPATIBLE = "2008";
 
 	// Recommended build. Was used by the update checker (suspended) to indicate
 	// an important update.
-	public static final String 	BUILD_IMPORTANT_UPDATE = "2005";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "2008";
 
 	// Games older than this build have to be migrated.
 	static final String 		BUILD_MIGRATION = "2005";
@@ -41,7 +41,7 @@ public class Constants
 	static final int 		NEUTRAL = -1;
 	public static final int PLAYERS_COUNT_MAX = 6;
 	public static final int PLAYERS_COUNT_MIN = 2;
-	public static final int PLANETS_COUNT_MAX = 42;
+	static final int PLANETS_COUNT_MAX = 42;
 	static final int 		DEFENSE_SHIELDS_COUNT_MAX = 2;
 	static final int 		MONEY_PRODUCTION_PURCHASE = 4;
 	static final int 		DEFENSE_SHIELD_FIGHTERS = 350;
@@ -61,12 +61,10 @@ public class Constants
 	static final int 		PLANET_NAME_LENGTH_MAX = 2;
 	public static final int GAME_NAME_LENGTH_MIN = 3;
 	public static final int GAME_NAME_LENGTH_MAX = 18;
-	static final int 		GAME_PLANETS_NEARBY_TRAVEL_TIME = 2;
 	static final int 		GAME_PLANETS_NEARBY_COUNT = 4;
 	static final double		DEFENSE_BONUS = 1.25;
 	
 	// Default values for a new game
-	public static final int PLANETS_COUNT_DEFAULT = 42;
 	public static final int PLAYERS_COUNT_DEFAULT = 6;
 	public static final int YEARS_COUNT_MAX_DEFAULT = 30;
 	

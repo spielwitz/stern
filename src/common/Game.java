@@ -113,14 +113,13 @@ public class Game extends EmailTransportBase implements Serializable
 	public Game(HashSet<GameOptions> options,
 			Player[] players,
 			String emailAddressGameHost,
-			int planetsCount,
 			int yearMax)
 	{
 		this.options = (HashSet<GameOptions>)Utils.klon(options);
 		this.players = (Player[])Utils.klon(players);
 		this.emailAddressGameHost = emailAddressGameHost;
 
-		this.planetsCount = planetsCount;
+		this.planetsCount = Constants.PLANETS_COUNT_MAX;
 		this.playersCount = players.length;
 		this.yearMax = yearMax;
 		
@@ -132,10 +131,9 @@ public class Game extends EmailTransportBase implements Serializable
 	public static Game create(HashSet<GameOptions> options,
 			Player[] players,
 			String emailAddressGameHost,
-			int planetsCount,
 			int yearMax)
 	{
-		Game game = new Game(options, players, emailAddressGameHost, planetsCount, yearMax);
+		Game game = new Game(options, players, emailAddressGameHost, yearMax);
 		game.createBoard();
 		
 		return game;

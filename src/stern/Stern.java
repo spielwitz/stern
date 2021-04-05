@@ -660,7 +660,7 @@ public class Stern extends Frame // NO_UCD (use default)
 				Object[] playersArray = dlg.getPlayers().toArray();
 				Player[] players =  Arrays.copyOf(playersArray,playersArray.length,Player[].class);
 
-				Game game = new Game(dlg.getOptions(), players, dlg.getEmailGameHost(), dlg.getPlanetsCount(), dlg.getYearMax());
+				Game game = new Game(dlg.getOptions(), players, dlg.getEmailGameHost(), dlg.getYearMax());
 				this.gameLastRawData = (Game)Utils.klon(game);
 				this.fileNameLast = "";
 				this.setNewGame(game, false);
