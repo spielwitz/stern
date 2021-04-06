@@ -94,7 +94,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 	private PanelDark[] panPlayers;
 	private CanvasPlayerColors[] canvasPlayersColors;
 	private ArrayList<Player> players;
-	private CheckBoxDark[] cbBot;
 	private HashSet<GameOptions> options;
 	
 	private Hashtable<GameOptions,CheckBoxDark> cbOptions;
@@ -228,25 +227,8 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		else if (source == this.butNewGameSubmit)
 			this.submitGame();
 		else if (source == this.comboPlayers || 
-				source == this.cbOptions.get(GameOptions.SIMPLE) ||
 				source == this.butNewGamenewBoard)
 			this.updateGame();
-		else if (source.getClass() == CheckBoxDark.class)
-		{
-			for (int playerIndex = 0; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
-			{
-				if (source == this.cbBot[playerIndex])
-				{
-					this.comboPlayersArray[playerIndex].setEnabled(!this.cbBot[playerIndex].isSelected());
-					
-					if (this.cbBot[playerIndex].isSelected())
-					{
-						this.comboPlayersArray[playerIndex].setSelectedIndex(0);
-					}
-					break;
-				}
-			}
-		}
 		else if (source.getClass() == ComboBoxDark.class)
 		{
 			for (int playerIndex = 1; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
@@ -381,7 +363,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		
 		this.panPlayers = new PanelDark[Constants.PLAYERS_COUNT_MAX];
 		this.comboPlayersArray = new ComboBoxDark[Constants.PLAYERS_COUNT_MAX];
-		this.cbBot = new CheckBoxDark[Constants.PLAYERS_COUNT_MAX];
 		this.canvasPlayersColors = new CanvasPlayerColors[Constants.PLAYERS_COUNT_MAX];
 		this.cbOptions = new Hashtable<GameOptions,CheckBoxDark>();		
 		
@@ -395,12 +376,12 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		panMain.add(add(this.getPlayerPanel(0)));
 		
 		PanelDark panPlanetsSub1 = new PanelDark(new FlowLayout(FlowLayout.LEFT));
+		panPlanetsSub1.add(new LabelDark(SternResources.Players(false), font));
 		String[] players = new String[Constants.PLAYERS_COUNT_MAX - Constants.PLAYERS_COUNT_MIN + 1];
 		for (int playerIndex = Constants.PLAYERS_COUNT_MIN; playerIndex <= Constants.PLAYERS_COUNT_MAX; playerIndex++)
 			players[playerIndex-Constants.PLAYERS_COUNT_MIN] = Integer.toString(playerIndex);
 		this.comboPlayers = new ComboBoxDark<String>(players, font);
 		panPlanetsSub1.add(this.comboPlayers);
-		panPlanetsSub1.add(new LabelDark(SternResources.Players(false), font));
 		
 		panMain.add(panPlanetsSub1);
 		
@@ -415,25 +396,22 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		
 		panMain.add(add(this.getPlayerPanel(2)));
 		
-		CheckBoxDark cbSimple = new CheckBoxDark(SternResources.SpielparameterJDialogSimpelStern(false), true, font);
-		this.cbOptions.put(GameOptions.SIMPLE, cbSimple);
-		this.cbOptions.get(GameOptions.SIMPLE).addActionListener(this);
-		panMain.add(cbSimple);
-		
-		panMain.add(add(this.getPlayerPanel(3)));
-		
 		PanelDark panGameName = new PanelDark(new FlowLayout(FlowLayout.LEFT));
 		panGameName.add(new LabelDark(SternResources.ServerGamesSpielname(false), font));
 		this.tfGameName = new TextFieldDark(font, 18);
 		panGameName.add(this.tfGameName);
 		panMain.add(panGameName);
+
+		panMain.add(add(this.getPlayerPanel(3)));
 		
+		panMain.add(new LabelDark(font));
+
 		panMain.add(add(this.getPlayerPanel(4)));
 		
 		panMain.add(new LabelDark(font));
-		
+
 		panMain.add(add(this.getPlayerPanel(5)));
-		
+				
 		panMain.add(new LabelDark(font));
 
 		// ----
@@ -461,7 +439,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		
 		this.comboPlayersArray[0].setSelectedItem(this.cuc.userId);
 		this.comboPlayersArray[0].setEnabled(false);
-		this.cbBot[0].setEnabled(false);
 		
 		for (GameOptions option: this.cbOptions.keySet())
 			this.cbOptions.get(option).setSelected(this.options.contains(option));
@@ -541,14 +518,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 			
 		this.panPlayers[playerIndex].add(this.comboPlayersArray[playerIndex]);
 		
-		this.cbBot[playerIndex] = new CheckBoxDark(
-				SternResources.SpielparameterJDialogBot(false), 
-				this.players.get(playerIndex).isBot(), 
-				font);
-		
-		this.cbBot[playerIndex].addActionListener(this);
-		this.panPlayers[playerIndex].add(this.cbBot[playerIndex]);
-		
 		return this.panPlayers[playerIndex];
 	}
 		
@@ -627,12 +596,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 
 		for (int playerIndex = 0; playerIndex < Constants.PLAYERS_COUNT_MAX; playerIndex++)
 		{
-			this.panPlayers[playerIndex].setVisible(playerIndex < playersCount);
-			
-			if (!this.options.contains(GameOptions.SIMPLE))
-				this.cbBot[playerIndex].setSelected(false);
-			
-			this.cbBot[playerIndex].setEnabled(playerIndex > 0 && this.options.contains(GameOptions.SIMPLE));
+			this.panPlayers[playerIndex].setVisible(playerIndex < playersCount);			
 		}
 		
 		this.game = Game.create(
@@ -671,7 +635,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		for (int playerIndex = 0; playerIndex < players.length; playerIndex++)
 		{
 			Player player = players[playerIndex];
-			if (player.getName().equals("") && !player.isBot())
+			if (player.getName().equals(""))
 			{
 				DialogWindow.showError(
 						this,
@@ -680,13 +644,8 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 				return;
 			}
 			
-			if (player.isBot())
-				player.setName("_" + SternResources.SpielparameterJDialogBot(false)+ (playerIndex+1)+"_");
-			else
-			{
-				ResponseMessageGamesAndUsers.UserInfo userInfo = this.gamesAndUsers.users.get(player.getName());
-				player.setEmail(userInfo.email);
-			}
+			ResponseMessageGamesAndUsers.UserInfo userInfo = this.gamesAndUsers.users.get(player.getName());
+			player.setEmail(userInfo.email);
 		}
 		
 		DialogWindowResult dialogResult = DialogWindow.showOkCancel(
@@ -734,8 +693,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 			
 			for (Player spieler: players)
 			{
-				if (spieler.getName().equals(this.cuc.userId) ||
-					spieler.isBot())
+				if (spieler.getName().equals(this.cuc.userId))
 					continue;
 				
 				playersForEmail.add(spieler);
@@ -791,7 +749,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 					(String)this.comboPlayersArray[playerIndex].getSelectedItem(),
 					"", 
 					this.canvasPlayersColors[playerIndex].colorIndex, 
-					this.cbBot[playerIndex].isSelected(),
 					false);
 		
 		return players;
@@ -996,7 +953,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 				
 				Player player = this.selectedGame.players[playerIndex];
 				
-				this.panelsPlayers[playerIndex].cbBot.setSelected(player.isBot());
 				this.panelsPlayers[playerIndex].cbEnterMovesFinished.setSelected(
 						this.selectedGame.moveEnteringFinalized.contains(player.getName()));
 				this.panelsPlayers[playerIndex].tfPlayerName.setText(player.getName());
@@ -1043,7 +999,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 								Utils.formatDateString(
 										Utils.convertMillisecondsToString(this.selectedGame.dateStart))));
 				
-				this.cbSimple.setSelected(this.selectedGame.simple);
 			}
 			
 			this.board.repaint();
@@ -1053,7 +1008,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		{
 			public CheckBoxDark cbEnterMovesFinished;
 			public TextFieldDark tfPlayerName;
-			public CheckBoxDark cbBot;
 			
 			public PanelPlayer()
 			{
@@ -1065,11 +1019,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 				
 				this.tfPlayerName = new TextFieldDark(font, 12);
 				this.tfPlayerName.setEditable(false);
-				this.add(this.tfPlayerName);
-				
-				this.cbBot = new CheckBoxDark(SternResources.SpielparameterJDialogBot(false), false, font);
-				this.cbBot.setEnabled(false);
-				this.add(this.cbBot);
+				this.add(this.tfPlayerName);				
 			}
 		}
 

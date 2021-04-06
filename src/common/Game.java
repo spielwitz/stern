@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.UUID;
-import java.util.Vector;
 
 @SuppressWarnings("serial")
 public class Game extends EmailTransportBase implements Serializable
@@ -258,11 +257,6 @@ public class Game extends EmailTransportBase implements Serializable
 		return this.buildRequired;
 	}
 	
-	public boolean isSimple()
-	{
-		return this.options.contains(GameOptions.SIMPLE);
-	}
-	
 	public ShipTravelTime[][] getDistanceMatrix()
 	{
 		if (this.distanceMatrix == null)
@@ -369,7 +363,6 @@ public class Game extends EmailTransportBase implements Serializable
 		info.players = this.players;
 		info.dateStart = this.dateStart;
 		info.dateUpdate = this.dateUpdate;
-		info.simple = (this.options.contains(GameOptions.SIMPLE));
 		info.planetInfo = this.getPlanetInfo();
 		
 		info.moveEnteringFinalized = new HashSet<String>();
@@ -508,7 +501,6 @@ public class Game extends EmailTransportBase implements Serializable
 							SternResources.Spieler(false)+(playerIndex+1), 
 							"", 
 							(byte)(playerIndex+Colors.COLOR_OFFSET_PLAYERS), 
-							false, 
 							false));
 		
 		return players;
@@ -667,16 +659,14 @@ public class Game extends EmailTransportBase implements Serializable
 					moneyProduction += (Utils.getRandomInteger(Constants.MONEY_PRODUCTION_INITIAL_NEUTRAL_EXTRA)+1);
 			}
 			
-			DefenceShield defenceShield = (!this.options.contains(GameOptions.SIMPLE) && isPlanetHome) ? 
+			DefenceShield defenceShield = isPlanetHome ? 
 									new DefenceShield() :
 									null;
 									
 	        Hashtable<ShipType, Integer> ships = new Hashtable<ShipType, Integer>();
 	        ships.put(ShipType.FIGHTERS, fightersCount);
 	        
-	        int moneySupply = this.options.contains(GameOptions.SIMPLE) ? 
-	        			  0 :	        		
-			        		isPlanetHome ?
+	        int moneySupply = isPlanetHome ?
 			        				Constants.MONEY_SUPPLY_INITIAL_PLAYERS :
 			        				0;
 	        
@@ -934,21 +924,16 @@ public class Game extends EmailTransportBase implements Serializable
 			else
 			{
 				int playersRemainingCount = 0;
-				int botsRemainingCount = 0;
 				
 				for (Player player: this.players)
 				{
 					if (!player.isDead())
 					{
-						if (player.isBot())
-							botsRemainingCount++;
-						else
-							playersRemainingCount++;
+						playersRemainingCount++;
 					}
 				}
 				
-				if ((playersRemainingCount <= 1 && botsRemainingCount == 0) ||
-					(playersRemainingCount == 0 && botsRemainingCount > 0))
+				if (playersRemainingCount <= 1)
 					this.finalizeGame(background);
 			}
 		}
@@ -1605,7 +1590,7 @@ public class Game extends EmailTransportBase implements Serializable
 				
 				this.inmkl();
 				
-				game.players[playerIndex] = new Player(playerName, "", (byte)(playerIndex+Colors.COLOR_OFFSET_PLAYERS), false, false);
+				game.players[playerIndex] = new Player(playerName, "", (byte)(playerIndex+Colors.COLOR_OFFSET_PLAYERS), false);
 			}
 			
 			game.planetsCount = this.inasc() + 1;
@@ -2148,23 +2133,6 @@ public class Game extends EmailTransportBase implements Serializable
 			}
 			else
 			{
-				for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
-				{
-					Player player = this.game.players[playerIndex];
-					
-					if (!this.game.moves.containsKey(playerIndex))
-					{
-						if (player.isBot())
-						{
-							Game.enterMovesBot(this.game, playerIndex);
-	
-			 				this.game.planets = (Planet[])Utils.klon(planetsCopy);
-			 				this.game.ships = (ArrayList<Ship>)Utils.klon(shipsCopy);
-							continue;
-						}
-					}
-				}
-				
 				do
 				{
 					ArrayList<Integer> playersWithMissingMoves = this.game.getPlayersWithMissingMoves();
@@ -2288,7 +2256,6 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			ArrayList<Move> moves = new ArrayList<Move>();
 			this.game.moves.put(playerIndex, moves);
-			boolean simple = this.game.options.contains(GameOptions.SIMPLE);
 				
 			boolean exit = false;
 			this.capitulated = false;
@@ -2308,33 +2275,17 @@ public class Game extends EmailTransportBase implements Serializable
  				
  				if (!this.capitulated)
  				{
- 					if (!simple)
- 						allowedKeys.add(new ConsoleKey("0",SternResources.ZugeingabePlanet(true)));
- 					else
- 						allowedKeys.add(new ConsoleKey("0",SternResources.ZugeingabePlaneteninfo(true)));
- 					
- 					allowedKeys.add(new ConsoleKey("1",SternResources.ZugeingabeRaumer(true)));
- 					
- 					if (!simple)
- 					{
- 						allowedKeys.add(new ConsoleKey("2",SternResources.ZugeingabeBuendRaumer(true)));
- 						allowedKeys.add(new ConsoleKey("3",SternResources.ZugeingabeAufklaerer(true)));
- 						allowedKeys.add(new ConsoleKey("4",SternResources.ZugeingabePatrouille(true)));
- 						allowedKeys.add(new ConsoleKey("5",SternResources.ZugeingabeTransporter(true)));
- 						allowedKeys.add(new ConsoleKey("6",SternResources.ZugeingabeMine(true)));
- 						allowedKeys.add(new ConsoleKey("7",SternResources.ZugeingabeMinenraeumer(true)));
- 						
- 						allowedKeys.add(new ConsoleKey("8",SternResources.ZugeingabeBuendnis(true)));
- 						allowedKeys.add(new ConsoleKey("9",SternResources.ZugeingabeMehr(true)));
- 					}
- 					else
- 					{
- 						allowedKeys.add(new ConsoleKey("5",SternResources.ZugeingabeKapitulieren(true)));
- 						allowedKeys.add(new ConsoleKey("7",SternResources.Entfernungstabelle(true)));
- 						allowedKeys.add(new ConsoleKey("8",SternResources.ZugeingabeObjekteAusblenden(true))); 						
- 						allowedKeys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
- 					}
- 				}
+ 					allowedKeys.add(new ConsoleKey("0",SternResources.ZugeingabePlanet(true))); 					
+ 					allowedKeys.add(new ConsoleKey("1",SternResources.ZugeingabeRaumer(true))); 					
+					allowedKeys.add(new ConsoleKey("2",SternResources.ZugeingabeBuendRaumer(true)));
+					allowedKeys.add(new ConsoleKey("3",SternResources.ZugeingabeAufklaerer(true)));
+					allowedKeys.add(new ConsoleKey("4",SternResources.ZugeingabePatrouille(true)));
+					allowedKeys.add(new ConsoleKey("5",SternResources.ZugeingabeTransporter(true)));
+					allowedKeys.add(new ConsoleKey("6",SternResources.ZugeingabeMine(true)));
+					allowedKeys.add(new ConsoleKey("7",SternResources.ZugeingabeMinenraeumer(true)));					
+					allowedKeys.add(new ConsoleKey("8",SternResources.ZugeingabeBuendnis(true)));
+					allowedKeys.add(new ConsoleKey("9",SternResources.ZugeingabeMehr(true)));
+			}
  				
  				boolean quit = this.stoppedShips();
 				if (quit)
@@ -2354,36 +2305,27 @@ public class Game extends EmailTransportBase implements Serializable
 					exit = this.finish();
 				else if (!capitulated && input.equals("1"))
 					this.fighters(false);
-				else if (!capitulated && !simple && (input.equals("2")))
+				else if (!capitulated && input.equals("2"))
 					this.fighters(true);
-				else if (!capitulated && !simple && (input.equals("3")))
+				else if (!capitulated && input.equals("3"))
 					this.scoutsPatrolsTransports(ShipType.SCOUT);
-				else if (!capitulated && !simple && (input.equals("4")))
+				else if (!capitulated && input.equals("4"))
 					this.scoutsPatrolsTransports(ShipType.PATROL);
-				else if (!capitulated && !simple && (input.equals("5")))
+				else if (!capitulated && input.equals("5"))
 					this.scoutsPatrolsTransports(ShipType.TRANSPORT);
-				else if (!capitulated && simple && (input.equals("5")))
+				else if (!capitulated && input.equals("5"))
 					this.capitulate();
-				else if (!capitulated && !simple && (input.equals("6")))
+				else if (!capitulated && input.equals("6"))
 					this.MinesAndSweepers(ShipType.MINE50);
-				else if (!capitulated && !simple && (input.equals("7")))
+				else if (!capitulated && input.equals("7"))
 					this.MinesAndSweepers(ShipType.MINESWEEPER);
-				else if (simple && (input.equals("7")))
-					new DistanceMatrix(this.game);
-				else if (!capitulated && !simple && (input.equals("8")))
+				else if (!capitulated && input.equals("8"))
 					this.alliance();
-				else if (!capitulated && simple && (input.equals("8")))
-					this.hideShips();
-				else if (!capitulated && !simple && (input.equals("0")))
+				else if (!capitulated && input.equals("0"))
 					this.planetEditor();
-				else if (!capitulated && simple && (input.equals("0")))
-					this.planetInfo();
 				else if (!capitulated && input.equals("9"))
 				{
-					if (simple)
-						this.inventory();
-					else
-						this.enterMovesPlayerMore(playerIndex);
+					this.enterMovesPlayerMore(playerIndex);
 				}
 				else if (input.equals("-"))
 				{
@@ -3756,50 +3698,6 @@ public class Game extends EmailTransportBase implements Serializable
 					this.game.planets[planetIndex].getOwner() != this.playerIndexNow);
  		}
  		 		
- 		private void planetInfo()
- 		{
-			this.game.console.setHeaderText(
-					this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.Zugeingabe(true) +" " + this.game.players[this.playerIndexNow].getName() + " -> "+ SternResources.ZugeingabePlaneteninfo(true),
-					this.game.players[this.playerIndexNow].getColorIndex());
-
-			this.game.console.clear();
-			
-			int planetIndex = -1;
-
-			do
-			{
-				PlanetInputStruct input = this.game.getPlanetInput(
-						SternResources.ZugeingabePlanet(true), 
-						!game.isMoveEnteringOpen(), 
-						PlanetInputStruct.ALLOWED_INPUT_PLANET);
-				
-				if (input == null)
-				{
-					return;
-				}
-				
-				planetIndex = input.planetIndex;
-
-				if (this.game.planets[planetIndex].getOwner() == this.playerIndexNow)
-					break;
-				else
-				{
-					this.game.console.appendText(SternResources.ZugeingabeAktionNichtMoeglich(true));
-					this.game.console.lineBreak();
-				}
-
-			} while (true);
-
-			game.console.appendText(
-					SternResources.ZugeingabePlaneteninfo2(
-							true, 
-							Integer.toString(this.game.planets[planetIndex].getFighterProduction())));
-			
-			game.console.waitForKeyPressed();
-			game.console.clear();
- 		}
-
- 		
  		private boolean finish()
  		{
 			this.game.console.setHeaderText(
@@ -5849,7 +5747,6 @@ public class Game extends EmailTransportBase implements Serializable
  		private GameInformation(Game game)
  		{
  			this.game = game;
- 			boolean simple = this.game.isSimple();
  			
  			do
  			{
@@ -5866,19 +5763,12 @@ public class Game extends EmailTransportBase implements Serializable
  				allowedKeys.add(new ConsoleKey("ESC", SternResources.Hauptmenue(true)));
  				allowedKeys.add(new ConsoleKey("0",SternResources.SpielinformationenPlanet(true)));
  				
- 				allowedKeys.add(new ConsoleKey("1",
- 						simple ?
- 								SternResources.SpielinformationenKampfschiffproduktion(true) :
- 								SternResources.SpielinformationenEnergieproduktion(true)));
+ 				allowedKeys.add(new ConsoleKey("1", SternResources.SpielinformationenEnergieproduktion(true)));
  				
- 				if (!simple)
- 					allowedKeys.add(new ConsoleKey("2", SternResources.SpielinformationenFestungen(true)));
- 				if (!simple)
- 					allowedKeys.add(new ConsoleKey("3",SternResources.SpielinformationenSender(true)));
- 				if (!simple)
- 					allowedKeys.add(new ConsoleKey("4",SternResources.SpielinformationenPatrouillen(true)));
- 				if (!simple)
- 					allowedKeys.add(new ConsoleKey("5",SternResources.SpielinformationenBuendnisse(true)));
+				allowedKeys.add(new ConsoleKey("2", SternResources.SpielinformationenFestungen(true)));
+				allowedKeys.add(new ConsoleKey("3",SternResources.SpielinformationenSender(true)));
+				allowedKeys.add(new ConsoleKey("4",SternResources.SpielinformationenPatrouillen(true)));
+				allowedKeys.add(new ConsoleKey("5",SternResources.SpielinformationenBuendnisse(true)));
  				 				
  				ConsoleInput input = this.game.console.waitForKeyPressed(allowedKeys, false);
  				
@@ -5891,14 +5781,14 @@ public class Game extends EmailTransportBase implements Serializable
  				String inputString = input.getInputText().toUpperCase();
  				
  				if (inputString.equals("1"))
- 					this.moneyProduction(simple);
- 				else if (!simple && inputString.equals("2"))
+ 					this.moneyProduction();
+ 				else if (inputString.equals("2"))
  					this.defenceShields();
- 				else if (!simple && inputString.equals("3"))
+ 				else if (inputString.equals("3"))
  					this.radioStations();
- 				else if (!simple && inputString.equals("4"))
+ 				else if (inputString.equals("4"))
  					this.patrols();
- 				else if (!simple && inputString.equals("5"))
+ 				else if (inputString.equals("5"))
  					this.alliances();
  				else if (inputString.equals("0"))
  					this.planetEditorDisplay();
@@ -5908,22 +5798,12 @@ public class Game extends EmailTransportBase implements Serializable
  			} while (true);
  		}
  		
- 		private void moneyProduction(boolean simple)
+ 		private void moneyProduction()
  		{
- 			if (simple)
- 			{
- 				this.game.console.setHeaderText(
-							this.game.mainMenuGetYearDisplayText() + 
-							" -> "+SternResources.Spielinformationen(true)+
-							" -> "+SternResources.SpielinformationenKampfschiffproduktionTitel(true), Colors.NEUTRAL);
- 			}
-	 		else
-	 		{
-	 			this.game.console.setHeaderText(
-	 							this.game.mainMenuGetYearDisplayText() + 
-	 							" -> "+SternResources.Spielinformationen(true)+
-	 							" -> "+SternResources.SpielinformationenEnergieproduktionTitel(true), Colors.NEUTRAL);
-	 		}
+ 			this.game.console.setHeaderText(
+ 							this.game.mainMenuGetYearDisplayText() + 
+ 							" -> "+SternResources.Spielinformationen(true)+
+ 							" -> "+SternResources.SpielinformationenEnergieproduktionTitel(true), Colors.NEUTRAL);
  			
  			ArrayList<ScreenContentBoardPlanet> screenContentsPlanet = new ArrayList<ScreenContentBoardPlanet>(this.game.planetsCount);
  			
@@ -6234,21 +6114,12 @@ public class Game extends EmailTransportBase implements Serializable
  				this.game.console.setHeaderText(
  						this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenPlanetTitel(true)+" " + this.game.getPlanetNameFromIndex(planetIndex), colorIndex);
  				
- 				if (this.game.options.contains(GameOptions.SIMPLE))
- 				{
- 					game.console.appendText(
- 							SternResources.InventurRaumerproduktionJahr(true)+": " + this.game.planets[planetIndex].getFighterProduction() + " " + SternResources.PlEditEe(true));
- 					
- 					game.console.lineBreak();
- 				}
- 				else
- 				{ 				
-	 				new PlanetEditor(
-	 						this.game,
-	 						planetIndex,
-	 						null,
-	 						true);
- 				}
+ 				new PlanetEditor(
+ 						this.game,
+ 						planetIndex,
+ 						null,
+ 						true);
+
  				
  			} while (true);
  		}
@@ -6305,13 +6176,11 @@ public class Game extends EmailTransportBase implements Serializable
   		private InventoryPdfData pdfData;
   		private GameInformation gameInformation;
   		private ScreenContent screenContentCopy;
-  		private boolean simple;
   		
   		private Inventory(Game game, int playerIndex)
   		{
   			this.game = game;
   			this.playerIndex = playerIndex;
-  			this.simple = this.game.options.contains(GameOptions.SIMPLE);
   			
   			this.game.console.setHeaderText(
 					this.game.mainMenuGetYearDisplayText() + " -> Zugeingabe " + this.game.players[this.playerIndex].getName() + " -> "+SternResources.InventurTitel(true),
@@ -6365,9 +6234,7 @@ public class Game extends EmailTransportBase implements Serializable
   			
   			this.planets();
   			this.ships();
-  			
-  			if (!this.simple)
-  				this.patrols();
+  			this.patrols();
   			
   			this.game.screenContent = screenContentCopy;
   			
@@ -6389,10 +6256,8 @@ public class Game extends EmailTransportBase implements Serializable
   		{
   			InventoryPdfChapter chapter = 
   					new InventoryPdfChapter(
-  							this.simple ? SternResources.InventurRaumer(false) : SternResources.InventurFlugobjekte(false),
-  							this.simple ?
-  									SternResources.InventurKeineRaumer(false) :
-  									SternResources.InventurKeineFlugobjekte(false));
+  							SternResources.InventurFlugobjekte(false),
+  							SternResources.InventurKeineFlugobjekte(false));
   			
   			ArrayList<ShipTravelTime> travelTimesRemaining = new ArrayList<ShipTravelTime>();
   			ArrayList<Ship> ships = new ArrayList<Ship>();
@@ -6430,51 +6295,34 @@ public class Game extends EmailTransportBase implements Serializable
   			}
   			
   			this.game.screenContent = new ScreenContent();
-			chapter.table = new InventoryPdfTable(this.simple? 4 : 8);
+			chapter.table = new InventoryPdfTable(8);
 			HashSet<Integer> planetIndicesHighlighted = new HashSet<Integer>();
  			ArrayList<Point> positionsMarked = new ArrayList<Point>();
 			
 			// Column headers
- 			if (this.simple)
- 			{
- 				chapter.table.cells.add(SternResources.InventurAnzahl(false));
-  				chapter.table.colAlignRight[0] = true;
-  				
-  				chapter.table.cells.add(SternResources.InventurStart(false));
-  				chapter.table.colAlignRight[1] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurZiel(false));
-  				chapter.table.colAlignRight[2] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurAnkunft(false));
-  				chapter.table.colAlignRight[3] = true;
- 			}
- 			else
- 			{
-  				chapter.table.cells.add(SternResources.InventurAnzahl(false));
-  				chapter.table.colAlignRight[0] = true;
-  				
-  				chapter.table.cells.add(SternResources.InventurTyp(false));
-  				chapter.table.colAlignRight[1] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurKommandant(false));
-  				chapter.table.colAlignRight[2] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurStart(false));
-  				chapter.table.colAlignRight[3] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurZiel(false));
-  				chapter.table.colAlignRight[4] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurFracht(false));
-  				chapter.table.colAlignRight[5] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurAnkunft(false));
-  				chapter.table.colAlignRight[6] = false;
-  				
-  				chapter.table.cells.add(SternResources.InventurBuendnis(false));
-  				chapter.table.colAlignRight[7] = false;
- 			}
+			chapter.table.cells.add(SternResources.InventurAnzahl(false));
+			chapter.table.colAlignRight[0] = true;
+			
+			chapter.table.cells.add(SternResources.InventurTyp(false));
+			chapter.table.colAlignRight[1] = false;
+			
+			chapter.table.cells.add(SternResources.InventurKommandant(false));
+			chapter.table.colAlignRight[2] = false;
+			
+			chapter.table.cells.add(SternResources.InventurStart(false));
+			chapter.table.colAlignRight[3] = false;
+			
+			chapter.table.cells.add(SternResources.InventurZiel(false));
+			chapter.table.colAlignRight[4] = false;
+			
+			chapter.table.cells.add(SternResources.InventurFracht(false));
+			chapter.table.colAlignRight[5] = false;
+			
+			chapter.table.cells.add(SternResources.InventurAnkunft(false));
+			chapter.table.colAlignRight[6] = false;
+			
+			chapter.table.cells.add(SternResources.InventurBuendnis(false));
+			chapter.table.colAlignRight[7] = false;
 			
 			// Sort ships by time of arrival
  			Collections.sort(travelTimesRemaining, new ShipTravelTime());
@@ -6510,47 +6358,44 @@ public class Game extends EmailTransportBase implements Serializable
  								Integer.toString(ship2.getCount()) :
  								"1");
  				
- 				if (!this.simple)
+ 				switch (ship2.getType())
  				{
-  	 				switch (ship2.getType())
-  	 				{
-  	 				case FIGHTERS:
-  	 					chapter.table.cells.add(SternResources.Raumer(false));
-  	 					break;
-  	 				case SCOUT:
-  	 					chapter.table.cells.add(SternResources.InventurAufklaerer(false));
-  	 					break;
-  	 				case PATROL:
-  	 					chapter.table.cells.add(SternResources.InventurPatrouilleTransfer(false));
-  	 					break;
-  	 				case TRANSPORT:
-  	 					chapter.table.cells.add(SternResources.InventurTransporter(false));
-  	 					break;
-  	 				case MINE50:
-  	 					chapter.table.cells.add(SternResources.InventurMinenleger50(false));
-  	 					break;
-  	 				case MINE100:
-  	 					chapter.table.cells.add(SternResources.InventurMinenleger100(false));
-  	 					break;
-  	 				case MINE250:
-  	 					chapter.table.cells.add(SternResources.InventurMinenleger250(false));
-  	 					break;
-  	 				case MINE500:
-  	 					chapter.table.cells.add(SternResources.InventurMinenleger500(false));
-  	 					break;
-  	 				case MINESWEEPER:
-  	 					if (ship2.isTransfer())
-  	 						chapter.table.cells.add(SternResources.InventurMinenraeumerTransfer(false));
-  	 					else
-  	 						chapter.table.cells.add(SternResources.InventurMinenraeumer(false));
-  	 					break;
-					default:
-						chapter.table.cells.add("");
-						break;
-  	 				}
-  	 				
-  	 				chapter.table.cells.add(this.game.players[ship2.getOwner()].getName());
+ 				case FIGHTERS:
+ 					chapter.table.cells.add(SternResources.Raumer(false));
+ 					break;
+ 				case SCOUT:
+ 					chapter.table.cells.add(SternResources.InventurAufklaerer(false));
+ 					break;
+ 				case PATROL:
+ 					chapter.table.cells.add(SternResources.InventurPatrouilleTransfer(false));
+ 					break;
+ 				case TRANSPORT:
+ 					chapter.table.cells.add(SternResources.InventurTransporter(false));
+ 					break;
+ 				case MINE50:
+ 					chapter.table.cells.add(SternResources.InventurMinenleger50(false));
+ 					break;
+ 				case MINE100:
+ 					chapter.table.cells.add(SternResources.InventurMinenleger100(false));
+ 					break;
+ 				case MINE250:
+ 					chapter.table.cells.add(SternResources.InventurMinenleger250(false));
+ 					break;
+ 				case MINE500:
+ 					chapter.table.cells.add(SternResources.InventurMinenleger500(false));
+ 					break;
+ 				case MINESWEEPER:
+ 					if (ship2.isTransfer())
+ 						chapter.table.cells.add(SternResources.InventurMinenraeumerTransfer(false));
+ 					else
+ 						chapter.table.cells.add(SternResources.InventurMinenraeumer(false));
+ 					break;
+				default:
+					chapter.table.cells.add("");
+					break;
  				}
+ 				
+ 				chapter.table.cells.add(this.game.players[ship2.getOwner()].getName());
  				
  				chapter.table.cells.add(Utils.padString(" " + game.getSectorNameFromPosition(ship2.getPositionStart()), 2));
  				
@@ -6559,43 +6404,37 @@ public class Game extends EmailTransportBase implements Serializable
  				else
  					chapter.table.cells.add(Utils.padString(" " + game.getSectorNameFromPosition(ship2.getPositionDestination()), 2));
  				
- 				if (!this.simple)
+ 				if (ship2.getType() == ShipType.TRANSPORT)
  				{
-  	 				if (ship2.getType() == ShipType.TRANSPORT)
-  	 				{
- 						chapter.table.cells.add(
- 								SternResources.InventurTransporterEe(
- 										false, 
- 										Integer.toString(ship2.getCount())));
-  	 				}
-  	 				else
-  	 					chapter.table.cells.add("");
+					chapter.table.cells.add(
+							SternResources.InventurTransporterEe(
+									false, 
+									Integer.toString(ship2.getCount())));
  				}
+ 				else
+ 					chapter.table.cells.add("");
  				
  				travelTimeRemaining.year += this.game.year;
  				chapter.table.cells.add(travelTimeRemaining.toOutputString(false));
  				
- 				if (!this.simple)
+ 				if (ship2.getType() == ShipType.FIGHTERS && ship2.isAlliance())
  				{
-  	 				if (ship2.getType() == ShipType.FIGHTERS && ship2.isAlliance())
-  	 				{
- 						StringBuilder sb = new StringBuilder(this.game.players[ship2.getOwner()].getName() + ": "+
- 											ship2.getFightersCount(ship2.getOwner()));
+					StringBuilder sb = new StringBuilder(this.game.players[ship2.getOwner()].getName() + ": "+
+										ship2.getFightersCount(ship2.getOwner()));
 
- 						for (int playerIndex = 0; playerIndex < game.playersCount; playerIndex++)
- 						{
- 							if (playerIndex == ship2.getOwner() || ship2.getFightersCount(playerIndex) <= 0)
- 								continue;
+					for (int playerIndex = 0; playerIndex < game.playersCount; playerIndex++)
+					{
+						if (playerIndex == ship2.getOwner() || ship2.getFightersCount(playerIndex) <= 0)
+							continue;
 
- 							sb.append("\n" + this.game.players[playerIndex].getName() + ": "+
- 											ship2.getFightersCount(playerIndex));
- 						}
- 						
- 						chapter.table.cells.add(sb.toString());
-  	 				}
-  	 				else
-  	 					chapter.table.cells.add("");
+						sb.append("\n" + this.game.players[playerIndex].getName() + ": "+
+										ship2.getFightersCount(playerIndex));
+					}
+					
+					chapter.table.cells.add(sb.toString());
  				}
+ 				else
+ 					chapter.table.cells.add("");
 			}
 			
 			ArrayList<ScreenContentBoardPlanet> planets = this.gameInformation.getDefaultBoard(this.alliances(), planetIndicesHighlighted);
@@ -6732,79 +6571,64 @@ public class Game extends EmailTransportBase implements Serializable
   		{
   			InventoryPdfChapter chapter = 
   					new InventoryPdfChapter(
-  							simple ? SternResources.InventurPlanetenTitelSimpel(false) : 
-  								SternResources.InventurPlanetenTitel(false),
+  							SternResources.InventurPlanetenTitel(false),
   							SternResources.InventurKeinePlaneten(false));
   			
   			this.game.screenContent = new ScreenContent();
   			
-  			chapter.table = new InventoryPdfTable(simple ? 3 : 17);
+  			chapter.table = new InventoryPdfTable(17);
 				
 			// Columns headers
-  			if (this.simple)
-  			{
-  				chapter.table.cells.add(SternResources.InventurPlanet(false));
-				chapter.table.colAlignRight[0] = false;
-				
-				chapter.table.cells.add(SternResources.InventurRaumerproduktionJahr(false));
-				chapter.table.colAlignRight[1] = true;
-				
-				chapter.table.cells.add(SternResources.InventurRaumer(false));
-				chapter.table.colAlignRight[2] = true;
-  			}
-  			else
-  			{
-	  			chapter.table.cells.add(SternResources.InventurPlanetKurz(false));
-				chapter.table.colAlignRight[0] = false;
-				
-				chapter.table.cells.add(SternResources.InventurBesitzerKurz(false));
-				chapter.table.colAlignRight[1] = false;
-				
-				chapter.table.cells.add(SternResources.InventurEnergievorratKurz(false));
-				chapter.table.colAlignRight[2] = true;
-				
-				chapter.table.cells.add(SternResources.InventurEnergieproduktionKurz(false));
-				chapter.table.colAlignRight[3] = true;
-				
-				chapter.table.cells.add(SternResources.InventurRaumerproduktionKurz(false));
-				chapter.table.colAlignRight[4] = true;
-				
-				chapter.table.cells.add(SternResources.InventurFestungKurz(false));
-				chapter.table.colAlignRight[5] = true;
-				
-				chapter.table.cells.add(SternResources.InventurFestungRaumerKurz(false));
-				chapter.table.colAlignRight[6] = true;
-				
-				chapter.table.cells.add(SternResources.InventurRaumerKurz(false));
-				chapter.table.colAlignRight[7] = true;
-				
-				chapter.table.cells.add(SternResources.InventurAufklaererKurz(false));
-				chapter.table.colAlignRight[8] = true;
-				
-				chapter.table.cells.add(SternResources.InventurTransporterKurz(false));
-				chapter.table.colAlignRight[9] = true;
-				
-				chapter.table.cells.add(SternResources.InventurPatrouilleKurz(false));
-				chapter.table.colAlignRight[10] = true;
-				
-				chapter.table.cells.add(SternResources.InventurMinenraeumerKurz(false));
-				chapter.table.colAlignRight[11] = true;
-				
-				chapter.table.cells.add(SternResources.InventurMine50Kurz(false));
-				chapter.table.colAlignRight[12] = true;
-				
-				chapter.table.cells.add(SternResources.InventurMine100Kurz(false));
-				chapter.table.colAlignRight[13] = true;
-				
-				chapter.table.cells.add(SternResources.InventurMine250Kurz(false));
-				chapter.table.colAlignRight[14] = true;
-				
-				chapter.table.cells.add(SternResources.InventurMine500Kurz(false));
-				chapter.table.colAlignRight[15] = true;
-				
-				chapter.table.cells.add(SternResources.InventurBuendnisKurz(false));
-				chapter.table.colAlignRight[16] = false;
-  			}
+  			chapter.table.cells.add(SternResources.InventurPlanetKurz(false));
+			chapter.table.colAlignRight[0] = false;
+			
+			chapter.table.cells.add(SternResources.InventurBesitzerKurz(false));
+			chapter.table.colAlignRight[1] = false;
+			
+			chapter.table.cells.add(SternResources.InventurEnergievorratKurz(false));
+			chapter.table.colAlignRight[2] = true;
+			
+			chapter.table.cells.add(SternResources.InventurEnergieproduktionKurz(false));
+			chapter.table.colAlignRight[3] = true;
+			
+			chapter.table.cells.add(SternResources.InventurRaumerproduktionKurz(false));
+			chapter.table.colAlignRight[4] = true;
+			
+			chapter.table.cells.add(SternResources.InventurFestungKurz(false));
+			chapter.table.colAlignRight[5] = true;
+			
+			chapter.table.cells.add(SternResources.InventurFestungRaumerKurz(false));
+			chapter.table.colAlignRight[6] = true;
+			
+			chapter.table.cells.add(SternResources.InventurRaumerKurz(false));
+			chapter.table.colAlignRight[7] = true;
+			
+			chapter.table.cells.add(SternResources.InventurAufklaererKurz(false));
+			chapter.table.colAlignRight[8] = true;
+			
+			chapter.table.cells.add(SternResources.InventurTransporterKurz(false));
+			chapter.table.colAlignRight[9] = true;
+			
+			chapter.table.cells.add(SternResources.InventurPatrouilleKurz(false));
+			chapter.table.colAlignRight[10] = true;
+			
+			chapter.table.cells.add(SternResources.InventurMinenraeumerKurz(false));
+			chapter.table.colAlignRight[11] = true;
+			
+			chapter.table.cells.add(SternResources.InventurMine50Kurz(false));
+			chapter.table.colAlignRight[12] = true;
+			
+			chapter.table.cells.add(SternResources.InventurMine100Kurz(false));
+			chapter.table.colAlignRight[13] = true;
+			
+			chapter.table.cells.add(SternResources.InventurMine250Kurz(false));
+			chapter.table.colAlignRight[14] = true;
+			
+			chapter.table.cells.add(SternResources.InventurMine500Kurz(false));
+			chapter.table.colAlignRight[15] = true;
+			
+			chapter.table.cells.add(SternResources.InventurBuendnisKurz(false));
+			chapter.table.colAlignRight[16] = false;
   			  			
   			for (int index = 0; index < game.planetsCount; index++)
   			{
@@ -6821,54 +6645,45 @@ public class Game extends EmailTransportBase implements Serializable
   				
   				chapter.table.cells.add(Utils.padString(" " + game.getPlanetNameFromIndex(planetIndex), 2));
   				
-  				if (!simple)
-  				{
-  					chapter.table.cells.add(planet.getOwner() == Constants.NEUTRAL ?
-  	  						"" :
-  	  						game.players[planet.getOwner()].getName());
-  					
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getMoneySupply()) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getMoneyProduction()) : "?");
-  				}
+				chapter.table.cells.add(planet.getOwner() == Constants.NEUTRAL ?
+  						"" :
+  						game.players[planet.getOwner()].getName());
+				
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getMoneySupply()) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getMoneyProduction()) : "?");
   				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getFighterProduction()) : "?");
   				
-  				if (!simple)
-  				{
-  					chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenceShieldFactor()) : "?");
-  					chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenceShieldFightersCount()) : "?");
-  				}
+				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenceShieldFactor()) : "?");
+				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenceShieldFightersCount()) : "?");
   				chapter.table.cells.add(Utils.convertToString(planet.getShipsCount(ShipType.FIGHTERS)));
   				
-  				if (!simple)
-  				{
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.SCOUT)) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.TRANSPORT)) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.PATROL)) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINESWEEPER)) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE50)) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE100)) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE250)) : "?");
-	  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE500)) : "?");
-	  				
-					if (planet.allianceExists())
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.SCOUT)) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.TRANSPORT)) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.PATROL)) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINESWEEPER)) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE50)) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE100)) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE250)) : "?");
+  				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.MINE500)) : "?");
+  				
+				if (planet.allianceExists())
+				{
+					StringBuilder sb = new StringBuilder(this.game.players[planet.getOwner()].getName() + ": "+
+										planet.getFightersCount(planet.getOwner()));
+
+					for (int playerIndex = 0; playerIndex < game.playersCount; playerIndex++)
 					{
-						StringBuilder sb = new StringBuilder(this.game.players[planet.getOwner()].getName() + ": "+
-											planet.getFightersCount(planet.getOwner()));
-	
-						for (int playerIndex = 0; playerIndex < game.playersCount; playerIndex++)
-						{
-							if (playerIndex == planet.getOwner() || !planet.isAllianceMember(playerIndex))
-								continue;
-	
-							sb.append("\n" + this.game.players[playerIndex].getName() + ": "+
-											planet.getFightersCount(playerIndex));
-						}
-						
-						chapter.table.cells.add(sb.toString());
+						if (playerIndex == planet.getOwner() || !planet.isAllianceMember(playerIndex))
+							continue;
+
+						sb.append("\n" + this.game.players[playerIndex].getName() + ": "+
+										planet.getFightersCount(playerIndex));
 					}
-					else
-						chapter.table.cells.add("");
-  				}
+					
+					chapter.table.cells.add(sb.toString());
+				}
+				else
+					chapter.table.cells.add("");
   			}
   			
 			ArrayList<ScreenContentBoardPlanet> planets = this.gameInformation.getDefaultBoard(this.alliances(), null);
@@ -7082,181 +6897,6 @@ public class Game extends EmailTransportBase implements Serializable
   	  	
   	// =========================================
   	
-  	private static class AI
-  	{
-  		private static Vector<MoveAi> calc (Game gameCopy, int playerIndex)
-  		{
-  			Vector<MoveAi> moves = new Vector<MoveAi>();
-  			
-  			gameCopy.getDistanceMatrix();
-  			
-  			int score[] = new int [gameCopy.planetsCount];
-
-  			score = evaluateInitialSituation(gameCopy, playerIndex, gameCopy.distanceMatrixYears);
-  			
-  			Vector<MoveAi> movesAi;
-  			
-  			int planetIndexStart, planetIndexDestination, distanceCurrent, fightersCountTotal = 0, fightersCountMin = 0;
-  			short fightersCount = 0;
-  			double	offenderExtra;
-  			
-  			int scoreSequence[] = Utils.sortValues(score, true);
-  			
-  			for (int t = 0; t < scoreSequence.length; t++)
-  			{
-  				planetIndexDestination = scoreSequence[t];
-  				Planet planetDestination = gameCopy.planets[planetIndexDestination];
-  				
-  				if (score[planetIndexDestination] < 0)
-  					continue;
-  						
-  				int distPl[] = Utils.sortValues(gameCopy.distanceMatrixYears[planetIndexDestination], false);
-  				
-  				distanceCurrent = -1;
-  				fightersCountTotal = 0;
-  				
-  				movesAi = new Vector<MoveAi>();
-  				
-  				offenderExtra = 1. + (double)Utils.getRandomInteger(Constants.AI_ATTACK_FACTOR_RND_MAX) / 100.;
-  				
-  				for (int tt = 0; tt < gameCopy.distanceMatrixYears.length; tt++)
-  				{
-  					planetIndexStart = distPl[tt];
-  					Planet planetStart = gameCopy.planets[planetIndexStart];
-  					
-  					if (planetIndexStart == planetIndexDestination || planetStart.getOwner() != playerIndex || score[planetIndexStart] > 0)
-  						continue;
-  					
-  					if (distanceCurrent >= 0 && gameCopy.distanceMatrixYears[planetIndexDestination][planetIndexStart] != distanceCurrent)
-  					{
-  						movesAi = new Vector<MoveAi>();
-  						fightersCountTotal = 0;
-  					}
-  					
-  					distanceCurrent = gameCopy.distanceMatrixYears[planetIndexDestination][planetIndexStart];
-  					fightersCount = 0;
-  					fightersCountMin = 999999999;
-  					
-  					if (planetDestination.getOwner() == playerIndex)
-  						fightersCountMin = score[planetIndexDestination];
-  					else
-  					{		
-  						int fightersProduction = 
-  								planetDestination.isNeutral() ?
-  										0 :
-  										planetDestination.getShipsCount(ShipType.FIGHTERS);
-  						
-  						fightersCountMin = Utils.round(offenderExtra * ((double)(fightersProduction+planetDestination.getFighterProduction()*(distanceCurrent+1))) * Constants.AI_ATTACK_FACTOR);
-  					}
-
-  					if (score[planetIndexStart] < 0)
-  					{
-  						fightersCount = (short)Math.min(planetStart.getShipsCount(ShipType.FIGHTERS), -Utils.round(((double)score[planetIndexStart] / Constants.AI_THREAT_FACTOR)));
-  						fightersCount = (short)Math.min(fightersCount, fightersCountMin);
-  					}
-
-  					if (fightersCount > 0)
-  					{
-  						MoveAi moveAi = new MoveAi();
-  						
-  						moveAi.planetIndexStart = planetIndexStart;
-  						moveAi.planetIndexDestination  = planetIndexDestination;
-  						moveAi.fightersCount = fightersCount;
-  						
-  						movesAi.add(moveAi);
-  						
-  						fightersCountTotal += fightersCount;
-  					}
-  					
-  					if (fightersCountTotal >= fightersCountMin)
-  						break;
-  				}
-  				
-  				if (fightersCountTotal >= fightersCountMin && movesAi.size() > 0)
-  				{
-  					for (MoveAi moveAi: movesAi)
-  		  			{
-  						moves.add(moveAi);
-  						
-  						Ship ship = new Ship(
-  								moveAi.planetIndexStart,
-  								moveAi.planetIndexDestination,
-  								gameCopy.planets[moveAi.planetIndexStart].getPosition(),
-  								gameCopy.planets[moveAi.planetIndexDestination].getPosition(),
-  								ShipType.FIGHTERS,
-  								moveAi.fightersCount,
-  								playerIndex,
-  								false,
-  								true,
-  								null);
-  						
-  						gameCopy.ships.add(ship);
-  						gameCopy.planets[moveAi.planetIndexStart].subtractFightersCount(gameCopy.playersCount, moveAi.fightersCount, playerIndex, false);
-  						
-  		  				score[moveAi.planetIndexStart] += Utils.round((double)moveAi.fightersCount * Constants.AI_THREAT_FACTOR
-  		  						);
-  		  				score[moveAi.planetIndexDestination]  -= moveAi.fightersCount;
-  		  			}
-  				}
-  			}
-
-  			return moves;
-  		}
-  		
-  		private static int[] evaluateInitialSituation(Game gameCopy, int playerIndex, int[][] distances)
-  		{
-  			int score[] = new int[gameCopy.planetsCount];
-  			
-  			int		years = 0;
-  			
-  			double 	valueDistance = 0.,
-  					valueFighters = 0.;
-  			
-  			for (int planetIndexDestination = 0; planetIndexDestination < gameCopy.planetsCount; planetIndexDestination++)
-  			{
-  				valueFighters = 0.;
-  				int diff = 0;
-  				
-  				Planet planetDestination = gameCopy.planets[planetIndexDestination];
-  				
-  				for (int planetIndexStart = 0; planetIndexStart < gameCopy.planetsCount; planetIndexStart++)
-  				{
-  					Planet planetStart = gameCopy.planets[planetIndexStart];
-  					if (planetDestination.getOwner() == planetStart.getOwner() || planetStart.getOwner() == Constants.NEUTRAL)
-  						continue;
-  					
-  					years = distances[planetIndexStart][planetIndexDestination] + 1;
-  					valueDistance = (double)Constants.AI_DISTANCE_FACTOR/(Math.pow((double)years, 2.));
-  					
-					diff = planetStart.getShipsCount(ShipType.FIGHTERS) - planetDestination.getShipsCount(ShipType.FIGHTERS); 
-
-  					valueFighters += (double)diff  * valueDistance;
-
-  				}
-  							
-  				for (Ship ships: gameCopy.ships)
-  				{
-  					if (ships.getOwner() == playerIndex && 
-  						ships.getType() == ShipType.FIGHTERS &&
-  						ships.getPlanetIndexDestination() == planetIndexDestination)
-  					{
-  						if (planetDestination.getOwner() != Constants.NEUTRAL)
-  							valueFighters -= ships.getCount();
-  						else
-  							valueFighters = -9999;
-  					}
-  				}
-  				
-  				score[planetIndexDestination] += Utils.round(valueFighters);
-  				
-				if (planetDestination.getOwner() != Constants.NEUTRAL)
-					score[planetIndexDestination] -= (planetDestination.getShipsCount(ShipType.FIGHTERS));
-  			}
-  			
-  			return score;
-  		}  		
-  	}
-  	
   	public void setEnableParameterChange(boolean enabled)
   	{
   		this.enableParameterChange = enabled;
@@ -7286,16 +6926,13 @@ public class Game extends EmailTransportBase implements Serializable
 		return playerIndex;
   	}
   	
-  	@SuppressWarnings("unchecked")
 	public boolean startEvaluationServer()
   	{
   		boolean allPlayersHaveEnteredMoves = true;
   		
   		for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
   		{
-  			Player player = this.players[playerIndex];
-  			
-  			if (!player.isBot() && !this.moves.containsKey(playerIndex))
+  			if (!this.moves.containsKey(playerIndex))
   			{
   				allPlayersHaveEnteredMoves = false;
   				break;
@@ -7304,26 +6941,6 @@ public class Game extends EmailTransportBase implements Serializable
   		
   		if (allPlayersHaveEnteredMoves)
   		{
-  			Planet[] planetsCopy = (Planet[])Utils.klon(this.planets);
-			ArrayList<Ship> shipsCopy = (ArrayList<Ship>)Utils.klon(this.ships);
-  			
-			for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
-			{
-				Player player = this.players[playerIndex];
-				
-				if (!this.moves.containsKey(playerIndex))
-				{
-					if (player.isBot())
-					{
-						Game.enterMovesBot(this, playerIndex);
-
-		 				this.planets = (Planet[])Utils.klon(planetsCopy);
-		 				this.ships = (ArrayList<Ship>)Utils.klon(shipsCopy);
-						continue;
-					}
-				}
-			}
-
   			this.console = new Console(this, true);
   			
 			this.updateBoard();
@@ -7335,37 +6952,6 @@ public class Game extends EmailTransportBase implements Serializable
   		}
   		
   		return allPlayersHaveEnteredMoves;
-  	}
-  	
-  	private static void enterMovesBot(Game game, int playerIndex)
-  	{
-  		Vector<MoveAi> movesAi = AI.calc(game, playerIndex);
-			
-		ArrayList<Move> moves = new ArrayList<Move>();
-		game.moves.put(playerIndex, moves);
-			
-		for (MoveAi moveAi: movesAi)
-		{
-			Ship ship = new Ship(
-					moveAi.planetIndexStart,
-					moveAi.planetIndexDestination,
-					game.planets[moveAi.planetIndexStart].getPosition(),
-					game.planets[moveAi.planetIndexDestination].getPosition(),
-					ShipType.FIGHTERS,
-					moveAi.fightersCount,
-					playerIndex,
-					false,
-					true,
-					null);
-			
-			game.planets[moveAi.planetIndexStart].subtractFightersCount(game.playersCount, moveAi.fightersCount, playerIndex, false);
-			
-			game.moves.get(playerIndex).add(
-					new Move(
-							moveAi.planetIndexStart,
-							ship,
-							null));
-		}
   	}
   	
   	public void setPlayerEmailAddress(String userId, String email)

@@ -28,7 +28,6 @@ public class GameInfo
 	public long dateUpdate;
 	public int yearMax;
 	public int year;
-	public boolean simple;
 	public HashSet<String> moveEnteringFinalized;
 	
 	public ArrayList<PlanetInfo> planetInfo;

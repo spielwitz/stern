@@ -135,18 +135,18 @@ class EmailSettingsJDialog extends JDialog implements ActionListener, FocusListe
 			Player player = this.players.get(playerIndex);
 			
 			this.cbEmailEnabled[playerIndex] = new CheckBoxDark(player.getName(), player.isEmailPlayer(), font);
-			this.cbEmailEnabled[playerIndex].setEnabled(!player.isBot() && !readOnly);
+			this.cbEmailEnabled[playerIndex].setEnabled(!readOnly);
 			this.cbEmailEnabled[playerIndex].setForeground(Colors.get(player.getColorIndex()));
 			panPlayers.add(this.cbEmailEnabled[playerIndex]);
 			
 			this.tfEmailPlayer[playerIndex] = new TextFieldDark(player.getEmail(), font);
 			this.tfEmailPlayer[playerIndex].setColumns(COLUMNS_TEXT_FIELS);
-			this.tfEmailPlayer[playerIndex].setEditable(!player.isBot() && !readOnly);	
+			this.tfEmailPlayer[playerIndex].setEditable(!readOnly);	
 			this.tfEmailPlayer[playerIndex].addFocusListener(this);
 			panPlayers.add(this.tfEmailPlayer[playerIndex]);
 			
 			this.butEmailPlayer[playerIndex] = new ButtonDark(this, EMAIL_SELECT_BUTTON_TEXT, font);
-			this.butEmailPlayer[playerIndex].setEnabled(!player.isBot() && !readOnly);
+			this.butEmailPlayer[playerIndex].setEnabled(!readOnly);
 			panPlayers.add(this.butEmailPlayer[playerIndex]);
 		}
 		

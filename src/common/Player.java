@@ -24,7 +24,6 @@ public class Player implements Serializable
 	private String name;
 	private String email;
 	private byte colorIndex;
-	private boolean bot;
 	private boolean emailPlayer;
 	private boolean dead;
 	
@@ -32,14 +31,12 @@ public class Player implements Serializable
 			String name, 
 			String email, 
 			byte colorIndex,
-			boolean bot, 
 			boolean emailPlayer)
 	{
 		super();
 		this.name = name;
 		this.email = email;
 		this.colorIndex = colorIndex;
-		this.bot = bot;
 		this.emailPlayer = emailPlayer;
 	}
 
@@ -68,16 +65,6 @@ public class Player implements Serializable
 	public void setEmail(String email)
 	{
 		this.email = email;
-	}
-	
-	public boolean isBot()
-	{
-		return this.bot;
-	}
-	
-	public void setBot(boolean bot)
-	{
-		this.bot = bot;
 	}
 	
 	public boolean isEmailPlayer()

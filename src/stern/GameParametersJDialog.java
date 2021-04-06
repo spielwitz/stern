@@ -71,7 +71,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 	
 	private PanelDark[] panPlayers;
 	private TextFieldDark[] tfPlayer;
-	private CheckBoxDark[] cbPlayer;
 	private CanvasPlayerColors[] canvasPlayerColors;
 	private Hashtable<GameOptions,CheckBoxDark> cbOptions;
 	private ComboBoxDark<String> comboYearLast;
@@ -102,7 +101,6 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		
 		this.panPlayers = new PanelDark[Constants.PLAYERS_COUNT_MAX];
 		this.tfPlayer = new TextFieldDark[Constants.PLAYERS_COUNT_MAX];
-		this.cbPlayer = new CheckBoxDark[Constants.PLAYERS_COUNT_MAX];
 		this.canvasPlayerColors = new CanvasPlayerColors[Constants.PLAYERS_COUNT_MAX];
 		this.cbOptions = new Hashtable<GameOptions,CheckBoxDark>();		
 		
@@ -123,11 +121,11 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		
 		PanelDark panBase = new PanelDark(new BorderLayout(10,10));
 		// ---------------
-		PanelDark panMain = new PanelDark(new GridLayout(6, 2, 20, 0));
-		
-		panMain.add(add(this.getPlayerPanel(0)));
+		PanelDark panMain = new PanelDark(new GridLayout(5, 2, 20, 0));
 		
 		PanelDark panPlanetsSub1 = new PanelDark(new FlowLayout(FlowLayout.LEFT));
+		panPlanetsSub1.add(new LabelDark(SternResources.Players(false), font));
+
 		String[] players = new String[Constants.PLAYERS_COUNT_MAX - Constants.PLAYERS_COUNT_MIN + 1];
 		for (int playerIndex = Constants.PLAYERS_COUNT_MIN; playerIndex <= Constants.PLAYERS_COUNT_MAX; playerIndex++)
 			players[playerIndex-Constants.PLAYERS_COUNT_MIN] = Integer.toString(playerIndex);
@@ -135,11 +133,8 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		this.comboPlayers.setSelectedItem(Integer.toString(this.playersCount));
 		this.comboPlayers.addActionListener(this);
 		panPlanetsSub1.add(this.comboPlayers);
-		panPlanetsSub1.add(new LabelDark(SternResources.Players(false), font));
 		
 		panMain.add(panPlanetsSub1);
-		
-		panMain.add(add(this.getPlayerPanel(1)));
 		
 		PanelDark panYearMax = new PanelDark(new FlowLayout(FlowLayout.LEFT));
 		panYearMax.add(new LabelDark(SternResources.SpielparameterJDialogSpieleBisJahr(false)+" ", font));
@@ -148,31 +143,22 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		panYearMax.add(this.comboYearLast);
 		panMain.add(panYearMax);
 		
+		panMain.add(add(this.getPlayerPanel(0)));
+		panMain.add(add(this.getPlayerPanel(1)));
 		panMain.add(add(this.getPlayerPanel(2)));
-
-		CheckBoxDark cbSimple = new CheckBoxDark(SternResources.SpielparameterJDialogSimpelStern(false), true, font);
-		this.cbOptions.put(GameOptions.SIMPLE, cbSimple);
-		this.cbOptions.get(GameOptions.SIMPLE).addActionListener(this);
-		panMain.add(cbSimple);
-		
 		panMain.add(add(this.getPlayerPanel(3)));
-
+		panMain.add(add(this.getPlayerPanel(4)));
+		panMain.add(add(this.getPlayerPanel(5)));
+		
 		CheckBoxDark cbAutoSave = new CheckBoxDark(SternResources.SpielparameterJDialogAutoSave(false), true, font);
 		this.cbOptions.put(GameOptions.AUTO_SAVE, cbAutoSave);
 		panMain.add(cbAutoSave);
-		
-		panMain.add(add(this.getPlayerPanel(4)));
-		
+				
 		CheckBoxDark cbEmail = new CheckBoxDark(SternResources.SpielparameterJDialogEmailModus(false), false, font);
 		this.cbOptions.put(GameOptions.EMAIL_BASED, cbEmail);
 		panMain.add(cbEmail);
-		
-		panMain.add(add(this.getPlayerPanel(5)));
 				
-		PanelDark panEmailConfigurationButton = new PanelDark(new FlowLayout(FlowLayout.RIGHT));
-		this.butEmailConfiguration = new ButtonDark(this, SternResources.SpielparameterJDialogEMailEinstellungen(false), font);
-		panEmailConfigurationButton.add(this.butEmailConfiguration);
-		panMain.add(panEmailConfigurationButton);
+
 		// ----
 		
 		panBase.add(panMain, BorderLayout.CENTER);
@@ -180,6 +166,9 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		// ----
 		
 		PanelDark panButtons = new PanelDark(new FlowLayout(FlowLayout.RIGHT));
+		
+		this.butEmailConfiguration = new ButtonDark(this, SternResources.SpielparameterJDialogEMailEinstellungen(false), font);
+		panButtons.add(this.butEmailConfiguration );
 		
 		this.butCancel = new ButtonDark(this, SternResources.Abbrechen(false), font);
 		panButtons.add(this.butCancel);
@@ -261,7 +250,7 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 						if (!colorIndicesUsed[colorIndexTemp])
 						{
 							colorIndicesUsed[colorIndexTemp] = true;
-							players.add(new Player("", "", colorIndexTemp, false, false));
+							players.add(new Player("", "", colorIndexTemp, false));
 							break;
 						}
 						colorIndexTemp = (byte)((colorIndexTemp + 1) % Constants.PLAYERS_COUNT_MAX);
@@ -285,14 +274,10 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 	
 	private void setControlsEnabled()
 	{
-		boolean simple = this.cbOptions.get(GameOptions.SIMPLE).isSelected();
-		
 		for (GameOptions option: this.cbOptions.keySet())
 		{
 			if (option == GameOptions.AUTO_SAVE)
 				this.cbOptions.get(option).setEnabled(this.mode != GameParametersDialogMode.EMAIL_BASED_GAME);
-			else if (option == GameOptions.SIMPLE)
-				this.cbOptions.get(option).setEnabled(this.mode == GameParametersDialogMode.NEW_GAME);
 			else if (option == GameOptions.EMAIL_BASED)
 				this.cbOptions.get(option).setEnabled(
 						this.mode != GameParametersDialogMode.FINALIZED_GAME &&
@@ -317,12 +302,7 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 						this.mode != GameParametersDialogMode.EMAIL_BASED_GAME);
 			}
 			else
-				this.panPlayers[playerIndex].setVisible(false);
-			
-			if (!simple)
-				this.cbPlayer[playerIndex].setSelected(false);
-			
-			this.cbPlayer[playerIndex].setEnabled(this.mode == GameParametersDialogMode.NEW_GAME && simple);
+				this.panPlayers[playerIndex].setVisible(false);			
 		}
 	}
 	
@@ -343,12 +323,7 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		this.tfPlayer[playerIndex].setText(this.players.get(playerIndex).getName());
 		
 		this.panPlayers[playerIndex].add(this.tfPlayer[playerIndex]);
-		
-		this.cbPlayer[playerIndex] = new CheckBoxDark(SternResources.SpielparameterJDialogBot(false), this.players.get(playerIndex).isBot(), font);
-		
-		this.cbPlayer[playerIndex].addActionListener(this);
-		this.panPlayers[playerIndex].add(this.cbPlayer[playerIndex]);
-		
+				
 		return this.panPlayers[playerIndex];
 	}
 	
@@ -386,31 +361,11 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 			this.abort = true;
 			this.close();
 		}
-		else if (e.getSource() == this.cbOptions.get(GameOptions.SIMPLE))
-		{
-			this.setControlsEnabled();
-		}
 		else if (e.getSource() == this.comboPlayers)
 		{
 			this.playersCount = Integer.parseInt((String)this.comboPlayers.getSelectedItem());
 			
 			this.setControlsEnabled();
-		}
-		else if (e.getSource().getClass() == CheckBoxDark.class)
-		{
-			for (int i = 0; i < Constants.PLAYERS_COUNT_MAX; i++)
-			{
-				if (e.getSource() == this.cbPlayer[i])
-				{
-					this.tfPlayer[i].setEnabled(!this.cbPlayer[i].isSelected());
-					
-					if (this.cbPlayer[i].isSelected())
-					{
-						this.tfPlayer[i].setText(SternResources.SpielparameterJDialogBot(false)+(i+1));
-					}
-					break;
-				}
-			}
 		}
 		else
 		{
@@ -514,20 +469,13 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 				
 				player.setName(this.tfPlayer[playerIndex].getText());
 				player.setColorIndex(this.canvasPlayerColors[playerIndex].colorIndex);
-				player.setBot(this.cbPlayer[playerIndex].isSelected());
 			}
 			else
 			{
 				player = new Player(this.tfPlayer[playerIndex].getText(), "", 
-						this.canvasPlayerColors[playerIndex].colorIndex, this.cbPlayer[playerIndex].isSelected(), false);
+						this.canvasPlayerColors[playerIndex].colorIndex, false);
 				
 				players.add(player);
-			}
-			
-			if (player.isBot())
-			{
-				player.setEmailPlayer(false);
-				player.setEmail("");
 			}
 			
 			boolean isUserNameAllowed = 
@@ -589,22 +537,14 @@ class GameParametersJDialog extends JDialog implements ActionListener, IColorCho
 		
 		for (Player player: players)
 		{
-			if (player.isBot())
+			if (player.isEmailPlayer() && !player.getEmail().contains("@"))
 			{
-				player.setEmail("");
-				player.setEmailPlayer(false);
-			}
-			else
-			{
-				if (player.isEmailPlayer() && !player.getEmail().contains("@"))
-				{
-					ok = false;
-					DialogWindow.showError(
-							c,
-							SternResources.SpielparameterJDialogSpielerEMail(false, player.getName()),
-							SternResources.Fehler(false));
-					break;
-				}
+				ok = false;
+				DialogWindow.showError(
+						c,
+						SternResources.SpielparameterJDialogSpielerEMail(false, player.getName()),
+						SternResources.Fehler(false));
+				break;
 			}
 		}
 		
