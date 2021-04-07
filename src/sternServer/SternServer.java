@@ -1519,21 +1519,18 @@ public class SternServer // NO_UCD (unused code)
 			
 			for (Player player: game.getPlayers())
 			{
-				if (!player.isBot())
+				UserServer user = this.users.get(player.getName());
+				
+				if (user == null)
 				{
-					UserServer user = this.users.get(player.getName());
+					responseMessage.error = true;
+					responseMessage.errorMsg = 
+							SternResources.ServerErrorAdminUserExistiertNicht(true, player.getName());
 					
-					if (user == null)
-					{
-						responseMessage.error = true;
-						responseMessage.errorMsg = 
-								SternResources.ServerErrorAdminUserExistiertNicht(true, player.getName());
-						
-						return responseMessage;
-					}
-					else
-						user.games.add(game.getName());
+					return responseMessage;
 				}
+				else
+					user.games.add(game.getName());
 			}
 			
 			String gameNameNew = this.updateGame(game, true);

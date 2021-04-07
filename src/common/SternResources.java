@@ -1806,7 +1806,7 @@ public class SternResources
 	}
 
 	/**
-	   * Play until year [5V]
+	   * Years [5V]
 	   */
 	public static String SpielparameterJDialogSpieleBisJahr(boolean symbol) {
 		return symbol ? "£5V£":messages.getString("SpielparameterJDialogSpieleBisJahr_5V");

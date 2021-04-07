@@ -20,7 +20,6 @@ public enum GameOptions
 {
 	LIMITED_NUMBER_OF_YEARS,
 	AUTO_SAVE,
-	SIMPLE,
 	EMAIL_BASED,
 	SERVER_BASED
 }

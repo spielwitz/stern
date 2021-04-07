@@ -21,11 +21,11 @@ public class Constants
 	// Minimum required build version when reading games or when exchaning data
 	// with the STERN server to avoid incompatibilities and advantages caused
 	// by program errors.
-	public static final String 	BUILD_COMPATIBLE = "2008";
+	public static final String 	BUILD_COMPATIBLE = "2009";
 
 	// Recommended build. Was used by the update checker (suspended) to indicate
 	// an important update.
-	public static final String 	BUILD_IMPORTANT_UPDATE = "2008";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "2009";
 
 	// Games older than this build have to be migrated.
 	static final String 		BUILD_MIGRATION = "2005";
@@ -66,7 +66,7 @@ public class Constants
 	
 	// Default values for a new game
 	public static final int PLAYERS_COUNT_DEFAULT = 6;
-	public static final int YEARS_COUNT_MAX_DEFAULT = 30;
+	public static final int YEARS_COUNT_MAX_DEFAULT = 50;
 	
 	// Spaceships
 	static final int 		NO_PLANET = -1;
@@ -98,12 +98,6 @@ public class Constants
 	static final char 		STATISTICS_MODE_PLANETS = '3';
 	static final char 		STATISTICS_MODE_MONEY_PRODUCTION = '4';
 	
-	// Artificial intelligence
-	static final int 		AI_DISTANCE_FACTOR 		= 1,
-				 			AI_ATTACK_FACTOR_RND_MAX = 30;
-	static final double 	AI_ATTACK_FACTOR 			= 1.5,
-							AI_THREAT_FACTOR		= 0.5;
-
 	// Replay and evaluation
 	static final int 		PAUSE_MILLISECS = 1000;
 	static final int 		PAUSE_MILLISECS_ANIMATION = 200;
