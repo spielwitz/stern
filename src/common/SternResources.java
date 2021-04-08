@@ -468,9 +468,15 @@ public class SternResources
 		symbolDict.put("ER","AbgeschlossenesSpiel_ER");
 		symbolDict.put("ET","ZugeingabeKapitulieren_ET");
 		symbolDict.put("EU","AuswertungKapitulation_EU");
+		symbolDict.put("EV","UpdateAvailable_EV");
+		symbolDict.put("EX","Update_EX");
 		symbolDict.put("EY","ZugeingabeSpielzuegeSchonEingegeben_EY");
 		symbolDict.put("EZ","ServerAnwendungsfehler_EZ");
 		symbolDict.put("FB","ReleaseFormatted_FB");
+		symbolDict.put("FC","UpdateAvailableImportant_FC");
+		symbolDict.put("FD","MenuSearchForUpdates_FD");
+		symbolDict.put("FE","UpdateUpToDate_FE");
+		symbolDict.put("FF","UpdateServerCannotBeReached_FF");
 		symbolDict.put("FG","ServerAdminSpielerLoeschen_FG");
 		symbolDict.put("FH","ServerAdminSpielerAnlegen_FH");
 		symbolDict.put("FI","ServerAdminAnmeldedatenErneuern_FI");
@@ -3612,6 +3618,20 @@ public class SternResources
 	}
 
 	/**
+	   * An update is available [EV]
+	   */
+	public static String UpdateAvailable(boolean symbol) {
+		return symbol ? "£EV£":messages.getString("UpdateAvailable_EV");
+	}
+
+	/**
+	   * Update [EX]
+	   */
+	public static String Update(boolean symbol) {
+		return symbol ? "£EX£":messages.getString("Update_EX");
+	}
+
+	/**
 	   * You have already submitted your moves. Please wait for the evaluation. [EY]
 	   */
 	public static String ZugeingabeSpielzuegeSchonEingegeben(boolean symbol) {
@@ -3630,6 +3650,34 @@ public class SternResources
 	   */
 	public static String ReleaseFormatted(boolean symbol, String arg0, String arg1, String arg2, String arg3, String arg4) {
 		return symbol ? "£FB§"+arg0+"§"+arg1+"§"+arg2+"§"+arg3+"§"+arg4+"£":MessageFormat.format(messages.getString("ReleaseFormatted_FB"), arg0, arg1, arg2, arg3, arg4);
+	}
+
+	/**
+	   * An important update is available [FC]
+	   */
+	public static String UpdateAvailableImportant(boolean symbol) {
+		return symbol ? "£FC£":messages.getString("UpdateAvailableImportant_FC");
+	}
+
+	/**
+	   * Search for updates [FD]
+	   */
+	public static String MenuSearchForUpdates(boolean symbol) {
+		return symbol ? "£FD£":messages.getString("MenuSearchForUpdates_FD");
+	}
+
+	/**
+	   * Your STERN build is up to date. [FE]
+	   */
+	public static String UpdateUpToDate(boolean symbol) {
+		return symbol ? "£FE£":messages.getString("UpdateUpToDate_FE");
+	}
+
+	/**
+	   * The update server cannot be reached. [FF]
+	   */
+	public static String UpdateServerCannotBeReached(boolean symbol) {
+		return symbol ? "£FF£":messages.getString("UpdateServerCannotBeReached_FF");
 	}
 
 	/**
