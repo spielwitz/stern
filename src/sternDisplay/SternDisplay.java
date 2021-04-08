@@ -55,11 +55,13 @@ import common.ScreenContentClient;
 import commonUi.DialogWindow;
 import commonUi.DialogWindowResult;
 import commonUi.ISternDisplayMethods;
+import commonUi.IUpdateCheckerCallback;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
 import commonUi.PanelScreenContent;
 import commonUi.LanguageSelectionJDialog;
 import commonUi.SternAbout;
+import commonUi.UpdateChecker;
 import common.SternResources;
 import common.Utils;
 
@@ -69,6 +71,7 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		WindowListener, 
 		ActionListener,
 		ISternDisplayMethods,
+		IUpdateCheckerCallback,
 		IHostComponentMethods
 {
 	boolean connected = false;
@@ -85,12 +88,16 @@ public class SternDisplay extends Frame // NO_UCD (use default)
     private MenuItem menuHelp;
     private MenuItem menuAbout;
     private MenuItem menuLanguage;
+    private MenuItem menuSearchForUpdates;
+
+    private String lastUpdateCheck;
     
     transient private static final String PROPERTIES_FILE_NAME = "SternDisplayProperties";
 	transient private static final String PROPERTY_NAME_SERVER_IP_ADDRESS = "serverIpAddress";
 	transient private static final String PROPERTY_NAME_MY_IP_ADDRESS = "myIpAddress";
 	transient private static final String PROPERTY_NAME_MY_NAME = "myName";
 	transient private static final String PROPERTY_NAME_LANGUAGE = "language";
+	transient private static final String PROPERTY_LAST_UPDATE_FOUND = "lastUpdateFound";
 	
 	public static void main(String[] args)
 	{
@@ -157,6 +164,9 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		this.setExtendedState(MAXIMIZED_BOTH);
 		this.setVisible(true);
 		this.paintPanel.requestFocusInWindow();
+		
+		Thread tUpdateChecker = new Thread( new UpdateChecker(this, this.lastUpdateCheck, true) );
+ 		tUpdateChecker.start();
 		
 		ActionEvent e = new ActionEvent(
 				this.menuConnectionSettings, 
@@ -243,6 +253,11 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 		{
 			SternAbout.show(this);
 		}
+		else if (menuItem == this.menuSearchForUpdates)
+ 		{
+ 			Thread tUpdateChecker = new Thread( new UpdateChecker(this, null, false) );
+ 			tUpdateChecker.start();
+ 		}
 	}
 
 	@Override
@@ -379,6 +394,10 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 	    this.menuAbout.addActionListener(this);
 	    menuStern.add (this.menuAbout);
 	    
+	    this.menuSearchForUpdates = new MenuItem (SternResources.MenuSearchForUpdates(false));
+ 	    this.menuSearchForUpdates.addActionListener(this);
+ 	    menuStern.add (this.menuSearchForUpdates);
+	    
 	    menuStern.addSeparator();
 	    
 	    this.menuConnectionSettings = new MenuItem(SternResources.MenuVerbindungseinstellungen(false));
@@ -431,6 +450,8 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 			if (languageCode != null)
 				SternResources.setLocale(languageCode);
 		}
+		if (properties.containsKey(PROPERTY_LAST_UPDATE_FOUND))
+ 			this.lastUpdateCheck = properties.getProperty(PROPERTY_LAST_UPDATE_FOUND);
 
 		return properties;
 	}
@@ -469,4 +490,12 @@ public class SternDisplay extends Frame // NO_UCD (use default)
 	{
 		return PdfLauncher.showPdf(pdfBytes);
 	}
+	
+	@Override
+ 	public void lastUpdateFound(String updateBuild)
+ 	{
+ 		this.properties.setProperty(PROPERTY_LAST_UPDATE_FOUND, updateBuild);
+ 		writeProperties(this.properties);
+
+ 	}
 }

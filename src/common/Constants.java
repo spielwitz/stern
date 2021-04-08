@@ -30,7 +30,7 @@ public class Constants
 	// Games older than this build have to be migrated.
 	static final String 		BUILD_MIGRATION = "2005";
 	
-	public static final String 	STERN_URL = "https://github.com/spielwitz/stern";
+	public static final String 	STERN_URL = "https://stern.dyndns1.de";
 	public static final String 	BUILD_NO_INFO = "9999";
 	
 	// Game board dimensions 

@@ -100,6 +100,7 @@ import commonUi.DialogWindow;
 import commonUi.DialogWindowResult;
 import commonUi.IHostComponentMethods;
 import commonUi.IServerMethods;
+import commonUi.IUpdateCheckerCallback;
 import commonUi.LabelDark;
 import commonUi.MessageWithLink;
 import commonUi.PanelScreenContent;
@@ -107,6 +108,7 @@ import commonUi.PanelDark;
 import commonUi.LanguageSelectionJDialog;
 import commonUi.SpringUtilities;
 import commonUi.SternAbout;
+import commonUi.UpdateChecker;
 
 @SuppressWarnings("serial") 
 public class Stern extends Frame // NO_UCD (use default)
@@ -116,6 +118,7 @@ public class Stern extends Frame // NO_UCD (use default)
 		ActionListener,
 		MouseListener,
 		IServerMethods,
+		IUpdateCheckerCallback,
 		IHostComponentMethods
 {
 	transient private final static String FILE_SUFFIX = ".stn";
@@ -127,6 +130,7 @@ public class Stern extends Frame // NO_UCD (use default)
 	transient private static final String PROPERTY_NAME_DIRECTORY_NAME_LAST = "lastDir";
 	transient private static final String PROPERTY_EMAILS = "emails";
 	transient static final String PROPERTY_EMAIL_SEPARATOR = "emailSeparator";
+	transient private static final String PROPERTY_LAST_UPDATE_FOUND = "lastUpdateFound";
 	transient private static final String PROPERTY_SERVER_ADMIN_CREDENTIAL_FILE = "serverAdminCredentials";
 	transient private static final String PROPERTY_SERVER_USER_CREDENTIAL_FILE = "serverUserCredentials";
 	transient private static final String PROPERTY_SERVER_COMMUNICATION_ENABLED = "serverCommunicationEnabled";
@@ -169,6 +173,7 @@ public class Stern extends Frame // NO_UCD (use default)
     private MenuItem menuServerGames;
     private MenuItem menuServerCredentials;
     private MenuItem menuLanguage;
+    private MenuItem menuSearchForUpdates;
     private MenuItem menuOutputWindow;
     
     private MenuItem menuServer;
@@ -200,6 +205,8 @@ public class Stern extends Frame // NO_UCD (use default)
 	private int currentGameJahr;
 	
 	private Timer gameInfoUpdateTimer;
+	
+	private String lastUpdateCheck;
 	
 	private Clip soundClipNotification;
 	
@@ -304,6 +311,9 @@ public class Stern extends Frame // NO_UCD (use default)
 		this.gameInfoUpdateTimer.start();
 		
 		this.getGameInfoByTimer();
+		
+		Thread tUpdateChecker = new Thread( new UpdateChecker(this, this.lastUpdateCheck, true) );
+ 		tUpdateChecker.start();
 	}
 	
 	private void keyPressed(KeyEventExtended event)
@@ -467,6 +477,10 @@ public class Stern extends Frame // NO_UCD (use default)
 		    this.menuHelp.addActionListener(this);
 		    menuHelp.add (this.menuHelp);
 	    }
+	    
+	    this.menuSearchForUpdates = new MenuItem (SternResources.MenuSearchForUpdates(false));
+ 	    this.menuSearchForUpdates.addActionListener(this);
+ 	    menuHelp.add (this.menuSearchForUpdates);
 	    
 	    menuBar.add(menuHelp);
 	    
@@ -858,6 +872,11 @@ public class Stern extends Frame // NO_UCD (use default)
 			this.inputEnabled = true;
 			this.redrawScreen();
 		}
+		else if (menuItem == this.menuSearchForUpdates)
+ 		{
+ 			Thread tUpdateChecker = new Thread( new UpdateChecker(this, null, false) );
+ 			tUpdateChecker.start();
+ 		}
 		else if (menuItem == this.menuOutputWindow)
 		{
 			if (this.outputWindow == null || !this.outputWindow.isVisible())
@@ -1070,6 +1089,9 @@ public class Stern extends Frame // NO_UCD (use default)
 		if (properties.containsKey(PROPERTY_CLIENTS_INACTIVE))
 			this.clientsInactiveWhileEnterMoves = 
 				Boolean.parseBoolean(properties.getProperty(PROPERTY_CLIENTS_INACTIVE));
+		
+		if (properties.containsKey(PROPERTY_LAST_UPDATE_FOUND))
+ 			this.lastUpdateCheck = properties.getProperty(PROPERTY_LAST_UPDATE_FOUND);
 		
 		return properties;
 	}
@@ -1757,6 +1779,12 @@ public class Stern extends Frame // NO_UCD (use default)
 	{
 		this.getGameInfoByTimer();
 	}
+	
+	@Override
+ 	public void lastUpdateFound(String updateBuild) 
+ 	{
+ 		this.setProperty(PROPERTY_LAST_UPDATE_FOUND, updateBuild);
+ 	}
 
 	public boolean areClientsInactiveWhileEnterMoves() // NO_UCD (use default)
 	{
