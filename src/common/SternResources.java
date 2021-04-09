@@ -54,7 +54,6 @@ public class SternResources
 		symbolDict.put("0E","InventurKeineFlugobjekte_0E");
 		symbolDict.put("0F","InventurKeinePatrouillen_0F");
 		symbolDict.put("0G","InventurKeinePlaneten_0G");
-		symbolDict.put("0H","InventurKeineRaumer_0H");
 		symbolDict.put("0I","InventurKommandant_0I");
 		symbolDict.put("0K","InventurMine100Kurz_0K");
 		symbolDict.put("0L","InventurMine250Kurz_0L");
@@ -71,7 +70,6 @@ public class SternResources
 		symbolDict.put("0W","InventurPatrrouillenTitel_0W");
 		symbolDict.put("0X","InventurPdfFehler_0X");
 		symbolDict.put("0Y","InventurPdfGeoeffnet_0Y");
-		symbolDict.put("0Z","InventurPlanet_0Z");
 		symbolDict.put("13","AuswertungAngriffAngreiferPlanet_13");
 		symbolDict.put("15","AuswertungAngriffSpielerErobert_15");
 		symbolDict.put("17","AuswertungAufklaererAngekommen_17");
@@ -81,11 +79,8 @@ public class SternResources
 		symbolDict.put("1C","InventurPlanetKurz_1C");
 		symbolDict.put("1D","InventurMinenraeumerKurz_1D");
 		symbolDict.put("1E","InventurPlanetenTitel_1E");
-		symbolDict.put("1F","InventurPlanetenTitelSimpel_1F");
 		symbolDict.put("1G","InventurPunkte_1G");
-		symbolDict.put("1H","InventurRaumer_1H");
 		symbolDict.put("1I","InventurRaumerKurz_1I");
-		symbolDict.put("1J","InventurRaumerproduktionJahr_1J");
 		symbolDict.put("1K","InventurRaumerproduktionKurz_1K");
 		symbolDict.put("1L","InventurSeite_1L");
 		symbolDict.put("1M","InventurStart_1M");
@@ -96,7 +91,6 @@ public class SternResources
 		symbolDict.put("1R","InventurTyp_1R");
 		symbolDict.put("1S","InventurZiel_1S");
 		symbolDict.put("1T","Ja_1T");
-		symbolDict.put("1V","Links_1V");
 		symbolDict.put("1W","Loeschen_1W");
 		symbolDict.put("1X","MenuBestenliste_1X");
 		symbolDict.put("1Z","MenuDatei_1Z");
@@ -151,15 +145,12 @@ public class SternResources
 		symbolDict.put("3I","PlEditRaumerProd_3I");
 		symbolDict.put("3J","PlEditVerkaufspreis_3J");
 		symbolDict.put("3K","Planeten_3K");
-		symbolDict.put("3L","PlaneteneditorAb_3L");
-		symbolDict.put("3M","PlaneteneditorAuf_3M");
 		symbolDict.put("3N","PlaneteneditorAuswahlAendern_3N");
 		symbolDict.put("3O","PlaneteneditorKaufen_3O");
 		symbolDict.put("3P","PlaneteneditorUebernehmen_3P");
 		symbolDict.put("3Q","PlaneteneditorVerkaufen_3Q");
 		symbolDict.put("3S","Punkte_3S");
 		symbolDict.put("3T","Raumer_3T");
-		symbolDict.put("3U","Rechts_3U");
 		symbolDict.put("3V","ReplayAuswertungWiedergeben_3V");
 		symbolDict.put("40","AuswertungPatrouilleRaumerGekapert_40");
 		symbolDict.put("41","AuswertungPatrouilleRaumerGesichtet_41");
@@ -204,12 +195,10 @@ public class SternResources
 		symbolDict.put("5L","Spielleiter_5L");
 		symbolDict.put("5M","Spielparameter_5M");
 		symbolDict.put("5O","SpielparameterJDialogAutoSave_5O");
-		symbolDict.put("5P","SpielparameterJDialogBot_5P");
 		symbolDict.put("5Q","SpielparameterJDialogEMailEinstellungen_5Q");
 		symbolDict.put("5R","SpielparameterJDialogEmailModus_5R");
 		symbolDict.put("5S","SpielparameterJDialogFarbe_5S");
 		symbolDict.put("5T","SpielparameterJDialogNameZuLang_5T");
-		symbolDict.put("5U","SpielparameterJDialogSimpelStern_5U");
 		symbolDict.put("5V","SpielparameterJDialogSpieleBisJahr_5V");
 		symbolDict.put("5W","SpielparameterJDialogSpielerEMail_5W");
 		symbolDict.put("5X","SpielparameterJDialogSpielleiterEMail_5X");
@@ -288,7 +277,6 @@ public class SternResources
 		symbolDict.put("86","Hauptmenue_86");
 		symbolDict.put("87","HighscoreFrage_87");
 		symbolDict.put("88","InventurAnkunft_88");
-		symbolDict.put("8A","ZugeingabeKeineSpielzuege_8A");
 		symbolDict.put("8C","ZugeingabeKuendigen_8C");
 		symbolDict.put("8D","ZugeingabeMaxAnzahlRaumer_8D");
 		symbolDict.put("8E","ZugeingabeMine_8E");
@@ -306,7 +294,6 @@ public class SternResources
 		symbolDict.put("8R","ZugeingabePatrouilleTransfer_8R");
 		symbolDict.put("8S","ZugeingabePlanet_8S");
 		symbolDict.put("8T","ZugeingabePlanetGehoertNicht_8T");
-		symbolDict.put("8U","ZugeingabePlaneteninfo_8U");
 		symbolDict.put("8V","ZugeingabeRaumer_8V");
 		symbolDict.put("8W","ZugeingabeSpielstandVerschicken_8W");
 		symbolDict.put("8X","ZugeingabeSpielzuegeFalscheRunde_8X");
@@ -330,7 +317,6 @@ public class SternResources
 		symbolDict.put("9F","ZugeingabeUndo_9F");
 		symbolDict.put("9G","ZugeingabeUndoErfolg_9G");
 		symbolDict.put("9H","ZugeingabeUndoFrage_9H");
-		symbolDict.put("9I","ZugeingabeWartenAufSpielzuege_9I");
 		symbolDict.put("9J","ZugeingabeWievieleEe_9J");
 		symbolDict.put("9K","ZugeingabeWohin100erMine_9K");
 		symbolDict.put("9L","ZugeingabeWohin250erMine_9L");
@@ -344,7 +330,6 @@ public class SternResources
 		symbolDict.put("9T","ZugeingabeZielplanet_9T");
 		symbolDict.put("9U","ZugeingabeZielplanetIstStartplanet_9U");
 		symbolDict.put("9V","ZugeingabeZuVielEe_9V");
-		symbolDict.put("9W","ZugeingabeZuerstKuendigen_9W");
 		symbolDict.put("9X","ZugeingabeZufaelligerSpieler_9X");
 		symbolDict.put("9Y","Zurueck_9Y");
 		symbolDict.put("9Z","Auswertung_9Z");
@@ -436,7 +421,6 @@ public class SternResources
 		symbolDict.put("DK","ServerErrorJahrVorbei_DK");
 		symbolDict.put("DM","ZugeingabePostMovesSuccess_DM");
 		symbolDict.put("DN","ZugeingabePostMovesError_DN");
-		symbolDict.put("DO","Taste_DO");
 		symbolDict.put("DP","NochmalVersuchen_DP");
 		symbolDict.put("DQ","WartenBisNaechsteZugeingabe_DQ");
 		symbolDict.put("DR","AuswertungVerfuegbar_DR");
@@ -470,7 +454,6 @@ public class SternResources
 		symbolDict.put("EU","AuswertungKapitulation_EU");
 		symbolDict.put("EV","UpdateAvailable_EV");
 		symbolDict.put("EX","Update_EX");
-		symbolDict.put("EY","ZugeingabeSpielzuegeSchonEingegeben_EY");
 		symbolDict.put("EZ","ServerAnwendungsfehler_EZ");
 		symbolDict.put("FB","ReleaseFormatted_FB");
 		symbolDict.put("FC","UpdateAvailableImportant_FC");
@@ -543,14 +526,11 @@ public class SternResources
 		symbolDict.put("IC","ServerSettingsJDialogInaktiv_IC");
 		symbolDict.put("ID","ClientSettingsJDialogIpErmitteln_ID");
 		symbolDict.put("IE","ClientSettingsJDialogMeineIp_IE");
-		symbolDict.put("IF","SpielinformationenKampfschiffproduktionTitel_IF");
-		symbolDict.put("IG","SpielinformationenKampfschiffproduktion_IG");
 		symbolDict.put("IH","ServerUrlUebernehmen_IH");
 		symbolDict.put("II","ServerZugangsdatenAendern_II");
 		symbolDict.put("IJ","BrowserNichtGeoeffnet_IJ");
 		symbolDict.put("IK","EmailNichtGeoeffnet_IK");
 		symbolDict.put("IL","ClientBuild_IL");
-		symbolDict.put("IM","ZugeingabePlaneteninfo2_IM");
 		symbolDict.put("IN","MenuAusgabeFenster_IN");
 		symbolDict.put("IO","ServerGamesSubmitSpielname_IO");
 		symbolDict.put("IP","ServerErrorSpielExistiert_IP");
@@ -723,13 +703,6 @@ public class SternResources
 	}
 
 	/**
-	   * There are no fighters. [0H]
-	   */
-	public static String InventurKeineRaumer(boolean symbol) {
-		return symbol ? "£0H£":messages.getString("InventurKeineRaumer_0H");
-	}
-
-	/**
 	   * Commander [0I]
 	   */
 	public static String InventurKommandant(boolean symbol) {
@@ -842,13 +815,6 @@ public class SternResources
 	}
 
 	/**
-	   * Planet [0Z]
-	   */
-	public static String InventurPlanet(boolean symbol) {
-		return symbol ? "£0Z£":messages.getString("InventurPlanet_0Z");
-	}
-
-	/**
 	   * Attacker: {0}, Planet: {1} [13]
 	   */
 	public static String AuswertungAngriffAngreiferPlanet(boolean symbol, String arg0, String arg1) {
@@ -912,13 +878,6 @@ public class SternResources
 	}
 
 	/**
-	   * Planets [1F]
-	   */
-	public static String InventurPlanetenTitelSimpel(boolean symbol) {
-		return symbol ? "£1F£":messages.getString("InventurPlanetenTitelSimpel_1F");
-	}
-
-	/**
 	   * {0} points [1G]
 	   */
 	public static String InventurPunkte(boolean symbol, String arg0) {
@@ -926,24 +885,10 @@ public class SternResources
 	}
 
 	/**
-	   * Fighters [1H]
-	   */
-	public static String InventurRaumer(boolean symbol) {
-		return symbol ? "£1H£":messages.getString("InventurRaumer_1H");
-	}
-
-	/**
 	   * Fght [1I]
 	   */
 	public static String InventurRaumerKurz(boolean symbol) {
 		return symbol ? "£1I£":messages.getString("InventurRaumerKurz_1I");
-	}
-
-	/**
-	   * Production of fighters/year [1J]
-	   */
-	public static String InventurRaumerproduktionJahr(boolean symbol) {
-		return symbol ? "£1J£":messages.getString("InventurRaumerproduktionJahr_1J");
 	}
 
 	/**
@@ -1014,13 +959,6 @@ public class SternResources
 	   */
 	public static String Ja(boolean symbol) {
 		return symbol ? "£1T£":messages.getString("Ja_1T");
-	}
-
-	/**
-	   * Left [1V]
-	   */
-	public static String Links(boolean symbol) {
-		return symbol ? "£1V£":messages.getString("Links_1V");
 	}
 
 	/**
@@ -1402,20 +1340,6 @@ public class SternResources
 	}
 
 	/**
-	   * Down [3L]
-	   */
-	public static String PlaneteneditorAb(boolean symbol) {
-		return symbol ? "£3L£":messages.getString("PlaneteneditorAb_3L");
-	}
-
-	/**
-	   * Up [3M]
-	   */
-	public static String PlaneteneditorAuf(boolean symbol) {
-		return symbol ? "£3M£":messages.getString("PlaneteneditorAuf_3M");
-	}
-
-	/**
 	   * Change selection [3N]
 	   */
 	public static String PlaneteneditorAuswahlAendern(boolean symbol) {
@@ -1455,13 +1379,6 @@ public class SternResources
 	   */
 	public static String Raumer(boolean symbol) {
 		return symbol ? "£3T£":messages.getString("Raumer_3T");
-	}
-
-	/**
-	   * Right [3U]
-	   */
-	public static String Rechts(boolean symbol) {
-		return symbol ? "£3U£":messages.getString("Rechts_3U");
 	}
 
 	/**
@@ -1773,13 +1690,6 @@ public class SternResources
 	}
 
 	/**
-	   * Bot [5P]
-	   */
-	public static String SpielparameterJDialogBot(boolean symbol) {
-		return symbol ? "£5P£":messages.getString("SpielparameterJDialogBot_5P");
-	}
-
-	/**
 	   * E-mail settings [5Q]
 	   */
 	public static String SpielparameterJDialogEMailEinstellungen(boolean symbol) {
@@ -1805,13 +1715,6 @@ public class SternResources
 	   */
 	public static String SpielparameterJDialogNameZuLang(boolean symbol, String arg0, String arg1, String arg2) {
 		return symbol ? "£5T§"+arg0+"§"+arg1+"§"+arg2+"£":MessageFormat.format(messages.getString("SpielparameterJDialogNameZuLang_5T"), arg0, arg1, arg2);
-	}
-
-	/**
-	   * STERN LIGHT [5U]
-	   */
-	public static String SpielparameterJDialogSimpelStern(boolean symbol) {
-		return symbol ? "£5U£":messages.getString("SpielparameterJDialogSimpelStern_5U");
 	}
 
 	/**
@@ -2361,13 +2264,6 @@ public class SternResources
 	}
 
 	/**
-	   * There are no moves. [8A]
-	   */
-	public static String ZugeingabeKeineSpielzuege(boolean symbol) {
-		return symbol ? "£8A£":messages.getString("ZugeingabeKeineSpielzuege_8A");
-	}
-
-	/**
 	   * Terminate alliance [8C]
 	   */
 	public static String ZugeingabeKuendigen(boolean symbol) {
@@ -2484,13 +2380,6 @@ public class SternResources
 	   */
 	public static String ZugeingabePlanetGehoertNicht(boolean symbol) {
 		return symbol ? "£8T£":messages.getString("ZugeingabePlanetGehoertNicht_8T");
-	}
-
-	/**
-	   * Planet info [8U]
-	   */
-	public static String ZugeingabePlaneteninfo(boolean symbol) {
-		return symbol ? "£8U£":messages.getString("ZugeingabePlaneteninfo_8U");
 	}
 
 	/**
@@ -2655,13 +2544,6 @@ public class SternResources
 	}
 
 	/**
-	   * These players still have to enter their moves: [9I]
-	   */
-	public static String ZugeingabeWartenAufSpielzuege(boolean symbol) {
-		return symbol ? "£9I£":messages.getString("ZugeingabeWartenAufSpielzuege_9I");
-	}
-
-	/**
 	   * How many $ (max. {0})? [9J]
 	   */
 	public static String ZugeingabeWievieleEe(boolean symbol, String arg0) {
@@ -2750,13 +2632,6 @@ public class SternResources
 	   */
 	public static String ZugeingabeZuVielEe(boolean symbol) {
 		return symbol ? "£9V£":messages.getString("ZugeingabeZuVielEe_9V");
-	}
-
-	/**
-	   * You must first withdraw all you battleships, bevor you can resign. [9W]
-	   */
-	public static String ZugeingabeZuerstKuendigen(boolean symbol) {
-		return symbol ? "£9W£":messages.getString("ZugeingabeZuerstKuendigen_9W");
 	}
 
 	/**
@@ -3397,13 +3272,6 @@ public class SternResources
 	}
 
 	/**
-	   * Any key [DO]
-	   */
-	public static String Taste(boolean symbol) {
-		return symbol ? "£DO£":messages.getString("Taste_DO");
-	}
-
-	/**
 	   * Try again [DP]
 	   */
 	public static String NochmalVersuchen(boolean symbol) {
@@ -3632,13 +3500,6 @@ public class SternResources
 	   */
 	public static String Update(boolean symbol) {
 		return symbol ? "£EX£":messages.getString("Update_EX");
-	}
-
-	/**
-	   * You have already submitted your moves. Please wait for the evaluation. [EY]
-	   */
-	public static String ZugeingabeSpielzuegeSchonEingegeben(boolean symbol) {
-		return symbol ? "£EY£":messages.getString("ZugeingabeSpielzuegeSchonEingegeben_EY");
 	}
 
 	/**
@@ -4146,20 +4007,6 @@ public class SternResources
 	}
 
 	/**
-	   * Fighter production of the planets [IF]
-	   */
-	public static String SpielinformationenKampfschiffproduktionTitel(boolean symbol) {
-		return symbol ? "£IF£":messages.getString("SpielinformationenKampfschiffproduktionTitel_IF");
-	}
-
-	/**
-	   * Fighter production [IG]
-	   */
-	public static String SpielinformationenKampfschiffproduktion(boolean symbol) {
-		return symbol ? "£IG£":messages.getString("SpielinformationenKampfschiffproduktion_IG");
-	}
-
-	/**
 	   * Do you want to save the changed server credentials? [IH]
 	   */
 	public static String ServerUrlUebernehmen(boolean symbol) {
@@ -4192,13 +4039,6 @@ public class SternResources
 	   */
 	public static String ClientBuild(boolean symbol) {
 		return symbol ? "£IL£":messages.getString("ClientBuild_IL");
-	}
-
-	/**
-	   * Produces {0} fighters per year. [IM]
-	   */
-	public static String ZugeingabePlaneteninfo2(boolean symbol, String arg0) {
-		return symbol ? "£IM§"+arg0+"£":MessageFormat.format(messages.getString("ZugeingabePlaneteninfo2_IM"), arg0);
 	}
 
 	/**
