@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Last used symbolic key: JK
+		// Last used symbolic key: JL
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -574,6 +574,7 @@ public class SternResources
 		symbolDict.put("JI","Players_JI");
 		symbolDict.put("JJ","PlanetListTitleFighters_JJ");
 		symbolDict.put("JK","PlanetListTitleDefenceShiels_JK");
+		symbolDict.put("JL","Evaluation_JL");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -1583,7 +1584,7 @@ public class SternResources
 	}
 
 	/**
-	   * Finalize game [4G]
+	   * Finalize [4G]
 	   */
 	public static String SpielAbschliessen(boolean symbol) {
 		return symbol ? "£4G£":messages.getString("SpielAbschliessen_4G");
@@ -1625,7 +1626,7 @@ public class SternResources
 	}
 
 	/**
-	   * Game information [4M]
+	   * Game info [4M]
 	   */
 	public static String Spielinformationen(boolean symbol) {
 		return symbol ? "£4M£":messages.getString("Spielinformationen_4M");
@@ -1842,7 +1843,7 @@ public class SternResources
 	}
 
 	/**
-	   * Replay evaluation [60]
+	   * Replay [60]
 	   */
 	public static String AuswertungWiederholen(boolean symbol) {
 		return symbol ? "£60£":messages.getString("AuswertungWiederholen_60");
@@ -2759,7 +2760,7 @@ public class SternResources
 	}
 
 	/**
-	   * Random player [9X]
+	   * Random [9X]
 	   */
 	public static String ZugeingabeZufaelligerSpieler(boolean symbol) {
 		return symbol ? "£9X£":messages.getString("ZugeingabeZufaelligerSpieler_9X");
@@ -4359,5 +4360,12 @@ public class SternResources
 	   */
 	public static String PlanetListTitleDefenceShiels(boolean symbol) {
 		return symbol ? "£JK£":messages.getString("PlanetListTitleDefenceShiels_JK");
+	}
+
+	/**
+	   * Evaluation [JL]
+	   */
+	public static String Evaluation(boolean symbol) {
+		return symbol ? "£JL£":messages.getString("Evaluation_JL");
 	}
 }
