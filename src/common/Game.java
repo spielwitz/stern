@@ -869,7 +869,7 @@ public class Game extends EmailTransportBase implements Serializable
 						
 						if (!this.moves.containsKey(soloPlayerIndex))
 						{
-							waitingForMovesOfPlayers = soloPlayerIndex;
+							waitingForMovesOfPlayers = (int)Math.pow(2, soloPlayerIndex);
 						}
 					}
 					else

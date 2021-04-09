@@ -994,7 +994,7 @@ public class Stern extends Frame // NO_UCD (use default)
 		if (this.t != null && this.t.getGame() != null && !this.t.getGame().isInitial())
 		{
 			Game game = this.t.getGame();
-			this.menuParameters.setEnabled(true);
+			this.menuParameters.setEnabled(game.isParameterChangeEnabled());
 			this.menuSave.setEnabled(game.isParameterChangeEnabled() && !game.isSoloPlayer());
 			this.menuEmailSend.setEnabled(game.getOptions().contains(GameOptions.EMAIL_BASED) ||
 					game.getOptions().contains(GameOptions.SERVER_BASED));
