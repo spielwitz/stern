@@ -862,10 +862,9 @@ public class Game extends EmailTransportBase implements Serializable
 				
 				if (!this.finalized)
 				{
-					readyForEvaluation = true;
-
 					if (this.isSoloPlayer())
 					{
+						readyForEvaluation = false;
 						int soloPlayerIndex = this.getSoloPlayerIndex();
 						
 						if (!this.moves.containsKey(soloPlayerIndex))
@@ -875,6 +874,8 @@ public class Game extends EmailTransportBase implements Serializable
 					}
 					else
 					{
+						readyForEvaluation = true;
+
 						for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
 						{
 							if (!this.moves.containsKey(playerIndex))
@@ -925,7 +926,7 @@ public class Game extends EmailTransportBase implements Serializable
 					allowedKeys.add(new ConsoleKey("8",SternResources.Statistik(true)));
 				if (!this.soloPlayer || this.finalized)
 					allowedKeys.add(new ConsoleKey("9",SternResources.Spielinformationen(true)));
-				if (this.options.contains(GameOptions.EMAIL_BASED) && !this.finalized)
+				if (!this.soloPlayer && this.options.contains(GameOptions.EMAIL_BASED) && !this.finalized)
 					allowedKeys.add(
 							new ConsoleKey("0",SternResources.ZugeingabeEMailAktionen(true)));
 				if (!this.soloPlayer && this.year > 0 && !this.finalized)
@@ -987,7 +988,7 @@ public class Game extends EmailTransportBase implements Serializable
 					this.console.clear();
 					new GameInformation(this);
 				}
-				else if (input.equals("0") && this.options.contains(GameOptions.EMAIL_BASED) && !this.finalized)
+				else if (!this.soloPlayer && input.equals("0") && this.options.contains(GameOptions.EMAIL_BASED) && !this.finalized)
 				{
 					this.console.clear();
 					this.emailMenu();
@@ -996,20 +997,36 @@ public class Game extends EmailTransportBase implements Serializable
 				{
 					boolean error = false;
 					
-					try
+					if (!this.soloPlayer)
 					{
-						int playerIndex = Integer.parseInt(input) - 1;
-						
-						if ((waitingForMovesOfPlayers & (int)Math.pow(2, playerIndex)) > 0)
+						try
 						{
-							new EnterMoves(this, playerIndex);
+							int playerIndex = Integer.parseInt(input) - 1;
+							
+							if ((waitingForMovesOfPlayers & (int)Math.pow(2, playerIndex)) > 0)
+							{
+								Player player = this.players[playerIndex];
+								
+								if (player.isEmailPlayer())
+								{
+									error = true;
+								}
+								else
+								{
+									new EnterMoves(this, playerIndex);
+								}
+							}
+							else
+							{
+								error = true;
+							}
 						}
-						else
+						catch (Exception x)
 						{
 							error = true;
 						}
 					}
-					catch (Exception x)
+					else
 					{
 						error = true;
 					}
@@ -1622,17 +1639,6 @@ public class Game extends EmailTransportBase implements Serializable
 		return markedPositions;
 	}
 	
-	private ArrayList<Integer> getPlayersWithMissingMoves()
-	{
-		ArrayList<Integer> retval = new ArrayList<Integer>();
-		
-		for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
-			if (!this.moves.containsKey(playerIndex) && !this.players[playerIndex].isDead())
-				retval.add(playerIndex);
-		
-		return retval;
-	}
-	
 	KeyEventExtended waitForKeyInput()
 	{
 		if (!this.console.isBackground())
@@ -2106,7 +2112,6 @@ public class Game extends EmailTransportBase implements Serializable
  	{
  		private Game game;
  		private int playerIndexNow;
- 		private boolean enterMovesFinished;
  		private boolean capitulated;
  		
  		@SuppressWarnings("unchecked")
@@ -2124,15 +2129,22 @@ public class Game extends EmailTransportBase implements Serializable
 			this.game.planets = (Planet[])Utils.klon(this.game.gameStartOfYear.planets);
 			this.game.ships = (ArrayList<Ship>)Utils.klon(this.game.gameStartOfYear.ships);
 			
-			if (this.game.isSoloPlayer())
+			if (!abort && this.game.isSoloPlayer())
 			{
 				this.postMovesSoloPlayer(playerIndex);
 			}
 			
 			this.game.console.clear();
-			this.game.autosave();
+			
+			if (!this.game.isSoloPlayer())
+			{
+				this.game.autosave();
+			}
 			
 			this.game.screenContentWhileMovesEntered = null;
+			
+			this.game.updateBoard();
+			this.game.updatePlanets(false);
  		}
 // 		@SuppressWarnings("unchecked")
 // 		private EnterMoves(Game game)
@@ -3636,26 +3648,17 @@ public class Game extends EmailTransportBase implements Serializable
  			
 			if (moves.size() == 0)
 			{
-				if (this.game.soloPlayer)
+				this.game.console.appendText(SternResources.ZugeingabeKeineSpielzuegeAbbrechen(true) + " ");
+				
+				String input = this.game.console.waitForKeyPressedYesNo(false).getInputText().toUpperCase();
+				if (input.equals(Console.KEY_YES))
 				{
-					this.game.console.appendText(SternResources.ZugeingabeKeineSpielzuege(true));
 					this.game.console.lineBreak();
-					return false;
+					return true;
 				}
 				else
 				{
-					this.game.console.appendText(SternResources.ZugeingabeKeineSpielzuegeAbbrechen(true) + " ");
-					
-					String input = this.game.console.waitForKeyPressedYesNo(false).getInputText().toUpperCase();
-					if (input.equals(Console.KEY_YES))
-					{
-						this.game.console.lineBreak();
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 			
