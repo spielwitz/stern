@@ -1285,7 +1285,11 @@ public class Game extends EmailTransportBase implements Serializable
 			this.screenContent = new ScreenContent();
 		
 		this.screenContent.setPlanets(
-				new ScreenContentPlanets(text, textCol));
+				new ScreenContentPlanets(
+						SternResources.PlanetListTitleFighters(true),
+						Colors.NEUTRAL,
+						text, 
+						textCol));
 		
 		if (!this.console.isBackground())
 			this.gameThread.updateDisplay(this.screenContent);
@@ -3790,10 +3794,10 @@ public class Game extends EmailTransportBase implements Serializable
 				allowedKeys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 			else
 			{
-				allowedKeys.add(new ConsoleKey(SternResources.PlaneteneditorAuf(true),SternResources.PlaneteneditorAuswahlAendern(true)));
-				allowedKeys.add(new ConsoleKey(SternResources.PlaneteneditorAb(true),SternResources.PlaneteneditorAuswahlAendern(true)));
-				allowedKeys.add(new ConsoleKey(SternResources.Rechts(true),SternResources.PlaneteneditorKaufen(true)));
-				allowedKeys.add(new ConsoleKey(SternResources.Links(true),SternResources.PlaneteneditorVerkaufen(true)));
+				allowedKeys.add(new ConsoleKey("\u2191",SternResources.PlaneteneditorAuswahlAendern(true)));
+				allowedKeys.add(new ConsoleKey("\u2193",SternResources.PlaneteneditorAuswahlAendern(true)));
+				allowedKeys.add(new ConsoleKey("\u2192",SternResources.PlaneteneditorKaufen(true)));
+				allowedKeys.add(new ConsoleKey("\u2190",SternResources.PlaneteneditorVerkaufen(true)));
 				allowedKeys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 				allowedKeys.add(new ConsoleKey("ENTER",SternResources.PlaneteneditorUebernehmen(true)));
 			}
@@ -6040,7 +6044,11 @@ public class Game extends EmailTransportBase implements Serializable
  			}
  			
  			this.game.screenContent.setPlanets(
- 					new ScreenContentPlanets(text, textCol));
+ 					new ScreenContentPlanets(
+ 							SternResources.PlanetListTitleDefenceShiels(true),
+ 							Colors.NEUTRAL,
+ 							text, 
+ 							textCol));
  			
  			this.game.gameThread.updateDisplay(this.game.screenContent);
 

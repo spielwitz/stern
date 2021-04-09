@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Last used symbolic key: JI
+		// Last used symbolic key: JK
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -572,6 +572,8 @@ public class SternResources
 		symbolDict.put("JG","EvaluationHomePlanetConquered_JG");
 		symbolDict.put("JH","EnterMovesPlanet_JH");
 		symbolDict.put("JI","Players_JI");
+		symbolDict.put("JJ","PlanetListTitleFighters_JJ");
+		symbolDict.put("JK","PlanetListTitleDefenceShiels_JK");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -4343,5 +4345,19 @@ public class SternResources
 	   */
 	public static String Players(boolean symbol) {
 		return symbol ? "£JI£":messages.getString("Players_JI");
+	}
+
+	/**
+	   * Fighters [JJ]
+	   */
+	public static String PlanetListTitleFighters(boolean symbol) {
+		return symbol ? "£JJ£":messages.getString("PlanetListTitleFighters_JJ");
+	}
+
+	/**
+	   * Defence shield fighters [JK]
+	   */
+	public static String PlanetListTitleDefenceShiels(boolean symbol) {
+		return symbol ? "£JK£":messages.getString("PlanetListTitleDefenceShiels_JK");
 	}
 }

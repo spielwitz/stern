@@ -419,12 +419,32 @@ public class ScreenPainter
 		
 		this.drawRect(PLANETLIST_OFFSET_X, PLANETLIST_OFFSET_Y, PLANETLIST_WIDTH, PLANETLIST_HEIGHT);
 		
+		this.drawLine(
+				PLANETLIST_OFFSET_X,
+				PLANETLIST_OFFSET_Y + BOARD_DX,
+				PLANETLIST_OFFSET_X + PLANETLIST_WIDTH,
+				PLANETLIST_OFFSET_Y + BOARD_DX);
+		
+		this.dbGraphics.setFont(this.fontPlanets);
+		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
+		
+		if (screenContentPlanets.getTitle() != null && screenContentPlanets.getTitle().length() > 0)
+		{
+			String text = SternResources.getString(screenContentPlanets.getTitle());
+			
+			this.setColor(Colors.get(screenContentPlanets.getTitleColor()));
+			
+			int width = this.fmPlanets.stringWidth(text);
+			
+			int x = Utils.round(this.factor * (PLANETLIST_OFFSET_X + PLANETLIST_WIDTH / 2) - width/2);
+			int y = Utils.round(this.factor * ((double)BOARD_OFFSET_Y + 0.5 * (double)BOARD_DX) + (double)height/2.);
+			
+			this.dbGraphics.drawString(text, x, y);
+		}
+		
 		int counter = 0;
 		int lineCounter = 0;
 		byte lastColorIndex = -1;
-
-		this.dbGraphics.setFont(this.fontPlanets);
-		int height = this.fmPlanets.getAscent() - this.fmPlanets.getDescent();
 
 		for (String text: screenContentPlanets.getText())
 		{
@@ -433,20 +453,20 @@ public class ScreenPainter
 			byte colorIndex = screenContentPlanets.getTextColorIndices().get(counter);
 			this.setColor(Colors.get(colorIndex));
 			
-			int line = lineCounter % Constants.BOARD_MAX_Y;
-			int column = lineCounter / Constants.BOARD_MAX_Y;
+			int line = lineCounter % (Constants.BOARD_MAX_Y - 1);
+			int column = lineCounter / (Constants.BOARD_MAX_Y - 1);
 			
-			if (counter > 0 && line == Constants.BOARD_MAX_Y-1 && colorIndex != lastColorIndex)
+			if (counter > 0 && line == Constants.BOARD_MAX_Y-2 && colorIndex != lastColorIndex)
 			{
 				lineCounter++;
-				line = lineCounter % Constants.BOARD_MAX_Y;
-				column = lineCounter / Constants.BOARD_MAX_Y;
+				line = lineCounter % (Constants.BOARD_MAX_Y - 1);
+				column = lineCounter / (Constants.BOARD_MAX_Y - 1);
 			}
 			
 			int dx = (column-1) * PLANETLIST_AXIS_DISTANCE + PLANETLIST_AXIS_X;
 			
 			int x = Utils.round(this.factor * (double)dx - (double)width/2.);
-			int y = Utils.round(this.factor * ((double)BOARD_OFFSET_Y + ((double)line+0.5) * (double)BOARD_DX) + (double)height/2.);
+			int y = Utils.round(this.factor * ((double)BOARD_OFFSET_Y + ((double)line+1.5) * (double)BOARD_DX) + (double)height/2.);
 			
 			this.dbGraphics.drawString(text, x, y);
 			
