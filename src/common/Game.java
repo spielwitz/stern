@@ -1286,14 +1286,14 @@ public class Game extends EmailTransportBase implements Serializable
 			ArrayList<Point> positionsMarked, 
 			int day)
 	{
-		this.updateBoard(frames, positionsMarked, null, day);
+		this.updateBoard(frames, positionsMarked, null, Constants.NEUTRAL, day);
 	}
 	
 	private void updateBoard (
-			Hashtable<Integer, 
-			ArrayList<Byte>> frames, 
+			Hashtable<Integer, ArrayList<Byte>> frames, 
 			ArrayList<Point> positionsMarked, 
 			ScreenContentBoardRadar radar,
+			int playerIndexDisplayedShips,
 			int day)
 	{
 		ArrayList<ScreenContentBoardPlanet> plData = new ArrayList<ScreenContentBoardPlanet>(this.planetsCount);
@@ -1315,11 +1315,12 @@ public class Game extends EmailTransportBase implements Serializable
 					frameCol));
 		}
 		
+		ArrayList<ScreenContentBoardLine> lines = new ArrayList<ScreenContentBoardLine>(); 
 		ArrayList<ScreenContentBoardPosition> positions = new ArrayList<ScreenContentBoardPosition>();
 
 		for (Ship ship: this.ships)
 		{
-			if (ship.isToBeDeleted() || ship.isStartedRecently()
+			if (ship.isToBeDeleted()
 				|| ship.getType() == ShipType.CAPITULATION)
 				continue;
 			
@@ -1331,13 +1332,30 @@ public class Game extends EmailTransportBase implements Serializable
 				continue;
 			}
 			
-			ScreenContentBoardPosition position = new ScreenContentBoardPosition(
- 					ship.getPositionOnDay(day), 
- 					this.players[ship.getOwner()].getColorIndex(),
- 					ship.getScreenDisplaySymbol(),
- 					ship.hashCode());
+			Point shipPosition = ship.getPositionOnDay(day);
 			
-			positions.add(position);			
+			if (owner == playerIndexDisplayedShips && ship.isStartedRecently())
+			{
+				ScreenContentBoardLine line = 
+						new ScreenContentBoardLine(
+								ship.getPositionStart(), 
+								ship.getPositionDestination(), 
+								null, 
+								this.players[ship.getOwner()].getColorIndex(),
+								(byte)-1);
+				
+				lines.add(line);
+			}
+			else
+			{
+				ScreenContentBoardPosition position = new ScreenContentBoardPosition(
+						shipPosition, 
+	 					this.players[ship.getOwner()].getColorIndex(),
+	 					ship.getScreenDisplaySymbol(),
+	 					ship.hashCode());
+				
+				positions.add(position);
+			}
 		}
 		
 		ArrayList<ScreenContentBoardMine> mines = new ArrayList<ScreenContentBoardMine>();
@@ -1350,7 +1368,7 @@ public class Game extends EmailTransportBase implements Serializable
 							mine.getPositionY(), 
 							mine.getStrength()));
 		}
-				
+		
 		if (this.screenContent == null)
 			this.screenContent = new ScreenContent();
 		
@@ -1358,7 +1376,7 @@ public class Game extends EmailTransportBase implements Serializable
 				new ScreenContentBoard(
 						plData,
 						positionsMarked,
-						null,
+						lines,
 						positions,
 						mines,
 						radar));
@@ -2290,6 +2308,11 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			this.game.shipsOfPlayerHidden = new BitSet(game.playersCount);
 			
+			if (this.game.isMoveEnteringOpen())
+			{
+				this.game.updateBoard(null, null, null, playerIndex, 0);
+			}
+			
  			do
  			{ 				
  				this.game.console.setHeaderText(
@@ -2370,7 +2393,10 @@ public class Game extends EmailTransportBase implements Serializable
 					this.game.console.outInvalidInput();
 				
 				if (game.isMoveEnteringOpen())
+				{
+					this.game.updateBoard(null, null, null, playerIndex, 0);
 					game.updatePlanetList(ShipType.values()[this.planetListShipTypeOrdinal], this.playerIndexNow, false);
+				}
 				else
 				{
 					this.game.screenContent.setPlanets(pdc);
@@ -3389,7 +3415,16 @@ public class Game extends EmailTransportBase implements Serializable
 				if (error)
 					this.game.console.outInvalidInput();
 				else
-					this.game.updateBoard();
+				{
+					if (this.game.isMoveEnteringOpen())
+					{
+						this.game.updateBoard(null, null, null, playerIndexNow, 0);
+					}
+					else
+					{
+						this.game.updateBoard();
+					}
+				}
 				
  			} while (true);
  			
@@ -4966,6 +5001,7 @@ public class Game extends EmailTransportBase implements Serializable
 						null,
 						this.game.getSimpleMarkedPosition(otherShipPosition),
 						radar,
+						Constants.NEUTRAL, 
 						day);
 				
 				this.game.console.setLineColor(this.game.players[patrol.getOwner()].getColorIndex());
@@ -4982,6 +5018,7 @@ public class Game extends EmailTransportBase implements Serializable
 						null,
 						this.game.getSimpleMarkedPosition(otherShipPosition),
 						radar,
+						Constants.NEUTRAL, 
 						day);
 
 				boolean capture = true;
@@ -5034,6 +5071,7 @@ public class Game extends EmailTransportBase implements Serializable
 							null,
 							this.game.getSimpleMarkedPosition(otherShipPosition),
 							radar,
+							Constants.NEUTRAL, 
 							day);
 					
 					this.waitForKeyPressed();

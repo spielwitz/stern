@@ -337,8 +337,6 @@ public class ScreenPainter
 					BOARD_OFFSET_X + Constants.BOARD_MAX_X * BOARD_DX,
 					BOARD_OFFSET_Y + y * BOARD_DX);
 		
-		this.drawBoardLines(screenContentBoard.getLines());
-		
 		for (int y = 0; y < Constants.BOARD_MAX_Y; y++)
 		{
 			for (int x = 0; x < Constants.BOARD_MAX_X; x++)
@@ -352,6 +350,9 @@ public class ScreenPainter
 						this.fmSectors);
 			}
 		}
+		
+		this.drawBoardMines(screenContentBoard.getMines());
+		this.drawBoardLines(screenContentBoard.getLines());
 		
 		if (screenContentBoard.getPlanets() != null)
 		{
@@ -394,8 +395,6 @@ public class ScreenPainter
 				this.drawBoardPlanetFrames(screenContentBoardPlanet);
 			}
 		}
-		
-		this.drawBoardMines(screenContentBoard.getMines());
 		
 		this.drawBoardRadarCircles(screenContentBoard.getRadarCircle());
 		
