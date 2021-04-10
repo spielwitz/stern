@@ -777,7 +777,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		private LabelDark labYear;
 		private LabelDark labDateStart;
 		private LabelDark labUpdateLast;
-		private CheckBoxDark cbSimple;
 		
 		public PanelGameSelector(
 				ArrayList<GameInfo> games, 
@@ -856,11 +855,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 			this.panelsPlayers[4] = new PanelPlayer();
 			panGrid.add(this.panelsPlayers[4]);
 			
-			this.cbSimple = new CheckBoxDark(
-					SternResources.SpielparameterJDialogSimpelStern(false), 
-					false, font);
-			this.cbSimple.setEnabled(false);
-			panGrid.add(this.cbSimple);
+			panGrid.add(new LabelDark(font));
 			
 			this.panelsPlayers[5] = new PanelPlayer();
 			panGrid.add(this.panelsPlayers[5]);
@@ -965,7 +960,6 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 			this.labYear.setVisible(this.selectedGame != null);
 			this.labPlayersAndPlanets.setVisible(this.selectedGame != null);
 			this.labDateStart.setVisible(this.selectedGame != null);
-			this.cbSimple.setVisible(this.selectedGame != null);
 			
 			if (this.selectedGame != null)
 			{

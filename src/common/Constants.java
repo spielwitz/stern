@@ -21,14 +21,14 @@ public class Constants
 	// Minimum required build version when reading games or when exchaning data
 	// with the STERN server to avoid incompatibilities and advantages caused
 	// by program errors.
-	public static final String 	BUILD_COMPATIBLE = "2009";
+	public static final String 	BUILD_COMPATIBLE = "2012";
 
 	// Recommended build. Was used by the update checker (suspended) to indicate
 	// an important update.
-	public static final String 	BUILD_IMPORTANT_UPDATE = "2009";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "2012";
 
 	// Games older than this build have to be migrated.
-	static final String 		BUILD_MIGRATION = "2005";
+	static final String 		BUILD_MIGRATION = "2012";
 	
 	public static final String 	STERN_URL = "https://stern.dyndns1.de";
 	public static final String 	BUILD_NO_INFO = "9999";

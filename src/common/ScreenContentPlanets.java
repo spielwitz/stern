@@ -22,16 +22,32 @@ import java.util.ArrayList;
 @SuppressWarnings("serial") 
 class ScreenContentPlanets implements Serializable
 {
+	private String l;
+	private byte o;
 	private ArrayList<String> t;
 	private ArrayList<Byte> c;
 	
 	ScreenContentPlanets(
+			String title,
+			byte titleColor,
 			ArrayList<String> text,
 			ArrayList<Byte> textColorIndices) 
 	{
 		super();
+		this.l = title;
+		this.o = titleColor;
 		this.t = text;
 		this.c = textColorIndices;
+	}
+	
+	public String getTitle()
+	{
+		return this.l;
+	}
+
+	public byte getTitleColor()
+	{
+		return this.o;
 	}
 	
 	public ArrayList<String> getText() {

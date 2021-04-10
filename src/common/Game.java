@@ -65,7 +65,7 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	transient private Console console;
 	transient private ScreenContent screenContent;
-	transient private ScreenContent screenContentStartOfYear;
+	transient private GameCopy gameCopyStartOfYear;
 	transient private GameThread gameThread;
 	
 	transient private Hashtable<Integer,String> mapPlanetIndexToName;
@@ -82,7 +82,7 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	transient private ShipTravelTime[][] distanceMatrix;
 	transient private int[][] distanceMatrixYears;
-		
+	
 	static {
 		editorPricesBuy = new Hashtable<ShipType, Integer>();
 		
@@ -165,7 +165,7 @@ public class Game extends EmailTransportBase implements Serializable
 			this.gameThread.checkMenueEnabled();
 			
 			this.updateBoardNewGame();
-			this.updatePlanets(true);
+			this.updatePlanetList(true);
 			
 			this.console.clear();
 			this.console.appendText(
@@ -378,7 +378,14 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	public ScreenContent getScreenContentStartOfYear()
 	{
-		return this.screenContentStartOfYear;
+		if (this.gameCopyStartOfYear == null)
+		{
+			return null;
+		}
+		else
+		{
+			return this.gameCopyStartOfYear.screenContent;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -402,7 +409,7 @@ public class Game extends EmailTransportBase implements Serializable
 		this.yearMax = yearMax;
 		
 		this.updateBoard();
-		this.updatePlanets(false);
+		this.updatePlanetList(false);
 	}
 	
 	private int[] getPlanetsSorted()
@@ -803,14 +810,13 @@ public class Game extends EmailTransportBase implements Serializable
 		do
 		{
 			this.updateBoard();
-			this.updatePlanets(false);
+			this.updatePlanetList(false);
 			
 			this.console.clear();
 			
-			this.screenContentStartOfYear = (ScreenContent) Utils.klon(this.screenContent);
-			this.screenContentStartOfYear.setConsole(null);
-			
 			this.checkIsGameFinalized(false);
+			
+			this.gameCopyStartOfYear = new GameCopy(this);
 			
 			this.mainMenu();
 			
@@ -836,6 +842,8 @@ public class Game extends EmailTransportBase implements Serializable
 	{
 		do
 		{
+			boolean readyForEvaluation = false;
+
 			this.setEnableParameterChange(true);
 			
 			if (this.goToReplay)
@@ -843,65 +851,194 @@ public class Game extends EmailTransportBase implements Serializable
 				new Replay(this);
 			}
 			else
-			{			
+			{		
+				int waitingForMovesOfPlayers = 0;
+				
+				ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
+				
+				if (!this.finalized)
+				{
+					if (this.isSoloPlayer())
+					{
+						readyForEvaluation = false;
+						int soloPlayerIndex = this.getSoloPlayerIndex();
+						
+						if (!this.moves.containsKey(soloPlayerIndex))
+						{
+							waitingForMovesOfPlayers = (int)Math.pow(2, soloPlayerIndex);
+						}
+					}
+					else
+					{
+						readyForEvaluation = true;
+
+						for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
+						{
+							if (!this.moves.containsKey(playerIndex))
+							{
+								readyForEvaluation = false;
+								
+								Player player = this.players[playerIndex];
+								
+								if (!player.isDead() && !player.isEmailPlayer())
+								{
+									waitingForMovesOfPlayers += Math.pow(2, playerIndex);
+
+									allowedKeys.add(
+											new ConsoleKey(
+													Integer.toString(playerIndex + 1), 
+													this.players[playerIndex].getName()));
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					readyForEvaluation = false;
+				}
+				
 				this.console.setHeaderText(
 						this.mainMenuGetYearDisplayText() + " -> "+SternResources.Hauptmenue(true), Colors.NEUTRAL);
 				
-				ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
-				if (!this.finalized)
-					allowedKeys.add(new ConsoleKey("TAB",SternResources.Zugeingabe(true)));
+				if (waitingForMovesOfPlayers > 0)
+				{
+					if (this.isSoloPlayer())
+					{
+						allowedKeys.add(new ConsoleKey("TAB",SternResources.Zugeingabe(true)));
+					}
+					else
+					{
+						allowedKeys.add(new ConsoleKey("TAB",SternResources.ZugeingabeZufaelligerSpieler(true)));
+					}
+				}
+				else if (readyForEvaluation)
+				{
+					allowedKeys.add(new ConsoleKey("TAB",SternResources.Evaluation(true)));
+				}
+				
 				if (this.evaluationExists())
-					allowedKeys.add(new ConsoleKey("1",SternResources.AuswertungWiederholen(true)));
+					allowedKeys.add(new ConsoleKey("7",SternResources.AuswertungWiederholen(true)));
 				if (this.year > 0 && (!this.soloPlayer || this.finalized))
-					allowedKeys.add(new ConsoleKey("2",SternResources.Statistik(true)));
+					allowedKeys.add(new ConsoleKey("8",SternResources.Statistik(true)));
 				if (!this.soloPlayer || this.finalized)
 					allowedKeys.add(new ConsoleKey("9",SternResources.Spielinformationen(true)));
+				if (!this.soloPlayer && this.options.contains(GameOptions.EMAIL_BASED) && !this.finalized)
+					allowedKeys.add(
+							new ConsoleKey("0",SternResources.ZugeingabeEMailAktionen(true)));
 				if (!this.soloPlayer && this.year > 0 && !this.finalized)
-					allowedKeys.add(new ConsoleKey("0",SternResources.SpielAbschliessen(true)));
+					allowedKeys.add(new ConsoleKey("-",SternResources.SpielAbschliessen(true)));
 				
 				ConsoleInput consoleInput = this.console.waitForKeyPressed(allowedKeys, false);
 				
-	 			this.setEnableParameterChange(false);
-	
 				String input = consoleInput.getInputText().toUpperCase();
 				
 				if (consoleInput.getLastKeyCode() == KeyEvent.VK_ESCAPE)
 					this.console.clear();
 				else if (!this.finalized && input.equals("\t"))
 				{
-					this.console.clear();
-					
-					this.setScreenContentWhileMovesEntered();
-					
-					EnterMoves enterMoves = new EnterMoves(this);
-					
-					this.screenContentWhileMovesEntered = null;
-					
-					if (enterMoves.enterMovesFinished)
+					if (readyForEvaluation)
+					{
 						break;
+					}
+					else if (waitingForMovesOfPlayers > 0)
+					{
+						if (this.soloPlayer)
+						{
+							new EnterMoves(this, this.getSoloPlayerIndex());
+						}
+						else
+						{
+							int randomPlayerIndex = Utils.getRandomInteger(this.playersCount);
+							
+							for (int i = 0; i < this.playersCount; i++)
+							{
+								randomPlayerIndex = (randomPlayerIndex + i) % this.playersCount;
+								
+								if ((waitingForMovesOfPlayers & (int)Math.pow(2, randomPlayerIndex)) > 0)
+								{
+									break;
+								}
+							}
+							
+							new EnterMoves(this, randomPlayerIndex);
+						}
+					}
+					else
+					{
+						console.appendText(SternResources.UngueltigeEingabe(true));
+						console.lineBreak();
+					}
 				}
-				else if (!this.soloPlayer && this.year > 0 && !this.finalized && input.equals("0"))
+				else if (!this.soloPlayer && this.year > 0 && !this.finalized && input.equals("-"))
+				{
 					this.askFinalizeGame();
-				else if (this.evaluationExists() && input.equals("1"))
+				}
+				else if (this.evaluationExists() && input.equals("7"))
+				{
 					new Replay(this);
+				}
+				else if (this.year > 0 && input.equals("8") && (!this.soloPlayer || this.finalized))
+				{
+					this.console.clear();
+					new Statistics(this);
+				}
 				else if ((!this.soloPlayer  || this.finalized) && input.equals("9"))
 				{
 					this.console.clear();
 					new GameInformation(this);
 				}
-				else if (this.year > 0 && input.equals("2") && (!this.soloPlayer || this.finalized))
+				else if (!this.soloPlayer && input.equals("0") && this.options.contains(GameOptions.EMAIL_BASED) && !this.finalized)
 				{
 					this.console.clear();
-					new Statistics(this);
+					this.emailMenu();
 				}
 				else
 				{
-					console.appendText(SternResources.UngueltigeEingabe(true));
-					console.lineBreak();
+					boolean error = false;
+					
+					if (!this.soloPlayer)
+					{
+						try
+						{
+							int playerIndex = Integer.parseInt(input) - 1;
+							
+							if ((waitingForMovesOfPlayers & (int)Math.pow(2, playerIndex)) > 0)
+							{
+								Player player = this.players[playerIndex];
+								
+								if (player.isEmailPlayer())
+								{
+									error = true;
+								}
+								else
+								{
+									new EnterMoves(this, playerIndex);
+								}
+							}
+							else
+							{
+								error = true;
+							}
+						}
+						catch (Exception x)
+						{
+							error = true;
+						}
+					}
+					else
+					{
+						error = true;
+					}
+					
+					if (error)
+					{
+						console.appendText(SternResources.UngueltigeEingabe(true));
+						console.lineBreak();
+					}
 				}
 			}
-		}
-		while (true);
+		}   while (true);
 		
 	}
 	private void askFinalizeGame()
@@ -1149,14 +1286,14 @@ public class Game extends EmailTransportBase implements Serializable
 			ArrayList<Point> positionsMarked, 
 			int day)
 	{
-		this.updateBoard(frames, positionsMarked, null, day);
+		this.updateBoard(frames, positionsMarked, null, Constants.NEUTRAL, day);
 	}
 	
 	private void updateBoard (
-			Hashtable<Integer, 
-			ArrayList<Byte>> frames, 
+			Hashtable<Integer, ArrayList<Byte>> frames, 
 			ArrayList<Point> positionsMarked, 
 			ScreenContentBoardRadar radar,
+			int playerIndexDisplayedShips,
 			int day)
 	{
 		ArrayList<ScreenContentBoardPlanet> plData = new ArrayList<ScreenContentBoardPlanet>(this.planetsCount);
@@ -1178,11 +1315,12 @@ public class Game extends EmailTransportBase implements Serializable
 					frameCol));
 		}
 		
+		ArrayList<ScreenContentBoardLine> lines = new ArrayList<ScreenContentBoardLine>(); 
 		ArrayList<ScreenContentBoardPosition> positions = new ArrayList<ScreenContentBoardPosition>();
 
 		for (Ship ship: this.ships)
 		{
-			if (ship.isToBeDeleted() || ship.isStartedRecently()
+			if (ship.isToBeDeleted()
 				|| ship.getType() == ShipType.CAPITULATION)
 				continue;
 			
@@ -1194,13 +1332,30 @@ public class Game extends EmailTransportBase implements Serializable
 				continue;
 			}
 			
-			ScreenContentBoardPosition position = new ScreenContentBoardPosition(
- 					ship.getPositionOnDay(day), 
- 					this.players[ship.getOwner()].getColorIndex(),
- 					ship.getScreenDisplaySymbol(),
- 					ship.hashCode());
+			Point shipPosition = ship.getPositionOnDay(day);
 			
-			positions.add(position);			
+			if (owner == playerIndexDisplayedShips && ship.isStartedRecently())
+			{
+				ScreenContentBoardLine line = 
+						new ScreenContentBoardLine(
+								ship.getPositionStart(), 
+								ship.getPositionDestination(), 
+								null, 
+								this.players[ship.getOwner()].getColorIndex(),
+								(byte)-1);
+				
+				lines.add(line);
+			}
+			else
+			{
+				ScreenContentBoardPosition position = new ScreenContentBoardPosition(
+						shipPosition, 
+	 					this.players[ship.getOwner()].getColorIndex(),
+	 					ship.getScreenDisplaySymbol(),
+	 					ship.hashCode());
+				
+				positions.add(position);
+			}
 		}
 		
 		ArrayList<ScreenContentBoardMine> mines = new ArrayList<ScreenContentBoardMine>();
@@ -1213,7 +1368,7 @@ public class Game extends EmailTransportBase implements Serializable
 							mine.getPositionY(), 
 							mine.getStrength()));
 		}
-				
+		
 		if (this.screenContent == null)
 			this.screenContent = new ScreenContent();
 		
@@ -1221,7 +1376,7 @@ public class Game extends EmailTransportBase implements Serializable
 				new ScreenContentBoard(
 						plData,
 						positionsMarked,
-						null,
+						lines,
 						positions,
 						mines,
 						radar));
@@ -1232,7 +1387,12 @@ public class Game extends EmailTransportBase implements Serializable
 			this.gameThread.updateDisplay(this.screenContent);
 	}
 	
-	private void updatePlanets (boolean newGame)
+	private void updatePlanetList(boolean newGame)
+	{
+		this.updatePlanetList(ShipType.FIGHTERS, Constants.NEUTRAL, newGame);
+	}
+	
+	private void updatePlanetList (ShipType shipTypeDisplay, int playerIndexEnterMoves, boolean newGame)
 	{
 		ArrayList<String> text = new ArrayList<String>();
 		ArrayList<Byte> textCol = new ArrayList<Byte>();
@@ -1249,18 +1409,26 @@ public class Game extends EmailTransportBase implements Serializable
 			for (int index = 0; index < this.planetsCount; index++)
 			{
 				int planetIndex = this.getPlanetsSorted()[index];
+				Planet planet = this.planets[planetIndex];
 				
-				if (this.planets[planetIndex].getOwner() != playerIndex)
+				if (planet.getOwner() != playerIndex)
 					continue;
 				
-				if (newGame && this.planets[planetIndex].getOwner() == Constants.NEUTRAL)
+				if (newGame && planet.getOwner() == Constants.NEUTRAL)
 					continue;
 				
 				if (isFirstLine)
 				{
 					if (playerIndex != Constants.NEUTRAL)
 					{
-						text.add(this.players[playerIndex].getName());
+						if (shipTypeDisplay == ShipType.ALLIANCES)
+						{
+							text.add("[" + Integer.toString(playerIndex+1) + "]");
+						}
+						else
+						{
+							text.add(this.players[playerIndex].getName());
+						}
 						textCol.add(this.players[playerIndex].getColorIndex());
 					}
 					isFirstLine = false;
@@ -1269,10 +1437,81 @@ public class Game extends EmailTransportBase implements Serializable
 				String planetName = newGame ?
 						" ??" :
 						" " + this.getPlanetNameFromIndex(planetIndex);
-				String fightersCount = "     " + this.planets[planetIndex].getShipsCount(ShipType.FIGHTERS);
+				
+				String shipCount = "";
+				
+				if (shipTypeDisplay == ShipType.FIGHTERS)
+				{
+					shipCount = Integer.toString(this.planets[planetIndex].getShipsCount(ShipType.FIGHTERS));
+				}
+				else if (shipTypeDisplay == ShipType.ALLIANCES)
+				{
+					if (planet.isAllianceMember(playerIndexEnterMoves) || planet.hasRadioStation(playerIndexEnterMoves))
+					{
+						if (planet.allianceExists())
+						{
+							boolean[] allianceMembers = planet.getAllianceMembers();
+							StringBuilder sbAlliance = new StringBuilder();
+							
+							for (int playerIndex2 = 0; playerIndex2 < this.playersCount; playerIndex2++)
+							{
+								if (allianceMembers[playerIndex2] && playerIndex2 != planet.getOwner())
+								{
+									sbAlliance.append(Integer.toString(playerIndex2 + 1));
+								}
+							}
+							
+							shipCount = sbAlliance.toString();
+						}
+						else
+						{
+							shipCount = "-";
+						}
+					}
+					else
+					{
+						shipCount = "?";
+					}
+				}
+				else if (planet.getOwner() != playerIndexEnterMoves && !planet.hasRadioStation(playerIndexEnterMoves))
+				{
+					shipCount = "?";
+				}
+				else if (shipTypeDisplay == ShipType.DEFENCE_SHIELD)
+				{
+					if (planet.getDefenceShieldFactor() > 0)
+					{
+						shipCount = planet.getDefenceShieldFactor() +
+								    "/" +
+								    planet.getDefenceShieldFightersCount();
+					}
+					else
+					{
+						shipCount = "-";
+					}
+				}
+				else if (shipTypeDisplay == ShipType.MONEY_PRODUCTION)
+				{
+					shipCount = Integer.toString(planet.getMoneyProduction());
+				}
+				else if (shipTypeDisplay == ShipType.FIGHTER_PRODUCTION)
+				{
+					shipCount = Integer.toString(planet.getFighterProduction());
+				}
+				else if (shipTypeDisplay == ShipType.MONEY_SUPPLY)
+				{
+					shipCount = Integer.toString(planet.getMoneySupply());
+				}
+				else
+				{
+					shipCount = Integer.toString(this.planets[planetIndex].getShipsCount(shipTypeDisplay));
+				}
+								
+				shipCount = Utils.padString(shipCount, 5);
+				
 				text.add(planetName.substring(planetName.length()-2, planetName.length()) + 
 						":" +
-						fightersCount.substring(fightersCount.length()-5, fightersCount.length()));
+						shipCount);
 				
 				textCol.add(
 						playerIndex == Constants.NEUTRAL ?
@@ -1284,8 +1523,62 @@ public class Game extends EmailTransportBase implements Serializable
 		if (this.screenContent == null)
 			this.screenContent = new ScreenContent();
 		
+		String title = "";
+		
+		switch (shipTypeDisplay)
+		{
+		case FIGHTERS:
+			title = SternResources.PlanetListTitleFighters(true);
+			break;
+		case SCOUT:
+			title = SternResources.PlanetListTitleScouts(true);
+			break;
+		case PATROL:
+			title = SternResources.PlanetListTitlePatrols(true);
+			break;
+		case MINE50:
+			title = SternResources.PlanetListTitleMine50(true);
+			break;
+		case MINE100:
+			title = SternResources.PlanetListTitleMine100(true);
+			break;
+		case MINE250:
+			title = SternResources.PlanetListTitleMine250(true);
+			break;
+		case MINE500:
+			title = SternResources.PlanetListTitleMine500(true);
+			break;
+		case TRANSPORT:
+			title = SternResources.PlanetListTitleTransport(true);
+			break;
+		case MINESWEEPER:
+			title = SternResources.PlanetListTitleMinesweepers(true);
+			break;
+		case DEFENCE_SHIELD:
+			title = SternResources.PlanetListTitleDefenceShields(true);
+			break;
+		case ALLIANCES:
+			title = SternResources.PlanetListTitleAlliances(true);
+			break;
+		case FIGHTER_PRODUCTION:
+			title = SternResources.PlanetListTitleFighterProduction(true);
+			break;
+		case MONEY_PRODUCTION:
+			title = SternResources.PlanetListTitleMoneyProduction(true);
+			break;
+		case MONEY_SUPPLY:
+			title = SternResources.PlanetListTitleMoneySupply(true);
+			break;
+		default:
+			title = "";
+		}
+		
 		this.screenContent.setPlanets(
-				new ScreenContentPlanets(text, textCol));
+				new ScreenContentPlanets(
+						title,
+						Colors.NEUTRAL,
+						text, 
+						textCol));
 		
 		if (!this.console.isBackground())
 			this.gameThread.updateDisplay(this.screenContent);
@@ -1487,17 +1780,6 @@ public class Game extends EmailTransportBase implements Serializable
 		markedPositions.add(position);
 		
 		return markedPositions;
-	}
-	
-	private ArrayList<Integer> getPlayersWithMissingMoves()
-	{
-		ArrayList<Integer> retval = new ArrayList<Integer>();
-		
-		for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
-			if (!this.moves.containsKey(playerIndex) && !this.players[playerIndex].isDead())
-				retval.add(playerIndex);
-		
-		return retval;
 	}
 	
 	KeyEventExtended waitForKeyInput()
@@ -1973,277 +2255,41 @@ public class Game extends EmailTransportBase implements Serializable
  	{
  		private Game game;
  		private int playerIndexNow;
- 		private boolean enterMovesFinished;
  		private boolean capitulated;
+ 		private int planetListShipTypeOrdinal = 0;
  		
  		@SuppressWarnings("unchecked")
- 		private EnterMoves(Game game)
+		private EnterMoves(Game game, int playerIndex)
  		{
  			this.game = game;
-
- 			Planet[] planetsCopy = (Planet[])Utils.klon(this.game.planets);
-			ArrayList<Ship> shipsCopy = (ArrayList<Ship>)Utils.klon(this.game.ships);
+ 			
+ 			this.game.setEnableParameterChange(false); 			
+			this.game.setScreenContentWhileMovesEntered();
+			 			
+ 			boolean abort = this.enterMovesPlayer(playerIndex);
 			
-			if (this.game.soloPlayer)
+			if (abort)
+				this.game.moves.remove(playerIndex);
+			
+			this.game.planets = (Planet[])Utils.klon(this.game.gameCopyStartOfYear.planets);
+			this.game.ships = (ArrayList<Ship>)Utils.klon(this.game.gameCopyStartOfYear.ships);
+			
+			if (!abort && this.game.isSoloPlayer())
 			{
-				int playerIndex = -1;
-				
-				for (int i = 0; i < this.game.playersCount; i++)
-				{
-					if (this.game.playerReferenceCodes[i] != null)
-					{
-						playerIndex = i;
-						break;
-					}
-				}
-				
-				if (this.game.moves != null && this.game.moves.containsKey(playerIndex))
-				{
-					this.game.console.appendText(
-								SternResources.ZugeingabeSpielzuegeSchonEingegeben(true));
-					this.game.console.lineBreak();
-					return;
-				}
-				
-				this.enterMovesPlayer(playerIndex);
-				
- 				this.game.planets = (Planet[])Utils.klon(planetsCopy);
- 				this.game.ships = (ArrayList<Ship>)Utils.klon(shipsCopy);
- 				
- 				MovesTransportObject movesTransportObject = new MovesTransportObject(
- 												this.game.playerReferenceCodes[playerIndex],
- 												Constants.BUILD_COMPATIBLE,
- 												this.game.moves.get(playerIndex));
- 				
- 				boolean success = false;
- 				PostMovesResult result = PostMovesResult.ERROR;
- 				
- 				do
- 				{
-	 				if (this.game.options.contains(GameOptions.SERVER_BASED))
-	 				{
-	 					result = this.game.gameThread.postMovesToServer(
-								game.name,
-								this.game.players[this.playerIndexNow].getName(),
-								movesTransportObject);
-	 						
-	 					if (result == PostMovesResult.USER_NOT_CONNECTED)
-	 					{
-	 						this.game.console.appendText(
-	 								SternResources.SpielerNichtAngemeldet(
-	 										true,
-	 										this.game.players[this.playerIndexNow].getName()));
-	 						this.game.console.lineBreak();
-	 					}
-	 					else if (result != PostMovesResult.ERROR)
-	 					{
-	 						this.game.console.appendText(
-	 								SternResources.ZugeingabePostMovesSuccess(true));
-	 						this.game.console.lineBreak();
-	 						success = true;
-	 					}
-	 				}
-	 				else
-	 				{
-		 				this.game.console.appendText(
-		 						SternResources.ZugeingabeEMailErzeugt(true));
-		 				this.game.console.lineBreak();
-		 				this.game.console.appendText(
-		 						SternResources.ZugeingabeEMailErzeugt2(true));
-		 				this.game.console.lineBreak();
-		 				
-		 				String subject = "[Stern] " + this.game.name;
-		 				
-		 				String bodyText = 
-		 						SternResources.ZugeingabeEMailBody(false,
-		 								this.game.name,
-		 								Integer.toString(this.game.year + 1),
-		 								this.game.players[playerIndex].getName(),
-		 								ReleaseGetter.getRelease(),
-		 								this.game.players[playerIndex].getName(),
-		 								this.game.getName());
-		 				
-		 				success = this.game.gameThread.launchEmail(
-		 						this.game.getEmailAddressGameHost(), 
-		 						subject, 
-		 						bodyText, 
-		 						movesTransportObject);
-	 				}
-	 				
-	 				if (!success)
-	 				{
-	 					this.game.console.appendText(
-	 							SternResources.ZugeingabePostMovesError(true));
-	 					this.game.console.lineBreak();
-	 					
-	 					ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
-	 					
-	 					allowedKeys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
-	 					allowedKeys.add(new ConsoleKey(
-	 							SternResources.AndereTaste(true),
-	 							SternResources.NochmalVersuchen(true)));
-						
-	 					ConsoleInput consoleInput = this.game.console.waitForKeyPressed(allowedKeys, false);
-						
-						if (consoleInput.getLastKeyCode() == KeyEvent.VK_ESCAPE)
-						{
-							success = true;
-						}
-	 				}
-						
-	 				
- 				} while (!success);
- 				
- 				do
- 				{
- 					// Endless loop!
- 					if (this.game.options.contains(GameOptions.SERVER_BASED))
- 					{
- 						this.game.gameThread.updateGameInfo();
- 						
- 						if (this.game.year >= this.game.yearMax - 1)
- 						{
- 							this.game.console.appendText(
-	 								SternResources.LetztesJahr(true));
- 							this.game.console.lineBreak();
- 							this.game.console.appendText(
- 									SternResources.LetztesJahr2(true));
- 						}
- 						else
- 						{
-	 						if (result == PostMovesResult.WAIT_FOR_EVAULATION)
-		 						this.game.console.appendText(
-		 								SternResources.WartenBisNaechsteZugeingabe(true));
-	 						else
-	 						{
-	 							this.game.console.appendText(
-		 								SternResources.AuswertungVerfuegbar(true));
-	 							this.game.console.lineBreak();
-	 							this.game.console.appendText(
-		 								SternResources.AuswertungVerfuegbar2(true));
-	 						}
- 						}
- 					}
- 					else
- 						this.game.console.appendText(
-		 						SternResources.ZugeingabeEMailEndlosschleife(true));
- 					
-	 				this.game.console.waitForKeyPressed();
- 				} while (true);
+				this.postMovesSoloPlayer(playerIndex);
 			}
-			else
+			
+			this.game.console.clear();
+			
+			if (!this.game.isSoloPlayer() && !abort)
 			{
-				do
-				{
-					ArrayList<Integer> playersWithMissingMoves = this.game.getPlayersWithMissingMoves();
-					this.enterMovesFinished = (playersWithMissingMoves.size() == 0);
-					
-					if (this.enterMovesFinished)
-						return;
-					
-					this.game.console.setHeaderText(
-								this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.ZugeingabeTitel(true), Colors.NEUTRAL);
-					
-					ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
-					StringBuilder sb = new StringBuilder();
-					
-					boolean missingMoves = false;
-
-					for (int i = 0; i < playersWithMissingMoves.size(); i++)
-					{
-						int playerIndex = playersWithMissingMoves.get(i).intValue();
-						if (!this.game.isPlayerEmail(playerIndex) && !this.game.soloPlayer)
-						{
-							allowedKeys.add(new ConsoleKey(
-									Integer.toString(playerIndex + 1),
-									this.game.players[playerIndex].getName()));
-							missingMoves = true;
-						}
-						
-						if (sb.length() > 0)
-							sb.append(", ");
-						sb.append(this.game.players[playerIndex].getName());
-					}
-					
-					if (this.game.options.contains(GameOptions.EMAIL_BASED))
-						allowedKeys.add(
-								new ConsoleKey("9",SternResources.ZugeingabeEMailAktionen(true)));
-					
-					allowedKeys.add(new ConsoleKey("ESC",SternResources.Hauptmenue(true)));
-					if (missingMoves)
-						allowedKeys.add(new ConsoleKey("TAB",SternResources.ZugeingabeZufaelligerSpieler(true)));
-										
-					int playerIndex = -1;
-					
-					this.game.console.setLineColor(Colors.NEUTRAL);
-					this.game.console.appendText(SternResources.ZugeingabeWartenAufSpielzuege(true));
-					this.game.console.lineBreak();
-					this.game.console.setLineColor(Colors.WHITE);
-					this.game.console.appendText(sb.toString());
-					this.game.console.lineBreak();
-					
-					ConsoleInput consoleInput = this.game.console.waitForKeyPressed(allowedKeys, false);
-					String input = consoleInput.getInputText().toUpperCase();
-					
-					if (consoleInput.getLastKeyCode() == KeyEvent.VK_ESCAPE)
-					{
-						this.game.console.clear();
-						break;
-					}
-					else if (input.equals("9"))
-					{
-						this.emailMenu();
-					}
-					else
-					{
-						boolean ok = false;
-						
-						try
-						{
-							if (missingMoves && input.equals("\t"))
-							{
-								playerIndex = Utils.getRandomInteger(game.playersCount);
-								
-								for (int i = 0; i < game.playersCount; i++)
-								{
-									if (playersWithMissingMoves.contains(playerIndex) && !(this.game.isPlayerEmail(playerIndex) && !this.game.soloPlayer))
-									{
-										ok = true;
-										break;
-									}
-									playerIndex = (playerIndex + 1) % game.playersCount;
-								}
-							}
-							else
-							{
-								playerIndex = Integer.parseInt(input) - 1;
-								
-								if (playersWithMissingMoves.contains(playerIndex) && !(this.game.isPlayerEmail(playerIndex) && !this.game.soloPlayer))
-									ok = true;
-							}
-						}
-						catch (Exception x)
-						{ }
-						
-						if (ok)
-						{
-							boolean abort = this.enterMovesPlayer(playerIndex);
-							
-							if (abort)
-								this.game.moves.remove(playerIndex);
-							
-			 				this.game.planets = (Planet[])Utils.klon(planetsCopy);
-			 				this.game.ships = (ArrayList<Ship>)Utils.klon(shipsCopy);
-			 				
-			 				this.game.console.clear();
-			 				
-			 				this.game.autosave();
-						}
-						else
-							this.game.console.outInvalidInput();
-					}
-				} while (true);
+				this.game.autosave();
 			}
+			
+			this.game.screenContentWhileMovesEntered = null;
+			
+			this.game.updateBoard();
+			this.game.updatePlanetList(false);
  		}
  		
  		private boolean enterMovesPlayer(int playerIndex)
@@ -2261,6 +2307,11 @@ public class Game extends EmailTransportBase implements Serializable
 			this.capitulated = false;
 			
 			this.game.shipsOfPlayerHidden = new BitSet(game.playersCount);
+			
+			if (this.game.isMoveEnteringOpen())
+			{
+				this.game.updateBoard(null, null, null, playerIndex, 0);
+			}
 			
  			do
  			{ 				
@@ -2342,7 +2393,10 @@ public class Game extends EmailTransportBase implements Serializable
 					this.game.console.outInvalidInput();
 				
 				if (game.isMoveEnteringOpen())
-					game.updatePlanets(false);
+				{
+					this.game.updateBoard(null, null, null, playerIndex, 0);
+					game.updatePlanetList(ShipType.values()[this.planetListShipTypeOrdinal], this.playerIndexNow, false);
+				}
 				else
 				{
 					this.game.screenContent.setPlanets(pdc);
@@ -2373,10 +2427,13 @@ public class Game extends EmailTransportBase implements Serializable
 			ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
 			
 			allowedKeys.add(new ConsoleKey("ESC",SternResources.Zurueck(true)));
-			allowedKeys.add(new ConsoleKey("7",SternResources.Entfernungstabelle(true)));
-			allowedKeys.add(new ConsoleKey("8",SternResources.ZugeingabeObjekteAusblenden(true)));
-			allowedKeys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
 			allowedKeys.add(new ConsoleKey("-",SternResources.ZugeingabeKapitulieren(true)));
+			if (game.isMoveEnteringOpen())
+				allowedKeys.add(new ConsoleKey("6",SternResources.EnterMovesOtherShips(true)));
+			allowedKeys.add(new ConsoleKey("7",SternResources.ZugeingabeObjekteAusblenden(true)));
+			allowedKeys.add(new ConsoleKey("8",SternResources.Entfernungstabelle(true)));
+			allowedKeys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
+			
 	
 			boolean exit = false;
 			
@@ -2394,10 +2451,12 @@ public class Game extends EmailTransportBase implements Serializable
 					this.game.console.clear();
 					exit = true;
 				}
+				else if (input.equals("6") && game.isMoveEnteringOpen())
+					this.togglePlanetListShipType();
 				else if (input.equals("7"))
-					new DistanceMatrix(this.game);
-				else if (input.equals("8"))
 					this.hideShips();
+				else if (input.equals("8"))
+					new DistanceMatrix(this.game);
 				else if (input.equals("9"))
 					this.inventory();
 				else if (input.equals("-"))
@@ -2455,108 +2514,6 @@ public class Game extends EmailTransportBase implements Serializable
 	
 			this.game.console.appendText(SternResources.ZugeingabeStartErfolgreich(true));
 			this.game.console.lineBreak();
- 		}
- 		
- 		private void emailMenu()
- 		{
- 			this.game.console.setHeaderText(
-					this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.ZugeingabeTitel(true)+" -> "+SternResources.ZugeingabeEMailAktionen(true), Colors.NEUTRAL);
-		
-			ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
-			allowedKeys.add(new ConsoleKey("1",SternResources.ZugeingabeSpielstandVerschicken(true)));
-			allowedKeys.add(new ConsoleKey("2",SternResources.ZugeingabeSpielzuegeImportieren(true)));
-			allowedKeys.add(new ConsoleKey("ESC",SternResources.Zurueck(true)));
-			
-			do
-			{
-				ConsoleInput consoleInput = this.game.console.waitForKeyPressed(allowedKeys, false);
-				String input = consoleInput.getInputText().toUpperCase();
-				
-				if (consoleInput.getLastKeyCode() == KeyEvent.VK_ESCAPE)
-					break;
-				else if (input.equals("1"))
-				{
-					this.game.autosave();
-					
-					this.sendGameToEmailPlayer();
-					break;
-				}
-				else if (input.equals("2"))
-				{
-					MovesTransportObject movesTransportObject = this.game.gameThread.importMovesFromEmail();
-					
-					if (movesTransportObject != null)
-					{
-						int playerIndex = this.game.importMovesFromEmail(movesTransportObject);
-						
-						if (playerIndex >= 0)
-						{
-							this.game.console.setLineColor(this.game.players[playerIndex].getColorIndex());
-							this.game.console.appendText(
-									SternResources.ZugeingabeSpielzuegeImportiert(true, this.game.players[playerIndex].getName()));
-							this.game.console.lineBreak();
-							this.game.console.setLineColor(Colors.WHITE);
-							
-							this.game.autosave();
-						}
-						else
-						{
-							this.game.console.appendText(SternResources.ZugeingabeSpielzuegeFalscheRunde(true));
-							this.game.console.lineBreak();
-						}
-					}
-					else
-					{
-						this.game.console.appendText(SternResources.ZugeingabeSpielzuegeNichtImportiert(true));
-						this.game.console.lineBreak();
-					}
-				}
-				else
-					this.game.console.outInvalidInput();
-					
-				
-			} while (true);
- 		}
- 		
- 		private void sendGameToEmailPlayer()
- 		{
- 			int emailsCount = 0;
- 			
- 			for (int playerIndex = 0; playerIndex < this.game.playersCount; playerIndex++)
- 			{
- 				Player player = this.game.players[playerIndex];
- 				if (!this.game.isPlayerEmail(playerIndex))
- 					continue;
- 				
- 				Game gameCopy = this.game.createCopyForPlayer(playerIndex);
- 				
- 				String subject = "[Stern] " + gameCopy.name;
- 				
- 				String bodyText = 
- 						SternResources.ZugeingabeEMailBody2(false,
- 								gameCopy.name,
- 								Integer.toString(gameCopy.year + 1),
- 								ReleaseGetter.getRelease(),
- 								player.getName());
- 				
- 				this.game.gameThread.launchEmail(
- 						player.getEmail(), 
- 						subject, 
- 						bodyText, 
- 						gameCopy);
- 				
- 				emailsCount++;
- 			}
- 			
- 			if (emailsCount > 0)
- 			{
- 				this.game.console.appendText(
- 						SternResources.ZugeingabeEMailErzeugt3(true,
- 							Integer.toString(emailsCount)));
- 				this.game.console.lineBreak();
- 				this.game.console.appendText(SternResources.ZugeingabeEMailErzeugt4(true));
- 				this.game.console.lineBreak();
- 			}
  		}
  		
  		private void fighters(boolean isAlliance)
@@ -3458,7 +3415,16 @@ public class Game extends EmailTransportBase implements Serializable
 				if (error)
 					this.game.console.outInvalidInput();
 				else
-					this.game.updateBoard();
+				{
+					if (this.game.isMoveEnteringOpen())
+					{
+						this.game.updateBoard(null, null, null, playerIndexNow, 0);
+					}
+					else
+					{
+						this.game.updateBoard();
+					}
+				}
 				
  			} while (true);
  			
@@ -3574,32 +3540,40 @@ public class Game extends EmailTransportBase implements Serializable
  			return quitEnterMoves;
  		}
  		
+ 		private void togglePlanetListShipType()
+ 		{
+ 			ShipType[] shipTypes = ShipType.values();
+ 			
+ 			this.planetListShipTypeOrdinal = (this.planetListShipTypeOrdinal + 1) % shipTypes.length;
+ 			
+ 			if (shipTypes[this.planetListShipTypeOrdinal] == ShipType.CAPITULATION ||
+ 				shipTypes[this.planetListShipTypeOrdinal] == ShipType.DEFENCE_SHIELD_REPAIR)
+ 			{
+ 				this.togglePlanetListShipType();
+ 			}
+ 			else
+ 			{
+ 				this.game.updatePlanetList(shipTypes[this.planetListShipTypeOrdinal], playerIndexNow, false);
+ 			}
+ 		}
+ 		
  		private boolean undo()
  		{
  			ArrayList<Move> moves = this.game.moves.get(this.playerIndexNow);
  			
 			if (moves.size() == 0)
 			{
-				if (this.game.soloPlayer)
+				this.game.console.appendText(SternResources.ZugeingabeKeineSpielzuegeAbbrechen(true) + " ");
+				
+				String input = this.game.console.waitForKeyPressedYesNo(false).getInputText().toUpperCase();
+				if (input.equals(Console.KEY_YES))
 				{
-					this.game.console.appendText(SternResources.ZugeingabeKeineSpielzuege(true));
 					this.game.console.lineBreak();
-					return false;
+					return true;
 				}
 				else
 				{
-					this.game.console.appendText(SternResources.ZugeingabeKeineSpielzuegeAbbrechen(true) + " ");
-					
-					String input = this.game.console.waitForKeyPressedYesNo(false).getInputText().toUpperCase();
-					if (input.equals(Console.KEY_YES))
-					{
-						this.game.console.lineBreak();
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 			
@@ -3717,6 +3691,130 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			return true;
  		}
+ 		
+ 		private void postMovesSoloPlayer(int playerIndex)
+ 		{
+ 			MovesTransportObject movesTransportObject = new MovesTransportObject(
+						this.game.playerReferenceCodes[playerIndex],
+						Constants.BUILD_COMPATIBLE,
+						this.game.moves.get(playerIndex));
+
+			boolean success = false;
+			PostMovesResult result = PostMovesResult.ERROR;
+			
+			do
+			{
+				if (this.game.options.contains(GameOptions.SERVER_BASED))
+				{
+					result = this.game.gameThread.postMovesToServer(
+						game.name,
+						this.game.players[this.playerIndexNow].getName(),
+						movesTransportObject);
+						
+					if (result == PostMovesResult.USER_NOT_CONNECTED)
+					{
+						this.game.console.appendText(
+								SternResources.SpielerNichtAngemeldet(
+										true,
+										this.game.players[this.playerIndexNow].getName()));
+						this.game.console.lineBreak();
+					}
+					else if (result != PostMovesResult.ERROR)
+					{
+						this.game.console.appendText(
+								SternResources.ZugeingabePostMovesSuccess(true));
+						this.game.console.lineBreak();
+						success = true;
+					}
+				}
+				else
+				{
+					this.game.console.appendText(
+							SternResources.ZugeingabeEMailErzeugt(true));
+					this.game.console.lineBreak();
+					this.game.console.appendText(
+							SternResources.ZugeingabeEMailErzeugt2(true));
+					this.game.console.lineBreak();
+					
+					String subject = "[Stern] " + this.game.name;
+					
+					String bodyText = 
+							SternResources.ZugeingabeEMailBody(false,
+									this.game.name,
+									Integer.toString(this.game.year + 1),
+									this.game.players[playerIndex].getName(),
+									ReleaseGetter.getRelease(),
+									this.game.players[playerIndex].getName(),
+									this.game.getName());
+					
+					success = this.game.gameThread.launchEmail(
+							this.game.getEmailAddressGameHost(), 
+							subject, 
+							bodyText, 
+							movesTransportObject);
+				}
+				
+				if (!success)
+				{
+					this.game.console.appendText(
+							SternResources.ZugeingabePostMovesError(true));
+					this.game.console.lineBreak();
+					
+					ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
+					
+					allowedKeys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
+					allowedKeys.add(new ConsoleKey(
+							SternResources.AndereTaste(true),
+							SternResources.NochmalVersuchen(true)));
+					
+					ConsoleInput consoleInput = this.game.console.waitForKeyPressed(allowedKeys, false);
+					
+					if (consoleInput.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+					{
+					success = true;
+					}
+					}
+					
+					
+					} while (!success);
+					
+					do
+					{
+					// Endless loop!
+					if (this.game.options.contains(GameOptions.SERVER_BASED))
+					{
+					this.game.gameThread.updateGameInfo();
+					
+					if (this.game.year >= this.game.yearMax - 1)
+					{
+						this.game.console.appendText(
+								SternResources.LetztesJahr(true));
+						this.game.console.lineBreak();
+						this.game.console.appendText(
+								SternResources.LetztesJahr2(true));
+					}
+					else
+					{
+						if (result == PostMovesResult.WAIT_FOR_EVAULATION)
+							this.game.console.appendText(
+									SternResources.WartenBisNaechsteZugeingabe(true));
+						else
+						{
+							this.game.console.appendText(
+									SternResources.AuswertungVerfuegbar(true));
+							this.game.console.lineBreak();
+							this.game.console.appendText(
+									SternResources.AuswertungVerfuegbar2(true));
+						}
+					}
+				}
+				else
+					this.game.console.appendText(
+							SternResources.ZugeingabeEMailEndlosschleife(true));
+				
+				this.game.console.waitForKeyPressed();
+			} while (true);
+ 		}
  	}
  	
  	// =============================
@@ -3790,10 +3888,10 @@ public class Game extends EmailTransportBase implements Serializable
 				allowedKeys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 			else
 			{
-				allowedKeys.add(new ConsoleKey(SternResources.PlaneteneditorAuf(true),SternResources.PlaneteneditorAuswahlAendern(true)));
-				allowedKeys.add(new ConsoleKey(SternResources.PlaneteneditorAb(true),SternResources.PlaneteneditorAuswahlAendern(true)));
-				allowedKeys.add(new ConsoleKey(SternResources.Rechts(true),SternResources.PlaneteneditorKaufen(true)));
-				allowedKeys.add(new ConsoleKey(SternResources.Links(true),SternResources.PlaneteneditorVerkaufen(true)));
+				allowedKeys.add(new ConsoleKey("\u2191",SternResources.PlaneteneditorAuswahlAendern(true)));
+				allowedKeys.add(new ConsoleKey("\u2193",SternResources.PlaneteneditorAuswahlAendern(true)));
+				allowedKeys.add(new ConsoleKey("\u2192",SternResources.PlaneteneditorKaufen(true)));
+				allowedKeys.add(new ConsoleKey("\u2190",SternResources.PlaneteneditorVerkaufen(true)));
 				allowedKeys.add(new ConsoleKey("ESC",SternResources.Abbrechen(true)));
 				allowedKeys.add(new ConsoleKey("ENTER",SternResources.PlaneteneditorUebernehmen(true)));
 			}
@@ -4006,8 +4104,8 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
 			
-			allowedKeys.add(new ConsoleKey(SternResources.Links(true),SternResources.StatistikJahrMinus(true)));
-			allowedKeys.add(new ConsoleKey(SternResources.Rechts(true),SternResources.StatistikJahrPlus(true)));
+			allowedKeys.add(new ConsoleKey("\u2190",SternResources.StatistikJahrMinus(true)));
+			allowedKeys.add(new ConsoleKey("\u2192",SternResources.StatistikJahrPlus(true)));
 			allowedKeys.add(new ConsoleKey(Character.toString(Constants.STATISTICS_MODE_SCORE),SternResources.Punkte(true)));
 			allowedKeys.add(new ConsoleKey(Character.toString(Constants.STATISTICS_MODE_FIGHTERS),SternResources.Raumer(true)));
 			allowedKeys.add(new ConsoleKey(Character.toString(Constants.STATISTICS_MODE_PLANETS),SternResources.Planeten(true)));
@@ -4223,7 +4321,7 @@ public class Game extends EmailTransportBase implements Serializable
 				ship.resetStartedRecently();
 			}
 			
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			this.game.updateBoard();
 			
 			this.addScreenSnapshotToReplay(0);
@@ -4256,7 +4354,7 @@ public class Game extends EmailTransportBase implements Serializable
 			}
 
 			this.game.updateBoard(Constants.DAYS_OF_YEAR_COUNT);
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			
 			for (Ship ships: this.game.ships)
 			{
@@ -4288,7 +4386,7 @@ public class Game extends EmailTransportBase implements Serializable
 				}
 			}
 			
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			
 			this.game.console.appendText(SternResources.AuswertungEnde(true));
 			this.waitForKeyPressed();
@@ -4676,7 +4774,7 @@ public class Game extends EmailTransportBase implements Serializable
   				ship.changeOwner(playerIndexLoser, playerIndexWinner);
   			}
   			
-  			this.game.updatePlanets(false);
+  			this.game.updatePlanetList(false);
   			this.game.updateBoard(day);
   			
   			this.waitForKeyPressed();
@@ -4903,6 +5001,7 @@ public class Game extends EmailTransportBase implements Serializable
 						null,
 						this.game.getSimpleMarkedPosition(otherShipPosition),
 						radar,
+						Constants.NEUTRAL, 
 						day);
 				
 				this.game.console.setLineColor(this.game.players[patrol.getOwner()].getColorIndex());
@@ -4919,6 +5018,7 @@ public class Game extends EmailTransportBase implements Serializable
 						null,
 						this.game.getSimpleMarkedPosition(otherShipPosition),
 						radar,
+						Constants.NEUTRAL, 
 						day);
 
 				boolean capture = true;
@@ -4971,6 +5071,7 @@ public class Game extends EmailTransportBase implements Serializable
 							null,
 							this.game.getSimpleMarkedPosition(otherShipPosition),
 							radar,
+							Constants.NEUTRAL, 
 							day);
 					
 					this.waitForKeyPressed();
@@ -5391,7 +5492,7 @@ public class Game extends EmailTransportBase implements Serializable
 									Integer.toString(ship.getCount()),
 									this.game.getPlanetNameFromIndex(ship.getPlanetIndexDestination())));
 					
-					this.game.updatePlanets(false);
+					this.game.updatePlanetList(false);
 					this.waitForKeyPressed();
 				}
 				else
@@ -5483,7 +5584,7 @@ public class Game extends EmailTransportBase implements Serializable
 				}
 			}
 			
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			this.game.updateBoard(
 					this.game.getSimpleFrameObjekt(planetIndex, Colors.WHITE),
 					day);
@@ -5619,7 +5720,7 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			this.replayArchive();
 				
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			this.game.updateBoard();
  		}
  		
@@ -5729,6 +5830,27 @@ public class Game extends EmailTransportBase implements Serializable
  		}
  	}
   	
+  	// ===============
+  	private class GameCopy
+  	{
+  		public Planet[] planets;
+  		public ArrayList<Ship> ships;
+  		public ScreenContent screenContent;
+  		
+		@SuppressWarnings("unchecked")
+		public GameCopy(Game game)
+  		{
+			this.planets = (Planet[])Utils.klon(game.planets);
+			this.ships = (ArrayList<Ship>)Utils.klon(game.ships);
+			this.screenContent = (ScreenContent)Utils.klon(game.screenContent);
+			
+			if (this.screenContent != null)
+			{
+				this.screenContent.setConsole(null);
+			}
+  		}
+  	}
+  	
   	// ==============
   	
   	private class GameInformation
@@ -5753,7 +5875,7 @@ public class Game extends EmailTransportBase implements Serializable
  				this.game.console.clear();
  				
  				this.game.updateBoard();
- 				this.game.updatePlanets(false);
+ 				this.game.updatePlanetList(false);
  				
  				this.game.console.setHeaderText(
  						this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.Spielinformationen(true), Colors.NEUTRAL);
@@ -6040,7 +6162,11 @@ public class Game extends EmailTransportBase implements Serializable
  			}
  			
  			this.game.screenContent.setPlanets(
- 					new ScreenContentPlanets(text, textCol));
+ 					new ScreenContentPlanets(
+ 							SternResources.PlanetListTitleDefenceShieldFighters(true),
+ 							Colors.NEUTRAL,
+ 							text, 
+ 							textCol));
  			
  			this.game.gameThread.updateDisplay(this.game.screenContent);
 
@@ -6944,7 +7070,7 @@ public class Game extends EmailTransportBase implements Serializable
   			this.console = new Console(this, true);
   			
 			this.updateBoard();
-			this.updatePlanets(false);
+			this.updatePlanetList(false);
   			
 	  		new Evaluation(this);
 	  		
@@ -7104,4 +7230,124 @@ public class Game extends EmailTransportBase implements Serializable
 		while (true);
 
   	}
+  	
+  	private int getSoloPlayerIndex()
+  	{
+  		int playerIndex = -1;
+		
+		for (int i = 0; i < this.playersCount; i++)
+		{
+			if (this.playerReferenceCodes[i] != null)
+			{
+				playerIndex = i;
+				break;
+			}
+		}
+		
+		return playerIndex;
+  	}
+  	
+		private void emailMenu()
+		{
+			this.console.setHeaderText(
+				this.mainMenuGetYearDisplayText() + " -> "+SternResources.ZugeingabeTitel(true)+" -> "+SternResources.ZugeingabeEMailAktionen(true), Colors.NEUTRAL);
+	
+		ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
+		allowedKeys.add(new ConsoleKey("1",SternResources.ZugeingabeSpielstandVerschicken(true)));
+		allowedKeys.add(new ConsoleKey("2",SternResources.ZugeingabeSpielzuegeImportieren(true)));
+		allowedKeys.add(new ConsoleKey("ESC",SternResources.Zurueck(true)));
+		
+		do
+		{
+			ConsoleInput consoleInput = this.console.waitForKeyPressed(allowedKeys, false);
+			String input = consoleInput.getInputText().toUpperCase();
+			
+			if (consoleInput.getLastKeyCode() == KeyEvent.VK_ESCAPE)
+				break;
+			else if (input.equals("1"))
+			{
+				this.autosave();
+				
+				this.sendGameToEmailPlayer();
+				break;
+			}
+			else if (input.equals("2"))
+			{
+				MovesTransportObject movesTransportObject = this.gameThread.importMovesFromEmail();
+				
+				if (movesTransportObject != null)
+				{
+					int playerIndex = this.importMovesFromEmail(movesTransportObject);
+					
+					if (playerIndex >= 0)
+					{
+						this.console.setLineColor(this.players[playerIndex].getColorIndex());
+						this.console.appendText(
+								SternResources.ZugeingabeSpielzuegeImportiert(true, this.players[playerIndex].getName()));
+						this.console.lineBreak();
+						this.console.setLineColor(Colors.WHITE);
+						
+						this.autosave();
+					}
+					else
+					{
+						this.console.appendText(SternResources.ZugeingabeSpielzuegeFalscheRunde(true));
+						this.console.lineBreak();
+					}
+				}
+				else
+				{
+					this.console.appendText(SternResources.ZugeingabeSpielzuegeNichtImportiert(true));
+					this.console.lineBreak();
+				}
+			}
+			else
+				this.console.outInvalidInput();
+				
+			
+		} while (true);
+	}
+		
+	private void sendGameToEmailPlayer()
+	{
+		int emailsCount = 0;
+		
+		for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
+		{
+			Player player = this.players[playerIndex];
+			if (!this.isPlayerEmail(playerIndex))
+				continue;
+			
+			Game gameCopy = this.createCopyForPlayer(playerIndex);
+			
+			String subject = "[Stern] " + gameCopy.name;
+			
+			String bodyText = 
+					SternResources.ZugeingabeEMailBody2(false,
+							gameCopy.name,
+							Integer.toString(gameCopy.year + 1),
+							ReleaseGetter.getRelease(),
+							player.getName());
+			
+			this.gameThread.launchEmail(
+					player.getEmail(), 
+					subject, 
+					bodyText, 
+					gameCopy);
+			
+			emailsCount++;
+		}
+		
+		if (emailsCount > 0)
+		{
+			this.console.appendText(
+					SternResources.ZugeingabeEMailErzeugt3(true,
+						Integer.toString(emailsCount)));
+			this.console.lineBreak();
+			this.console.appendText(SternResources.ZugeingabeEMailErzeugt4(true));
+			this.console.lineBreak();
+		}
+	}
+ 		
+
 }
