@@ -82,7 +82,7 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	transient private ShipTravelTime[][] distanceMatrix;
 	transient private int[][] distanceMatrixYears;
-		
+	
 	static {
 		editorPricesBuy = new Hashtable<ShipType, Integer>();
 		
@@ -165,7 +165,7 @@ public class Game extends EmailTransportBase implements Serializable
 			this.gameThread.checkMenueEnabled();
 			
 			this.updateBoardNewGame();
-			this.updatePlanets(true);
+			this.updatePlanetList(true);
 			
 			this.console.clear();
 			this.console.appendText(
@@ -409,7 +409,7 @@ public class Game extends EmailTransportBase implements Serializable
 		this.yearMax = yearMax;
 		
 		this.updateBoard();
-		this.updatePlanets(false);
+		this.updatePlanetList(false);
 	}
 	
 	private int[] getPlanetsSorted()
@@ -810,7 +810,7 @@ public class Game extends EmailTransportBase implements Serializable
 		do
 		{
 			this.updateBoard();
-			this.updatePlanets(false);
+			this.updatePlanetList(false);
 			
 			this.console.clear();
 			
@@ -1378,7 +1378,12 @@ public class Game extends EmailTransportBase implements Serializable
 			this.gameThread.updateDisplay(this.screenContent);
 	}
 	
-	private void updatePlanets (boolean newGame)
+	private void updatePlanetList(boolean newGame)
+	{
+		this.updatePlanetList(ShipType.FIGHTERS, Constants.NEUTRAL, newGame);
+	}
+	
+	private void updatePlanetList (ShipType shipTypeDisplay, int playerIndexEnterMoves, boolean newGame)
 	{
 		ArrayList<String> text = new ArrayList<String>();
 		ArrayList<Byte> textCol = new ArrayList<Byte>();
@@ -1395,18 +1400,27 @@ public class Game extends EmailTransportBase implements Serializable
 			for (int index = 0; index < this.planetsCount; index++)
 			{
 				int planetIndex = this.getPlanetsSorted()[index];
+				Planet planet = this.planets[planetIndex];
 				
-				if (this.planets[planetIndex].getOwner() != playerIndex)
+				if (planet.getOwner() != playerIndex)
 					continue;
 				
-				if (newGame && this.planets[planetIndex].getOwner() == Constants.NEUTRAL)
+				if (newGame && planet.getOwner() == Constants.NEUTRAL)
 					continue;
 				
 				if (isFirstLine)
 				{
 					if (playerIndex != Constants.NEUTRAL)
 					{
-						text.add(this.players[playerIndex].getName());
+						if (shipTypeDisplay == ShipType.DEFENCE_SHIELD_REPAIR)
+						{
+							// Alliance!
+							text.add("[" + Integer.toString(playerIndex+1) + "]");
+						}
+						else
+						{
+							text.add(this.players[playerIndex].getName());
+						}
 						textCol.add(this.players[playerIndex].getColorIndex());
 					}
 					isFirstLine = false;
@@ -1415,10 +1429,82 @@ public class Game extends EmailTransportBase implements Serializable
 				String planetName = newGame ?
 						" ??" :
 						" " + this.getPlanetNameFromIndex(planetIndex);
-				String fightersCount = "     " + this.planets[planetIndex].getShipsCount(ShipType.FIGHTERS);
+				
+				String shipCount = "";
+				
+				if (shipTypeDisplay == ShipType.FIGHTERS)
+				{
+					shipCount = Integer.toString(this.planets[planetIndex].getShipsCount(ShipType.FIGHTERS));
+				}
+				else if (shipTypeDisplay == ShipType.DEFENCE_SHIELD_REPAIR)
+				{
+					// Misused to show alliances!
+					if (planet.isAllianceMember(playerIndexEnterMoves) || planet.hasRadioStation(playerIndexEnterMoves))
+					{
+						if (planet.allianceExists())
+						{
+							boolean[] allianceMembers = planet.getAllianceMembers();
+							StringBuilder sbAlliance = new StringBuilder();
+							
+							for (int playerIndex2 = 0; playerIndex2 < this.playersCount; playerIndex2++)
+							{
+								if (allianceMembers[playerIndex2])
+								{
+									sbAlliance.append(Integer.toString(playerIndex2 + 1));
+								}
+							}
+							
+							shipCount = sbAlliance.toString();
+						}
+						else
+						{
+							shipCount = "-";
+						}
+					}
+					else
+					{
+						shipCount = "?";
+					}
+				}
+				else if (planet.getOwner() != playerIndexEnterMoves && !planet.hasRadioStation(playerIndexEnterMoves))
+				{
+					shipCount = "?";
+				}
+				else if (shipTypeDisplay == ShipType.DEFENCE_SHIELD)
+				{
+					if (planet.getDefenceShieldFactor() > 0)
+					{
+						shipCount = planet.getDefenceShieldFactor() +
+								    "/" +
+								    planet.getDefenceShieldFightersCount();
+					}
+					else
+					{
+						shipCount = "-";
+					}
+				}
+				else if (shipTypeDisplay == ShipType.MONEY_PRODUCTION)
+				{
+					shipCount = Integer.toString(planet.getMoneyProduction());
+				}
+				else if (shipTypeDisplay == ShipType.FIGHTER_PRODUCTION)
+				{
+					shipCount = Integer.toString(planet.getFighterProduction());
+				}
+				else if (shipTypeDisplay == ShipType.MONEY_SUPPLY)
+				{
+					shipCount = Integer.toString(planet.getMoneySupply());
+				}
+				else
+				{
+					shipCount = Integer.toString(this.planets[planetIndex].getShipsCount(shipTypeDisplay));
+				}
+								
+				shipCount = Utils.padString(shipCount, 5);
+				
 				text.add(planetName.substring(planetName.length()-2, planetName.length()) + 
 						":" +
-						fightersCount.substring(fightersCount.length()-5, fightersCount.length()));
+						shipCount);
 				
 				textCol.add(
 						playerIndex == Constants.NEUTRAL ?
@@ -1430,9 +1516,59 @@ public class Game extends EmailTransportBase implements Serializable
 		if (this.screenContent == null)
 			this.screenContent = new ScreenContent();
 		
+		String title = "";
+		
+		switch (shipTypeDisplay)
+		{
+		case FIGHTERS:
+			title = SternResources.PlanetListTitleFighters(true);
+			break;
+		case SCOUT:
+			title = SternResources.PlanetListTitleScouts(true);
+			break;
+		case PATROL:
+			title = SternResources.PlanetListTitlePatrols(true);
+			break;
+		case MINE50:
+			title = SternResources.PlanetListTitleMine50(true);
+			break;
+		case MINE100:
+			title = SternResources.PlanetListTitleMine100(true);
+			break;
+		case MINE250:
+			title = SternResources.PlanetListTitleMine250(true);
+			break;
+		case MINE500:
+			title = SternResources.PlanetListTitleMine500(true);
+			break;
+		case TRANSPORT:
+			title = SternResources.PlanetListTitleTransport(true);
+			break;
+		case MINESWEEPER:
+			title = SternResources.PlanetListTitleMinesweepers(true);
+			break;
+		case DEFENCE_SHIELD:
+			title = SternResources.PlanetListTitleDefenceShields(true);
+			break;
+		case DEFENCE_SHIELD_REPAIR:
+			title = SternResources.PlanetListTitleAlliances(true);
+			break;
+		case FIGHTER_PRODUCTION:
+			title = SternResources.PlanetListTitleFighterProduction(true);
+			break;
+		case MONEY_PRODUCTION:
+			title = SternResources.PlanetListTitleMoneyProduction(true);
+			break;
+		case MONEY_SUPPLY:
+			title = SternResources.PlanetListTitleMoneySupply(true);
+			break;
+		default:
+			title = "";
+		}
+		
 		this.screenContent.setPlanets(
 				new ScreenContentPlanets(
-						SternResources.PlanetListTitleFighters(true),
+						title,
 						Colors.NEUTRAL,
 						text, 
 						textCol));
@@ -2113,6 +2249,7 @@ public class Game extends EmailTransportBase implements Serializable
  		private Game game;
  		private int playerIndexNow;
  		private boolean capitulated;
+ 		private int planetListShipTypeOrdinal = 0;
  		
  		@SuppressWarnings("unchecked")
 		private EnterMoves(Game game, int playerIndex)
@@ -2144,7 +2281,7 @@ public class Game extends EmailTransportBase implements Serializable
 			this.game.screenContentWhileMovesEntered = null;
 			
 			this.game.updateBoard();
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
  		}
  		
  		private boolean enterMovesPlayer(int playerIndex)
@@ -2243,7 +2380,7 @@ public class Game extends EmailTransportBase implements Serializable
 					this.game.console.outInvalidInput();
 				
 				if (game.isMoveEnteringOpen())
-					game.updatePlanets(false);
+					game.updatePlanetList(ShipType.values()[this.planetListShipTypeOrdinal], this.playerIndexNow, false);
 				else
 				{
 					this.game.screenContent.setPlanets(pdc);
@@ -2274,10 +2411,13 @@ public class Game extends EmailTransportBase implements Serializable
 			ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
 			
 			allowedKeys.add(new ConsoleKey("ESC",SternResources.Zurueck(true)));
-			allowedKeys.add(new ConsoleKey("7",SternResources.Entfernungstabelle(true)));
-			allowedKeys.add(new ConsoleKey("8",SternResources.ZugeingabeObjekteAusblenden(true)));
-			allowedKeys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
 			allowedKeys.add(new ConsoleKey("-",SternResources.ZugeingabeKapitulieren(true)));
+			if (game.isMoveEnteringOpen())
+				allowedKeys.add(new ConsoleKey("6",SternResources.EnterMovesOtherShips(true)));
+			allowedKeys.add(new ConsoleKey("7",SternResources.ZugeingabeObjekteAusblenden(true)));
+			allowedKeys.add(new ConsoleKey("8",SternResources.Entfernungstabelle(true)));
+			allowedKeys.add(new ConsoleKey("9",SternResources.ZugeingabeInventur(true)));
+			
 	
 			boolean exit = false;
 			
@@ -2295,10 +2435,12 @@ public class Game extends EmailTransportBase implements Serializable
 					this.game.console.clear();
 					exit = true;
 				}
+				else if (input.equals("6") && game.isMoveEnteringOpen())
+					this.togglePlanetListShipType();
 				else if (input.equals("7"))
-					new DistanceMatrix(this.game);
-				else if (input.equals("8"))
 					this.hideShips();
+				else if (input.equals("8"))
+					new DistanceMatrix(this.game);
 				else if (input.equals("9"))
 					this.inventory();
 				else if (input.equals("-"))
@@ -3373,6 +3515,22 @@ public class Game extends EmailTransportBase implements Serializable
  			return quitEnterMoves;
  		}
  		
+ 		private void togglePlanetListShipType()
+ 		{
+ 			ShipType[] shipTypes = ShipType.values();
+ 			
+ 			this.planetListShipTypeOrdinal = (this.planetListShipTypeOrdinal + 1) % shipTypes.length;
+ 			
+ 			if (shipTypes[this.planetListShipTypeOrdinal] == ShipType.CAPITULATION)
+ 			{
+ 				this.togglePlanetListShipType();
+ 			}
+ 			else
+ 			{
+ 				this.game.updatePlanetList(shipTypes[this.planetListShipTypeOrdinal], playerIndexNow, false);
+ 			}
+ 		}
+ 		
  		private boolean undo()
  		{
  			ArrayList<Move> moves = this.game.moves.get(this.playerIndexNow);
@@ -4137,7 +4295,7 @@ public class Game extends EmailTransportBase implements Serializable
 				ship.resetStartedRecently();
 			}
 			
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			this.game.updateBoard();
 			
 			this.addScreenSnapshotToReplay(0);
@@ -4170,7 +4328,7 @@ public class Game extends EmailTransportBase implements Serializable
 			}
 
 			this.game.updateBoard(Constants.DAYS_OF_YEAR_COUNT);
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			
 			for (Ship ships: this.game.ships)
 			{
@@ -4202,7 +4360,7 @@ public class Game extends EmailTransportBase implements Serializable
 				}
 			}
 			
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			
 			this.game.console.appendText(SternResources.AuswertungEnde(true));
 			this.waitForKeyPressed();
@@ -4590,7 +4748,7 @@ public class Game extends EmailTransportBase implements Serializable
   				ship.changeOwner(playerIndexLoser, playerIndexWinner);
   			}
   			
-  			this.game.updatePlanets(false);
+  			this.game.updatePlanetList(false);
   			this.game.updateBoard(day);
   			
   			this.waitForKeyPressed();
@@ -5305,7 +5463,7 @@ public class Game extends EmailTransportBase implements Serializable
 									Integer.toString(ship.getCount()),
 									this.game.getPlanetNameFromIndex(ship.getPlanetIndexDestination())));
 					
-					this.game.updatePlanets(false);
+					this.game.updatePlanetList(false);
 					this.waitForKeyPressed();
 				}
 				else
@@ -5397,7 +5555,7 @@ public class Game extends EmailTransportBase implements Serializable
 				}
 			}
 			
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			this.game.updateBoard(
 					this.game.getSimpleFrameObjekt(planetIndex, Colors.WHITE),
 					day);
@@ -5533,7 +5691,7 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			this.replayArchive();
 				
-			this.game.updatePlanets(false);
+			this.game.updatePlanetList(false);
 			this.game.updateBoard();
  		}
  		
@@ -5667,7 +5825,7 @@ public class Game extends EmailTransportBase implements Serializable
  				this.game.console.clear();
  				
  				this.game.updateBoard();
- 				this.game.updatePlanets(false);
+ 				this.game.updatePlanetList(false);
  				
  				this.game.console.setHeaderText(
  						this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.Spielinformationen(true), Colors.NEUTRAL);
@@ -5955,7 +6113,7 @@ public class Game extends EmailTransportBase implements Serializable
  			
  			this.game.screenContent.setPlanets(
  					new ScreenContentPlanets(
- 							SternResources.PlanetListTitleDefenceShiels(true),
+ 							SternResources.PlanetListTitleDefenceShieldFighters(true),
  							Colors.NEUTRAL,
  							text, 
  							textCol));
@@ -6862,7 +7020,7 @@ public class Game extends EmailTransportBase implements Serializable
   			this.console = new Console(this, true);
   			
 			this.updateBoard();
-			this.updatePlanets(false);
+			this.updatePlanetList(false);
   			
 	  		new Evaluation(this);
 	  		

@@ -36,7 +36,7 @@ public class SternResources
 	}
 
 	private static void fillSymbolDict() {
-		// Last used symbolic key: JL
+		// Last used symbolic key: JZ
 		symbolDict.put("00","Abbrechen_00");
 		symbolDict.put("01","AbschlussEprod_01");
 		symbolDict.put("02","AbschlussPlatz_02");
@@ -553,8 +553,22 @@ public class SternResources
 		symbolDict.put("JH","EnterMovesPlanet_JH");
 		symbolDict.put("JI","Players_JI");
 		symbolDict.put("JJ","PlanetListTitleFighters_JJ");
-		symbolDict.put("JK","PlanetListTitleDefenceShiels_JK");
+		symbolDict.put("JK","PlanetListTitleDefenceShieldFighters_JK");
 		symbolDict.put("JL","Evaluation_JL");
+		symbolDict.put("JM","EnterMovesOtherShips_JM");
+		symbolDict.put("JN","PlanetListTitleScouts_JN");
+		symbolDict.put("JO","PlanetListTitlePatrols_JO");
+		symbolDict.put("JP","PlanetListTitleMine50_JP");
+		symbolDict.put("JQ","PlanetListTitleMine250_JQ");
+		symbolDict.put("JR","PlanetListTitleMine100_JR");
+		symbolDict.put("JS","PlanetListTitleMine500_JS");
+		symbolDict.put("JT","PlanetListTitleTransport_JT");
+		symbolDict.put("JU","PlanetListTitleMinesweepers_JU");
+		symbolDict.put("JV","PlanetListTitleDefenceShields_JV");
+		symbolDict.put("JW","PlanetListTitleAlliances_JW");
+		symbolDict.put("JX","PlanetListTitleFighterProduction_JX");
+		symbolDict.put("JY","PlanetListTitleMoneyProduction_JY");
+		symbolDict.put("JZ","PlanetListTitleMoneySupply_JZ");
 	}
 	public static String getString(String symbolString){
 		StringBuilder sb = new StringBuilder();
@@ -3979,7 +3993,7 @@ public class SternResources
 	}
 
 	/**
-	   * >>> Players are entering their moves. Input is disabled. <<< [IB]
+	   * >>> A player is entering his moves. Input is disabled. <<< [IB]
 	   */
 	public static String ZugeingabeClientEingabeGesperrt(boolean symbol) {
 		return symbol ? "£IB£":messages.getString("ZugeingabeClientEingabeGesperrt_IB");
@@ -4198,8 +4212,8 @@ public class SternResources
 	/**
 	   * Defence shield fighters [JK]
 	   */
-	public static String PlanetListTitleDefenceShiels(boolean symbol) {
-		return symbol ? "£JK£":messages.getString("PlanetListTitleDefenceShiels_JK");
+	public static String PlanetListTitleDefenceShieldFighters(boolean symbol) {
+		return symbol ? "£JK£":messages.getString("PlanetListTitleDefenceShieldFighters_JK");
 	}
 
 	/**
@@ -4207,5 +4221,103 @@ public class SternResources
 	   */
 	public static String Evaluation(boolean symbol) {
 		return symbol ? "£JL£":messages.getString("Evaluation_JL");
+	}
+
+	/**
+	   * Other ship types [JM]
+	   */
+	public static String EnterMovesOtherShips(boolean symbol) {
+		return symbol ? "£JM£":messages.getString("EnterMovesOtherShips_JM");
+	}
+
+	/**
+	   * Scouts [JN]
+	   */
+	public static String PlanetListTitleScouts(boolean symbol) {
+		return symbol ? "£JN£":messages.getString("PlanetListTitleScouts_JN");
+	}
+
+	/**
+	   * Patrols [JO]
+	   */
+	public static String PlanetListTitlePatrols(boolean symbol) {
+		return symbol ? "£JO£":messages.getString("PlanetListTitlePatrols_JO");
+	}
+
+	/**
+	   * Mines (50) [JP]
+	   */
+	public static String PlanetListTitleMine50(boolean symbol) {
+		return symbol ? "£JP£":messages.getString("PlanetListTitleMine50_JP");
+	}
+
+	/**
+	   * Mine (250) [JQ]
+	   */
+	public static String PlanetListTitleMine250(boolean symbol) {
+		return symbol ? "£JQ£":messages.getString("PlanetListTitleMine250_JQ");
+	}
+
+	/**
+	   * Mines (100) [JR]
+	   */
+	public static String PlanetListTitleMine100(boolean symbol) {
+		return symbol ? "£JR£":messages.getString("PlanetListTitleMine100_JR");
+	}
+
+	/**
+	   * Mines (500) [JS]
+	   */
+	public static String PlanetListTitleMine500(boolean symbol) {
+		return symbol ? "£JS£":messages.getString("PlanetListTitleMine500_JS");
+	}
+
+	/**
+	   * Transporters [JT]
+	   */
+	public static String PlanetListTitleTransport(boolean symbol) {
+		return symbol ? "£JT£":messages.getString("PlanetListTitleTransport_JT");
+	}
+
+	/**
+	   * Minesweepers [JU]
+	   */
+	public static String PlanetListTitleMinesweepers(boolean symbol) {
+		return symbol ? "£JU£":messages.getString("PlanetListTitleMinesweepers_JU");
+	}
+
+	/**
+	   * Defence shields [JV]
+	   */
+	public static String PlanetListTitleDefenceShields(boolean symbol) {
+		return symbol ? "£JV£":messages.getString("PlanetListTitleDefenceShields_JV");
+	}
+
+	/**
+	   * Alliances [JW]
+	   */
+	public static String PlanetListTitleAlliances(boolean symbol) {
+		return symbol ? "£JW£":messages.getString("PlanetListTitleAlliances_JW");
+	}
+
+	/**
+	   * Fighter production [JX]
+	   */
+	public static String PlanetListTitleFighterProduction(boolean symbol) {
+		return symbol ? "£JX£":messages.getString("PlanetListTitleFighterProduction_JX");
+	}
+
+	/**
+	   * $ production [JY]
+	   */
+	public static String PlanetListTitleMoneyProduction(boolean symbol) {
+		return symbol ? "£JY£":messages.getString("PlanetListTitleMoneyProduction_JY");
+	}
+
+	/**
+	   * $ supply [JZ]
+	   */
+	public static String PlanetListTitleMoneySupply(boolean symbol) {
+		return symbol ? "£JZ£":messages.getString("PlanetListTitleMoneySupply_JZ");
 	}
 }
