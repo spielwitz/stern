@@ -65,7 +65,7 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	transient private Console console;
 	transient private ScreenContent screenContent;
-	transient private Game gameStartOfYear;
+	transient private GameCopy gameCopyStartOfYear;
 	transient private GameThread gameThread;
 	
 	transient private Hashtable<Integer,String> mapPlanetIndexToName;
@@ -378,13 +378,13 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	public ScreenContent getScreenContentStartOfYear()
 	{
-		if (this.gameStartOfYear == null)
+		if (this.gameCopyStartOfYear == null)
 		{
 			return null;
 		}
 		else
 		{
-			return this.gameStartOfYear.screenContent;
+			return this.gameCopyStartOfYear.screenContent;
 		}
 	}
 	
@@ -816,11 +816,7 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			this.checkIsGameFinalized(false);
 			
-			this.gameStartOfYear = (Game)Utils.klon(this);
-			if (this.gameStartOfYear.screenContent != null)
-			{
-				this.gameStartOfYear.screenContent.setConsole(null);
-			}
+			this.gameCopyStartOfYear = new GameCopy(this);
 			
 			this.mainMenu();
 			
@@ -887,6 +883,7 @@ public class Game extends EmailTransportBase implements Serializable
 								if (!player.isDead() && !player.isEmailPlayer())
 								{
 									waitingForMovesOfPlayers += Math.pow(2, playerIndex);
+
 									allowedKeys.add(
 											new ConsoleKey(
 													Integer.toString(playerIndex + 1), 
@@ -934,8 +931,6 @@ public class Game extends EmailTransportBase implements Serializable
 				
 				ConsoleInput consoleInput = this.console.waitForKeyPressed(allowedKeys, false);
 				
-	 			this.setEnableParameterChange(false);
-	
 				String input = consoleInput.getInputText().toUpperCase();
 				
 				if (consoleInput.getLastKeyCode() == KeyEvent.VK_ESCAPE)
@@ -968,6 +963,11 @@ public class Game extends EmailTransportBase implements Serializable
 							
 							new EnterMoves(this, randomPlayerIndex);
 						}
+					}
+					else
+					{
+						console.appendText(SternResources.UngueltigeEingabe(true));
+						console.lineBreak();
 					}
 				}
 				else if (!this.soloPlayer && this.year > 0 && !this.finalized && input.equals("-"))
@@ -1036,15 +1036,6 @@ public class Game extends EmailTransportBase implements Serializable
 						console.appendText(SternResources.UngueltigeEingabe(true));
 						console.lineBreak();
 					}
-					
-					//this.setScreenContentWhileMovesEntered();
-					
-//					EnterMoves enterMoves = new EnterMoves(this);
-//					
-//					this.screenContentWhileMovesEntered = null;
-//					
-//					if (enterMoves.enterMovesFinished)
-//						break;
 				}
 			}
 		}   while (true);
@@ -2256,6 +2247,7 @@ public class Game extends EmailTransportBase implements Serializable
  		{
  			this.game = game;
  			
+ 			this.game.setEnableParameterChange(false); 			
 			this.game.setScreenContentWhileMovesEntered();
 			 			
  			boolean abort = this.enterMovesPlayer(playerIndex);
@@ -2263,8 +2255,8 @@ public class Game extends EmailTransportBase implements Serializable
 			if (abort)
 				this.game.moves.remove(playerIndex);
 			
-			this.game.planets = (Planet[])Utils.klon(this.game.gameStartOfYear.planets);
-			this.game.ships = (ArrayList<Ship>)Utils.klon(this.game.gameStartOfYear.ships);
+			this.game.planets = (Planet[])Utils.klon(this.game.gameCopyStartOfYear.planets);
+			this.game.ships = (ArrayList<Ship>)Utils.klon(this.game.gameCopyStartOfYear.ships);
 			
 			if (!abort && this.game.isSoloPlayer())
 			{
@@ -5800,6 +5792,27 @@ public class Game extends EmailTransportBase implements Serializable
  			this.game.pause(Constants.PAUSE_MILLISECS_ANIMATION);
  		}
  	}
+  	
+  	// ===============
+  	private class GameCopy
+  	{
+  		public Planet[] planets;
+  		public ArrayList<Ship> ships;
+  		public ScreenContent screenContent;
+  		
+		@SuppressWarnings("unchecked")
+		public GameCopy(Game game)
+  		{
+			this.planets = (Planet[])Utils.klon(game.planets);
+			this.ships = (ArrayList<Ship>)Utils.klon(game.ships);
+			this.screenContent = (ScreenContent)Utils.klon(game.screenContent);
+			
+			if (this.screenContent != null)
+			{
+				this.screenContent.setConsole(null);
+			}
+  		}
+  	}
   	
   	// ==============
   	
