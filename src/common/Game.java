@@ -1403,9 +1403,8 @@ public class Game extends EmailTransportBase implements Serializable
 				{
 					if (playerIndex != Constants.NEUTRAL)
 					{
-						if (shipTypeDisplay == ShipType.DEFENCE_SHIELD_REPAIR)
+						if (shipTypeDisplay == ShipType.ALLIANCES)
 						{
-							// Alliance!
 							text.add("[" + Integer.toString(playerIndex+1) + "]");
 						}
 						else
@@ -1427,9 +1426,8 @@ public class Game extends EmailTransportBase implements Serializable
 				{
 					shipCount = Integer.toString(this.planets[planetIndex].getShipsCount(ShipType.FIGHTERS));
 				}
-				else if (shipTypeDisplay == ShipType.DEFENCE_SHIELD_REPAIR)
+				else if (shipTypeDisplay == ShipType.ALLIANCES)
 				{
-					// Misused to show alliances!
 					if (planet.isAllianceMember(playerIndexEnterMoves) || planet.hasRadioStation(playerIndexEnterMoves))
 					{
 						if (planet.allianceExists())
@@ -1439,7 +1437,7 @@ public class Game extends EmailTransportBase implements Serializable
 							
 							for (int playerIndex2 = 0; playerIndex2 < this.playersCount; playerIndex2++)
 							{
-								if (allianceMembers[playerIndex2])
+								if (allianceMembers[playerIndex2] && playerIndex2 != planet.getOwner())
 								{
 									sbAlliance.append(Integer.toString(playerIndex2 + 1));
 								}
@@ -1541,7 +1539,7 @@ public class Game extends EmailTransportBase implements Serializable
 		case DEFENCE_SHIELD:
 			title = SternResources.PlanetListTitleDefenceShields(true);
 			break;
-		case DEFENCE_SHIELD_REPAIR:
+		case ALLIANCES:
 			title = SternResources.PlanetListTitleAlliances(true);
 			break;
 		case FIGHTER_PRODUCTION:
@@ -2265,7 +2263,7 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			this.game.console.clear();
 			
-			if (!this.game.isSoloPlayer())
+			if (!this.game.isSoloPlayer() && !abort)
 			{
 				this.game.autosave();
 			}
@@ -3513,7 +3511,8 @@ public class Game extends EmailTransportBase implements Serializable
  			
  			this.planetListShipTypeOrdinal = (this.planetListShipTypeOrdinal + 1) % shipTypes.length;
  			
- 			if (shipTypes[this.planetListShipTypeOrdinal] == ShipType.CAPITULATION)
+ 			if (shipTypes[this.planetListShipTypeOrdinal] == ShipType.CAPITULATION ||
+ 				shipTypes[this.planetListShipTypeOrdinal] == ShipType.DEFENCE_SHIELD_REPAIR)
  			{
  				this.togglePlanetListShipType();
  			}
