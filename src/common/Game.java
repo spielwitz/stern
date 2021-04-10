@@ -1446,7 +1446,9 @@ public class Game extends EmailTransportBase implements Serializable
 				}
 				else if (shipTypeDisplay == ShipType.ALLIANCES)
 				{
-					if (planet.isAllianceMember(playerIndexEnterMoves) || planet.hasRadioStation(playerIndexEnterMoves))
+					if (planet.getOwner() == playerIndexEnterMoves ||
+						planet.isAllianceMember(playerIndexEnterMoves) || 
+						planet.hasRadioStation(playerIndexEnterMoves))
 					{
 						if (planet.allianceExists())
 						{
