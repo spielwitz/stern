@@ -58,7 +58,7 @@ public class ScreenPainter
 	
 	private static final int	    PROGRESS_BAR_BORDER = 2;
 	
-	private static final int		HOME_PLANET_POLYCOUNT_EDGES_COUNT = 6;
+	public static final int		HOME_PLANET_POLYCOUNT_EDGES_COUNT = 6;
 	
 	private double factor;
 	

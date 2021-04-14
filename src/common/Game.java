@@ -341,13 +341,18 @@ public class Game extends EmailTransportBase implements Serializable
 	{
 		ArrayList<PlanetInfo> retval = new ArrayList<PlanetInfo>(this.planetsCount);
 		
-		for (Planet planet: this.planets)
+		for (int planetIndex = 0; planetIndex < this.planetsCount; planetIndex++)
+		{
+			Planet planet = this.planets[planetIndex];
+			
 			retval.add(new PlanetInfo(
 					(int)planet.getPosition().getX(), 
 					(int)planet.getPosition().getY(), 
 					planet.getOwner() == Constants.NEUTRAL ?
 							Colors.NEUTRAL :
-							this.players[planet.getOwner()].getColorIndex()));
+							this.players[planet.getOwner()].getColorIndex(),
+					planetIndex < this.playersCount));
+		}
 		
 		return retval;
 	}
@@ -656,7 +661,9 @@ public class Game extends EmailTransportBase implements Serializable
 			boolean isPlanetHome = (planetIndex < this.playersCount);
 											
 			int owner 	  	  = isPlanetHome ? planetIndex : Constants.NEUTRAL;
-			int fightersCount = isPlanetHome ? Constants.FIGHTERS_COUNT_INITIAL_PLAYERS : 0;
+			int fightersCount = isPlanetHome ? 
+								Constants.FIGHTERS_COUNT_INITIAL_PLAYERS : 
+								Utils.getRandomInteger(Constants.FIGHTERS_COUNT_INITIAL_NEUTRAL_MAX + 1);
 			
 			int moneyProduction = Constants.MONEY_PRODUCTION_INITIAL_PLAYERS;
 			if (!isPlanetHome)
@@ -675,7 +682,7 @@ public class Game extends EmailTransportBase implements Serializable
 	        
 	        int moneySupply = isPlanetHome ?
 			        				Constants.MONEY_SUPPLY_INITIAL_PLAYERS :
-			        				0;
+			        				Utils.getRandomInteger(Constants.MONEY_SUPPLY_INITIAL_NEUTRAL_MAX + 1);
 	        
 			this.planets[planetIndex] = new Planet(
 										new Point(
@@ -2244,12 +2251,14 @@ public class Game extends EmailTransportBase implements Serializable
  		public int positionX;
  		public int positionY;
  		public byte colorIndex;
+ 		public boolean isHomePlanet;
  		
- 		private PlanetInfo(int positionX, int positionY, byte colorIndex)
+ 		private PlanetInfo(int positionX, int positionY, byte colorIndex, boolean isHomePlanet)
  		{
  			this.positionX = positionX;
  			this.positionY = positionY;
  			this.colorIndex = colorIndex;
+ 			this.isHomePlanet = isHomePlanet;
  		}
  	}
  	// =====================
@@ -4381,11 +4390,8 @@ public class Game extends EmailTransportBase implements Serializable
 			
 			for (Planet planet: this.game.planets)
 			{
-				if (planet.getOwner() != Constants.NEUTRAL)
-				{
-					planet.produceMoneySupply();
-					planet.produceFighters();
-				}
+				planet.produceMoneySupply();
+				planet.produceFighters();
 			}
 			
 			this.game.updatePlanetList(false);

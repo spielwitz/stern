@@ -75,6 +75,7 @@ import commonUi.TextFieldDark;
 import common.GameInfo;
 import common.GameOptions;
 import common.Player;
+import common.ScreenPainter;
 import common.SternResources;
 import common.Utils;
 
@@ -573,10 +574,33 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 							Colors.get(Colors.NEUTRAL) : 
 							Color.white);
 				
-				int x = Utils.round(offset + plInfo.positionX * PIXEL_PER_SECTOR);
-				int y = Utils.round(offset + plInfo.positionY * PIXEL_PER_SECTOR);
-				
-				g.fillOval(x, y, PIXEL_PER_SECTOR, PIXEL_PER_SECTOR);
+				if (plInfo.isHomePlanet)
+				{
+					int[] polyX = new int[ScreenPainter.HOME_PLANET_POLYCOUNT_EDGES_COUNT];
+					int[] polyY = new int[ScreenPainter.HOME_PLANET_POLYCOUNT_EDGES_COUNT];
+					
+					double rr = 0.75 * (double)PIXEL_PER_SECTOR;
+					
+					for (int i = 0; i < ScreenPainter.HOME_PLANET_POLYCOUNT_EDGES_COUNT; i++)
+					{
+						double angle = i * 2 * Math.PI / ScreenPainter.HOME_PLANET_POLYCOUNT_EDGES_COUNT;
+						
+						double x = offset + ((double)plInfo.positionX + 0.5) * PIXEL_PER_SECTOR - rr * Math.sin(angle);
+						double y = offset + ((double)plInfo.positionY + 0.5) * PIXEL_PER_SECTOR - rr * Math.cos(angle);
+						
+						polyX[i] = Utils.round(x);
+						polyY[i] = Utils.round(y);
+					}		
+					
+					g.fillPolygon(polyX, polyY, ScreenPainter.HOME_PLANET_POLYCOUNT_EDGES_COUNT);
+				}
+				else
+				{
+					int x = Utils.round(offset + plInfo.positionX * PIXEL_PER_SECTOR);
+					int y = Utils.round(offset + plInfo.positionY * PIXEL_PER_SECTOR);
+					
+					g.fillOval(x, y, PIXEL_PER_SECTOR, PIXEL_PER_SECTOR);
+				}
 			}
 		}
 
