@@ -644,14 +644,29 @@ public class Game extends EmailTransportBase implements Serializable
 		for (int planetIndex = this.playersCount + playersCount * planetsNearbyCount; planetIndex < this.planetsCount; planetIndex++)
 		{
 			Point position = null;
+			boolean tooCloseToHomePlanet = false;
 			
 			do
 			{
-				position = new Point(
-						Utils.getRandomInteger(this.boardWidth),
-						Utils.getRandomInteger(this.boardHeight));
+				tooCloseToHomePlanet = false;
 				
-			} while (this.isPlanetPositionInvalid(position, positions));
+				do
+				{
+					position = new Point(
+							Utils.getRandomInteger(this.boardWidth),
+							Utils.getRandomInteger(this.boardHeight));
+					
+				} while (this.isPlanetPositionInvalid(position, positions));
+				
+				for (int planetIndexHome = 0; planetIndexHome < this.playersCount; planetIndexHome++)
+				{
+					if (position.distance(positions[planetIndexHome]) <= 4)
+					{
+						tooCloseToHomePlanet = true;
+						break;
+					}
+				}
+			}  while (tooCloseToHomePlanet);
 			
 			positions[planetIndex] = position;
 		}
