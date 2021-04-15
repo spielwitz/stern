@@ -41,7 +41,7 @@ public class Constants
 	static final int 		NEUTRAL = -1;
 	public static final int PLAYERS_COUNT_MAX = 6;
 	public static final int PLAYERS_COUNT_MIN = 2;
-	static final int PLANETS_COUNT_MAX = 42;
+	public static final int PLANETS_COUNT_MAX = 42;
 	static final int 		DEFENSE_SHIELDS_COUNT_MAX = 2;
 	static final int 		MONEY_PRODUCTION_PURCHASE = 4;
 	static final int 		DEFENSE_SHIELD_FIGHTERS = 350;

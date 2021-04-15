@@ -100,6 +100,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 	private Hashtable<GameOptions,CheckBoxDark> cbOptions;
 	private ComboBoxDark<String> comboYearLast;
 	private ComboBoxDark<String> comboPlayers;
+	private ComboBoxDark<String> comboPlanets;
 	private TextFieldDark tfGameName;
 	
 	Game gameLoaded;
@@ -227,7 +228,8 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 			this.close();
 		else if (source == this.butNewGameSubmit)
 			this.submitGame();
-		else if (source == this.comboPlayers || 
+		else if (source == this.comboPlayers ||
+				 source == this.comboPlanets ||
 				source == this.butNewGamenewBoard)
 			this.updateGame();
 		else if (source.getClass() == ComboBoxDark.class)
@@ -388,6 +390,18 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		
 		panMain.add(add(this.getPlayerPanel(1)));
 		
+		PanelDark panPlanetsSub2 = new PanelDark(new FlowLayout(FlowLayout.LEFT));
+		panPlanetsSub2.add(new LabelDark(SternResources.Planeten(false), font));
+		String[] planets = new String[Constants.PLANETS_COUNT_MAX - Constants.PLAYERS_COUNT_MAX + 1];
+		for (int planetIndex = Constants.PLAYERS_COUNT_MAX; planetIndex <= Constants.PLANETS_COUNT_MAX; planetIndex++)
+			planets[planetIndex-Constants.PLAYERS_COUNT_MAX] = Integer.toString(planetIndex);
+		this.comboPlanets = new ComboBoxDark<String>(planets, font);
+		panPlanetsSub2.add(this.comboPlanets);
+		
+		panMain.add(panPlanetsSub2);
+		
+		panMain.add(add(this.getPlayerPanel(2)));
+		
 		PanelDark panYearMax = new PanelDark(new FlowLayout(FlowLayout.LEFT));
 		panYearMax.add(new LabelDark(SternResources.SpielparameterJDialogSpieleBisJahr(false)+" ", font));
 		String[] years = { ENDLESS_GAME_STRING, "15", "20", "30", "40", "50", "75", "100", "150", "200" };
@@ -395,17 +409,13 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		panYearMax.add(this.comboYearLast);
 		panMain.add(panYearMax);
 		
-		panMain.add(add(this.getPlayerPanel(2)));
+		panMain.add(add(this.getPlayerPanel(3)));
 		
 		PanelDark panGameName = new PanelDark(new FlowLayout(FlowLayout.LEFT));
 		panGameName.add(new LabelDark(SternResources.ServerGamesSpielname(false), font));
 		this.tfGameName = new TextFieldDark(font, 18);
 		panGameName.add(this.tfGameName);
 		panMain.add(panGameName);
-
-		panMain.add(add(this.getPlayerPanel(3)));
-		
-		panMain.add(new LabelDark(font));
 
 		panMain.add(add(this.getPlayerPanel(4)));
 		
@@ -450,10 +460,12 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 			this.comboYearLast.setSelectedItem(ENDLESS_GAME_STRING);
 		
 		this.comboPlayers.setSelectedItem(Integer.toString(Constants.PLAYERS_COUNT_MAX));
+		this.comboPlanets.setSelectedItem(Integer.toString(Constants.PLANETS_COUNT_MAX));
 		
 		this.updateGame();
 		
 		this.comboPlayers.addActionListener(this);
+		this.comboPlanets.addActionListener(this);
 		
 		panShell.add(panBase);
 		
@@ -609,6 +621,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 	private void updateGame()
 	{
 		int playersCount = Integer.parseInt((String)this.comboPlayers.getSelectedItem());
+		int planetsCount = Integer.parseInt((String)this.comboPlanets.getSelectedItem());
 		
 		for (GameOptions option: this.cbOptions.keySet())
 		{
@@ -626,6 +639,7 @@ class ServerGamesJDialog extends JDialog implements ActionListener, IColorChoose
 		this.game = Game.create(
 				this.options,
 				this.getPlayers(playersCount),
+				planetsCount,
 				this.gamesAndUsers.emailGameHost,
 				30);
 		
