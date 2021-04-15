@@ -111,6 +111,7 @@ public class Game extends EmailTransportBase implements Serializable
 	@SuppressWarnings("unchecked")
 	public Game(HashSet<GameOptions> options,
 			Player[] players,
+			int planetsCount,
 			String emailAddressGameHost,
 			int yearMax)
 	{
@@ -118,7 +119,7 @@ public class Game extends EmailTransportBase implements Serializable
 		this.players = (Player[])Utils.klon(players);
 		this.emailAddressGameHost = emailAddressGameHost;
 
-		this.planetsCount = Constants.PLANETS_COUNT_MAX;
+		this.planetsCount = planetsCount;
 		this.playersCount = players.length;
 		this.yearMax = yearMax;
 		
@@ -129,10 +130,11 @@ public class Game extends EmailTransportBase implements Serializable
 	
 	public static Game create(HashSet<GameOptions> options,
 			Player[] players,
+			int planetsCount,
 			String emailAddressGameHost,
 			int yearMax)
 	{
-		Game game = new Game(options, players, emailAddressGameHost, yearMax);
+		Game game = new Game(options, players, planetsCount, emailAddressGameHost, yearMax);
 		game.createBoard();
 		
 		return game;
