@@ -25,7 +25,7 @@ public class Constants
 
 	// Recommended build. Was used by the update checker (suspended) to indicate
 	// an important update.
-	public static final String 	BUILD_IMPORTANT_UPDATE = "2016";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "2017";
 
 	// Games older than this build have to be migrated.
 	static final String 		BUILD_MIGRATION = "2012";

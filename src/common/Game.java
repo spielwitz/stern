@@ -861,7 +861,7 @@ public class Game extends EmailTransportBase implements Serializable
 			}
 			else
 			{		
-				int waitingForMovesOfPlayers = 0;
+				BitSet playerHasNotEnteredMoves = new BitSet(this.playersCount);
 				
 				ArrayList<ConsoleKey> allowedKeys = new ArrayList<ConsoleKey>();
 				
@@ -874,7 +874,7 @@ public class Game extends EmailTransportBase implements Serializable
 						
 						if (!this.moves.containsKey(soloPlayerIndex))
 						{
-							waitingForMovesOfPlayers = (int)Math.pow(2, soloPlayerIndex);
+							playerHasNotEnteredMoves.set(soloPlayerIndex);
 						}
 					}
 					else
@@ -891,7 +891,7 @@ public class Game extends EmailTransportBase implements Serializable
 								
 								if (!player.isDead() && !player.isEmailPlayer())
 								{
-									waitingForMovesOfPlayers += Math.pow(2, playerIndex);
+									playerHasNotEnteredMoves.set(playerIndex);
 
 									allowedKeys.add(
 											new ConsoleKey(
@@ -910,7 +910,7 @@ public class Game extends EmailTransportBase implements Serializable
 				this.console.setHeaderText(
 						this.mainMenuGetYearDisplayText() + " -> "+SternResources.Hauptmenue(true), Colors.NEUTRAL);
 				
-				if (waitingForMovesOfPlayers > 0)
+				if (!playerHasNotEnteredMoves.isEmpty())
 				{
 					if (this.isSoloPlayer())
 					{
@@ -950,7 +950,7 @@ public class Game extends EmailTransportBase implements Serializable
 					{
 						break;
 					}
-					else if (waitingForMovesOfPlayers > 0)
+					else if (!playerHasNotEnteredMoves.isEmpty())
 					{
 						if (this.soloPlayer)
 						{
@@ -958,17 +958,13 @@ public class Game extends EmailTransportBase implements Serializable
 						}
 						else
 						{
-							int randomPlayerIndex = Utils.getRandomInteger(this.playersCount);
+							int randomPlayerIndex = -1;
 							
-							for (int i = 0; i < this.playersCount; i++)
+							do
 							{
-								randomPlayerIndex = (randomPlayerIndex + i) % this.playersCount;
+								randomPlayerIndex = Utils.getRandomInteger(this.playersCount);
 								
-								if ((waitingForMovesOfPlayers & (int)Math.pow(2, randomPlayerIndex)) > 0)
-								{
-									break;
-								}
-							}
+							} while (!playerHasNotEnteredMoves.get(randomPlayerIndex));
 							
 							new EnterMoves(this, randomPlayerIndex);
 						}
@@ -1012,7 +1008,9 @@ public class Game extends EmailTransportBase implements Serializable
 						{
 							int playerIndex = Integer.parseInt(input) - 1;
 							
-							if ((waitingForMovesOfPlayers & (int)Math.pow(2, playerIndex)) > 0)
+							if (playerIndex >= 0 &&
+								playerIndex < this.playersCount &&
+								playerHasNotEnteredMoves.get(playerIndex))
 							{
 								Player player = this.players[playerIndex];
 								
