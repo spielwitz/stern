@@ -40,8 +40,8 @@ public class ScreenPainter
 	private static final int		SHIP_SIZE_PIXEL_MIN = 2;
 	
 	private static final int 		PLANET_EDITOR_COLUMN1 = 5;
-	private static final int 		PLANET_EDITOR_COLUMN2 = 46;
-	private static final int 		PLANET_EDITOR_COLUMN3 = 64;
+	private static final int 		PLANET_EDITOR_COLUMN2 = 49;
+	private static final int 		PLANET_EDITOR_COLUMN3 = 70;
 	
 	private static final String 	CURSOR_CHARACTER = "_";
 	
@@ -495,11 +495,8 @@ public class ScreenPainter
 		this.drawPlanetEditorTextLeft(Utils.padString(screenContentPlanetEditor.getMoneySupply(),4), PLANET_EDITOR_COLUMN1, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
 		this.drawPlanetEditorTextLeft(SternResources.PlEditEeEnergievorrat(false), PLANET_EDITOR_COLUMN1+5, 1, Colors.get(Colors.NEUTRAL));
 		
-		if (screenContentPlanetEditor.isHomePlanet())
-			this.drawPlanetEditorTextCentered(SternResources.HomePlanet(false), PLANET_EDITOR_COLUMN2+15, 1, Colors.get(screenContentPlanetEditor.getColorIndex()));
-		
-		this.drawPlanetEditorTextCentered(SternResources.PlEditKaufpreis(false), PLANET_EDITOR_COLUMN2+6, 2, Colors.get(Colors.NEUTRAL));
-		this.drawPlanetEditorTextCentered(SternResources.PlEditVerkaufspreis(false), PLANET_EDITOR_COLUMN3+6, 2, Colors.get(Colors.NEUTRAL));
+		this.drawPlanetEditorTextCentered(SternResources.PlEditKaufpreis(false), PLANET_EDITOR_COLUMN2+9, 2, Colors.get(Colors.NEUTRAL));
+		this.drawPlanetEditorTextCentered(SternResources.PlEditVerkaufspreis(false), PLANET_EDITOR_COLUMN3+9, 2, Colors.get(Colors.NEUTRAL));
 		
 		this.drawPlanetEditorLine(ShipType.MONEY_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditEprodPlus4(false), 3);
 		this.drawPlanetEditorLine(ShipType.FIGHTER_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditRaumerProd(false), 4);
@@ -518,7 +515,11 @@ public class ScreenPainter
 		this.drawPlanetEditorLine(ShipType.MINE500, screenContentPlanetEditor, SternResources.Mine500Plural(false), 16);
 	}
 	
-	private void drawPlanetEditorLine(ShipType type, ScreenContentPlanetEditor screenContentPlanetEditor, String name, int line)
+	private void drawPlanetEditorLine(
+			ShipType type, 
+			ScreenContentPlanetEditor screenContentPlanetEditor, 
+			String name, 
+			int line)
 	{
 		this.drawPlanetEditorTextLeft(Utils.padString(screenContentPlanetEditor.getCount().get(type),4), PLANET_EDITOR_COLUMN1, line, Colors.get(screenContentPlanetEditor.getColorIndex()));
 		this.drawPlanetEditorTextLeft(name, PLANET_EDITOR_COLUMN1+5, line, 
@@ -536,8 +537,14 @@ public class ScreenPainter
 		if (screenContentPlanetEditor.getBuyImpossible().contains(type))
 			colorIndex = Colors.NEUTRAL;
 				
-		this.drawPlanetEditorTextLeft(Utils.padString(Game.editorPricesBuy.get(type),2), PLANET_EDITOR_COLUMN2 + 4, line, Colors.get(colorIndex));
+		this.drawPlanetEditorTextLeft(
+				Utils.padString(
+						screenContentPlanetEditor.getPriceBuy(type),
+						2), 
+				PLANET_EDITOR_COLUMN2 + 4, line, Colors.get(colorIndex));
 		this.drawPlanetEditorTextLeft(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN2+7, line, Colors.get(colorIndex));
+		
+		this.drawPlanetEditorTextLeft(this.getPriceRangeString(type, false), PLANET_EDITOR_COLUMN2+9, line, Colors.get(Colors.NEUTRAL));
 		
 		if (type == ShipType.MONEY_PRODUCTION || type == ShipType.DEFENCE_SHIELD_REPAIR)
 			return;
@@ -546,8 +553,36 @@ public class ScreenPainter
 		if (screenContentPlanetEditor.getSellImpossible().contains(type))
 			colorIndex = Colors.NEUTRAL;
 		
-		this.drawPlanetEditorTextLeft(Utils.padString(Game.editorPricesSell.get(type),2), PLANET_EDITOR_COLUMN3 + 4, line, Colors.get(colorIndex));
+		this.drawPlanetEditorTextLeft(
+				Utils.padString(
+						screenContentPlanetEditor.getPriceSell(type),
+						2), 
+				PLANET_EDITOR_COLUMN3 + 4, line, Colors.get(colorIndex));
 		this.drawPlanetEditorTextLeft(SternResources.PlEditEe(false), PLANET_EDITOR_COLUMN3+7, line, Colors.get(colorIndex));
+		
+		this.drawPlanetEditorTextLeft(this.getPriceRangeString(type, true), PLANET_EDITOR_COLUMN3+9, line, Colors.get(Colors.NEUTRAL));
+		
+	}
+	
+	private String getPriceRangeString(ShipType type, boolean sell)
+	{
+		int minVal = sell ?
+				Utils.round(Constants.PRICES_MIN_MAX.get(type).x * Constants.PRICE_RATIO_BUY_SELL) :
+				Utils.round(Constants.PRICES_MIN_MAX.get(type).x);
+		
+		int maxVal = sell ?
+				Utils.round(Constants.PRICES_MIN_MAX.get(type).y * Constants.PRICE_RATIO_BUY_SELL) :
+				Utils.round(Constants.PRICES_MIN_MAX.get(type).y);
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("(");
+		sb.append(Utils.padString(Integer.toString(minVal), 2));
+		sb.append("-");
+		sb.append(Utils.padString(Integer.toString(maxVal), 2));
+		sb.append(")");
+		
+		return sb.toString();
 	}
 	
 	private void drawPlanetEditorTextLeft(String text, int column, int line, Color color)

@@ -25,33 +25,35 @@ class ScreenContentPlanetEditor implements Serializable
 {
 	private ShipType typeHighlighted;
 	private Hashtable<ShipType,String> count;
+	private Hashtable<ShipType, Integer> pricesBuy;
+	private Hashtable<ShipType, Integer> pricesSell;
 	private HashSet<ShipType> buyImpossible;
 	private HashSet<ShipType> sellImpossible;
 	
 	private boolean readOnly;
 	private byte colorIndex;
 	private int moneySupply;
-	private boolean isHomePlanet;
-	
 	
 	ScreenContentPlanetEditor(
 			ShipType typeHighlighted,
 			Hashtable<ShipType, String> count,
+			Hashtable<ShipType, Integer> pricesBuy,
+			Hashtable<ShipType, Integer> pricesSell,
 			HashSet<ShipType> buyImpossible,
 			HashSet<ShipType> sellImpossible,
 			byte colorIndex,
 			int moneySupply,
-			boolean isHomePlanet,
 			boolean readOnly) 
 	{
 		super();
 		this.typeHighlighted = typeHighlighted;
 		this.count = count;
+		this.pricesBuy = pricesBuy;
+		this.pricesSell = pricesSell;
 		this.buyImpossible = buyImpossible;
 		this.sellImpossible = sellImpossible;
 		this.colorIndex = colorIndex;
 		this.moneySupply = moneySupply;
-		this.isHomePlanet = isHomePlanet;
 		this.readOnly = readOnly;
 	}
 
@@ -88,7 +90,13 @@ class ScreenContentPlanetEditor implements Serializable
 	}
 
 
-	public boolean isHomePlanet() {
-		return isHomePlanet;
+	public int getPriceBuy(ShipType shipType) 
+	{
+		return this.pricesBuy.get(shipType);
+	}
+	
+	public int getPriceSell(ShipType shipType) 
+	{
+		return this.pricesSell.get(shipType);
 	}
 }
