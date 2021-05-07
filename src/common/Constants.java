@@ -16,19 +16,21 @@
 
 package common;
 
+import java.util.Hashtable;
+
 public class Constants
 {
 	// Minimum required build version when reading games or when exchaning data
 	// with the STERN server to avoid incompatibilities and advantages caused
 	// by program errors.
-	public static final String 	BUILD_COMPATIBLE = "2013";
+	public static final String 	BUILD_COMPATIBLE = "2018";
 
 	// Recommended build. Was used by the update checker (suspended) to indicate
 	// an important update.
-	public static final String 	BUILD_IMPORTANT_UPDATE = "2017";
+	public static final String 	BUILD_IMPORTANT_UPDATE = "2018";
 
 	// Games older than this build have to be migrated.
-	static final String 		BUILD_MIGRATION = "2012";
+	static final String 		BUILD_MIGRATION = "2018";
 	
 	public static final String 	STERN_URL = "https://stern.dyndns1.de";
 	public static final String 	BUILD_NO_INFO = "9999";
@@ -79,20 +81,29 @@ public class Constants
 	static final int 		PATROL_CAPUTURES_FIGHTERS_COUNT_MAX = 5;
 	
 	// Prices
-	static final int 		PRICE_SCOUT = 4;
-	static final int 		PRICE_PATROL = 8;
-	static final int 		PRICE_DEFENSE_SHIELD = 75;
-	static final int 		PRICE_DEFENSE_SHIELD_REPAIR = 1;
-	static final int 		PRICE_MONEY_PRODUCTION_INCREASE = 75;
-	static final int 		PRICE_FIGHTER_PRODUCTION = 0;
-	static final int 		PRICE_MINE50 = 14;
-	static final int 		PRICE_MINE100 = 22;
-	static final int 		PRICE_MINE250 = 43;
-	static final int 		PRICE_MINE500 = 65;
-	static final int 		PRICE_MINENSWEEPER = 25;
-	static final int 		PRICE_TRANSPORT= 5;
-	
 	static final double 	PRICE_RATIO_BUY_SELL = 2./3.;
+	
+	static Hashtable<ShipType, Point> PRICES_MIN_MAX;
+	
+	static 
+	{
+		PRICES_MIN_MAX = new Hashtable<ShipType, Point>();
+		
+		PRICES_MIN_MAX.put(ShipType.DEFENCE_SHIELD, new Point(60, 90));
+		PRICES_MIN_MAX.put(ShipType.DEFENCE_SHIELD_REPAIR, new Point(1, 1));
+		PRICES_MIN_MAX.put(ShipType.MONEY_PRODUCTION, new Point(60, 90));
+		PRICES_MIN_MAX.put(ShipType.FIGHTER_PRODUCTION, new Point(0, 0));
+		
+		PRICES_MIN_MAX.put(ShipType.SCOUT, new Point(3, 6));
+		PRICES_MIN_MAX.put(ShipType.PATROL, new Point(6, 10));
+		PRICES_MIN_MAX.put(ShipType.TRANSPORT, new Point(4, 7));
+		PRICES_MIN_MAX.put(ShipType.MINESWEEPER, new Point(20, 28));
+		
+		PRICES_MIN_MAX.put(ShipType.MINE50, new Point(12, 17));
+		PRICES_MIN_MAX.put(ShipType.MINE100, new Point(20, 25));
+		PRICES_MIN_MAX.put(ShipType.MINE250, new Point(40, 47));
+		PRICES_MIN_MAX.put(ShipType.MINE500, new Point(60, 70));		
+	}
 	
 	// Statistics
 	static final char 		STATISTICS_MODE_SCORE = '1';

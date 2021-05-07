@@ -51,6 +51,7 @@ public class Game extends EmailTransportBase implements Serializable
 	private ArrayList<Ship> ships;
 	private Hashtable<Integer,ArrayList<Move>> moves;
 	private UUID[] playerReferenceCodes;
+	private Hashtable<ShipType, Integer> editorPrices;
 	private Hashtable<String,Mine> mines;
 	private String emailAddressGameHost;
 	
@@ -72,8 +73,6 @@ public class Game extends EmailTransportBase implements Serializable
 	transient private Hashtable<String,Integer> mapPlanetNameToIndex;
 	transient private Hashtable<String,Integer> planetsByPosition;
 	transient private int[] planetIndicesSorted;
-	transient static Hashtable<ShipType, Integer> editorPricesBuy;
-	transient static Hashtable<ShipType, Integer> editorPricesSell;
 	
 	transient private boolean goToReplay;
 	
@@ -83,29 +82,6 @@ public class Game extends EmailTransportBase implements Serializable
 	transient private ShipTravelTime[][] distanceMatrix;
 	transient private int[][] distanceMatrixYears;
 	
-	static {
-		editorPricesBuy = new Hashtable<ShipType, Integer>();
-		
-		editorPricesBuy.put(ShipType.SCOUT, Constants.PRICE_SCOUT);
-		editorPricesBuy.put(ShipType.MONEY_PRODUCTION, Constants.PRICE_MONEY_PRODUCTION_INCREASE);
-		editorPricesBuy.put(ShipType.FIGHTER_PRODUCTION, Constants.PRICE_FIGHTER_PRODUCTION);
-		editorPricesBuy.put(ShipType.DEFENCE_SHIELD, Constants.PRICE_DEFENSE_SHIELD);
-		editorPricesBuy.put(ShipType.DEFENCE_SHIELD_REPAIR, Constants.PRICE_DEFENSE_SHIELD_REPAIR);
-		editorPricesBuy.put(ShipType.MINE50, Constants.PRICE_MINE50);
-		editorPricesBuy.put(ShipType.MINE100, Constants.PRICE_MINE100);
-		editorPricesBuy.put(ShipType.MINE250, Constants.PRICE_MINE250);
-		editorPricesBuy.put(ShipType.MINE500, Constants.PRICE_MINE500);
-		editorPricesBuy.put(ShipType.MINESWEEPER, Constants.PRICE_MINENSWEEPER);
-		editorPricesBuy.put(ShipType.PATROL, Constants.PRICE_PATROL);
-		editorPricesBuy.put(ShipType.TRANSPORT, Constants.PRICE_TRANSPORT);
-		
-		editorPricesSell = new Hashtable<ShipType, Integer>();
-		
-		for (ShipType typ: editorPricesBuy.keySet())
-			editorPricesSell.put(typ, 
-					Utils.round((double)editorPricesBuy.get(typ) * Constants.PRICE_RATIO_BUY_SELL));
-		
-	}
 	protected Game() {}
 	
 	@SuppressWarnings("unchecked")
@@ -1226,6 +1202,42 @@ public class Game extends EmailTransportBase implements Serializable
 		
 		for (int playerIndex = 0; playerIndex < this.playersCount; playerIndex++)
 			this.playerReferenceCodes[playerIndex] = UUID.randomUUID();
+		
+		this.editorPrices = new Hashtable<ShipType, Integer>();
+		
+		this.prepareYearSetPrice(ShipType.SCOUT);
+		this.prepareYearSetPrice(ShipType.MONEY_PRODUCTION);
+		this.prepareYearSetPrice(ShipType.FIGHTER_PRODUCTION);
+		this.prepareYearSetPrice(ShipType.DEFENCE_SHIELD);
+		this.prepareYearSetPrice(ShipType.DEFENCE_SHIELD_REPAIR);
+		this.prepareYearSetPrice(ShipType.MINE50);
+		this.prepareYearSetPrice(ShipType.MINE100);
+		this.prepareYearSetPrice(ShipType.MINE250);
+		this.prepareYearSetPrice(ShipType.MINE500);
+		this.prepareYearSetPrice(ShipType.MINESWEEPER);
+		this.prepareYearSetPrice(ShipType.PATROL);
+		this.prepareYearSetPrice(ShipType.TRANSPORT);
+	}
+	
+	private void prepareYearSetPrice(ShipType shipType)
+	{
+		int price = Utils.getRandomInteger((int)(
+				Constants.PRICES_MIN_MAX.get(shipType).y - 
+				Constants.PRICES_MIN_MAX.get(shipType).x + 1)) + 
+				(int)Constants.PRICES_MIN_MAX.get(shipType).x;
+		
+		this.editorPrices.put(shipType, price);
+
+	}
+	
+	private int getPriceBuy(ShipType shipType)
+	{
+		return this.editorPrices.get(shipType);
+	}
+	
+	private int getPriceSell(ShipType shipType)
+	{
+		return (int)Math.round((double)this.getPriceBuy(shipType) * Constants.PRICE_RATIO_BUY_SELL);
 	}
 		
 	private void updateBoard()
@@ -3854,6 +3866,8 @@ public class Game extends EmailTransportBase implements Serializable
  	private class PlanetEditor
  	{
  		private ArrayList<ShipType> itemSequence;
+ 		private Hashtable<ShipType, Integer> pricesBuy = new Hashtable<ShipType, Integer>();
+		private Hashtable<ShipType, Integer> pricesSell = new Hashtable<ShipType, Integer>();
  		private Game game;
  		private boolean readOnly;
  		
@@ -3885,6 +3899,12 @@ public class Game extends EmailTransportBase implements Serializable
  			this.itemSequence.add(ShipType.MINE500);
 
 			int lineIndex = 1;
+			
+ 			for (ShipType shipType: this.game.editorPrices.keySet())
+ 			{
+ 				pricesBuy.put(shipType, this.game.getPriceBuy(shipType));
+ 				pricesSell.put(shipType, this.game.getPriceSell(shipType));
+ 			}
 			
 			Planet planet = (Planet)Utils.klon(game.planets[planetIndex]);
 			
@@ -3983,7 +4003,7 @@ public class Game extends EmailTransportBase implements Serializable
  			if (itemType == ShipType.MONEY_PRODUCTION)
  			{
  				if (buy)
- 					planet.buyMoneyProduction(Game.editorPricesBuy.get(ShipType.MONEY_PRODUCTION));
+ 					planet.buyMoneyProduction(this.game.getPriceBuy(ShipType.MONEY_PRODUCTION));
  			}
  			else if (itemType == ShipType.FIGHTER_PRODUCTION)
  			{
@@ -3995,22 +4015,23 @@ public class Game extends EmailTransportBase implements Serializable
  			else if (itemType == ShipType.DEFENCE_SHIELD)
  			{
  				if (buy)
- 					planet.buyDefenceShield(Game.editorPricesBuy.get(itemType));				
+ 					planet.buyDefenceShield(this.game.getPriceBuy(itemType));				
  				else
  					planet.sellDefenceShield(Utils.round((double)(
- 							Game.editorPricesSell.get(itemType) * planet.getDefenceShieldStateFactor())));
+ 							this.game.getPriceSell(itemType) * planet.getDefenceShieldStateFactor())));
  			}
  			else if (itemType == ShipType.DEFENCE_SHIELD_REPAIR)
  			{
  				if (buy && planet.getDefenceShieldFactor() > 0 && !planet.isDefenceShieldComplete())
- 					planet.repairDefenceShield(Constants.PRICE_DEFENSE_SHIELD_REPAIR * planet.getDefenceShieldFactor());
+ 					planet.repairDefenceShield(
+ 							this.game.getPriceBuy(ShipType.DEFENCE_SHIELD_REPAIR) * planet.getDefenceShieldFactor());
  			}
  			else
  			{
  				if (buy)
- 					planet.buyShip(itemType, 1, Game.editorPricesBuy.get(itemType));
+ 					planet.buyShip(itemType, 1, this.game.getPriceBuy(itemType));
  				else
- 					planet.sellShip(itemType, Game.editorPricesSell.get(itemType));
+ 					planet.sellShip(itemType, this.game.getPriceSell(itemType));
  			}
  		}
  		
@@ -4064,7 +4085,7 @@ public class Game extends EmailTransportBase implements Serializable
  					buyImpossible.add(itemType);
  				else if (itemType == ShipType.DEFENCE_SHIELD && count >= Constants.DEFENSE_SHIELDS_COUNT_MAX)
  					buyImpossible.add(itemType);
- 				else if (Game.editorPricesBuy.get(itemType) > moneySupply)
+ 				else if (this.game.getPriceBuy(itemType) > moneySupply)
  					buyImpossible.add(itemType);
  				
  				if (count < 1)
@@ -4080,11 +4101,12 @@ public class Game extends EmailTransportBase implements Serializable
  					new ScreenContentPlanetEditor(
  						this.itemSequence.get(lineIndex),
  						ships,
+ 						this.pricesBuy,
+ 						this.pricesSell,
  						buyImpossible,
  						sellImpossible,
  						colorIndex,
  						planet.getMoneySupply(),
- 						this.game.isHomePlanet(planetIndex),
  						this.readOnly));
  			
  			this.game.gameThread.updateDisplay(this.game.screenContent);
