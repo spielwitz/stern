@@ -14,21 +14,25 @@ Michael Schweitzer
 
 ![STERN](sternEN.png)
 
-STERN is a multiplayer game, similar to the board game "Risk". Players control planets, and attempt to take over the galaxy by sending spaceships to other planets. At the end of the game, the player with the most planets wins.
+Space, a final frontier. Conquer as many planets as possible with your spaceships. The player with the most planets wins the game.
 
-The game is turn based. When it is your turn, enter where you want to send your spaceships. You can enter multiple moves per round. When you have entered all the moves for a round, pass on to the next player. When all moves have been entered, the computer will move the spaceships.
+STERN works like a turn-based board game: two to six players enter their moves. Then the computer evaluates the moves and moves the spaceships, whereupon the next round begins.
 
-If you have ever played "Risk", you know how intense such a game can be. STERN is so addictive, not because of its spectacular graphics and sound effects - in fact, there are none at all - but because it requires strategic decisions and diplomatic actions among the players. So invite some friends over give this game a good try. For a game with 30 rounds, you should calculate about three days with four hours per day.
+Strategic thinking, communication between the players, diplomacy and negotiating skills are required. And a little luck. That is why STERN unfolds its greatest appeal in a sociable group of four players or more. There are no computer opponents, nor are there any sound or graphics effects.
 
-Don't first-try this game with fewer than three players. If you do, you won't understand why it is any good. A great game takes four to six players with at least 28 planets.
+The STERN space is a grid of square sectors. In some sectors there are planets that have to be conquered and defended. As you send ships from planet to planet, they will fly at constant speed in a straight line from the center of the starting sector to the center of the target sector.
 
-In addition to the classic "hot seat" mode, STERN can also be played via e-mail or hosted on a server, so that the players do not necessarily have to gather around a single computer.
+Planets produce money every year, simply called $ in STERN. New fighters, scouts, patrols, transporters, minelayers, minesweepers and defense shields are created from the $ produced. And finally, you can use $ to increase the $ production of planets.
 
-But the best thing is still the classic game variant, which has been around since 1989: Sit with your friends on a large couch in front of a large screen or projector, serve chips and unhealthy drinks, switch off all devices that didn't exist in the 80s and have a good time together.
+Fight alone or make alliances with your fellow players to defend or attack planets together.
 
-For me, STERN is a hobby to try out programming techniques in my spare time and to imitate the lifecycle management of a very important open source software. I am realistic enough not to believe that STERN will be in the top 10 major game rankings. For me, STERN is a learning project that has been going on for over 30 years. Perhaps there is some intelligent life form in the vastness of the universe that shares the joy of STERN with me. If so: Please drop me a message!
+You can play STERN in different ways:
 
-Have fun playing!
+* In "Hot Seat" mode, the players sit at a computer and enter their moves one after the other. A large second monitor or projector is recommended for this mode.
+
+* In an email game, players enter their moves on their computers and email them to the game host.
+
+* As a server game: Set up your own STERN server on which the games are hosted. The players enter their moves on their own computers and send them to the server, which carries out the annual evaluations. You can use it to host a "LAN party" or enable players from all over the world to take part in a STERN game.
 
 ## Built With
 

@@ -89,8 +89,8 @@ public class Constants
 	{
 		PRICES_MIN_MAX = new Hashtable<ShipType, Point>();
 		
-		PRICES_MIN_MAX.put(ShipType.DEFENCE_SHIELD, new Point(60, 90));
-		PRICES_MIN_MAX.put(ShipType.DEFENCE_SHIELD_REPAIR, new Point(1, 1));
+		PRICES_MIN_MAX.put(ShipType.DEFENSE_SHIELD, new Point(60, 90));
+		PRICES_MIN_MAX.put(ShipType.DEFENSE_SHIELD_REPAIR, new Point(1, 1));
 		PRICES_MIN_MAX.put(ShipType.MONEY_PRODUCTION, new Point(60, 90));
 		PRICES_MIN_MAX.put(ShipType.FIGHTER_PRODUCTION, new Point(0, 0));
 		

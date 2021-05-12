@@ -26,14 +26,14 @@ import java.util.Hashtable;
 	private Alliance alliance;
 	private Hashtable<ShipType,Integer> ships;
 	private int owner;
-	private DefenceShield defenceShield;
+	private DefenseShield defenceShield;
 	private int moneySupply;
 	private int moneyProduction;
 	private int fighterProduction;
 	private HashSet<Integer> radioStationsByPlayer;
 	
 	Planet(Point position, Alliance alliance,
-			Hashtable<ShipType, Integer> ships, int owner, DefenceShield defenceShield,
+			Hashtable<ShipType, Integer> ships, int owner, DefenseShield defenseShield,
 			int moneySupply, int moneyProduction, int fighterProduction)
 	{
 		super();
@@ -41,7 +41,7 @@ import java.util.Hashtable;
 		this.alliance = alliance;
 		this.ships = ships;
 		this.owner = owner;
-		this.defenceShield = defenceShield;
+		this.defenceShield = defenseShield;
 		this.moneySupply = moneySupply;
 		this.moneyProduction = moneyProduction;
 		this.fighterProduction = fighterProduction;
@@ -136,7 +136,7 @@ import java.util.Hashtable;
 		this.fighterProduction = fighterProduction;
 	}
 	
-	public int getDefenceShieldFightersCount()
+	public int getDefenseShieldFightersCount()
 	{
 		if (this.defenceShield == null)
 			return 0;
@@ -144,7 +144,7 @@ import java.util.Hashtable;
 			return this.defenceShield.getFightersCount();
 	}
 	
-	public int getDefenceShieldFactor()
+	public int getDefenseShieldFactor()
 	{
 		if (this.defenceShield == null)
 			return 0;
@@ -225,12 +225,12 @@ import java.util.Hashtable;
 		}
 	}
 	
-	void buyDefenceShield(int price)
+	void buyDefenseShield(int price)
 	{
-		if (this.moneySupply >= price && this.getDefenceShieldFactor() < Constants.DEFENSE_SHIELDS_COUNT_MAX)
+		if (this.moneySupply >= price && this.getDefenseShieldFactor() < Constants.DEFENSE_SHIELDS_COUNT_MAX)
 		{
 			if (this.defenceShield == null)
-				this.defenceShield = new DefenceShield();
+				this.defenceShield = new DefenseShield();
 			else
 				this.defenceShield.add();
 			
@@ -238,7 +238,7 @@ import java.util.Hashtable;
 		}
 	}
 	
-	void sellDefenceShield(int price)
+	void sellDefenseShield(int price)
 	{
 		if (this.defenceShield != null)
 		{
@@ -256,7 +256,7 @@ import java.util.Hashtable;
 		}
 	}
 	
-	void repairDefenceShield(int price)
+	void repairDefenseShield(int price)
 	{
 		if (this.moneySupply >= price && this.defenceShield != null && !this.defenceShield.isComplete())
 		{
@@ -265,7 +265,7 @@ import java.util.Hashtable;
 		}
 	}
 	
-	boolean isDefenceShieldComplete()
+	boolean isDefenseShieldComplete()
 	{
 		if (this.defenceShield == null)
 			return true;
@@ -273,7 +273,7 @@ import java.util.Hashtable;
 			return this.defenceShield.isComplete();
 	}
 	
-	double getDefenceShieldStateFactor()
+	double getDefenseShieldStateFactor()
 	{
 		if (this.defenceShield == null)
 			return 0;
@@ -281,7 +281,7 @@ import java.util.Hashtable;
 			return this.defenceShield.getStateFactor();
 	}
 	
-	void setDefenceShieldFightersCount(int fightersCount)
+	void setDefenseShieldFightersCount(int fightersCount)
 	{
 		if (this.defenceShield != null)
 			this.defenceShield.setFightersCount(fightersCount);
@@ -400,7 +400,7 @@ import java.util.Hashtable;
 			
 	}
 	
-	void deleteDefenceShield()
+	void deleteDefenseShield()
 	{
 		this.defenceShield = null;
 	}

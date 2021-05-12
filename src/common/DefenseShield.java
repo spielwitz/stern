@@ -19,12 +19,12 @@ package common;
 import java.io.Serializable;
 
 @SuppressWarnings("serial") 
-class DefenceShield implements Serializable
+class DefenseShield implements Serializable
 {
 	private int factor;
 	private int fightersCount;
 	
-	DefenceShield()
+	DefenseShield()
 	{
 		this.factor = 0;
 		this.fightersCount = 0;
@@ -101,20 +101,20 @@ class DefenceShield implements Serializable
 			return 0;
 	}
 	
-	static DefenceShield migrate(int factor, int intactPercent)
+	static DefenseShield migrate(int factor, int intactPercent)
 	{
-		DefenceShield defenceShield = new DefenceShield();
-		defenceShield.factor = factor;
+		DefenseShield defenseShield = new DefenseShield();
+		defenseShield.factor = factor;
 		
 		if (intactPercent >= 0)
 		{
-			defenceShield.fightersCount = Utils.round(
+			defenseShield.fightersCount = Utils.round(
 					(double)Constants.DEFENSE_SHIELD_FIGHTERS * 
-					(double)defenceShield.factor *
+					(double)defenseShield.factor *
 					(double)intactPercent / (double)100);
 			
 		}
 		
-		return defenceShield;
+		return defenseShield;
 	}
 }
