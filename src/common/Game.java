@@ -651,8 +651,8 @@ public class Game extends EmailTransportBase implements Serializable
 					moneyProduction += (Utils.getRandomInteger(Constants.MONEY_PRODUCTION_INITIAL_NEUTRAL_EXTRA)+1);
 			}
 			
-			DefenceShield defenceShield = isPlanetHome ? 
-									new DefenceShield() :
+			DefenseShield defenseShield = isPlanetHome ? 
+									new DefenseShield() :
 									null;
 									
 	        Hashtable<ShipType, Integer> ships = new Hashtable<ShipType, Integer>();
@@ -669,7 +669,7 @@ public class Game extends EmailTransportBase implements Serializable
 										null,
 										ships,
 										owner, 
-										defenceShield,
+										defenseShield,
 										moneySupply,
 										moneyProduction,
 										moneyProduction);
@@ -1208,8 +1208,8 @@ public class Game extends EmailTransportBase implements Serializable
 		this.prepareYearSetPrice(ShipType.SCOUT);
 		this.prepareYearSetPrice(ShipType.MONEY_PRODUCTION);
 		this.prepareYearSetPrice(ShipType.FIGHTER_PRODUCTION);
-		this.prepareYearSetPrice(ShipType.DEFENCE_SHIELD);
-		this.prepareYearSetPrice(ShipType.DEFENCE_SHIELD_REPAIR);
+		this.prepareYearSetPrice(ShipType.DEFENSE_SHIELD);
+		this.prepareYearSetPrice(ShipType.DEFENSE_SHIELD_REPAIR);
 		this.prepareYearSetPrice(ShipType.MINE50);
 		this.prepareYearSetPrice(ShipType.MINE100);
 		this.prepareYearSetPrice(ShipType.MINE250);
@@ -1498,13 +1498,13 @@ public class Game extends EmailTransportBase implements Serializable
 				{
 					shipCount = "?";
 				}
-				else if (shipTypeDisplay == ShipType.DEFENCE_SHIELD)
+				else if (shipTypeDisplay == ShipType.DEFENSE_SHIELD)
 				{
-					if (planet.getDefenceShieldFactor() > 0)
+					if (planet.getDefenseShieldFactor() > 0)
 					{
-						shipCount = planet.getDefenceShieldFactor() +
+						shipCount = planet.getDefenseShieldFactor() +
 								    "/" +
-								    planet.getDefenceShieldFightersCount();
+								    planet.getDefenseShieldFightersCount();
 					}
 					else
 					{
@@ -1575,8 +1575,8 @@ public class Game extends EmailTransportBase implements Serializable
 		case MINESWEEPER:
 			title = SternResources.PlanetListTitleMinesweepers(true);
 			break;
-		case DEFENCE_SHIELD:
-			title = SternResources.PlanetListTitleDefenceShields(true);
+		case DEFENSE_SHIELD:
+			title = SternResources.PlanetListTitleDefenseShields(true);
 			break;
 		case ALLIANCES:
 			title = SternResources.PlanetListTitleAlliances(true);
@@ -1947,11 +1947,11 @@ public class Game extends EmailTransportBase implements Serializable
 				short owner = (short)(this.inasc() - 1);
 				
 				short defenseShielCount = this.inasc();
-				DefenceShield defenceShield = null;
+				DefenseShield defenseShield = null;
 				if (defenseShielCount > 0)
 				{
 					short intactPercent = this.inasc();
-					defenceShield = DefenceShield.migrate(defenseShielCount, intactPercent);
+					defenseShield = DefenseShield.migrate(defenseShielCount, intactPercent);
 				}
 				
 				short moneySupply = this.inmki();
@@ -1985,7 +1985,7 @@ public class Game extends EmailTransportBase implements Serializable
 			    				alliance, 
 			    				ships, 
 			    				owner, 
-			    				defenceShield, 
+			    				defenseShield, 
 			    				moneySupply, 
 			    				moneyProduction, 
 			    				fighterProduction);
@@ -3570,7 +3570,7 @@ public class Game extends EmailTransportBase implements Serializable
  			this.planetListShipTypeOrdinal = (this.planetListShipTypeOrdinal + 1) % shipTypes.length;
  			
  			if (shipTypes[this.planetListShipTypeOrdinal] == ShipType.CAPITULATION ||
- 				shipTypes[this.planetListShipTypeOrdinal] == ShipType.DEFENCE_SHIELD_REPAIR)
+ 				shipTypes[this.planetListShipTypeOrdinal] == ShipType.DEFENSE_SHIELD_REPAIR)
  			{
  				this.togglePlanetListShipType();
  			}
@@ -3885,8 +3885,8 @@ public class Game extends EmailTransportBase implements Serializable
  			
  			this.itemSequence.add(ShipType.MONEY_PRODUCTION);
  			this.itemSequence.add(ShipType.FIGHTER_PRODUCTION);
- 			this.itemSequence.add(ShipType.DEFENCE_SHIELD);
- 			this.itemSequence.add(ShipType.DEFENCE_SHIELD_REPAIR);
+ 			this.itemSequence.add(ShipType.DEFENSE_SHIELD);
+ 			this.itemSequence.add(ShipType.DEFENSE_SHIELD_REPAIR);
 			
  			this.itemSequence.add(ShipType.SCOUT);
  			this.itemSequence.add(ShipType.TRANSPORT);
@@ -4012,19 +4012,19 @@ public class Game extends EmailTransportBase implements Serializable
  				else
  					planet.decrementFighterProduction();
  			}
- 			else if (itemType == ShipType.DEFENCE_SHIELD)
+ 			else if (itemType == ShipType.DEFENSE_SHIELD)
  			{
  				if (buy)
- 					planet.buyDefenceShield(this.game.getPriceBuy(itemType));				
+ 					planet.buyDefenseShield(this.game.getPriceBuy(itemType));				
  				else
- 					planet.sellDefenceShield(Utils.round((double)(
- 							this.game.getPriceSell(itemType) * planet.getDefenceShieldStateFactor())));
+ 					planet.sellDefenseShield(Utils.round((double)(
+ 							this.game.getPriceSell(itemType) * planet.getDefenseShieldStateFactor())));
  			}
- 			else if (itemType == ShipType.DEFENCE_SHIELD_REPAIR)
+ 			else if (itemType == ShipType.DEFENSE_SHIELD_REPAIR)
  			{
- 				if (buy && planet.getDefenceShieldFactor() > 0 && !planet.isDefenceShieldComplete())
- 					planet.repairDefenceShield(
- 							this.game.getPriceBuy(ShipType.DEFENCE_SHIELD_REPAIR) * planet.getDefenceShieldFactor());
+ 				if (buy && planet.getDefenseShieldFactor() > 0 && !planet.isDefenseShieldComplete())
+ 					planet.repairDefenseShield(
+ 							this.game.getPriceBuy(ShipType.DEFENSE_SHIELD_REPAIR) * planet.getDefenseShieldFactor());
  			}
  			else
  			{
@@ -4058,14 +4058,14 @@ public class Game extends EmailTransportBase implements Serializable
  					count = planet.getFighterProduction();
  					countString = Integer.toString(count);
  				}
- 				else if (itemType == ShipType.DEFENCE_SHIELD)
+ 				else if (itemType == ShipType.DEFENSE_SHIELD)
  				{
- 					count = planet.getDefenceShieldFactor();
+ 					count = planet.getDefenseShieldFactor();
  					countString = Utils.convertToString(count);
  				}
- 				else if (itemType == ShipType.DEFENCE_SHIELD_REPAIR)
+ 				else if (itemType == ShipType.DEFENSE_SHIELD_REPAIR)
  				{
- 					count = planet.getDefenceShieldFightersCount();
+ 					count = planet.getDefenseShieldFightersCount();
  					countString = Utils.convertToString(count);
  				}
  				else
@@ -4076,14 +4076,14 @@ public class Game extends EmailTransportBase implements Serializable
  				
  				ships.put(itemType, countString);
  				
- 				if (itemType == ShipType.DEFENCE_SHIELD_REPAIR)
+ 				if (itemType == ShipType.DEFENSE_SHIELD_REPAIR)
  				{
- 					if (planet.getDefenceShieldFactor() == 0 || (planet.getDefenceShieldFactor() > 0 && planet.isDefenceShieldComplete()))
+ 					if (planet.getDefenseShieldFactor() == 0 || (planet.getDefenseShieldFactor() > 0 && planet.isDefenseShieldComplete()))
  						buyImpossible.add(itemType);
  				}
  				else if (itemType == ShipType.MONEY_PRODUCTION && planet.getMoneyProduction() >= Constants.MONEY_PRODUCTION_MAX)
  					buyImpossible.add(itemType);
- 				else if (itemType == ShipType.DEFENCE_SHIELD && count >= Constants.DEFENSE_SHIELDS_COUNT_MAX)
+ 				else if (itemType == ShipType.DEFENSE_SHIELD && count >= Constants.DEFENSE_SHIELDS_COUNT_MAX)
  					buyImpossible.add(itemType);
  				else if (this.game.getPriceBuy(itemType) > moneySupply)
  					buyImpossible.add(itemType);
@@ -5555,25 +5555,25 @@ public class Game extends EmailTransportBase implements Serializable
 			this.game.console.lineBreak();
 			this.game.console.setLineColor(Colors.WHITE);
 
-			int defenceShieldFightersCount = planet.getDefenceShieldFightersCount();
+			int defenseShieldFightersCount = planet.getDefenseShieldFightersCount();
 			
-			if (defenceShieldFightersCount > 0)
+			if (defenseShieldFightersCount > 0)
 			{
-				fightStruct.defenderCount = defenceShieldFightersCount;
-				fightStruct.defenceShieldExists = true;
+				fightStruct.defenderCount = defenseShieldFightersCount;
+				fightStruct.defenseShieldExists = true;
 				
 				this.fight(fightStruct);
 				
 				if (fightStruct.defenderCount == 0)
 				{
-					planet.deleteDefenceShield();
+					planet.deleteDefenseShield();
 				}
 				else
 				{
 					if (fightStruct.defenderCount <= 0)
-						planet.deleteDefenceShield();
+						planet.deleteDefenseShield();
 					else
-						planet.setDefenceShieldFightersCount(fightStruct.defenderCount);
+						planet.setDefenseShieldFightersCount(fightStruct.defenderCount);
 					
 				}
 				
@@ -5587,7 +5587,7 @@ public class Game extends EmailTransportBase implements Serializable
 
 			if (fightStruct.offenderCount > 0)
 			{			
-				fightStruct.defenceShieldExists = false;
+				fightStruct.defenseShieldExists = false;
 				
 				fightStruct.defenderCount = planet.getShipsCount(ShipType.FIGHTERS);
 				
@@ -5635,7 +5635,7 @@ public class Game extends EmailTransportBase implements Serializable
   			
 			do
 			{
-				if (fightStruct.defenceShieldExists)
+				if (fightStruct.defenseShieldExists)
 	  			{
 		  			this.game.console.appendText(
 							SternResources.AuswertungAngriffAngreiferFestung(
@@ -5686,7 +5686,7 @@ public class Game extends EmailTransportBase implements Serializable
   		{
   			public int offenderCount;
   			public int defenderCount;
-  			public boolean defenceShieldExists;
+  			public boolean defenseShieldExists;
   		}
   		
   		private void placeMine(Ship obj)
@@ -5935,7 +5935,7 @@ public class Game extends EmailTransportBase implements Serializable
  				if (inputString.equals("1"))
  					this.moneyProduction();
  				else if (inputString.equals("2"))
- 					this.defenceShields();
+ 					this.defenseShields();
  				else if (inputString.equals("3"))
  					this.radioStations();
  				else if (inputString.equals("4"))
@@ -6116,7 +6116,7 @@ public class Game extends EmailTransportBase implements Serializable
  			this.game.console.waitForKeyPressed();
  		}
  		
- 		private void defenceShields()
+ 		private void defenseShields()
  		{
  			this.game.console.setHeaderText(this.game.mainMenuGetYearDisplayText() + " -> "+SternResources.Spielinformationen(true)+" -> "+SternResources.SpielinformationenFestungenTitel(true), Colors.NEUTRAL);
  			
@@ -6129,7 +6129,7 @@ public class Game extends EmailTransportBase implements Serializable
  				
  				ArrayList<Byte> frameCols = new ArrayList<Byte>();
  				
- 				for (int i = 0; i < this.game.planets[planetIndex].getDefenceShieldFactor(); i++)
+ 				for (int i = 0; i < this.game.planets[planetIndex].getDefenseShieldFactor(); i++)
  					frameCols.add(Colors.WHITE);
  						
  				if (frameCols.size() > 0)
@@ -6162,7 +6162,7 @@ public class Game extends EmailTransportBase implements Serializable
  					int planetIndex = getPlanetsSorted()[index];
  					
  					if (this.game.planets[planetIndex].getOwner() != playerIndex ||
- 						this.game.planets[planetIndex].getDefenceShieldFactor() == 0)
+ 						this.game.planets[planetIndex].getDefenseShieldFactor() == 0)
  						continue;
  					
  					String playerName = (playerIndex == Constants.NEUTRAL) ?
@@ -6182,10 +6182,10 @@ public class Game extends EmailTransportBase implements Serializable
  					}
  					
  					String planetName = " " + this.game.getPlanetNameFromIndex(planetIndex);
- 					String defenceShieldFightersCount = "     " + this.game.planets[planetIndex].getDefenceShieldFightersCount();
+ 					String defenseShieldFightersCount = "     " + this.game.planets[planetIndex].getDefenseShieldFightersCount();
  					text.add(planetName.substring(planetName.length()-2, planetName.length()) + 
  							":" +
- 							defenceShieldFightersCount.substring(defenceShieldFightersCount.length()-5, defenceShieldFightersCount.length()));
+ 							defenseShieldFightersCount.substring(defenseShieldFightersCount.length()-5, defenseShieldFightersCount.length()));
  					
  					textCol.add(colorIndex);
  				}
@@ -6193,7 +6193,7 @@ public class Game extends EmailTransportBase implements Serializable
  			
  			this.game.screenContent.setPlanets(
  					new ScreenContentPlanets(
- 							SternResources.PlanetListTitleDefenceShieldFighters(true),
+ 							SternResources.PlanetListTitleDefenseShieldFighters(true),
  							Colors.NEUTRAL,
  							text, 
  							textCol));
@@ -6809,8 +6809,8 @@ public class Game extends EmailTransportBase implements Serializable
   				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getMoneyProduction()) : "?");
   				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getFighterProduction()) : "?");
   				
-				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenceShieldFactor()) : "?");
-				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenceShieldFightersCount()) : "?");
+				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenseShieldFactor()) : "?");
+				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getDefenseShieldFightersCount()) : "?");
   				chapter.table.cells.add(Utils.convertToString(planet.getShipsCount(ShipType.FIGHTERS)));
   				
   				chapter.table.cells.add(playerIsOwner ? Utils.convertToString(planet.getShipsCount(ShipType.SCOUT)) : "?");

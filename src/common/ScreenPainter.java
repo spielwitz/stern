@@ -500,8 +500,8 @@ public class ScreenPainter
 		
 		this.drawPlanetEditorLine(ShipType.MONEY_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditEprodPlus4(false), 3);
 		this.drawPlanetEditorLine(ShipType.FIGHTER_PRODUCTION, screenContentPlanetEditor, SternResources.PlEditRaumerProd(false), 4);
-		this.drawPlanetEditorLine(ShipType.DEFENCE_SHIELD, screenContentPlanetEditor, SternResources.PlEditFestungen(false), 5);
-		this.drawPlanetEditorLine(ShipType.DEFENCE_SHIELD_REPAIR, screenContentPlanetEditor, 
+		this.drawPlanetEditorLine(ShipType.DEFENSE_SHIELD, screenContentPlanetEditor, SternResources.PlEditFestungen(false), 5);
+		this.drawPlanetEditorLine(ShipType.DEFENSE_SHIELD_REPAIR, screenContentPlanetEditor, 
 				SternResources.PlEditFestungRaumer(false, Integer.toString(Constants.DEFENSE_SHIELD_REPAIR_FIGHTERS_COUNT)), 6);
 		
 		this.drawPlanetEditorLine(ShipType.SCOUT, screenContentPlanetEditor, SternResources.AufklaererPlural(false), 8);
@@ -546,7 +546,7 @@ public class ScreenPainter
 		
 		this.drawPlanetEditorTextLeft(this.getPriceRangeString(type, false), PLANET_EDITOR_COLUMN2+9, line, Colors.get(Colors.NEUTRAL));
 		
-		if (type == ShipType.MONEY_PRODUCTION || type == ShipType.DEFENCE_SHIELD_REPAIR)
+		if (type == ShipType.MONEY_PRODUCTION || type == ShipType.DEFENSE_SHIELD_REPAIR)
 			return;
 		
 		colorIndex = screenContentPlanetEditor.getColorIndex();

@@ -553,7 +553,7 @@ public class SternResources
 		symbolDict.put("JH","EnterMovesPlanet_JH");
 		symbolDict.put("JI","Players_JI");
 		symbolDict.put("JJ","PlanetListTitleFighters_JJ");
-		symbolDict.put("JK","PlanetListTitleDefenceShieldFighters_JK");
+		symbolDict.put("JK","PlanetListTitleDefenseShieldFighters_JK");
 		symbolDict.put("JL","Evaluation_JL");
 		symbolDict.put("JM","EnterMovesOtherShips_JM");
 		symbolDict.put("JN","PlanetListTitleScouts_JN");
@@ -564,7 +564,7 @@ public class SternResources
 		symbolDict.put("JS","PlanetListTitleMine500_JS");
 		symbolDict.put("JT","PlanetListTitleTransport_JT");
 		symbolDict.put("JU","PlanetListTitleMinesweepers_JU");
-		symbolDict.put("JV","PlanetListTitleDefenceShields_JV");
+		symbolDict.put("JV","PlanetListTitleDefenseShields_JV");
 		symbolDict.put("JW","PlanetListTitleAlliances_JW");
 		symbolDict.put("JX","PlanetListTitleFighterProduction_JX");
 		symbolDict.put("JY","PlanetListTitleMoneyProduction_JY");
@@ -647,7 +647,7 @@ public class SternResources
 	}
 
 	/**
-	   * Attacker: {0}, Defence shield: {1} [07]
+	   * Attacker: {0}, Defense shield: {1} [07]
 	   */
 	public static String AuswertungAngriffAngreiferFestung(boolean symbol, String arg0, String arg1) {
 		return symbol ? "£07§"+arg0+"§"+arg1+"£":MessageFormat.format(messages.getString("AuswertungAngriffAngreiferFestung_07"), arg0, arg1);
@@ -1312,14 +1312,14 @@ public class SternResources
 	}
 
 	/**
-	   * Defence shield fighters (buy +{0}) [3F]
+	   * Defense shield fighters (buy +{0}) [3F]
 	   */
 	public static String PlEditFestungRaumer(boolean symbol, String arg0) {
 		return symbol ? "£3F§"+arg0+"£":MessageFormat.format(messages.getString("PlEditFestungRaumer_3F"), arg0);
 	}
 
 	/**
-	   * Defence shields [3G]
+	   * Defense shields [3G]
 	   */
 	public static String PlEditFestungen(boolean symbol) {
 		return symbol ? "£3G£":messages.getString("PlEditFestungen_3G");
@@ -1606,14 +1606,14 @@ public class SternResources
 	}
 
 	/**
-	   * Defence shields [4X]
+	   * Defense shields [4X]
 	   */
 	public static String SpielinformationenFestungen(boolean symbol) {
 		return symbol ? "£4X£":messages.getString("SpielinformationenFestungen_4X");
 	}
 
 	/**
-	   * Defence shields [4Y]
+	   * Defense shields [4Y]
 	   */
 	public static String SpielinformationenFestungenTitel(boolean symbol) {
 		return symbol ? "£4Y£":messages.getString("SpielinformationenFestungenTitel_4Y");
@@ -4210,10 +4210,10 @@ public class SternResources
 	}
 
 	/**
-	   * Defence shield fighters [JK]
+	   * Defense shield fighters [JK]
 	   */
-	public static String PlanetListTitleDefenceShieldFighters(boolean symbol) {
-		return symbol ? "£JK£":messages.getString("PlanetListTitleDefenceShieldFighters_JK");
+	public static String PlanetListTitleDefenseShieldFighters(boolean symbol) {
+		return symbol ? "£JK£":messages.getString("PlanetListTitleDefenseShieldFighters_JK");
 	}
 
 	/**
@@ -4287,10 +4287,10 @@ public class SternResources
 	}
 
 	/**
-	   * Defence shields [JV]
+	   * Defense shields [JV]
 	   */
-	public static String PlanetListTitleDefenceShields(boolean symbol) {
-		return symbol ? "£JV£":messages.getString("PlanetListTitleDefenceShields_JV");
+	public static String PlanetListTitleDefenseShields(boolean symbol) {
+		return symbol ? "£JV£":messages.getString("PlanetListTitleDefenseShields_JV");
 	}
 
 	/**

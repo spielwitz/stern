@@ -27,8 +27,8 @@ enum ShipType
 	MINE250,
 	MINE500,
 	MINESWEEPER,
-	DEFENCE_SHIELD, // Action types in the planet editor
-	DEFENCE_SHIELD_REPAIR,
+	DEFENSE_SHIELD, // Action types in the planet editor
+	DEFENSE_SHIELD_REPAIR,
 	FIGHTER_PRODUCTION,
 	MONEY_PRODUCTION,
 	MONEY_SUPPLY,
